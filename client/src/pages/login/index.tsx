@@ -114,7 +114,7 @@ const Login = () => {
     const checkLogin = (user: string, password: string) => {
         if (user === "admin" && password === "admin") {
             toast.success("Login Success")
-            navigate('/home')
+            // navigate('/home')
             return true;
         }
         toast.error("Login Fail")
