@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter, useRoutes } from 'react-router-dom'
 import routes from 'routes'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 
 const Main = () => {
@@ -14,6 +16,17 @@ const App = () => {
         <BrowserRouter>
             <Main />
         </BrowserRouter>
+        <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   )
 }
