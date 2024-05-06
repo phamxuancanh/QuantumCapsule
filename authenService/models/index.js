@@ -4,3 +4,23 @@ const Permission = require('./permission')
 const Role = require('./role')
 const RoleToPermission = require('./role_to_permission')
 const Route = require('./route')
+
+Role.hasMany(User, { foreignKey: 'roleId' })
+User.belongsTo(Role, { foreignKey: 'roleId' })
+
+RoleToPermission.belongsTo(Role, { foreignKey: 'roleId' })
+RoleToPermission.belongsTo(Permission, { foreignKey: 'permissionId' })
+
+Role.belongsToMany(Permission, { through: RoleToPermission, foreignKey: 'roleId' })
+Permission.belongsToMany(Role, { through: RoleToPermission, foreignKey: 'permissionId' })
+
+module.exports = {
+    sequelize,
+    models: {
+        User,
+        Permission,
+        Role,
+        RoleToPermission,
+        Route
+    }
+}

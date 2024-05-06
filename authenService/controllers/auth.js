@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt')
 const randToken = require('rand-token')
 const { errorLogger, infoLogger } = require('../logs/logger')
 
+const CryptoJS = require('crypto-js')
+
 const {
   SALT_KEY,
   generateToken,
@@ -81,8 +83,23 @@ router.post('/login', async (req, res) => {
     }
     const accessTokenLife = process.env.ACCESS_TOKEN_LIFE
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+
+    const getGroupWithRoles = async (user) => {
+      const roles = await models.Role.findOne({
+        where: { id: user.roleId },
+        attributes: ['id', 'name', 'description'],
+        include: {
+          model: models.Permission,
+          attributes: ['id', 'name', 'description', 'url', 'method'],
+          through: { attributes: [] }
+        }
+      })
+      return roles
+    }
+
     const dataForAccessToken = {
-      id: user.id
+      id: user.id,
+      GroupWithRoles: await getGroupWithRoles(user)
     }
     const accessToken = await generateToken(
       dataForAccessToken,
@@ -117,10 +134,14 @@ router.post('/login', async (req, res) => {
       method: 'POST',
       obj: { username }
     })
+
+    const encryptedGroupWithRoles = CryptoJS.AES.encrypt((dataForAccessToken.GroupWithRoles.description), 'Access_Token_Secret_#$%_ExpressJS_Authentication').toString()
+
     return res.json({
       accessToken,
       refreshToken,
-      username
+      username,
+      key: encryptedGroupWithRoles
     })
   } catch (error) {
     errorLogger.error({
