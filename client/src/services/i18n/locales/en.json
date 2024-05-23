@@ -1,0 +1,19 @@
+{
+    "translation": {
+        "welcome-to-react": "Hello",
+        "login": {
+            "title_signIn": "Login",
+            "title_signUp": "Sign Up",
+            "username": "Username",
+            "password": "Password",
+            "confirm_password": "Confirm password",
+            "submit_login": "Sign In",
+            "submit_signup": "Sign Up",
+            "forgot_password": "Forgot password?",
+            "username_not_empty": "Username is required",
+            "password_not_empty": "Password is required",
+            "confirm_password_must_match": "Confirm password must match",
+            "back": "Back"
+        }
+    }
+}

@@ -1,7 +1,4 @@
-const express = require('express')
 const { models } = require('../models')
-const { isAuthenticated } = require('../middlewares/authentication')
-const router = express.Router()
 const { infoLogger, errorLogger } = require('../logs/logger')
 
 const MASSAGE = {
@@ -35,7 +32,7 @@ function logError (req, error) {
     endpoint: req.path,
     request: request,
     error: error,
-    user: req.user.id
+    // user: req.user.id
   })
 }
 
@@ -47,12 +44,13 @@ function logInfo (req, response) {
     endpoint: req.path,
     request: request,
     response: response,
-    user: req.user.id
+    // user: req.user.id
   })
 }
 
 // get all permission
-router.get('/', isAuthenticated, async (req, res) => {
+const getAllPermissions = async (req, res) => {
+  console.log('run 53')
   try {
     const role = await models.Permission.findAll()
     logInfo(req, role)
@@ -61,9 +59,9 @@ router.get('/', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.PERMISSION_NOT_FOUND })
   }
-})
+}
 
-router.post('/', isAuthenticated, async (req, res) => {
+const createPermission = async (req, res) => {
   try {
     const { name, description, url, method } = req.body.data
     console.log('check data post server:___________ ', req.body.data)
@@ -107,9 +105,9 @@ router.post('/', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.NO_CREATE_PERMISSION })
   }
-})
+}
 
-router.put('/:id', isAuthenticated, async (req, res) => {
+const updatePermission = async (req, res) => {
   try {
     const { id } = req.params
     const { name, description, url, method } = req.body.data
@@ -177,9 +175,9 @@ router.put('/:id', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.NO_UPDATE_PERMISSION })
   }
-})
+}
 
-router.delete('/:id', isAuthenticated, async (req, res) => {
+const deletePermission = async (req, res) => {
   try {
     const { id } = req.params
     const permission = await models.Permission.findByPk(id)
@@ -195,9 +193,9 @@ router.delete('/:id', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.NO_DELETE_PERMISSION })
   }
-})
+}
 
-router.get('/by-role/:roleId', isAuthenticated, async (req, res) => {
+const getPermissionsByRole = async (req, res) => {
   try {
     const { roleId } = req.params
     const permissions = await models.Permission.findAll({
@@ -218,9 +216,9 @@ router.get('/by-role/:roleId', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.PERMISSION_NOT_FOUND })
   }
-})
+}
 
-router.post('/assign-to-role', isAuthenticated, async (req, res) => {
+const assignPermissionsToRole = async (req, res) => {
   try {
     const { roleId, permissionIds } = req.body.data
     if (!Array.isArray(permissionIds)) {
@@ -254,9 +252,9 @@ router.post('/assign-to-role', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.NO_ASSIGN_PERMISSION })
   }
-})
+}
 
-router.get('/pagination', isAuthenticated, async (req, res) => {
+const getPaginatedPermissions = async (req, res) => {
   try {
     const {
       page = '1',
@@ -305,9 +303,9 @@ router.get('/pagination', isAuthenticated, async (req, res) => {
     logError(req, error)
     res.status(500).json({ message: MASSAGE.PERMISSION_NOT_FOUND })
   }
-})
+}
 
-function applyNameSearch (searchCondition, data) {
+const applyNameSearch = (searchCondition, data) => {
   if (searchCondition) {
     data = data.filter(
       (d) => d.description?.toLowerCase()?.indexOf(searchCondition.toLowerCase()) >= 0
@@ -326,4 +324,12 @@ function getDataInWindowSize (size, page, data) {
   return data
 }
 
-module.exports = router
+module.exports = {
+  getAllPermissions,
+  createPermission,
+  updatePermission,
+  deletePermission,
+  getPermissionsByRole,
+  assignPermissionsToRole,
+  getPaginatedPermissions
+}
