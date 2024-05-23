@@ -22,7 +22,8 @@ import {
 import { FormProvider, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import getUnicodeFlagIcon from 'country-flag-icons/unicode'
-
+import GoogleIcon from '@mui/icons-material/Google'
+import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined'
 const theme = createTheme();
 
 const STATE_MACHINE_NAME = "Login Machine";
@@ -60,8 +61,8 @@ const Login = () => {
     }
     const languageOptions = useMemo(() => {
         return [
-          { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
-          { label: 'VN', value: 'vi', flag: getUnicodeFlagIcon('VN') }
+            { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
+            { label: 'VN', value: 'vi', flag: getUnicodeFlagIcon('VN') }
         ]
     }, [])
     const handleChange = useCallback(
@@ -82,7 +83,7 @@ const Login = () => {
                 password: method.getValues('password')
             })
             setCheck(true);
-            if(response) {
+            if (response) {
                 toast.success('Login success')
                 triggerSuccess()
                 const tokens = JSON.stringify(response.data)
@@ -197,7 +198,7 @@ const Login = () => {
                     ))}
                 </select>
                 <div className="flex content-center items-center">
-                    <RiveComponent style={{ width: '600px', height: '300px'}} />
+                    <RiveComponent style={{ width: '600px', height: '300px' }} />
                 </div>
                 <CssBaseline />
 
@@ -325,6 +326,19 @@ const Login = () => {
                                         sx={{ mt: 3, mb: 2 }}>
                                         {t('login.submit_signup')}
                                     </Button>
+                                    <div className="flex flex-col space-y-4">
+                                        <button
+                                            className="bg-blue-600 text-white p-2 rounded"
+                                        >
+                                            <GoogleIcon/>Login with Google
+                                        </button>
+
+                                        <button
+                                            className="bg-blue-800 text-white p-2 rounded"
+                                        >
+                                            <FacebookOutlinedIcon/>Login with Facebook
+                                        </button>
+                                    </div>
                                 </>
 
                             ) : (
@@ -361,6 +375,19 @@ const Login = () => {
                                     >
                                         {t('login.goToSignUp')}
                                     </Button>
+                                    <div className="flex flex-col space-y-4">
+                                        <button
+                                            className="bg-blue-600 text-white p-2 rounded"
+                                        >
+                                            <GoogleIcon/>Login with Google
+                                        </button>
+
+                                        <button
+                                            className="bg-blue-800 text-white p-2 rounded"
+                                        >
+                                            <FacebookOutlinedIcon/>Login with Facebook
+                                        </button>
+                                    </div>
                                 </>
                             )
                             }
