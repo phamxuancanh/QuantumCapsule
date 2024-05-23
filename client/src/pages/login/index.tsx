@@ -1,14 +1,9 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useRive, useStateMachineInput } from 'rive-react';
-import { useEffect, useState } from "react";
+import { useRive, useStateMachineInput } from 'rive-react'
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { setToLocalStorage } from "utils/functions";
@@ -26,18 +21,18 @@ import {
 } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 
 const theme = createTheme();
-
 
 const STATE_MACHINE_NAME = "Login Machine";
 const Login = () => {
     const navigate = useNavigate()
     const [type, setType] = useState<boolean>(false)
-    const [isSignUp, setIsSignUp] = useState<boolean>(true)
+    const [isSignUp, setIsSignUp] = useState<boolean>(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
-    const { t } = useTranslation()
-
+    const { t, i18n } = useTranslation()
+    const [selectedLanguage, setSelectedLanguage] = useState('en')
 
     const schema = useMemo(() => {
         const messUsername = t('login.username_not_empty')
@@ -63,19 +58,45 @@ const Login = () => {
     ) => {
         event.preventDefault()
     }
-
+    const languageOptions = useMemo(() => {
+        return [
+          { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
+          { label: 'VN', value: 'vi', flag: getUnicodeFlagIcon('VN') }
+        ]
+    }, [])
+    const handleChange = useCallback(
+        async (e: React.ChangeEvent<HTMLSelectElement>) => {
+            try {
+                await i18n.changeLanguage(e.target.value)
+                setSelectedLanguage(e.target.value)
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        [i18n]
+    )
     const handleLogin = useCallback(async () => {
         try {
             const response = await signIn({
                 username: method.getValues('username'),
                 password: method.getValues('password')
             })
-            const tokens = JSON.stringify(response.data)
-            setToLocalStorage('tokens', tokens)
-            navigate(ROUTES.home)
-            setErrorMessage('')
+            setCheck(true);
+            if(response) {
+                toast.success('Login success')
+                triggerSuccess()
+                const tokens = JSON.stringify(response.data)
+                setToLocalStorage('tokens', tokens)
+                navigate(ROUTES.home)
+            } else {
+                toast.error('Login failed')
+                triggerFail()
+                setErrorMessage('Login failed')
+            }
         } catch (error: { code: number, message: string } | any) {
             // eslint-disable-next-line no-console
+            triggerFail()
+            toast.error('Login failed')
             setErrorMessage(error?.message)
         }
     }, [method, navigate])
@@ -96,7 +117,6 @@ const Login = () => {
     // CON GAU, DONT CARE
     const [user, setUser] = useState('');
     const { rive, RiveComponent } = useRive({
-        // src: "520-990-teddy-login-screen.riv",
         src: "animated_login_character3.riv",
         autoplay: true,
         stateMachines: STATE_MACHINE_NAME,
@@ -166,16 +186,24 @@ const Login = () => {
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
-                <div className="text-2xl font-bold text-center">
+                <div className="text-2xl font-bold text-center mt-10">
                     {isSignUp ? t('login.title_signUp') : t('login.title_signIn')}
                 </div>
-                <CssBaseline />
-                <div >
-                    <RiveComponent style={{ width: '600px', height: '400px' }} />
+                <select className="w-full px-4 py-2 rounded-lg font-bold text-gray-700  border border-gray-300 focus:border-indigo-500 focus:outline-none shadow" onChange={handleChange}>
+                    {languageOptions.map((option, index) => (
+                        <option key={index} value={option.value} className='font-bold py-2'>
+                            {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
+                        </option>
+                    ))}
+                </select>
+                <div className="flex content-center items-center">
+                    <RiveComponent style={{ width: '600px', height: '300px'}} />
                 </div>
+                <CssBaseline />
+
                 <div>
                     <FormProvider {...method}>
-                        <form
+                        <form className="flex content-center items-center flex-col"
                             onSubmit={
                                 isSignUp
                                     ? method.handleSubmit(handleRegister)
@@ -188,7 +216,11 @@ const Login = () => {
                                 </InputLabel>
                                 <OutlinedInput
                                     {...method.register('username', { required: true })}
-                                    onChange={(e) => method.setValue('username', e.target.value)}
+                                    onFocus={() => setHangUp(false)}
+                                    onChange={(e) => {
+                                        method.setValue('username', e.target.value);
+                                        setUser(e.target.value);
+                                    }}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             <AccountCircle />
@@ -198,7 +230,7 @@ const Login = () => {
                                 />
                             </FormControl>
                             {(method.formState.errors.username != null) && (
-                                <div>
+                                <div className="mt-2 text-sm text-red-600">
                                     {method.formState.errors.username.message}
                                 </div>
                             )}
@@ -209,7 +241,10 @@ const Login = () => {
                                 <OutlinedInput
                                     type={type ? 'text' : 'password'}
                                     {...method.register('password', { required: true })}
-                                    onChange={(e) => method.setValue('password', e.target.value)}
+                                    onChange={(e) => {
+                                        method.setValue('password', e.target.value);
+                                        setHangUp(true);
+                                    }}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             <IconButton
@@ -224,8 +259,8 @@ const Login = () => {
                                     label={t('login.password')}
                                 />
                             </FormControl>
-                            {(method.formState.errors.password != null) && (
-                                <div>
+                            {method.formState.errors.password && (
+                                <div className="mt-2 text-sm text-red-600">
                                     {method.formState.errors.password.message}
                                 </div>
                             )}
@@ -240,9 +275,10 @@ const Login = () => {
                                                 required: isSignUp
                                             })}
                                             type={type ? 'text' : 'password'}
-                                            onChange={(e) =>
-                                                method.setValue('confirm_password', e.target.value)
-                                            }
+                                            onChange={(e) => {
+                                                method.setValue('confirm_password', e.target.value);
+                                                setHangUp(true);
+                                            }}
                                             endAdornment={
                                                 <InputAdornment position="end">
                                                     <IconButton
@@ -258,7 +294,7 @@ const Login = () => {
                                         />
                                     </FormControl>
                                     {(method.formState.errors.confirm_password != null) && (
-                                        <div>
+                                        <div className="mt-2 text-sm text-red-600">
                                             {method.formState.errors.confirm_password.message}
                                         </div>
                                     )}
@@ -278,7 +314,7 @@ const Login = () => {
                                         variant="contained"
                                         sx={{ mt: 3, mb: 2 }}
                                     >
-                                        Basck
+                                        {t('login.back')}
                                     </Button>
                                     <Button
                                         onMouseOver={() => setHangUp(false)}
@@ -287,7 +323,7 @@ const Login = () => {
                                         fullWidth
                                         variant="contained"
                                         sx={{ mt: 3, mb: 2 }}>
-                                        Sign Up
+                                        {t('login.submit_signup')}
                                     </Button>
                                 </>
 
@@ -301,7 +337,6 @@ const Login = () => {
                                         variant="contained"
                                         // onClick={() => {
 
-                                        //     setCheck(true);
                                         //     if (checkLogin(user, password)) {
                                         //         triggerSuccess()
                                         //     } else {
@@ -310,7 +345,7 @@ const Login = () => {
                                         // }}
                                         sx={{ mt: 3, mb: 2 }}
                                     >
-                                        Sign In
+                                        {t('login.submit_login')}
                                     </Button>
                                     <Button
                                         onMouseOver={() => setHangUp(false)}
@@ -324,12 +359,12 @@ const Login = () => {
                                         }}
                                         sx={{ mt: 3, mb: 2 }}
                                     >
-                                        di toi trang dki
+                                        {t('login.goToSignUp')}
                                     </Button>
                                 </>
                             )
                             }
-                            {errorMessage && <div>{errorMessage}</div>}
+                            {errorMessage && <div className="mt-2 text-sm text-red-600">{errorMessage}</div>}
                         </form>
                     </FormProvider>
                 </div>

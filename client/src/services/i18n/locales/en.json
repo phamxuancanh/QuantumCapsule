@@ -13,7 +13,9 @@
             "username_not_empty": "Username is required",
             "password_not_empty": "Password is required",
             "confirm_password_must_match": "Confirm password must match",
-            "back": "Back"
+            "back": "Back",
+            "goToSignUp": "Go to sign up page"
+
         }
     }
 }

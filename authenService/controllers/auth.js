@@ -6,6 +6,7 @@ const {
     signRefreshToken,
     verifyRefreshToken
 } = require('../middlewares/jwtService')
+
 const signIn = async (req, res, next) => {
     try {
         const { username, password } = req.body.data

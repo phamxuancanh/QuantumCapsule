@@ -13,7 +13,8 @@
             "username_not_empty": "Tên đăng nhập không được để trống",
             "password_not_empty": "Mật khẩu không được để trống",
             "confirm_password_must_match": "Mật khẩu xác nhận không khớp",
-            "back": "Trở về"
+            "back": "Trở về",
+            "goToSignUp": "Đi tới trang đăng ký"
         }
     }
 }
