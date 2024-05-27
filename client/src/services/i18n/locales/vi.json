@@ -1,0 +1,20 @@
+{
+    "translation": {
+        "welcome-to-react": "Xin chào",
+        "login": {
+            "title_signIn": "Đăng nhập",
+            "title_signUp": "Đăng ký",
+            "username": "Tên đăng nhập",
+            "password": "Mật khẩu",
+            "confirm_password": "Mật khẩu xác nhận",
+            "submit_login": "Đăng nhập",
+            "submit_signup": "Đăng ký",
+            "forgot_password": "Quên mật khẩu?",
+            "username_not_empty": "Tên đăng nhập không được để trống",
+            "password_not_empty": "Mật khẩu không được để trống",
+            "confirm_password_must_match": "Mật khẩu xác nhận không khớp",
+            "back": "Trở về",
+            "goToSignUp": "Đi tới trang đăng ký"
+        }
+    }
+}

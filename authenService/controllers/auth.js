@@ -1,204 +1,140 @@
-const express = require('express')
-const { models } = require('../models')
 const bcrypt = require('bcrypt')
-const randToken = require('rand-token')
-const { errorLogger, infoLogger } = require('../logs/logger')
-
+const { models } = require('../models')
+const client = require('../middlewares/connectRedis')
 const {
-  SALT_KEY,
-  generateToken,
-  REFRESH_TOKEN_SIZE,
-  decodeToken
-} = require('../utils')
+    signAccessToken,
+    signRefreshToken,
+    verifyRefreshToken
+} = require('../middlewares/jwtService')
 
-const router = express.Router()
-
-router.post('/register', async (req, res) => {
-  try {
-    const { username, password } = req.body.data
-    console.log(username)
-    const user = await models.User.findOne({
-      where: { username }
-    })
-
-    if (user) {
-      res.status(409).json({
-        code: 409,
-        message: 'Create new account failed.'
-      })
-    } else {
-      const hashPassword = bcrypt.hashSync(password, SALT_KEY)
-      const newUser = {
-        username,
-        password: hashPassword
-      }
-      const createdUser = await models.User.create(newUser)
-      if (!createdUser) {
-        return res.status(400).json({
-          code: 400,
-          message: 'Create new account failed.'
+const signIn = async (req, res, next) => {
+    try {
+        const { username, password } = req.body.data
+        const user = await models.User.findOne({
+            where: { username }
         })
-      }
-      return res.json({
-        username,
-        status: 'Register success!'
-      })
+        if (!user) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Username is not registered.'
+            })
+        }
+        const isPasswordValid = bcrypt.compareSync(password, user.password)
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Username or password is incorrect.'
+            })
+        }
+        
+        const accessToken = await signAccessToken(user.id);
+        const refreshToken = await signRefreshToken(user.id);
+
+        res.setHeader("authorization", accessToken);
+        res.setHeader("refreshToken", refreshToken);
+
+        return res
+            .status(200)
+            .json({ success: true, accessToken, refreshToken, user });
+    } catch (error) {
+        next(error);
     }
-  } catch (error) {
-    console.log(error)
-    res.json({ error })
-  }
-})
+}
+const signUp = async (req, res, next) => {
+    try {
+        const { username, password } = req.body.data
+        const user = await models.User.findOne({
+            where: { username }
+        })
+        if (user) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Username is already registered.'
+            })
+        }
+        const salt = await bcrypt.genSalt(10)
+        const hashPassword = bcrypt.hashSync(password, salt)
 
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body.data
-    const user = await models.User.findOne({
-      where: { username }
-    })
-    if (!user) {
-      errorLogger.error({
-        message: 'Login failed!',
-        path: '/login',
-        method: 'POST'
-      })
-      return res.status(401).json({
-        code: 401,
-        message: 'Login failed.'
-      })
+        const newUser = await models.User.create({
+            username,
+            password: hashPassword
+        })
+        return res.status(200).json({ success: true, user: newUser })
+    } catch (error) {
+        next(error)
     }
-    const isPasswordValid = bcrypt.compareSync(password, user.password)
-    if (!isPasswordValid) {
-      errorLogger.error({
-        message: 'Login failed!',
-        path: '/login',
-        method: 'POST'
-      })
-      return res.status(401).json({
-        code: 401,
-        message: 'Login failed.'
-      })
+}
+const refreshToken = async (req, res, next) => {
+    console.log('refreshToken')
+    try {
+        const { refreshToken } = req.body
+        if (!refreshToken) {
+            return res.status(403).json({ error: { message: 'Unauthorized' } })
+        }
+        const userId = await verifyRefreshToken(refreshToken)
+        const accessToken = await signAccessToken(userId)
+        const newRefreshToken = await signRefreshToken(userId)
+        res.setHeader('authorization', accessToken)
+        return res.status(200).json({ success: true, accessToken, newRefreshToken })
+    } catch (error) {
+        next(error)
     }
-    const accessTokenLife = process.env.ACCESS_TOKEN_LIFE
-    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
-    const dataForAccessToken = {
-      id: user.id
+}
+const signOut = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.body
+        if (!refreshToken) {
+            return res.status(403).json({ error: { message: 'Unauthorized' } })
+        }
+        const userId = await verifyRefreshToken(refreshToken)
+        client.del(userId.toString(), (err, val) => {
+            if (err) {
+                console.log(err)
+                return res.status(500).json({ error: { message: 'Internal Server Error' } })
+            }
+            return res.status(200).json({ success: true })
+        })
+    } catch (error) {
+        next(error)
     }
-    const accessToken = await generateToken(
-      dataForAccessToken,
-      accessTokenSecret,
-      accessTokenLife
-    )
-    console.log(accessToken)
-    if (!accessToken) {
-      errorLogger.error({
-        message: 'Create access token failed!',
-        path: '/login',
-        method: 'POST',
-        obj: { username }
-      })
-      return res
-        .status(401)
-        .json({ code: 401, message: 'Login failed.' })
+}
+const changePassword = async (req, res, next) => {
+    try {
+        const { username, oldPassword, newPassword, reNewPassword } = req.body
+        const user = await models.User.findOne({
+            where: { username }
+        })
+        if (!user) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Username is not registered.'
+            })
+        }
+        const isPasswordValid = bcrypt.compareSync(oldPassword, user.password)
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Old password is incorrect.'
+            })
+        }
+        if (newPassword !== reNewPassword) {
+            return res.status(400).json({
+                code: 400,
+                message: 'New password and re-entered password do not match.'
+            })
+        }
+        const salt = await bcrypt.genSalt(10)
+        const hashPassword = bcrypt.hashSync(newPassword, salt)
+        await user.update({ password: hashPassword })
+        return res.status(200).json({ success: true })
+    } catch (error) {
+        next(error)
     }
-
-    let refreshToken = randToken.generate(REFRESH_TOKEN_SIZE)
-    if (!user.refreshToken) {
-      user.set({
-        refreshToken
-      })
-      await user.save()
-    } else {
-      refreshToken = user.refreshToken
-    }
-    infoLogger.info({
-      message: 'Login success!',
-      path: '/login',
-      method: 'POST',
-      obj: { username }
-    })
-    return res.json({
-      accessToken,
-      refreshToken,
-      username
-    })
-  } catch (error) {
-    errorLogger.error({
-      message: 'Login failed!',
-      path: '/login',
-      method: 'POST'
-    })
-    res.json({ error })
-  }
-})
-
-router.post('/refresh', async (req, res) => {
-  const [, accessTokenFromHeader] = req.headers.authorization.split(' ')
-  if (!accessTokenFromHeader) {
-    return res.status(401).json({
-      code: 401,
-      message: 'Invalid access token.'
-    })
-  }
-
-  const refreshTokenFromBody = req.body.data?.refreshToken
-  if (!refreshTokenFromBody) {
-    return res.status(401).json({
-      code: 401,
-      message: 'Invalid access token.'
-    })
-  }
-
-  const accessTokenLife = process.env.ACCESS_TOKEN_LIFE
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
-
-  const decoded = await decodeToken(accessTokenFromHeader, accessTokenSecret)
-  if (!decoded) {
-    return res.status(401).json({
-      code: 401,
-      message: 'Invalid access token.'
-    })
-  }
-
-  const userId = decoded.payload.id
-
-  const user = await models.User.findOne({
-    where: {
-      id: userId
-    }
-  })
-  if (!user) {
-    return res.status(401).json({
-      code: 401,
-      message: 'Invalid access token.'
-    })
-  }
-
-  if (refreshTokenFromBody !== user.refreshToken) {
-    return res.status(400).json({
-      code: 400,
-      message: 'Invalid refresh token!'
-    })
-  }
-
-  const dataForAccessToken = {
-    id: userId
-  }
-
-  const accessToken = await generateToken(
-    dataForAccessToken,
-    accessTokenSecret,
-    accessTokenLife
-  )
-  if (!accessToken) {
-    return res.status(400).json({
-      code: 400,
-      message: 'Create access token failed! Please try again!'
-    })
-  }
-  return res.json({
-    accessToken
-  })
-})
-
-module.exports = router
+}
+module.exports = {
+    signIn,
+    signUp,
+    refreshToken,
+    signOut,
+    changePassword
+}

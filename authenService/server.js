@@ -4,9 +4,8 @@ const morgan = require('morgan')
 const path = require('path')
 
 const { sequelize } = require('./models')
-const authController = require('./controllers/auth')
 const seedDatabase = require('./seeds/index')
-const { API_PREFIX } = require('./utils')
+const IndexRouter = require("./routes/index");
 
 const app = express()
 
@@ -19,9 +18,12 @@ app.use(morgan('combined'))
 app.use(express.json({ limit: '50mb' }))
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
-
-app.use(`${API_PREFIX}/auth`, authController)
-
+app.use("/", IndexRouter);
+// app.use((req, res, next) => {
+//   const err = new Error("Not Found");
+//   err.status = 404;
+//   next(err);
+// });
 async function startServer () {
   try {
     await sequelize.sync()
@@ -30,7 +32,7 @@ async function startServer () {
     console.log('Data seeded successfully')
 
     app.listen(process.env.PORT, () => {
-      console.log('Server is running')
+      console.log('Server is running on port', process.env.PORT)
     })
   } catch (error) {
     console.error('Error starting server:', error)

@@ -3,7 +3,7 @@ import { BrowserRouter, useRoutes } from 'react-router-dom'
 import routes from 'routes'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-
+import 'services/i18n'
 
 const Main = () => {
   const element = useRoutes(routes)
