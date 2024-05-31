@@ -36,8 +36,8 @@ public class Grid {
     private GridInputType inputType = GridInputType.text;
     @Column(nullable = false)
     private String label;
-    private boolean editable = true;
+    private Boolean editable = true;
     private String dataSource;
-    private boolean isDisplay = true;
+    private Boolean isDisplay = true;
 
 }

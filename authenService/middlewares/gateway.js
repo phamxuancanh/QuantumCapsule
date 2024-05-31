@@ -2,9 +2,13 @@ const { route } = require("../routes");
 
 const services = [
     {
-        route: "/inventory",
-        target: "http://localhost:8001/api/v1/inventory",
+        route: "/inventories",
+        target: "http://localhost:8001/api/v1/inventories",
     },
+    {
+        route:"/grids",
+        target: "http://localhost:8001/api/v1/grids",
+    }
 ];
 
 

@@ -1,6 +1,7 @@
 package kltn.manageService.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
@@ -27,13 +28,13 @@ public class Inventory {
     @Id
     private String id;
     private String name;
-    private double price;
-    private int quantity;
+    private Double price;
+    private Integer quantity;
     private String storage;
     private String category;
     private String unit;
-    private LocalDate createdDate;
-    private LocalDate updatedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
     @Enumerated(EnumType.STRING)
     private InventoryStatus status = InventoryStatus.ENABLED;
 
@@ -44,11 +45,11 @@ public class Inventory {
             String uuid = UUID.randomUUID().toString();
             this.id = "IN_" + currentDate + "_" + uuid;
         }
-        this.createdDate = LocalDate.now();
-        this.updatedDate = LocalDate.now();
+        this.createdDate = LocalDateTime.now();
+        this.updatedDate = LocalDateTime.now();
     }
     @PreUpdate
     protected void onUpdate() {
-        this.updatedDate = LocalDate.now();
+        this.updatedDate = LocalDateTime.now();
     }
 }

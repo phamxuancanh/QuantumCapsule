@@ -1,13 +1,12 @@
 package kltn.manageService.services;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import kltn.manageService.exceptions.SuccessRespone;
+import kltn.manageService.enums.ResponseMessage;
+import kltn.manageService.exceptions.ItemNotFoundException;
 import kltn.manageService.ids.GridId;
 import kltn.manageService.models.Grid;
+import kltn.manageService.models.Response;
 import kltn.manageService.repositories.GridRepository;
 
 @Service
@@ -15,25 +14,50 @@ public class GridService {
     @Autowired
     private GridRepository gridRepository;
 
-    public List<Grid> findAll() {
-        return gridRepository.findAll();
+    public Response findAll() {
+        return Response.success(ResponseMessage.SUCCESS.getMessage(), gridRepository.findAll());
     }
 
 
-    public Grid create(Grid grid) {
-        return gridRepository.save(grid);
+    public Response create(Grid grid) {
+        try {
+            Grid data = gridRepository.save(grid);
+            return Response.success(ResponseMessage.CREATE_SUCCESS.getMessage(), data);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
-    public Grid update(Grid grid) {
-        return gridRepository.save(grid);
+    public Response update(Grid grid) {
+        try {
+            GridId id = new GridId(grid.getTableName(), grid.getColumnName());
+            if (!gridRepository.existsById(id)) {
+                throw new ItemNotFoundException();
+            }
+            return Response.success(ResponseMessage.UPDATE_SUCCESS.getMessage(), gridRepository.save(grid));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
-    public SuccessRespone delete(String tableName, String columnName) {
-        gridRepository.deleteById(new GridId(tableName, columnName));
-        return new SuccessRespone(200, "Delete success");
+    public Response delete(String tableName, String columnName) {
+        try {
+            GridId id = new GridId(tableName, columnName);
+            if (!gridRepository.existsById(id)) {
+                throw new ItemNotFoundException();
+            }
+            gridRepository.deleteById(id);
+            return Response.success(ResponseMessage.DELETE_SUCCESS.getMessage(), null);
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
-    public List<Grid> filterByTableName(String table) {
-        return gridRepository.findByTableName(table);
+    public Response filterByTableName(String table) {
+        try {
+            return Response.success(ResponseMessage.SUCCESS.getMessage(), gridRepository.findByTableName(table));
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 }

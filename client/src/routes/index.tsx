@@ -17,6 +17,9 @@ const Login = loadable(async () => await import('pages/login'), {
 const NotFound = loadable(async () => await import('pages/not-found'), {
     fallback: <Loading />
 })
+const Dev = loadable(async () => await import('pages/dev'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -40,7 +43,18 @@ const routes: RouteObject[] = [
             { index: true, element: <Home /> },
             { path: ROUTES.notfound, element: <NotFound /> },
         ]
-    }
+    },
+    {
+        path: ROUTES.dev,
+        element: (
+            <LayoutDefault />
+        ),
+        children: [
+            { index: true, element: <Dev /> },
+            { path: ROUTES.notfound, element: <NotFound /> },
+        ]
+    },
+    
 ]
 
 export default routes

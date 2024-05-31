@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kltn.manageService.enums.ResponseMessage;
 import kltn.manageService.exceptions.ItemNotFoundException;
 import kltn.manageService.models.Inventory;
+import kltn.manageService.models.Response;
 import kltn.manageService.services.InventoryService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,40 +23,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping("/inventories")
 public class InventoryController{
     @Autowired
     private InventoryService inventoryService;
     @PostMapping("/test")
-    public String getMethodName() {
-        return "inventory";
+    public Response getMethodName() {
+        return Response.success(ResponseMessage.SUCCESS.getMessage(), "Test success");
     }
     
 
     @GetMapping("/findAll")
-    public List<Inventory> findAll() {
+    public Response findAll() {
         return inventoryService.findAll();
     }
     @GetMapping("/findById")
-    public ResponseEntity<Inventory> findById(@RequestParam(name = "id") String id) {
-        Inventory found = inventoryService.findById(id).orElseThrow(ItemNotFoundException::new);
-        return ResponseEntity.ok(found);
+    public Response findById(@RequestParam(name = "id") String id) {
+        return inventoryService.findById(id);
     }
     @PostMapping("/create")
-    public Inventory create(@RequestBody Inventory entity) {
+    public Response create(@RequestBody Inventory entity) {
         return inventoryService.create(entity);
     }
     @DeleteMapping("/delete")
-    public Inventory delete(@RequestParam(name = "id") String id) {
+    public Response delete(@RequestParam(name = "id") String id) {
         return inventoryService.delete(id);  
     }
     @PutMapping("/update")
-    public Inventory update(@RequestBody Inventory entity) {
+    public Response update(@RequestBody Inventory entity) {
         return inventoryService.update(entity); 
     }
     
     @GetMapping("/filter")
-    public ResponseEntity<List<Inventory>> getMethodName(
+    public Response getMethodName(
         @RequestParam(name = "name", required = false) String  name,
         @RequestParam(name = "category", required = false) String  category
     ) {
@@ -67,7 +67,7 @@ public class InventoryController{
         if (list.isEmpty()) {
             throw new ItemNotFoundException();
         }
-        return ResponseEntity.ok(list);
+        return Response.success(ResponseMessage.SUCCESS.getMessage(), list);
     }
     
 
