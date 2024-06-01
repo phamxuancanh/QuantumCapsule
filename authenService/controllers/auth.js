@@ -30,13 +30,13 @@ const signIn = async (req, res, next) => {
         const refreshToken = await signRefreshToken(user.id);
 
         const expire = new Date();
-        expire.setMinutes(expire.getMinutes() + 1);
+        expire.setMinutes(expire.getDate() + 1);
         await models.User.update({ expire }, { where: { id: user.id } });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             sameSite: 'Strict',
-            maxAge: 60 * 60 * 1000,
+            maxAge: 24 * 60 * 60 * 1000,
           });
         res.setHeader("authorization", accessToken);
 
@@ -153,6 +153,7 @@ const changePassword = async (req, res, next) => {
         next(error)
     }
 }
+
 module.exports = {
     signIn,
     signUp,

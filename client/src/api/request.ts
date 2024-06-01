@@ -12,7 +12,7 @@ import { IBaseErrorResponse } from './interfaces'
 export const requestWithJwt = axios.create({
   baseURL: process.env.REACT_APP_API,
   timeout: 10000,
-  withCredentials: false
+  withCredentials: true
 })
 
 requestWithJwt.interceptors.request.use(async (config) => {
@@ -65,7 +65,7 @@ requestWithJwt.interceptors.response.use(
 export const requestWithoutJwt = axios.create({
   baseURL: process.env.REACT_APP_API,
   timeout: 10000,
-  withCredentials: false
+  withCredentials: true
 })
 
 requestWithoutJwt.interceptors.response.use(
