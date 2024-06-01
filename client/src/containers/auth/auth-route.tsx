@@ -4,10 +4,11 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import ROUTES from 'routes/constant'
 import { getFromLocalStorage, removeAllLocalStorage, setToLocalStorage } from 'utils/functions'
-import { useMemo, useEffect, useState} from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import { refresh, signOut } from 'api/post/post.api'
-import  Cookies from 'js-cookie'
+import Cookies from 'js-cookie'
+import { PacmanLoader } from 'react-spinners'
 interface IAuthRouteProps {
   children: JSX.Element
 }
@@ -20,7 +21,7 @@ interface IAuthRouteProps {
 const AuthRoute = ({ children }: IAuthRouteProps) => {
   const location = useLocation()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
-  const tokens = getFromLocalStorage<any>('tokens')
+  const [loading, setLoading] = useState<boolean>(true)
   const navigate = useNavigate()
 
   /**
@@ -51,28 +52,47 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
       const newAccessToken = response.data.accessToken;
       setToLocalStorage('tokens', JSON.stringify({ accessToken: newAccessToken }));
       return newAccessToken;
-    } catch (error: any) {
-      if(tokens){
-      alert('Login session expired. Please login again.');
-    }
+    } catch (error) {
+      // if (tokens) {
+      //   alert('Login session expired. Please login again.');
+      // }
       removeAllLocalStorage()
       document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       console.log('Failed to refresh access token:', error);
       return null;
     }
   };
+
   useEffect(() => {
-    console.log('AuthRoute', location.pathname) 
     const verifyAuthentication = async () => {
       const validAccessToken = await handleTokenRefresh()
       console.log(validAccessToken)
       setIsAuthenticated(!!validAccessToken)
+      setLoading(false)
     }
     if (location.pathname !== ROUTES.login) {
       verifyAuthentication()
+    } else {
+      setLoading(false)
     }
-  }, [navigate])
+  }, [location]);
 
+  if (loading) {
+    return <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">
+    <PacmanLoader
+      className='tw-flex tw-justify-center tw-items-center tw-w-full tw-mt-20'
+      color='#5EEAD4'
+      cssOverride={{
+        display: 'block',
+        margin: '0 auto',
+        borderColor: 'blue'
+      }}
+      loading
+      margin={10}
+      speedMultiplier={3}
+      size={40}
+    /></div>
+  }
 
   if (isAuthenticated && location.pathname === ROUTES.login) {
     return <Navigate to={ROUTES.home} />
@@ -84,6 +104,5 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
 
   return children
 }
-
 
 export default AuthRoute

@@ -10,12 +10,12 @@ const signAccessToken = async (userId) => {
         };
         const secret = process.env.ACCESS_TOKEN_SECRET
         const options = {
-            expiresIn: "15s"
+            expiresIn: "1h"
         };
         JWT.sign(payload, secret, options, (err, token) => {
             if (err) reject(err)
             // Save the access token in Redis
-            client.set(userId.toString(), token, 'EX', 15);
+            client.set(userId.toString(), token, 'EX', 3600);
             resolve(token)
         })
     })
