@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { requestWithJwt, requestWithoutJwt } from '../request'
+import { requestWithJwt, requestWithoutJwt } from './request'
 
 
 export interface IInventory {

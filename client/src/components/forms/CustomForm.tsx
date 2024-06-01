@@ -5,11 +5,14 @@ import {
     Grid,
 } from '@mui/material';
 import { getGridData } from 'api/get/get.api';
+import { ACTIONS } from 'utils/enums';
 
 
 interface ICustomFormProps {
     tableName: string;
     initData: {};
+
+    action: ACTIONS
 }
 
 const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
@@ -47,7 +50,7 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                     defaultValue={props.initData?.[item.columnName as keyof typeof props.initData] || ""}
                                     onChange={handleChange}
                                     variant="outlined"
-                                    disabled={!item.editable}
+                                    disabled={props.action === ACTIONS.VIEW? true : !item.editable}
                                     fullWidth
                                     required
                                 />

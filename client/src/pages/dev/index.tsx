@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DataGrid, GridColDef, useGridApiRef } from '@mui/x-data-grid';
 import ModalAction from 'components/modals/ModalAction';
 import CustomForm from 'components/forms/CustomForm';
-import { InProgress } from 'api/models/Inventory';
+import { InProgress } from 'api/api-shared';
 import { Button } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 
@@ -30,6 +30,14 @@ const DevPage: React.FC = () => {
     async function handleClick(action: ACTIONS): Promise<void> {
         console.log('Action:', action);
         switch (action) {
+            case ACTIONS.VIEW:
+                setAction(action);
+                if (rowSelected.id) {
+                    setOpenModal(true);
+                } else {
+                    alert('Please select a row to view');
+                }
+                break;
             case ACTIONS.CREATE:
                 setAction(action);
                 setRowSelected({});
@@ -71,9 +79,12 @@ const DevPage: React.FC = () => {
                         tableName="inventories"
                         initData={tableData}
                         onRowClick={onRowClick}
+
+                        pageSizeOptions={[5, 10, 20]}
                     />
                 )
             }
+            <Button onClick={() => handleClick(ACTIONS.VIEW)}>xem</Button>
             <Button onClick={() => handleClick(ACTIONS.CREATE)}>thêm</Button>
             <Button onClick={() => handleClick(ACTIONS.UPDATE)}>sửa</Button>
             <Button onClick={() => handleClick(ACTIONS.DELETE)}>xóa</Button>
@@ -87,6 +98,8 @@ const DevPage: React.FC = () => {
                 <CustomForm
                     tableName='inventories'
                     initData={rowSelected}
+
+                    action={action} 
                 />
             </ModalAction>
         </>
