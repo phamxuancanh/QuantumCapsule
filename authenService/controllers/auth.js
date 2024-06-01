@@ -30,7 +30,7 @@ const signIn = async (req, res, next) => {
         const refreshToken = await signRefreshToken(user.id);
 
         const expire = new Date();
-        expire.setMinutes(expire.getDate() + 1);
+        expire.setDate(expire.getDay() + 1);
         await models.User.update({ expire }, { where: { id: user.id } });
 
         res.cookie("refreshToken", refreshToken, {
@@ -100,19 +100,22 @@ const refreshToken = async (req, res, next) => {
 const signOut = async (req, res, next) => {
     try {
         const { refreshToken } = req.cookies;
-        console.log(refreshToken, "refreshToken");
+        console.log("TOKENNNNNNNNNNNNNNN");
+        console.log(refreshToken);
         if (!refreshToken) {
             return res.status(403).json({ error: { message: 'Unauthorized' } });
         }
         const userId  = await verifyRefreshToken(refreshToken);
+        console.log(userId, "userId");
         const user = await models.User.findByPk(userId);
         if (!user) {
             return res.status(404).json({ error: { message: 'User not found' } });
         }
         // Clear the refresh token in the cookie
         res.cookie('refreshToken', '', { expires: new Date(0) }); // Đặt cookie với giá trị rỗng và thời gian hết hạn là ngay lập tức
-        // Clear the refresh token in the database
+        // Clear the refresh token and expire in the database
         user.refreshToken = null;
+        user.expire = null;
         await user.save();
 
         return res.status(200).json({ success: true });

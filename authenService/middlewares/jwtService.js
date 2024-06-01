@@ -65,10 +65,11 @@ const verifyRefreshToken = (refreshToken) => {
             if (!user) {
                 return reject({ status: 401, message: 'Token not found' });
             }
-
+            console.log(user)
             // Check if the token has expired
             const now = new Date();
             if (user.expire < now) {
+                console.log("Token has expiredddddddddddddddddddddddddddddddddddddddddd")
                 return reject({ status: 401, message: 'Token has expired' });
             }
 
