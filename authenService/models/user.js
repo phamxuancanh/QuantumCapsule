@@ -41,6 +41,9 @@ const User = sequelize.define(
     refreshToken: {
       type: DataTypes.STRING
     },
+    expire: {
+      type: DataTypes.DATE
+    },
     roleId: {
       type: DataTypes.BIGINT,
       allowNull: false,

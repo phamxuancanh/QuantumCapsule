@@ -4,7 +4,9 @@ import Loading from 'containers/loadable-fallback/loading'
 import ROUTES from './constant'
 import { RouteObject } from 'react-router-dom'
 import loadable from '@loadable/component'
+
 import React from 'react'
+
 /**
  * Lazy load page components. Fallback to <Loading /> when in loading phase
  */

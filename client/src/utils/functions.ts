@@ -65,4 +65,6 @@ export const reload = () => {
   export const removeLocalStorage = (key: string): void => {
     return window.localStorage.removeItem(key)
   }
-  
+  export const removeAllLocalStorage = (): void => {
+    return window.localStorage.clear()
+  }
