@@ -187,24 +187,24 @@ const Login = () => {
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
-                <div className="text-2xl font-bold text-center mt-10">
+                <div className="tw-text-2xl tw-font-bold tw-text-center tw-mt-10">
                     {isSignUp ? t('login.title_signUp') : t('login.title_signIn')}
                 </div>
-                <select className="w-full px-4 py-2 rounded-lg font-bold text-gray-700  border border-gray-300 focus:border-indigo-500 focus:outline-none shadow" onChange={handleChange}>
+                <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700  tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
                     {languageOptions.map((option, index) => (
-                        <option key={index} value={option.value} className='font-bold py-2'>
+                        <option key={index} value={option.value} className='tw-font-bold tw-py-2'>
                             {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
                         </option>
                     ))}
                 </select>
-                <div className="flex content-center items-center">
+                <div className="tw-flex tw-content-center tw-items-center">
                     <RiveComponent style={{ width: '600px', height: '300px' }} />
                 </div>
                 <CssBaseline />
 
                 <div>
                     <FormProvider {...method}>
-                        <form className="flex content-center items-center flex-col"
+                        <form className="tw-flex tw-content-center tw-items-center tw-flex-col"
                             onSubmit={
                                 isSignUp
                                     ? method.handleSubmit(handleRegister)
@@ -231,7 +231,7 @@ const Login = () => {
                                 />
                             </FormControl>
                             {(method.formState.errors.username != null) && (
-                                <div className="mt-2 text-sm text-red-600">
+                                <div className="tw-mt-2 tw-text-sm tw-text-red-600">
                                     {method.formState.errors.username.message}
                                 </div>
                             )}
@@ -261,7 +261,7 @@ const Login = () => {
                                 />
                             </FormControl>
                             {method.formState.errors.password && (
-                                <div className="mt-2 text-sm text-red-600">
+                                <div className="tw-mt-2 tw-text-sm tw-text-red-600">
                                     {method.formState.errors.password.message}
                                 </div>
                             )}
@@ -295,7 +295,7 @@ const Login = () => {
                                         />
                                     </FormControl>
                                     {(method.formState.errors.confirm_password != null) && (
-                                        <div className="mt-2 text-sm text-red-600">
+                                        <div className="tw-mt-2 tw-text-sm tw-text-red-600">
                                             {method.formState.errors.confirm_password.message}
                                         </div>
                                     )}
@@ -326,15 +326,15 @@ const Login = () => {
                                         sx={{ mt: 3, mb: 2 }}>
                                         {t('login.submit_signup')}
                                     </Button>
-                                    <div className="flex flex-col space-y-4">
+                                    <div className="tw-flex tw-flex-col tw-space-y-4">
                                         <button
-                                            className="bg-blue-600 text-white p-2 rounded"
+                                            className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded"
                                         >
                                             <GoogleIcon/>Login with Google
                                         </button>
 
                                         <button
-                                            className="bg-blue-800 text-white p-2 rounded"
+                                            className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded"
                                         >
                                             <FacebookOutlinedIcon/>Login with Facebook
                                         </button>
@@ -375,15 +375,15 @@ const Login = () => {
                                     >
                                         {t('login.goToSignUp')}
                                     </Button>
-                                    <div className="flex flex-col space-y-4">
+                                    <div className="tw-flex tw-flex-col tw-space-y-4">
                                         <button
-                                            className="bg-blue-600 text-white p-2 rounded"
+                                            className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded"
                                         >
                                             <GoogleIcon/>Login with Google
                                         </button>
 
                                         <button
-                                            className="bg-blue-800 text-white p-2 rounded"
+                                            className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded"
                                         >
                                             <FacebookOutlinedIcon/>Login with Facebook
                                         </button>
@@ -391,7 +391,7 @@ const Login = () => {
                                 </>
                             )
                             }
-                            {errorMessage && <div className="mt-2 text-sm text-red-600">{errorMessage}</div>}
+                            {errorMessage && <div className="tw-mt-2 tw-text-sm tw-text-red-600">{errorMessage}</div>}
                         </form>
                     </FormProvider>
                 </div>

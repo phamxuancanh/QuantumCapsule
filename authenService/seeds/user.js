@@ -26,7 +26,8 @@ const generateUsers = async () => {
     refreshToken: faker.random.alphaNumeric(32),
     roleId: await generateRoleId(),
     createdAt: faker.date.past(),
-    updatedAt: faker.date.recent()
+    updatedAt: faker.date.recent(),
+    expire: faker.date.future()
   })))
 }
 
