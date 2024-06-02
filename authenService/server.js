@@ -7,10 +7,18 @@ const seedDatabase = require('./seeds/index')
 const IndexRouter = require("./routes/index");
 const bodyParser = require('body-parser')
 const app = express()
+const passport = require('./middlewares/passport-setup');
+const session = require('express-session')
 // const cors = require('cors')
 app.set('trust proxy', true)
 
-// app.use(cors())
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', "http://localhost:3000");

@@ -17,6 +17,9 @@ const User = sequelize.define(
     lastName: {
       type: DataTypes.STRING
     },
+    avatar: {
+      type: DataTypes.STRING
+    },
     description: {
       type: DataTypes.STRING
     },
