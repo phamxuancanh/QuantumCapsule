@@ -17,6 +17,7 @@ const generateUsers = async () => {
   return await Promise.all(Array.from({ length: 10 }, async () => ({
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
+    avatar: faker.image.avatar(),
     description: faker.person.jobDescriptor(),
     email: faker.internet.email(),
     gender: faker.datatype.boolean(),

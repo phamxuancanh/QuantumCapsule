@@ -7,7 +7,7 @@ import { useRive, useStateMachineInput } from 'rive-react'
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { setToLocalStorage } from "utils/functions";
-import { signIn, signUp } from "api/post/post.api";
+import { signIn, signUp, googleSignIn, facebookSignIn } from "api/post/post.api";
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
 import { useTranslation } from 'react-i18next'
@@ -77,6 +77,8 @@ const Login = () => {
         [i18n]
     )
     const handleLogin = useCallback(async () => {
+        alert('call login')
+        console.log('ASKJDHFKJDSHFKJ')
         try {
             const response = await signIn({
                 username: method.getValues('username'),
@@ -328,15 +330,15 @@ const Login = () => {
                                     </Button>
                                     <div className="tw-flex tw-flex-col tw-space-y-4">
                                         <button
-                                            className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded"
+                                            className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-green-800" onClick={googleSignIn}
                                         >
-                                            <GoogleIcon/>Login with Google
+                                            <GoogleIcon/>SignUP with Google
                                         </button>
 
                                         <button
-                                            className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded"
+                                            className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded hover:tw-bg-red-800" onClick={facebookSignIn}
                                         >
-                                            <FacebookOutlinedIcon/>Login with Facebook
+                                            <FacebookOutlinedIcon/>SignUP with Facebook
                                         </button>
                                     </div>
                                 </>
@@ -377,15 +379,15 @@ const Login = () => {
                                     </Button>
                                     <div className="tw-flex tw-flex-col tw-space-y-4">
                                         <button
-                                            className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded"
+                                            className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-red-700" onClick={googleSignIn}
                                         >
-                                            <GoogleIcon/>Login with Google
+                                            <GoogleIcon/>SignIn with Google
                                         </button>
 
                                         <button
-                                            className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded"
+                                            className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded hover:tw-bg-yellow-800" onClick={facebookSignIn}
                                         >
-                                            <FacebookOutlinedIcon/>Login with Facebook
+                                            <FacebookOutlinedIcon/>SignIn with Facebook
                                         </button>
                                     </div>
                                 </>

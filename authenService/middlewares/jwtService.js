@@ -61,25 +61,28 @@ const verifyRefreshToken = (refreshToken) => {
     return new Promise(async (resolve, reject) => {
         try {
             // Query the database for the user with the given refresh token
-            const user = await models.User.findOne({ where: { refreshToken: refreshToken } });
+            const user = await models.User.findOne({ where: { refreshToken: refreshToken } })
             if (!user) {
-                return reject({ status: 401, message: 'Token not found' });
+                return reject({ status: 401, message: 'Token not found' })
             }
             console.log(user)
             // Check if the token has expired
             const now = new Date();
             if (user.expire < now) {
-                console.log("Token has expiredddddddddddddddddddddddddddddddddddddddddd")
-                return reject({ status: 401, message: 'Token has expired' });
+                console.log('Token has expired')
+                user.expire = null; // Clear the expire field
+                await user.save(); // Save the changes to the database
+                return reject({ status: 401, message: 'Token has expired' })
             }
 
             // Resolve with the user's ID
-            resolve(user.id);
+            resolve(user.id)
         } catch (err) {
-            reject(err);
+            reject(err)
         }
     });
 };
+
 module.exports = {
     signAccessToken,
     verifyAccessToken,

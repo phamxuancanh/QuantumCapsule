@@ -6,7 +6,7 @@ const {
     signRefreshToken,
     verifyRefreshToken
 } = require('../middlewares/jwtService')
-
+const passport = require('../middlewares/passport-setup')
 const signIn = async (req, res, next) => {
     try {
         const { username, password } = req.body.data
@@ -30,7 +30,7 @@ const signIn = async (req, res, next) => {
         const refreshToken = await signRefreshToken(user.id);
 
         const expire = new Date();
-        expire.setDate(expire.getDay() + 1);
+        expire.setDate(expire.getDate() + 1);
         await models.User.update({ expire }, { where: { id: user.id } });
 
         res.cookie("refreshToken", refreshToken, {
@@ -112,7 +112,8 @@ const signOut = async (req, res, next) => {
             return res.status(404).json({ error: { message: 'User not found' } });
         }
         // Clear the refresh token in the cookie
-        res.cookie('refreshToken', '', { expires: new Date(0) }); // Đặt cookie với giá trị rỗng và thời gian hết hạn là ngay lập tức
+        res.cookie('refreshToken', '', { expires: new Date(0) });
+        res.cookie('connect.sid', '', { expires: new Date(0) }); // Đặt cookie với giá trị rỗng và thời gian hết hạn là ngay lập tức
         // Clear the refresh token and expire in the database
         user.refreshToken = null;
         user.expire = null;
@@ -120,9 +121,12 @@ const signOut = async (req, res, next) => {
 
         return res.status(200).json({ success: true });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
+
+
 const changePassword = async (req, res, next) => {
     try {
         const { username, oldPassword, newPassword, reNewPassword } = req.body
@@ -156,11 +160,65 @@ const changePassword = async (req, res, next) => {
         next(error)
     }
 }
+const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] });
 
+const googleCallback = (req, res, next) => {
+    passport.authenticate('google', async (err, user, info) => {
+        if (err || !user) {
+            console.log(err);
+            return res.redirect('http://localhost:3000');
+        }
+        const accessToken = await signAccessToken(user.id);
+        const refreshToken = await signRefreshToken(user.id);
+        const expire = new Date();
+        expire.setDate(expire.getDate() + 1);
+        await models.User.update({ expire }, { where: { id: user.id } });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: 'Strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        // Trả về accessToken dưới dạng query string để lưu trữ trên client
+        // return res.redirect('http://localhost:3000');
+        return res.redirect(`http://localhost:3000?accessToken=${accessToken}`);
+    })(req, res, next);
+};
+const signInWithFacebook = passport.authenticate('facebook', { scope: ['email'] });
+
+const facebookCallback = (req, res, next) => {
+    passport.authenticate('facebook', async (err, user, info) => {
+        if (err || !user) {
+            console.log(err);
+            console.log(user);
+            return res.redirect('http://localhost:3000');
+        }
+        const accessToken = await signAccessToken(user.id);
+        const refreshToken = await signRefreshToken(user.id);
+        const expire = new Date();
+        expire.setDate(expire.getDate() + 1);
+        await models.User.update({ expire }, { where: { id: user.id } });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: 'Strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        // Trả về accessToken dưới dạng query string để lưu trữ trên client
+        // return res.redirect('http://localhost:3000');
+        return res.redirect(`http://localhost:3000?accessToken=${accessToken}`);
+    })(req, res, next);
+};
 module.exports = {
     signIn,
     signUp,
     refreshToken,
     signOut,
-    changePassword
-}
+    changePassword,
+    signInWithGoogle,
+    googleCallback,
+    signInWithFacebook,
+    facebookCallback
+};
