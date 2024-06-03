@@ -1,30 +1,33 @@
 const bcrypt = require('bcrypt')
 const { models } = require('../models')
 const client = require('../middlewares/connectRedis')
+const passport = require('../middlewares/passport-setup')
+const { produceMessage } = require('../middlewares/kafkaClient'); 
 const {
     signAccessToken,
     signRefreshToken,
     verifyRefreshToken
 } = require('../middlewares/jwtService')
-const passport = require('../middlewares/passport-setup')
+
+
 const signIn = async (req, res, next) => {
     try {
-        const { username, password } = req.body.data
+        const { username, password } = req.body.data;
         const user = await models.User.findOne({
             where: { username }
-        })
+        });
         if (!user) {
             return res.status(401).json({
                 code: 401,
                 message: 'Username is not registered.'
-            })
+            });
         }
-        const isPasswordValid = bcrypt.compareSync(password, user.password)
+        const isPasswordValid = bcrypt.compareSync(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({
                 code: 401,
                 message: 'Username or password is incorrect.'
-            })
+            });
         }
         const accessToken = await signAccessToken(user.id);
         const refreshToken = await signRefreshToken(user.id);
@@ -37,41 +40,48 @@ const signIn = async (req, res, next) => {
             httpOnly: true,
             sameSite: 'Strict',
             maxAge: 24 * 60 * 60 * 1000,
-          });
+        });
         res.setHeader("authorization", accessToken);
 
-        return res
-            .status(200)
-            .json({ success: true, accessToken, user });
+        // Produce a message to Kafka with full user data
+        await produceMessage('user-signin', user.id, user.toJSON());
+
+        return res.status(200).json({ success: true, accessToken, user });
     } catch (error) {
         next(error);
     }
-}
+};
+
 const signUp = async (req, res, next) => {
     try {
-        const { username, password } = req.body.data
-        console.log(req.body)
+        const { username, password } = req.body.data;
+        console.log(req.body);
         const user = await models.User.findOne({
             where: { username }
-        })
+        });
         if (user) {
             return res.status(401).json({
                 code: 401,
                 message: 'Username is already registered.'
-            })
+            });
         }
-        const salt = await bcrypt.genSalt(10)
-        const hashPassword = bcrypt.hashSync(password, salt)
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = bcrypt.hashSync(password, salt);
 
         const newUser = await models.User.create({
             username,
             password: hashPassword
-        })
-        return res.status(200).json({ success: true, user: newUser })
+        });
+
+        // Produce a message to Kafka with full user data
+        await produceMessage('user-signup', newUser.id, newUser.toJSON());
+
+        return res.status(200).json({ success: true, user: newUser });
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
+
 const refreshToken = async (req, res, next) => {
     console.log('REFRESH TOKENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
     try {
@@ -105,7 +115,7 @@ const signOut = async (req, res, next) => {
         if (!refreshToken) {
             return res.status(403).json({ error: { message: 'Unauthorized' } });
         }
-        const userId  = await verifyRefreshToken(refreshToken);
+        const userId = await verifyRefreshToken(refreshToken);
         console.log(userId, "userId");
         const user = await models.User.findByPk(userId);
         if (!user) {
@@ -119,6 +129,9 @@ const signOut = async (req, res, next) => {
         user.expire = null;
         await user.save();
 
+        // Produce a message to Kafka with full user data
+        await produceMessage('user-signout', user.id, user.toJSON());
+
         return res.status(200).json({ success: true });
     } catch (error) {
         console.log(error);
@@ -126,40 +139,43 @@ const signOut = async (req, res, next) => {
     }
 };
 
-
 const changePassword = async (req, res, next) => {
     try {
-        const { username, oldPassword, newPassword, reNewPassword } = req.body
+        const { username, oldPassword, newPassword, reNewPassword } = req.body;
         const user = await models.User.findOne({
             where: { username }
-        })
+        });
         if (!user) {
             return res.status(401).json({
                 code: 401,
                 message: 'Username is not registered.'
-            })
+            });
         }
-        const isPasswordValid = bcrypt.compareSync(oldPassword, user.password)
+        const isPasswordValid = bcrypt.compareSync(oldPassword, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({
                 code: 401,
                 message: 'Old password is incorrect.'
-            })
+            });
         }
         if (newPassword !== reNewPassword) {
             return res.status(400).json({
                 code: 400,
                 message: 'New password and re-entered password do not match.'
-            })
+            });
         }
-        const salt = await bcrypt.genSalt(10)
-        const hashPassword = bcrypt.hashSync(newPassword, salt)
-        await user.update({ password: hashPassword })
-        return res.status(200).json({ success: true })
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = bcrypt.hashSync(newPassword, salt);
+        await user.update({ password: hashPassword });
+
+        // Produce a message to Kafka with full user data
+        await produceMessage('password-change', user.id, user.toJSON());
+
+        return res.status(200).json({ success: true });
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
 const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] });
 
 const googleCallback = (req, res, next) => {
@@ -180,8 +196,10 @@ const googleCallback = (req, res, next) => {
             maxAge: 24 * 60 * 60 * 1000,
         });
 
+        // Produce a message to Kafka with full user data
+        await produceMessage('google-signin', user.id, user.toJSON());
+
         // Trả về accessToken dưới dạng query string để lưu trữ trên client
-        // return res.redirect('http://localhost:3000');
         return res.redirect(`http://localhost:3000?accessToken=${accessToken}`);
     })(req, res, next);
 };
@@ -206,8 +224,10 @@ const facebookCallback = (req, res, next) => {
             maxAge: 24 * 60 * 60 * 1000,
         });
 
+        // Produce a message to Kafka with full user data
+        await produceMessage('facebook-signin', user.id, user.toJSON());
+
         // Trả về accessToken dưới dạng query string để lưu trữ trên client
-        // return res.redirect('http://localhost:3000');
         return res.redirect(`http://localhost:3000?accessToken=${accessToken}`);
     })(req, res, next);
 };
