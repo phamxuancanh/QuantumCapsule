@@ -22,6 +22,9 @@ const NotFound = loadable(async () => await import('pages/not-found'), {
 const Dev = loadable(async () => await import('pages/dev'), {
     fallback: <Loading />
 })
+const ForgotPassword = loadable(async () => await import('pages/forgot_password'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -31,6 +34,14 @@ const routes: RouteObject[] = [
         element: (
             <AuthRoute>
                 <Login />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.forgot_password,
+        element: (
+            <AuthRoute>
+                <ForgotPassword />
             </AuthRoute>
         )
     },
@@ -45,6 +56,7 @@ const routes: RouteObject[] = [
             { index: true, element: <Home /> },
             { path: ROUTES.notfound, element: <NotFound /> },
             { path: ROUTES.dev, element: <Dev /> }
+            // { path: ROUTES.forgot_password, element: <ForgotPassword />}
         ]
     }
     

@@ -3,12 +3,22 @@ const { models } = require('../models')
 const client = require('../middlewares/connectRedis')
 const passport = require('../middlewares/passport-setup')
 const { produceMessage } = require('../middlewares/kafkaClient'); 
+const nodemailer = require('nodemailer'); 
+const path = require('path');
+const fs = require('fs')
 const {
     signAccessToken,
     signRefreshToken,
     verifyRefreshToken
 } = require('../middlewares/jwtService')
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'canhmail292@gmail.com',
+        pass: 'hajcwelbzkljvsgp'
+    }
+});
 
 const signIn = async (req, res, next) => {
     try {
@@ -54,24 +64,60 @@ const signIn = async (req, res, next) => {
 
 const signUp = async (req, res, next) => {
     try {
-        const { username, password } = req.body.data;
-        console.log(req.body);
-        const user = await models.User.findOne({
-            where: { username }
-        });
-        if (user) {
-            return res.status(401).json({
-                code: 401,
-                message: 'Username is already registered.'
-            });
+        const { username, password, email } = req.body.data;
+        const userByUsername = await models.User.findOne({ where: { username } });
+        if (userByUsername) {
+            return res.status(401).json({ code: 401, message: 'Username is already registered.' });
         }
+        const userByEmail = await models.User.findOne({ where: { email } });
+        if (userByEmail) {
+            return res.status(401).json({ code: 401, message: 'Email is already registered.' });
+        }
+        // Generate a confirmation token
+        // const token = jwt.sign({ username, password, email }, 'your-secret-key', { expiresIn: '1h' });
+        // Define the confirmation URL
+        const confirmationUrl = `http://localhost:3000`
+        // Read the HTML template
+        const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
+        // const templatePath = path.join(__dirname, '..', 'templates', 'forgot_pass_email_template.html')
+        const htmlContent = fs.readFileSync(templatePath, 'utf8');
+        const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl);
+        // Send the email
+        const mailOptions = {
+            from: 'canhmail292@gmail.com',
+            to: email,
+            subject: 'Email Confirmation',
+            html: htmlWithLink
+        };
+        await transporter.sendMail(mailOptions);
+        return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' });
+    } catch (error) {
+        next(error);
+    }
+};
+const confirmEmail = async (req, res, next) => {
+    try {
+        const { token } = req.query;
+        if (!token) {
+            return res.status(400).json({ code: 400, message: 'Invalid token.' });
+        }
+
+        // Verify the token
+        const decoded = jwt.verify(token, 'your-secret-key');
+        const { username, password, email } = decoded;
+
+        const userByUsername = await models.User.findOne({ where: { username } });
+        const userByEmail = await models.User.findOne({ where: { email } });
+
+        if (userByUsername || userByEmail) {
+            return res.status(401).json({ code: 401, message: 'Username or email is already registered.' });
+        }
+
+        // Create the user
         const salt = await bcrypt.genSalt(10);
         const hashPassword = bcrypt.hashSync(password, salt);
 
-        const newUser = await models.User.create({
-            username,
-            password: hashPassword
-        });
+        const newUser = await models.User.create({ username, password: hashPassword, email });
 
         // Produce a message to Kafka with full user data
         await produceMessage('user-signup', newUser.id, newUser.toJSON());
@@ -81,7 +127,6 @@ const signUp = async (req, res, next) => {
         next(error);
     }
 };
-
 const refreshToken = async (req, res, next) => {
     console.log('REFRESH TOKENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
     try {

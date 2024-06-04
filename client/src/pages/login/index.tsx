@@ -24,6 +24,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import GoogleIcon from '@mui/icons-material/Google'
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined'
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 const theme = createTheme();
 
 const STATE_MACHINE_NAME = "Login Machine";
@@ -36,19 +37,24 @@ const Login = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('en')
 
     const schema = useMemo(() => {
-        const messUsername = t('login.username_not_empty')
-        const messPassword = t('login.password_not_empty')
-        const messConfirm = t('login.password_must_match')
+        const messUsername = t('login.username_not_empty');
+        const messPassword = t('login.password_not_empty');
+        const messConfirm = t('login.password_must_match');
+        const messEmail = t('login.email_not_valid'); // Add a message for email validation
+
         return yup
             .object({
                 username: yup.string().required(messUsername),
                 password: yup.string().required(messPassword),
                 confirm_password: isSignUp
-                    ? yup.string().oneOf([yup.ref('password')], messConfirm)
-                    : yup.string()
+                    ? yup.string().oneOf([yup.ref('password')], messConfirm).required(messConfirm)
+                    : yup.string(),
+                email: isSignUp
+                    ? yup.string().email(messEmail).required(t('login.email_required'))
+                    : yup.string().email(messEmail)
             })
-            .required()
-    }, [isSignUp, t])
+            .required();
+    }, [isSignUp, t]);
 
     const method = useForm({
         resolver: yupResolver(schema)
@@ -105,12 +111,14 @@ const Login = () => {
     }, [method, navigate])
 
     const handleRegister = useCallback(async () => {
-        alert(method.getValues('username') + ' ' + method.getValues('password') + ' ' + method.getValues('confirm_password'))
+        alert('call register')
         try {
             const result = await signUp({
                 username: method.getValues('username'),
-                password: method.getValues('password')
+                password: method.getValues('password'),
+                email: method.getValues('email')
             })
+            console.log(result)
             setErrorMessage(result?.data?.status.toString())
         } catch (error: { code: number, message: string } | any) {
             // eslint-disable-next-line no-console
@@ -206,13 +214,36 @@ const Login = () => {
 
                 <div>
                     <FormProvider {...method}>
-                        <form className="tw-flex tw-content-center tw-items-center tw-flex-col"
+                        <form className="tw-flex tw-content-center tw-items-center tw-flex-col tw-bg-red-500"
                             onSubmit={
                                 isSignUp
                                     ? method.handleSubmit(handleRegister)
                                     : method.handleSubmit(handleLogin)
                             }
                         >
+                            {isSignUp && (
+                                <>
+                                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+                                        <InputLabel htmlFor="outlined-adornment-password">
+                                            {t('login.email')}
+                                        </InputLabel>
+                                        <OutlinedInput
+                                            {...method.register('email', { required: true })}
+                                            onFocus={() => setHangUp(false)}
+                                            onChange={(e) => {
+                                                method.setValue('email', e.target.value);
+                                                setUser(e.target.value);
+                                            }}
+                                            endAdornment={
+                                                <InputAdornment position="end">
+                                                    <AlternateEmailIcon />
+                                                </InputAdornment>
+                                            }
+                                            label={t('login.email')}
+                                        />
+                                    </FormControl>
+                                </>
+                            )}
                             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                                 <InputLabel htmlFor="outlined-adornment-password">
                                     {t('login.username')}
@@ -269,6 +300,11 @@ const Login = () => {
                             )}
                             {isSignUp && (
                                 <>
+                                    {(method.formState.errors.username != null) && (
+                                        <div className="tw-mt-2 tw-text-sm tw-text-red-600">
+                                            {method.formState.errors.username.message}
+                                        </div>
+                                    )}
                                     <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                                         <InputLabel htmlFor="outlined-adornment-password">
                                             {t('login.confirm_password')}
@@ -332,13 +368,13 @@ const Login = () => {
                                         <button
                                             className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-green-800" onClick={googleSignIn}
                                         >
-                                            <GoogleIcon/>SignUP with Google
+                                            <GoogleIcon />SignUP with Google
                                         </button>
 
                                         <button
                                             className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded hover:tw-bg-red-800" onClick={facebookSignIn}
                                         >
-                                            <FacebookOutlinedIcon/>SignUP with Facebook
+                                            <FacebookOutlinedIcon />SignUP with Facebook
                                         </button>
                                     </div>
                                 </>
@@ -381,13 +417,13 @@ const Login = () => {
                                         <button
                                             className="tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-red-700" onClick={googleSignIn}
                                         >
-                                            <GoogleIcon/>SignIn with Google
+                                            <GoogleIcon />SignIn with Google
                                         </button>
 
                                         <button
                                             className="tw-bg-blue-800 tw-text-white tw-p-2 tw-rounded hover:tw-bg-yellow-800" onClick={facebookSignIn}
                                         >
-                                            <FacebookOutlinedIcon/>SignIn with Facebook
+                                            <FacebookOutlinedIcon />SignIn with Facebook
                                         </button>
                                     </div>
                                 </>
@@ -395,6 +431,9 @@ const Login = () => {
                             }
                             {errorMessage && <div className="tw-mt-2 tw-text-sm tw-text-red-600">{errorMessage}</div>}
                         </form>
+                        <div>
+                            <a href="/forgot_password">Forgot password?</a>
+                        </div>
                     </FormProvider>
                 </div>
 
