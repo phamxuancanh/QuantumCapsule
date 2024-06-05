@@ -1,7 +1,10 @@
 import React from 'react';
-import { getGridData, getTableData } from 'api/get/get.api';
-import { DataGrid, GridRowsProp, GridColDef, GridEventListener } from '@mui/x-data-grid';
-import { Box, Button } from '@mui/material';
+import { getGridData } from 'api/get/get.api';
+import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
+import { Box, darken, lighten, styled } from '@mui/material';
+// import customs.scss
+import { COLORS } from 'utils/colors';
+
 
 
 interface GridTableProps {
@@ -9,19 +12,9 @@ interface GridTableProps {
     initData: any[];
     apiRef: any;
 
-    onRowClick?: GridEventListener<"rowClick">;
-}
+    pageSizeOptions?: number[];
 
-enum InputType {
-    // text, number, date, datetime, select, checkbox, radio, textarea,
-    TEXT = 'text',
-    NUMBER = 'number',
-    DATE = 'date',
-    DATETIME = 'datetime',
-    SELECT = 'select',
-    CHECKBOX = 'checkbox',
-    RADIO = 'radio',
-    TEXTAREA = 'textarea',
+    onRowClick?: GridEventListener<"rowClick">;
 }
 enum FieldType {
     // NUMBER, STRING, DATE, DATETIME, BOOLEAN,
@@ -32,53 +25,47 @@ enum FieldType {
     BOOLEAN = 'BOOLEAN',
 }
 
+const styles = {
+    '& .super-app-theme--header': {
+        backgroundColor: COLORS.th,
+        color: 'black',
+        fontWeight: 'bold',
+    },
+}
+
 const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
-    const [initData, setTableData] = React.useState<any[]>(props.initData);
-    const [dataGrid, setDataGrid] = React.useState<any[]>([]);
     const [columns, setColumns] = React.useState<GridColDef[]>([]);
 
     React.useEffect(() => {
         (async () => {
-            const res2 = await getGridData(props.tableName);
-            setDataGrid(res2.data.data);
+            const res = await getGridData(props.tableName);
+            const gridColumns = convertColumns(res.data.data)
+            setColumns(gridColumns);
         })();
     }, [])
-    React.useEffect(() => {
-        convertDates(dataGrid, initData);
-        const gridColumns = convertColumns(dataGrid)
-        setColumns(gridColumns);
-    }, [dataGrid])
+
 
 
     const convertTypes = (type: string) => {
         switch (type) {
             case FieldType.BOOLEAN: return 'boolean';
-            case FieldType.DATE: return 'date';
-            case FieldType.DATETIME: return 'dateTime';
+            case FieldType.DATE: return 'string';
+            case FieldType.DATETIME: return 'string';
             case FieldType.NUMBER: return 'number';
             case FieldType.STRING: return 'string';
             default: return 'string';
         }
     }
-    const convertDates = (dataGrid: any[], initData: any[]) => {
-        let tempData = [...initData]
-        tempData.forEach((element: any) => {
-            dataGrid.forEach((gridElement: any) => {
-                if (gridElement.columnType === FieldType.DATE || gridElement.columnType === FieldType.DATETIME) {
-                    element[gridElement.columnName] = new Date(element[gridElement.columnName]);
-                }
-            })
-        })
-        setTableData(tempData);
-    }
+
     const convertColumns = (dataGrid: any): GridColDef[] => {
         return dataGrid.map((element: any) => {
             return {
                 field: element.columnName,
                 headerName: element.label,
                 type: convertTypes(element.columnType),
+                headerClassName: 'super-app-theme--header',
                 editable: false,
-
+                flex: 1,
             }
         });
     }
@@ -86,19 +73,21 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
 
 
     return (
-        <Box sx={{ height: 400, width: '100%' }}>
-            <Button onClick={() => console.log(initData)}>Log Data</Button>
-            <DataGrid
-                apiRef={props.apiRef}
-                rows={initData}
-                columns={columns}
-                initialState={{
-                    pagination: { paginationModel: { pageSize: 10, page: 1 } }
-                }}
-                pageSizeOptions={[10, 20]}
-                onRowClick={props.onRowClick}
-            />
-        </Box>
+        <DataGrid
+            sx={styles}
+            apiRef={props.apiRef}
+            rows={props.initData}
+            columns={columns}
+            initialState={{
+                pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } }
+            }}
+            pageSizeOptions={props.pageSizeOptions || [10, 20]}
+            onRowClick={props.onRowClick}
+            disableColumnResize
+            getRowClassName={(params) => `super-app-theme--${params.row.status}`}
+            
+            autoHeight
+        />
     );
 };
 

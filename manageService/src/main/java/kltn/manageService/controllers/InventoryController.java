@@ -43,6 +43,7 @@ public class InventoryController{
     }
     @PostMapping("/create")
     public Response create(@RequestBody Inventory entity) {
+        System.out.println(entity);
         return inventoryService.create(entity);
     }
     @DeleteMapping("/delete")
@@ -51,6 +52,7 @@ public class InventoryController{
     }
     @PutMapping("/update")
     public Response update(@RequestBody Inventory entity) {
+        System.out.println(entity);
         return inventoryService.update(entity); 
     }
     

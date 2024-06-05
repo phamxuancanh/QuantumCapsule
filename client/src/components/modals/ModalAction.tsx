@@ -6,9 +6,11 @@ interface ICustomModalProps {
     title: string;
     open: boolean;
     children: React.ReactNode;
-    action: ACTIONS;
+    type: ACTIONS;
+    formData: {};
     onSave: () => void;
-    setOpenModal: (open: boolean) => void;
+    onClose: () => void;
+    // setFormData: (data: any) => void;
 }
 
 const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
@@ -20,7 +22,7 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: isSmallScreen ? '90%' : isMediumScreen ? '80%' : '75%',
+        width: isSmallScreen ? '95%' : isMediumScreen ? '90%' : '85%',
         maxWidth: '90%',
         bgcolor: 'background.paper',
         border: '2px solid #000',
@@ -30,7 +32,6 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
     return (
         <Modal
             open={props.open}
-            // onClose={() => props.setOpenModal(false)}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -42,15 +43,18 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
                     {props.children}
                 </Typography>
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button variant="contained" color="primary" onClick={props.onSave} sx={{ mr: 2 }}>
-                        Lưu
-                    </Button>
-                    <Button variant="outlined" onClick={() => props.setOpenModal(false)}>
+                    {
+                        props.type === ACTIONS.VIEW ? null :
+                            <Button variant="contained" color="primary" onClick={props.onSave} sx={{ mr: 2 }}>
+                                Lưu
+                            </Button>
+                    }
+                    <Button variant="outlined" onClick={() => props.onClose()}>
                         Đóng
                     </Button>
                 </Box>
             </Box>
-            
+
         </Modal>
     );
 };
