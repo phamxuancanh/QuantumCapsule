@@ -16,16 +16,12 @@ export interface IInventory {
 }
 export class InProgress {
 
-    async create(data: IInventory): Promise<AxiosResponse> {
-        return await requestWithoutJwt.post('/inventories/create', data); 
+    create = async (payload: IInventory): Promise<AxiosResponse<any>> => {    
+        return await requestWithoutJwt.post<any>(`/inventories/create`, {data: payload})
     }
 
-    async findById(id: string): Promise<AxiosResponse> {
-        return await requestWithoutJwt.get(`/inventories/findById`, {params: {id}}); 
-    }
-
-    async update(id: string, data: IInventory): Promise<AxiosResponse> {
-        return await requestWithoutJwt.put(`/inventories/update`, data); 
+    update = async (payload: IInventory): Promise<AxiosResponse<any>> => {    
+        return await requestWithoutJwt.put<any>(`/inventories/update`, {data: payload})
     }
 
     delete = async (id: string): Promise<AxiosResponse<any>> => {    

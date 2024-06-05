@@ -6,9 +6,11 @@ interface ICustomModalProps {
     title: string;
     open: boolean;
     children: React.ReactNode;
-    action: ACTIONS;
+    type: ACTIONS;
+    formData: {};
     onSave: () => void;
-    setOpenModal: (open: boolean) => void;
+    onClose: () => void;
+    // setFormData: (data: any) => void;
 }
 
 const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
@@ -30,7 +32,6 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
     return (
         <Modal
             open={props.open}
-            // onClose={() => props.setOpenModal(false)}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -43,12 +44,12 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
                 </Typography>
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
                     {
-                        props.action === ACTIONS.VIEW ? null :
+                        props.type === ACTIONS.VIEW ? null :
                             <Button variant="contained" color="primary" onClick={props.onSave} sx={{ mr: 2 }}>
                                 Lưu
                             </Button>
                     }
-                    <Button variant="outlined" onClick={() => props.setOpenModal(false)}>
+                    <Button variant="outlined" onClick={() => props.onClose()}>
                         Đóng
                     </Button>
                 </Box>

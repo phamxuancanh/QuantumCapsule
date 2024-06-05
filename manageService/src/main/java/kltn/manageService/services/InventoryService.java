@@ -19,7 +19,7 @@ public class InventoryService {
     
     public Response findAll() {
         try {
-            return Response.success(ResponseMessage.SUCCESS.getMessage(), inventoryRepository.findAll());
+            return Response.success(ResponseMessage.SUCCESS.getMessage(), inventoryRepository.findLatest());
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
