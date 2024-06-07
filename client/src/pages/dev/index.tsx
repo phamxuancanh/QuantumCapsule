@@ -1,24 +1,25 @@
 import { getTableData } from 'api/get/get.api';
 import GridTable from 'components/tables/gridTable/GridTable';
-import React, { useEffect, useMemo, useState } from 'react';
-import { DataGrid, GridColDef, GridRowParams, useGridApiRef } from '@mui/x-data-grid';
+import React, { useEffect, useState } from 'react';
+import { GridRowParams, useGridApiRef } from '@mui/x-data-grid';
 import ModalAction from 'components/modals/ModalAction';
 import CustomForm from 'components/forms/CustomForm';
 import { InProgress, IInventory } from 'api/api-shared';
 import { Button } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
-import { IAction, defaultAction} from 'utils/interfaces';
+import { IAction, IFormParam, defaultAction } from 'utils/interfaces';
+import { set } from 'react-hook-form';
+import { string } from 'yup';
 
 
 const DevPage: React.FC = () => {
     const instance = new InProgress();
     const [tableData, setTableData] = useState<IInventory[]>([]);
     const [formData, setFormData] = useState<IInventory>({});
-    // const [rowSelected, setRowSelected] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false);
     const gridRef = useGridApiRef();
     const [action, setAction] = useState<IAction>(defaultAction);
-    
+
     useEffect(() => {
         (async () => {
             setLoading(true);
@@ -36,7 +37,7 @@ const DevPage: React.FC = () => {
         }
         return storages;
     };
-    const formParams = [
+    const formParams: IFormParam[] = [
         {
             name: 'status',
             label: 'trạng thái',
@@ -50,8 +51,22 @@ const DevPage: React.FC = () => {
             values: generateStorages(),
         }
     ]
-    const onRowClick = (row :  GridRowParams<any>) => {
+    const onRowClick = (row: GridRowParams<any>) => {
         setFormData(row.row);
+    }
+    const handleValidation = () => {
+        let isValid = true;
+        if(
+            !formData.name
+            || !new RegExp('^([1-9]\d*(\.\d+)?)|([1-9][0-9]*)$').test(formData.price?.toString() || '') 
+            || !new RegExp('^[1-9][0-9]*$').test(formData.quantity?.toString() || '') 
+            || !new RegExp('^[A-Z][a-zA-Z]*$').test(formData.unit?.toString() || '') 
+        ){
+            isValid = false;
+        }
+        console.log(isValid);
+        
+        return isValid
     }
     async function handleClick(action: ACTIONS): Promise<void> {
         console.log('Action:', action);
@@ -91,11 +106,10 @@ const DevPage: React.FC = () => {
             case ACTIONS.DELETE:
                 // const instance = new InProgress();
                 try {
-                    if(formData.id) {
+                    if (formData.id) {
                         setLoading(true);
-                        instance.delete(formData.id);
-                        let tempTableData = [...tableData].filter((item) => item.id !== formData.id);
-                        gridRef.current?.setRows(tempTableData);
+                        await instance.delete(formData.id);
+                        gridRef.current?.updateRows([{ id: formData.id, _action: 'delete' }]);
                         setLoading(false);
                     }
                     else {
@@ -114,16 +128,23 @@ const DevPage: React.FC = () => {
             setLoading(true);
             switch (action.type) {
                 case ACTIONS.CREATE:
-                    const resCreate = await instance.create(formData);
-                    console.log(resCreate.data.data);
-                    gridRef.current?.setRows([resCreate.data.data, ...tableData]);
-                    setAction(defaultAction);
+                    if (handleValidation()) {
+                        const resCreate = await instance.create(formData);
+                        gridRef.current?.updateRows([resCreate.data.data]);
+                        setAction(defaultAction);
+                    } else {
+                        alert('Please check your input');
+                    }
                     break;
                 case ACTIONS.UPDATE:
-                    console.log(formData);
-                    const resUpdate = await instance.update(formData);
-                    gridRef.current?.setRows([...tableData].map((item) => item.id === formData.id ? resUpdate.data.data : item));
-                    setAction(defaultAction);
+                    if (handleValidation()) {
+                        const resUpdate = await instance.update(formData);
+                        gridRef.current?.updateRows([resUpdate.data.data]);
+                        setAction(defaultAction);
+                    }
+                    else {
+                        alert('Please check your input');
+                    }
                     break;
                 default:
                     break;
@@ -144,7 +165,7 @@ const DevPage: React.FC = () => {
                         apiRef={gridRef}
                         tableName="inventories"
                         initData={tableData}
-                        onRowClick={(row)=>onRowClick(row)}
+                        onRowClick={(row) => onRowClick(row)}
 
                         pageSizeOptions={[5, 10, 20]}
                     />
@@ -157,15 +178,16 @@ const DevPage: React.FC = () => {
             <ModalAction
                 title='INVENTORY FORM'
                 open={action.open}
-                type={action.type} 
+                type={action.type}
                 formData={action.payload}
                 onSave={() => handleSave()}
                 onClose={() => setAction(defaultAction)}
             >
                 <CustomForm
                     tableName='inventories'
-                    initData={action.payload}
+                    // initData={action.payload}
                     action={action.type}
+                    formData={formData}
                     setFormData={setFormData}
                     formParams={formParams}
                 />

@@ -28,7 +28,7 @@ export class InProgress {
             quantity: 100,
             storage: 'Storage A',
             category: 'category A',
-            unit: 'cai',
+            unit: 'Cai',
             createdDate: new Date(),
             updatedDate: new Date(),
             status: 'ENABLED'

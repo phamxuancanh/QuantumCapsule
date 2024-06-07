@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Button,
     TextField,
     Grid,
     Checkbox,
@@ -10,49 +9,49 @@ import {
     Select,
     MenuItem,
     Box,
+    SelectChangeEvent,
 } from '@mui/material';
 import { getGridData } from 'api/get/get.api';
 import { ACTIONS, InputType } from 'utils/enums';
 import { convertDate } from 'utils/functions';
-
+import { IAction, IGrid } from 'utils/interfaces'
+import { faIR } from '@mui/material/locale';
 
 
 interface ICustomFormProps {
     tableName: string;
-    initData: {};
+    // initData: {};
     action: ACTIONS;
     formParams: any[];
+    formData: {};
     setFormData: (data: any) => void;
 }
 
 const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
 
-    const ref = React.useRef(null)
-    const [gridData, setGridData] = useState<any[]>([]);
-    const {setFormData} = props;
+    const [gridData, setGridData] = useState<IGrid[]>([]);
+    const { setFormData } = props;
     useEffect(() => {
         (async () => {
             const res = await getGridData(props.tableName);
             setGridData(res.data.data);
         })();
     }, []);
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown; }>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown; }> | SelectChangeEvent<never>) => {
         const { name, value } = e.target;
-        setFormData((prevData : {}) => ({
+        setFormData((prevData: {}) => ({
             ...prevData,
             [name as string]: value as string,
         }));
-        console.log("name: ", name, "value: ", value);
-        
     };
 
 
     return (
         <Box>
-            <form ref={ref}>
+            <form>
                 <Grid container spacing={2}>
                     {
-                        gridData.map((item) => {
+                        gridData.sort((a: IGrid, b: IGrid) => a.position - b.position).map((item) => {
                             switch (item.inputType) {
                                 case InputType.TEXT:
                                     return <Grid item xs={12} md={6} key={item.columnName}>
@@ -60,12 +59,21 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                             <InputLabel>{item.label || ""}</InputLabel>
                                             <TextField
                                                 name={item.columnName || ""}
-                                                defaultValue={props.initData?.[item.columnName as keyof typeof props.initData]}
+                                                defaultValue={props.formData?.[item.columnName as keyof typeof props.formData]}
                                                 onChange={handleChange}
                                                 variant="outlined"
-                                                disabled={props.action === ACTIONS.VIEW? true : !item.editable}
+                                                disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
+                                                helperText={item.regexMessage}
+                                                inputProps={{
+                                                    pattern: item.regex,
+                                                }}
+                                                error={
+                                                    item.regex ?
+                                                        !new RegExp(item.regex).test(props.formData?.[item.columnName as keyof typeof props.formData] as string)
+                                                        : false
+                                                }
                                                 fullWidth
-                                                required
+                                            // required
                                             />
                                         </FormGroup>
                                     </Grid>
@@ -75,12 +83,21 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                             <InputLabel>{item.label || ""}</InputLabel>
                                             <TextField
                                                 name={item.columnName || ""}
-                                                defaultValue={props.initData?.[item.columnName as keyof typeof props.initData]}
+                                                defaultValue={props.formData?.[item.columnName as keyof typeof props.formData]}
                                                 onChange={handleChange}
                                                 variant="outlined"
-                                                disabled={props.action === ACTIONS.VIEW? true : !item.editable}
+                                                disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
+                                                helperText={item.regexMessage}
+                                                inputProps={{
+                                                    pattern: item.regex,
+                                                }}
+                                                error={
+                                                    item.regex ?
+                                                        !new RegExp(item.regex).test(props.formData?.[item.columnName as keyof typeof props.formData] as string)
+                                                        : false
+                                                }
                                                 fullWidth
-                                                required
+                                                // required
                                                 type='number'
                                             />
                                         </FormGroup>
@@ -96,16 +113,10 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                                         <Checkbox
                                                             name={checkBoxParams?.name || ""}
                                                             value={checkBoxParams?.value || ""}
-                                                            disabled={props.action === ACTIONS.VIEW? true : !item.editable}
-                                                            defaultChecked={props.initData?.[item.columnName as keyof typeof props.initData] === checkBoxParams?.value}
+                                                            disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
+                                                            defaultChecked={props.formData?.[item.columnName as keyof typeof props.formData] === checkBoxParams?.value}
                                                             onChange={
-                                                                (e) => {
-                                                                    const { name, value } = e.target;
-                                                                    setFormData((prevData : {}) => ({
-                                                                        ...prevData,
-                                                                        [name]: value,
-                                                                    }));
-                                                                }
+                                                                handleChange
                                                             }
                                                         />
                                                     }
@@ -122,19 +133,13 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                                 <InputLabel>{selectBoxParams?.label}</InputLabel>
                                                 <Select
                                                     name={selectBoxParams?.name}
-                                                    defaultValue={props.initData?.[item.columnName as keyof typeof props.initData]}
-                                                    disabled={props.action === ACTIONS.VIEW? true : !item.editable}
+                                                    defaultValue={props.formData?.[item.columnName as keyof typeof props.formData]}
+                                                    disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
                                                     onChange={
-                                                        (e) => {
-                                                            const { name, value } = e.target;
-                                                            setFormData((prevData : {}) => ({
-                                                                ...prevData,
-                                                                [name]: value,
-                                                            }));
-                                                        }
+                                                        handleChange
                                                     }
                                                 >
-                                                    {selectBoxParams?.values?.map((value : any) => {
+                                                    {selectBoxParams?.values?.map((value: any) => {
                                                         return (
                                                             <MenuItem value={value.value}>{value.label}</MenuItem>
                                                         )
@@ -150,10 +155,10 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                                 <InputLabel>{item.label || ""}</InputLabel>
                                                 <TextField
                                                     name={item.columnName || ""}
-                                                    defaultValue={convertDate(props.initData?.[item.columnName as keyof typeof props.initData]) }
+                                                    defaultValue={convertDate(props.formData?.[item.columnName as keyof typeof props.formData])}
                                                     onChange={handleChange}
                                                     variant="outlined"
-                                                    disabled={props.action === ACTIONS.VIEW? true : !item.editable}
+                                                    disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
                                                     fullWidth
                                                     required
                                                     type='datetime-local'

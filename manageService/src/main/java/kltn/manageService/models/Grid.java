@@ -39,5 +39,8 @@ public class Grid {
     private Boolean editable = true;
     private String dataSource;
     private Boolean isDisplay = true;
+    private String regex;
+    private String regexMessage;
+    private Integer position;
 
 }

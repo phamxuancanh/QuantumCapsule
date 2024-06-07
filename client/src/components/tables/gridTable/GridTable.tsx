@@ -4,13 +4,15 @@ import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
 import { Box, darken, lighten, styled } from '@mui/material';
 // import customs.scss
 import { COLORS } from 'utils/colors';
+import {IGrid} from 'utils/interfaces';
+import { GridApiCommunity } from '@mui/x-data-grid/internals';
 
 
 
 interface GridTableProps {
     tableName: string;
     initData: any[];
-    apiRef: any;
+    apiRef: React.MutableRefObject<GridApiCommunity>;
 
     pageSizeOptions?: number[];
 
@@ -57,8 +59,8 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
         }
     }
 
-    const convertColumns = (dataGrid: any): GridColDef[] => {
-        return dataGrid.map((element: any) => {
+    const convertColumns = (dataGrid: IGrid[]): GridColDef[] => {
+        return dataGrid.sort((a: IGrid, b: IGrid) => a.position - b.position).map((element: IGrid) => {
             return {
                 field: element.columnName,
                 headerName: element.label,
@@ -66,7 +68,7 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
                 headerClassName: 'super-app-theme--header',
                 editable: false,
                 flex: 1,
-            }
+            } as GridColDef;
         });
     }
 

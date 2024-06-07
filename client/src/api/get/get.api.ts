@@ -1,8 +1,9 @@
-import { get } from 'http'
+
 import { requestWithJwt, requestWithoutJwt } from '../request'
 
 import { AxiosResponse } from 'axios'
 import { IGetTableData } from './get.interface';
+// import {IGrid} from 'utils/interfaces'
 
 export const getTableData = async (params: IGetTableData): Promise<AxiosResponse<any>> => {    
   return await requestWithoutJwt.get<any>(`/${params.tableName}/findAll`)
