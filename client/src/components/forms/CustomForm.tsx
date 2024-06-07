@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { getGridData } from 'api/get/get.api';
 import { ACTIONS, InputType } from 'utils/enums';
+import { convertDate } from 'utils/functions';
 
 
 
@@ -26,7 +27,7 @@ interface ICustomFormProps {
 
 const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
 
-    // const [formData, setFormData] = useState<{}>(props.initData);
+    const ref = React.useRef(null)
     const [gridData, setGridData] = useState<any[]>([]);
     const {setFormData} = props;
     useEffect(() => {
@@ -41,12 +42,14 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
             ...prevData,
             [name as string]: value as string,
         }));
+        console.log("name: ", name, "value: ", value);
+        
     };
 
 
     return (
         <Box>
-            <form>
+            <form ref={ref}>
                 <Grid container spacing={2}>
                     {
                         gridData.map((item) => {
@@ -56,9 +59,8 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                         <FormGroup>
                                             <InputLabel>{item.label || ""}</InputLabel>
                                             <TextField
-                                                // label={item.label || ""}
                                                 name={item.columnName || ""}
-                                                defaultValue={props.initData?.[item.columnName as keyof typeof props.initData] || ""}
+                                                defaultValue={props.initData?.[item.columnName as keyof typeof props.initData]}
                                                 onChange={handleChange}
                                                 variant="outlined"
                                                 disabled={props.action === ACTIONS.VIEW? true : !item.editable}
@@ -73,7 +75,7 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                             <InputLabel>{item.label || ""}</InputLabel>
                                             <TextField
                                                 name={item.columnName || ""}
-                                                defaultValue={props.initData?.[item.columnName as keyof typeof props.initData] || 0}
+                                                defaultValue={props.initData?.[item.columnName as keyof typeof props.initData]}
                                                 onChange={handleChange}
                                                 variant="outlined"
                                                 disabled={props.action === ACTIONS.VIEW? true : !item.editable}
@@ -95,7 +97,7 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                                             name={checkBoxParams?.name || ""}
                                                             value={checkBoxParams?.value || ""}
                                                             disabled={props.action === ACTIONS.VIEW? true : !item.editable}
-                                                            defaultChecked={props.initData?.[checkBoxParams?.name as keyof typeof props.initData] === checkBoxParams?.value || checkBoxParams?.defaultChecked}
+                                                            defaultChecked={props.initData?.[item.columnName as keyof typeof props.initData] === checkBoxParams?.value}
                                                             onChange={
                                                                 (e) => {
                                                                     const { name, value } = e.target;
@@ -148,7 +150,7 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                                 <InputLabel>{item.label || ""}</InputLabel>
                                                 <TextField
                                                     name={item.columnName || ""}
-                                                    defaultValue={props.initData?.[item.columnName as keyof typeof props.initData] || ""}
+                                                    defaultValue={convertDate(props.initData?.[item.columnName as keyof typeof props.initData]) }
                                                     onChange={handleChange}
                                                     variant="outlined"
                                                     disabled={props.action === ACTIONS.VIEW? true : !item.editable}

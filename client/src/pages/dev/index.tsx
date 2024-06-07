@@ -1,19 +1,19 @@
 import { getTableData } from 'api/get/get.api';
 import GridTable from 'components/tables/gridTable/GridTable';
 import React, { useEffect, useMemo, useState } from 'react';
-import { DataGrid, GridColDef, useGridApiRef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowParams, useGridApiRef } from '@mui/x-data-grid';
 import ModalAction from 'components/modals/ModalAction';
 import CustomForm from 'components/forms/CustomForm';
-import { InProgress } from 'api/api-shared';
+import { InProgress, IInventory } from 'api/api-shared';
 import { Button } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { IAction, defaultAction} from 'utils/interfaces';
 
 
-
 const DevPage: React.FC = () => {
-    const [tableData, setTableData] = useState<any[]>([]);
-    const [formData, setFormData] = useState<any>({});
+    const instance = new InProgress();
+    const [tableData, setTableData] = useState<IInventory[]>([]);
+    const [formData, setFormData] = useState<IInventory>({});
     // const [rowSelected, setRowSelected] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false);
     const gridRef = useGridApiRef();
@@ -50,9 +50,8 @@ const DevPage: React.FC = () => {
             values: generateStorages(),
         }
     ]
-    const onRowClick = () => {
-        
-        setFormData(gridRef.current?.getSelectedRows().values().next().value);
+    const onRowClick = (row :  GridRowParams<any>) => {
+        setFormData(row.row);
     }
     async function handleClick(action: ACTIONS): Promise<void> {
         console.log('Action:', action);
@@ -69,14 +68,17 @@ const DevPage: React.FC = () => {
                 }
                 break;
             case ACTIONS.CREATE:
+                console.log(instance.init());
+                setFormData(instance.init());
                 setAction({
                     open: true,
-                    payload: {},
+                    payload: instance.init(),
                     type: ACTIONS.CREATE
                 });
                 break;
             case ACTIONS.UPDATE:
-                if (formData.id) {
+                console.log(formData);
+                if (formData?.id) {
                     setAction({
                         open: true,
                         payload: formData,
@@ -87,13 +89,18 @@ const DevPage: React.FC = () => {
                 }
                 break;
             case ACTIONS.DELETE:
-                const instance = new InProgress();
+                // const instance = new InProgress();
                 try {
-                    setLoading(true);
-                    instance.delete(formData.id)
-                    let tempTableData = [...tableData].filter((item) => item.id !== formData.id);
-                    gridRef.current?.setRows(tempTableData);
-                    setLoading(false);
+                    if(formData.id) {
+                        setLoading(true);
+                        instance.delete(formData.id);
+                        let tempTableData = [...tableData].filter((item) => item.id !== formData.id);
+                        gridRef.current?.setRows(tempTableData);
+                        setLoading(false);
+                    }
+                    else {
+                        alert('Please select a row to delete');
+                    }
                 } catch (error) {
                     alert(error);
                 }
@@ -103,18 +110,20 @@ const DevPage: React.FC = () => {
         }
     }
     async function handleSave(): Promise<void> {
-        const instance = new InProgress();
         try {
             setLoading(true);
             switch (action.type) {
                 case ACTIONS.CREATE:
-                    console.log(formData);
-                    
-                    instance.create(formData);
+                    const resCreate = await instance.create(formData);
+                    console.log(resCreate.data.data);
+                    gridRef.current?.setRows([resCreate.data.data, ...tableData]);
+                    setAction(defaultAction);
                     break;
                 case ACTIONS.UPDATE:
                     console.log(formData);
-                    instance.update(formData);
+                    const resUpdate = await instance.update(formData);
+                    gridRef.current?.setRows([...tableData].map((item) => item.id === formData.id ? resUpdate.data.data : item));
+                    setAction(defaultAction);
                     break;
                 default:
                     break;
@@ -135,7 +144,7 @@ const DevPage: React.FC = () => {
                         apiRef={gridRef}
                         tableName="inventories"
                         initData={tableData}
-                        onRowClick={onRowClick}
+                        onRowClick={(row)=>onRowClick(row)}
 
                         pageSizeOptions={[5, 10, 20]}
                     />

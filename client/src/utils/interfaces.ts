@@ -6,7 +6,7 @@ export interface IAction {
     type: ACTIONS;
 }
 
-export const defaultAction = {
+export const defaultAction: IAction = {
     open: false,
     payload: {},
     type: ACTIONS.CREATE

@@ -44,9 +44,15 @@ const routes: RouteObject[] = [
         children: [
             { index: true, element: <Home /> },
             { path: ROUTES.notfound, element: <NotFound /> },
-            { path: ROUTES.dev, element: <Dev /> }
+            // { path: ROUTES.dev, element: <Dev /> }
         ]
-    }
+    },
+    {
+        path: ROUTES.dev,
+        element: (
+            <Dev />
+        )
+    },
     
 ]
 

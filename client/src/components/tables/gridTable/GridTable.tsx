@@ -83,7 +83,7 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
             }}
             pageSizeOptions={props.pageSizeOptions || [10, 20]}
             onRowClick={props.onRowClick}
-            disableColumnResize
+            // disableColumnResize
             getRowClassName={(params) => `super-app-theme--${params.row.status}`}
             
             autoHeight
