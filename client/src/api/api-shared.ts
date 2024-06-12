@@ -1,30 +1,49 @@
 import { AxiosResponse } from 'axios';
 import { requestWithJwt, requestWithoutJwt } from './request'
+import { convertDate } from 'utils/functions'
 
 
 export interface IInventory {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    storage: string;
-    category: string;
-    unit: string;
-    createdDate: string;
-    updatedDate: string;
-    status: string;
+    id?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    storage?: string;
+    category?: string;
+    unit?: string;
+    createdDate?: Date | string;
+    updatedDate?: Date | string;
+    status?: "ENABLED" | "DISABLED"
 }
+
+
+
 export class InProgress {
 
-    create = async (payload: IInventory): Promise<AxiosResponse<any>> => {    
-        return await requestWithoutJwt.post<any>(`/inventories/create`, {data: payload})
+    init = (): IInventory => {
+        return {
+            id: 'IN_'+new Date().getDay().toString()+'_'+Math.floor(Math.random()*1000),
+            name: 'name',
+            price: 100,
+            quantity: 100,
+            storage: 'Storage A',
+            category: 'category A',
+            unit: 'Cai',
+            createdDate: new Date(),
+            updatedDate: new Date(),
+            status: 'ENABLED'
+        }
     }
 
-    update = async (payload: IInventory): Promise<AxiosResponse<any>> => {    
-        return await requestWithoutJwt.put<any>(`/inventories/update`, {data: payload})
+    create = async (body: IInventory): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.post(`/inventories/create`, body)
     }
 
-    delete = async (id: string): Promise<AxiosResponse<any>> => {    
-        return await requestWithoutJwt.delete<any>(`/inventories/delete`, {params: {id}})
+    update = async (body: IInventory): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.put(`/inventories/update`, body)
+    }
+
+    delete = async (id: string): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.delete(`/inventories/delete`, { params: { id } })
     }
 }

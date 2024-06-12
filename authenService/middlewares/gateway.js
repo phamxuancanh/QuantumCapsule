@@ -26,6 +26,7 @@ setInterval(() => {
 function rateLimitAndTimeout(req, res, next) {
     const ip = req.ip;
     console.log("IP: ", ip);
+    // console.log("request: ", req.body);
     requestCounts[ip] = (requestCounts[ip] || 0) + 1;
 
     if (requestCounts[ip] > rateLimit) {
