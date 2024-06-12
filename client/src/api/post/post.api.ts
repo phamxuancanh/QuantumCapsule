@@ -16,6 +16,9 @@ export const refresh = async (payload: any): Promise<AxiosResponse<any>> => {
 export const signOut = async (payload: any): Promise<AxiosResponse<any>> => {
   return await requestWithJwt.post<any>('/auths/signOut', { data: payload }, { withCredentials: true } )
 }
+export const verifyEmail = async (payload: any): Promise<AxiosResponse<any>> => {
+  return await requestWithoutJwt.get<any>('/auths/verifyEmail', { data: payload })
+}
 export const googleSignIn = () => {
   window.location.href = 'http://localhost:8000/api/v1/auths/google/callback'
 };

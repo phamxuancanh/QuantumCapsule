@@ -3,8 +3,8 @@ import { signOut } from '../../api/post/post.api';
 import { useNavigate } from 'react-router-dom';
 import ROUTES from 'routes/constant';
 import { removeAllLocalStorage } from 'utils/functions';
-
-const Home = () => {
+// import { Helmet } from 'react-helmet'
+const ForgotPassword = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -18,9 +18,12 @@ const Home = () => {
     };
     return (
         <div>
+                    {/* <Helmet>
+            <title>Home - My Website</title>
+        </Helmet> */}
             FORGOT PASSWWORD
         </div>
     );
 };
 
-export default Home;
+export default ForgotPassword;

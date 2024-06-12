@@ -83,7 +83,6 @@ const Login = () => {
         [i18n]
     )
     const handleLogin = useCallback(async () => {
-        alert('call login')
         console.log('ASKJDHFKJDSHFKJ')
         try {
             const response = await signIn({
@@ -214,7 +213,7 @@ const Login = () => {
 
                 <div>
                     <FormProvider {...method}>
-                        <form className="tw-flex tw-content-center tw-items-center tw-flex-col tw-bg-red-500"
+                        <form className="tw-flex tw-content-center tw-items-center tw-flex-col"
                             onSubmit={
                                 isSignUp
                                     ? method.handleSubmit(handleRegister)

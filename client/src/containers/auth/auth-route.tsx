@@ -104,7 +104,7 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
     return <Navigate to={ROUTES.home} />;
   }
 
-  if (!isAuthenticated && location.pathname !== ROUTES.login && location.pathname !== ROUTES.forgot_password) {
+  if (!isAuthenticated && location.pathname !== ROUTES.login && location.pathname !== ROUTES.forgot_password && location.pathname !== ROUTES.email_verify) {
     return <Navigate to={ROUTES.login} />;
   }
 

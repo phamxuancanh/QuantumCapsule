@@ -25,6 +25,9 @@ const Dev = loadable(async () => await import('pages/dev'), {
 const ForgotPassword = loadable(async () => await import('pages/forgot_password'), {
     fallback: <Loading />
 })
+const EmailVerify = loadable(async () => await import('pages/email_verify_page'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -42,6 +45,14 @@ const routes: RouteObject[] = [
         element: (
             <AuthRoute>
                 <ForgotPassword />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.email_verify,
+        element: (
+            <AuthRoute>
+                <EmailVerify />
             </AuthRoute>
         )
     },

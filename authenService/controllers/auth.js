@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const { models } = require('../models')
 const client = require('../middlewares/connectRedis')
 const passport = require('../middlewares/passport-setup')
@@ -6,6 +7,7 @@ const { produceMessage } = require('../middlewares/kafkaClient');
 const nodemailer = require('nodemailer'); 
 const path = require('path');
 const fs = require('fs')
+
 const {
     signAccessToken,
     signRefreshToken,
@@ -19,7 +21,48 @@ const transporter = nodemailer.createTransport({
         pass: 'hajcwelbzkljvsgp'
     }
 });
+// SIGN IN CHUA CO VERIFY
+// const signIn = async (req, res, next) => {
+//     try {
+//         const { username, password } = req.body.data;
+//         const user = await models.User.findOne({
+//             where: { username }
+//         });
+//         if (!user) {
+//             return res.status(401).json({
+//                 code: 401,
+//                 message: 'Username is not registered.'
+//             });
+//         }
+//         const isPasswordValid = bcrypt.compareSync(password, user.password);
+//         if (!isPasswordValid) {
+//             return res.status(401).json({
+//                 code: 401,
+//                 message: 'Username or password is incorrect.'
+//             });
+//         }
+//         const accessToken = await signAccessToken(user.id);
+//         const refreshToken = await signRefreshToken(user.id);
 
+//         const expire = new Date();
+//         expire.setDate(expire.getDate() + 1);
+//         await models.User.update({ expire }, { where: { id: user.id } });
+
+//         res.cookie("refreshToken", refreshToken, {
+//             httpOnly: true,
+//             sameSite: 'Strict',
+//             maxAge: 24 * 60 * 60 * 1000,
+//         });
+//         res.setHeader("authorization", accessToken);
+
+//         // Produce a message to Kafka with full user data
+//         await produceMessage('user-signin', user.id, user.toJSON());
+
+//         return res.status(200).json({ success: true, accessToken, user });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 const signIn = async (req, res, next) => {
     try {
         const { username, password } = req.body.data;
@@ -30,6 +73,13 @@ const signIn = async (req, res, next) => {
             return res.status(401).json({
                 code: 401,
                 message: 'Username is not registered.'
+            });
+        }
+        // Check if the email is verified
+        if (!user.emailVerified) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Email is not verified.'
             });
         }
         const isPasswordValid = bcrypt.compareSync(password, user.password);
@@ -61,69 +111,130 @@ const signIn = async (req, res, next) => {
         next(error);
     }
 };
-
+// const signUp = async (req, res, next) => {
+//     try {
+//         const { username, password, email } = req.body.data;
+//         const userByUsername = await models.User.findOne({ where: { username } });
+//         if (userByUsername) {
+//             return res.status(401).json({ code: 401, message: 'Username is already registered.' });
+//         }
+//         const userByEmail = await models.User.findOne({ where: { email } });
+//         if (userByEmail) {
+//             return res.status(401).json({ code: 401, message: 'Email is already registered.' });
+//         }
+//         // Generate a confirmation token
+//         // const token = jwt.sign({ username, password, email }, 'your-secret-key', { expiresIn: '1h' });
+//         // Define the confirmation URL
+//         const confirmationUrl = `http://localhost:3000`
+//         // Read the HTML template
+//         const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
+//         // const templatePath = path.join(__dirname, '..', 'templates', 'forgot_pass_email_template.html')
+//         const htmlContent = fs.readFileSync(templatePath, 'utf8');
+//         const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl);
+//         // Send the email
+//         const mailOptions = {
+//             from: 'canhmail292@gmail.com',
+//             to: email,
+//             subject: 'Email Confirmation',
+//             html: htmlWithLink
+//         };
+//         await transporter.sendMail(mailOptions);
+//         return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 const signUp = async (req, res, next) => {
     try {
         const { username, password, email } = req.body.data;
+
+        // Kiểm tra xem username đã được đăng ký chưa
         const userByUsername = await models.User.findOne({ where: { username } });
         if (userByUsername) {
             return res.status(401).json({ code: 401, message: 'Username is already registered.' });
         }
+
+        // Kiểm tra xem email đã được đăng ký chưa
         const userByEmail = await models.User.findOne({ where: { email } });
         if (userByEmail) {
             return res.status(401).json({ code: 401, message: 'Email is already registered.' });
         }
-        // Generate a confirmation token
-        // const token = jwt.sign({ username, password, email }, 'your-secret-key', { expiresIn: '1h' });
-        // Define the confirmation URL
-        const confirmationUrl = `http://localhost:3000`
-        // Read the HTML template
-        const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
-        // const templatePath = path.join(__dirname, '..', 'templates', 'forgot_pass_email_template.html')
+
+        // Mã hóa mật khẩu
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Lưu người dùng vào cơ sở dữ liệu với trạng thái email chưa được xác thực
+        const newUser = await models.User.create({
+            username,
+            password: hashedPassword,
+            email,
+            emailVerified: false  // Giả định bạn có trường này trong model
+        });
+
+        // Tạo token xác thực email
+        const emailToken = jwt.sign({ id: newUser.id, username: newUser.username, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' });
+
+        // Định nghĩa URL xác thực
+        const confirmationUrl = `http://localhost:3000/verify/email?token=${emailToken}`;
+
+        // Đọc template HTML
+        const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html');
         const htmlContent = fs.readFileSync(templatePath, 'utf8');
         const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl);
-        // Send the email
+
+        // Gửi email xác thực
         const mailOptions = {
             from: 'canhmail292@gmail.com',
             to: email,
             subject: 'Email Confirmation',
             html: htmlWithLink
         };
+
         await transporter.sendMail(mailOptions);
+
         return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' });
     } catch (error) {
         next(error);
     }
 };
-const confirmEmail = async (req, res, next) => {
+const verifyEmail = async (req, res, next) => {
     try {
         const { token } = req.query;
+
         if (!token) {
-            return res.status(400).json({ code: 400, message: 'Invalid token.' });
+            return res.status(400).json({ message: 'Missing token.' });
         }
 
         // Verify the token
         const decoded = jwt.verify(token, 'your-secret-key');
-        const { username, password, email } = decoded;
+        const { id, username, email } = decoded;
 
-        const userByUsername = await models.User.findOne({ where: { username } });
-        const userByEmail = await models.User.findOne({ where: { email } });
-
-        if (userByUsername || userByEmail) {
-            return res.status(401).json({ code: 401, message: 'Username or email is already registered.' });
+        // Find the user in the database
+        const user = await models.User.findOne({ where: { id, username, email } });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token.' });
         }
 
-        // Create the user
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = bcrypt.hashSync(password, salt);
+        // Check if the email is already verified
+        if (user.emailVerified) {
+            return res.status(400).json({ message: 'Email is already verified.' });
+        }
 
-        const newUser = await models.User.create({ username, password: hashPassword, email });
+        // Update the user's emailVerified status
+        user.emailVerified = true;
+        await user.save();
 
-        // Produce a message to Kafka with full user data
-        await produceMessage('user-signup', newUser.id, newUser.toJSON());
+        // Optionally, generate an access token for the user
+        const accessToken = jwt.sign({ id: user.id, username: user.username, email: user.email }, 'your-secret-key', { expiresIn: '1h' });
 
-        return res.status(200).json({ success: true, user: newUser });
+        return res.status(200).json({ success: true, message: 'Email verified successfully.', accessToken });
     } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(400).json({ message: 'Token has expired.' });
+        }
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
         next(error);
     }
 };
@@ -279,6 +390,7 @@ const facebookCallback = (req, res, next) => {
 module.exports = {
     signIn,
     signUp,
+    verifyEmail,
     refreshToken,
     signOut,
     changePassword,
