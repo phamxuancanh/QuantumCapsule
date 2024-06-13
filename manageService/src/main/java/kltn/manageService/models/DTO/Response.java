@@ -1,4 +1,4 @@
-package kltn.manageService.models;
+package kltn.manageService.models.DTO;
 
 import kltn.manageService.enums.StatusResponse;
 import lombok.AllArgsConstructor;

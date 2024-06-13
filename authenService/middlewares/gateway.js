@@ -8,6 +8,10 @@ const services = [
     {
         route:"/grids",
         target: "http://localhost:8001/api/v1/grids",
+    },
+    {
+        route:"/storages",
+        target: "http://localhost:8001/api/v1/storages",
     }
 ];
 

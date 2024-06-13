@@ -7,7 +7,6 @@ interface ICustomModalProps {
     open: boolean;
     children: React.ReactNode;
     type: ACTIONS;
-    formData: {};
     onSave: () => void;
     onClose: () => void;
     // setFormData: (data: any) => void;

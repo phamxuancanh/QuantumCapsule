@@ -8,7 +8,8 @@ export interface IInventory {
     name?: string;
     price?: number;
     quantity?: number;
-    storage?: string;
+    storageName?: string;
+    storageId?: string;
     category?: string;
     unit?: string;
     createdDate?: Date | string;
@@ -22,11 +23,12 @@ export class InProgress {
 
     init = (): IInventory => {
         return {
-            id: 'IN_'+new Date().getDay().toString()+'_'+Math.floor(Math.random()*1000),
+            id: 'random ID',
             name: 'name',
             price: 100,
             quantity: 100,
-            storage: 'Storage A',
+            storageName: 'Storage A',
+            storageId: 'ST_1',
             category: 'category A',
             unit: 'Cai',
             createdDate: new Date(),

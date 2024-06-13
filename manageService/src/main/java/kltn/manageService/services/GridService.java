@@ -6,7 +6,7 @@ import kltn.manageService.enums.ResponseMessage;
 import kltn.manageService.exceptions.ItemNotFoundException;
 import kltn.manageService.ids.GridId;
 import kltn.manageService.models.Grid;
-import kltn.manageService.models.Response;
+import kltn.manageService.models.DTO.Response;
 import kltn.manageService.repositories.GridRepository;
 
 @Service
