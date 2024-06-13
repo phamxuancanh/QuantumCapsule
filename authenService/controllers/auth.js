@@ -200,7 +200,7 @@ const signUp = async (req, res, next) => {
 const verifyEmail = async (req, res, next) => {
     try {
         const { token } = req.query;
-
+        console.log(req.data, "token")
         if (!token) {
             return res.status(400).json({ message: 'Missing token.' });
         }

@@ -110,21 +110,27 @@ const Login = () => {
     }, [method, navigate])
 
     const handleRegister = useCallback(async () => {
-        alert('call register')
+        alert('call register');
         try {
-            const result = await signUp({
-                username: method.getValues('username'),
-                password: method.getValues('password'),
-                email: method.getValues('email')
-            })
-            console.log(result)
-            setErrorMessage(result?.data?.status.toString())
-        } catch (error: { code: number, message: string } | any) {
-            // eslint-disable-next-line no-console
-            setErrorMessage(error?.message)
+            const username = method.getValues('username');
+            const password = method.getValues('password');
+            const email = method.getValues('email');
+    
+            const result = await signUp({ username, password, email });
+    
+            console.log('signUp result:', result);
+    
+            // Check if the result has the expected data structure
+            if (result?.data) {
+                navigate(ROUTES.email_verify_send);
+            } else {
+                setErrorMessage('Unexpected response from server');
+            }
+        } catch (error: any) {
+            console.error('signUp error:', error);
+            setErrorMessage(error?.message || 'Registration failed');
         }
-    }, [method])
-    // CON GAU, DONT CARE
+    }, [method, navigate]);
     const [user, setUser] = useState('');
     const { rive, RiveComponent } = useRive({
         src: "animated_login_character3.riv",

@@ -28,6 +28,12 @@ const ForgotPassword = loadable(async () => await import('pages/forgot_password'
 const EmailVerify = loadable(async () => await import('pages/email_verify_page'), {
     fallback: <Loading />
 })
+const EmailVerifySend = loadable(async () => await import('pages/email_veirfy_send_page'), {
+    fallback: <Loading />
+})
+const EmailVerifySuccess = loadable(async () => await import('pages/email_verify_success_page'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -53,6 +59,22 @@ const routes: RouteObject[] = [
         element: (
             <AuthRoute>
                 <EmailVerify />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.email_verify_send,
+        element: (
+            <AuthRoute>
+                <EmailVerifySend />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.email_verify_success,
+        element: (
+            <AuthRoute>
+                <EmailVerifySuccess />
             </AuthRoute>
         )
     },

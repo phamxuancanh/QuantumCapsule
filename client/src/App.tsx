@@ -4,6 +4,9 @@ import routes from 'routes'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'services/i18n'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const Main = () => {
   const element = useRoutes(routes)
@@ -12,11 +15,11 @@ const Main = () => {
 
 const App = () => {
   return (
-    <>
-        <BrowserRouter>
-            <Main />
-        </BrowserRouter>
-        <ToastContainer
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+          <Main />
+      </BrowserRouter>
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -27,8 +30,8 @@ const App = () => {
         draggable
         pauseOnHover
       />
-    </>
+    </QueryClientProvider>
   )
 }
 
-export default App;
+export default App
