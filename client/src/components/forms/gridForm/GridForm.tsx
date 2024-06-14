@@ -30,7 +30,7 @@ interface IState {
     dataSources: IDataSource[];
     gridData: IGrid[];
 }
-const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
+const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
 
     const { setFormData } = props;
     const [state, setState] = useState<IState>({
@@ -190,4 +190,4 @@ const BasicForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
     );
 };
 
-export default BasicForm;
+export default GridForm;

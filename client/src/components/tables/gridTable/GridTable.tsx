@@ -3,7 +3,7 @@ import { getGridData } from 'api/get/get.api';
 import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
 import {IGrid} from 'utils/interfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
-import 'styles/global.scss'
+import './index.scss'
 
 interface GridTableProps {
     tableName: string;
@@ -66,6 +66,7 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
                 editable: false,
                 flex: 1,
                 hideable: true,
+                minWidth: 180,
             };
             return gridColumn
         });
