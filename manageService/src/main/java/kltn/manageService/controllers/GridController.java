@@ -3,7 +3,7 @@ package kltn.manageService.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import kltn.manageService.models.Grid;
-import kltn.manageService.models.Response;
+import kltn.manageService.models.DTO.Response;
 import kltn.manageService.services.GridService;
 
 import org.springframework.web.bind.annotation.RequestMapping;

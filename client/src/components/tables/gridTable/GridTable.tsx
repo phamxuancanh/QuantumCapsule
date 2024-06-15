@@ -1,13 +1,9 @@
 import React from 'react';
 import { getGridData } from 'api/get/get.api';
 import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
-import { Box, darken, lighten, styled } from '@mui/material';
-// import customs.scss
-import { COLORS } from 'utils/colors';
 import {IGrid} from 'utils/interfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
-
-
+import './index.scss'
 
 interface GridTableProps {
     tableName: string;
@@ -27,22 +23,23 @@ enum FieldType {
     BOOLEAN = 'BOOLEAN',
 }
 
-const styles = {
-    '& .super-app-theme--header': {
-        backgroundColor: COLORS.th,
-        color: 'black',
-        fontWeight: 'bold',
-    },
+interface IState {
+    columns: GridColDef[];
+    gridData: IGrid[];
+
 }
 
 const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
-    const [columns, setColumns] = React.useState<GridColDef[]>([]);
+    const [state, setState] = React.useState<IState>({
+        columns: [],
+        gridData: [],
+    });
 
     React.useEffect(() => {
         (async () => {
             const res = await getGridData(props.tableName);
             const gridColumns = convertColumns(res.data.data)
-            setColumns(gridColumns);
+            setState(prep=>({...prep, columns: gridColumns, gridData: res.data.data}));
         })();
     }, [])
 
@@ -61,31 +58,41 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
 
     const convertColumns = (dataGrid: IGrid[]): GridColDef[] => {
         return dataGrid.sort((a: IGrid, b: IGrid) => a.position - b.position).map((element: IGrid) => {
-            return {
+            const gridColumn :GridColDef = {
                 field: element.columnName,
                 headerName: element.label,
                 type: convertTypes(element.columnType),
-                headerClassName: 'super-app-theme--header',
+                headerClassName: 'table-header',
                 editable: false,
                 flex: 1,
-            } as GridColDef;
+                hideable: true,
+                minWidth: 180,
+            };
+            return gridColumn
         });
     }
 
-
+    const columnVisibilityModel = () => {
+        let visibles: { [key: string]: boolean } = {};
+        state.gridData.forEach((grid) => {
+            visibles[grid.columnName] = grid.isDisplayTable;
+        });
+        console.log(visibles);
+        
+        return visibles;
+    };
 
     return (
         <DataGrid
-            sx={styles}
             apiRef={props.apiRef}
             rows={props.initData}
-            columns={columns}
+            columns={state.columns}
+            columnVisibilityModel= {columnVisibilityModel()}
             initialState={{
-                pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } }
+                pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } },
             }}
             pageSizeOptions={props.pageSizeOptions || [10, 20]}
             onRowClick={props.onRowClick}
-            // disableColumnResize
             getRowClassName={(params) => `super-app-theme--${params.row.status}`}
             
             autoHeight

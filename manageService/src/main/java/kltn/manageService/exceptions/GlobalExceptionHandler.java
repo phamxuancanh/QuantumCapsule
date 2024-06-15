@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import kltn.manageService.enums.ResponseMessage;
-import kltn.manageService.models.Response;
+import kltn.manageService.models.DTO.Response;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import kltn.manageService.enums.ResponseMessage;
 import kltn.manageService.exceptions.ItemNotFoundException;
 import kltn.manageService.models.Inventory;
-import kltn.manageService.models.Response;
+import kltn.manageService.models.DTO.InventoryDTO;
+import kltn.manageService.models.DTO.Response;
 import kltn.manageService.services.InventoryService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,8 +43,7 @@ public class InventoryController{
         return inventoryService.findById(id);
     }
     @PostMapping("/create")
-    public Response create(@RequestBody Inventory entity) {
-        System.out.println(entity);
+    public Response create(@RequestBody InventoryDTO entity) {
         return inventoryService.create(entity);
     }
     @DeleteMapping("/delete")
@@ -51,7 +51,7 @@ public class InventoryController{
         return inventoryService.delete(id);  
     }
     @PutMapping("/update")
-    public Response update(@RequestBody Inventory entity) {
+    public Response update(@RequestBody InventoryDTO entity) {
         System.out.println(entity);
         return inventoryService.update(entity); 
     }
@@ -70,6 +70,10 @@ public class InventoryController{
             throw new ItemNotFoundException();
         }
         return Response.success(ResponseMessage.SUCCESS.getMessage(), list);
+    }
+    @GetMapping("/getStatusDirections")
+    public Response getStatusDirections() {
+        return inventoryService.getStatusDirections();
     }
     
 

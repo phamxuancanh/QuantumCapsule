@@ -1,0 +1,57 @@
+@import "styles/global.scss";
+
+.modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .modal-box {
+    overflow-y: auto;
+    max-height: 100vh;
+    background-color: $form-bg-color;
+    border-radius: 8px;
+    padding: 20px;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    box-shadow: $box-shadow;
+    outline: none;
+
+    @media (max-width: 768px) {
+      padding: 15px;
+      width: 95%;
+    }
+
+    @media (max-width: 480px) {
+      padding: 10px;
+      width: 100%;
+    }
+  }
+
+  .modal-title {
+    font-size: 1.5em;
+    color: $text-color;
+    margin-bottom: 10px;
+
+    @media (max-width: 768px) {
+      font-size: 1.3em;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.2em;
+    }
+  }
+
+  .modal-children {
+    margin-top: 20px;
+    color: $text-color;
+
+    @media (max-width: 768px) {
+      margin-top: 15px;
+    }
+
+    @media (max-width: 480px) {
+      margin-top: 10px;
+    }
+  }
+}

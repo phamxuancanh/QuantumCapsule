@@ -21,21 +21,20 @@ export interface IGrid {
     label: string;
     editable: boolean;
     dataSource: string;
-    isDisplay: boolean;
+    isDisplayForm: boolean;
+    isDisplayTable: boolean;
     regex: string;
     regexMessage: string;
     position: number;
 }
 
-export interface IFormParam {
-    name: string;
-    label: string;
-    value?: any;
-    labelValue?: string;
-    defaultChecked?: boolean;
-    values?: IValueFormParam[];
-}
-export interface IValueFormParam {
+
+
+export interface IDirection{
     value: any;
     label: string;
+}
+export interface IDataSource{
+    name: string;
+    values: IDirection[];
 }
