@@ -1,4 +1,4 @@
-import { ACTIONS } from "./enums";
+import { ACTIONS, IconName} from "./enums";
 
 export interface IAction {
     open: boolean;
@@ -37,4 +37,10 @@ export interface IDirection{
 export interface IDataSource{
     name: string;
     values: IDirection[];
+}
+
+export interface IMenuItem {
+    icon: IconName,
+    name: string,
+    text: string,
 }

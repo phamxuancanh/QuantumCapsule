@@ -1,8 +1,8 @@
-import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Grid, Typography } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
 import React from 'react';
 import './index.scss'
 
-interface IProps {
+export interface IInfoCardProps {
     image?: string
     name: string
 
@@ -18,7 +18,7 @@ interface IProps {
 
 }
 
-const InfoCard: React.FC<IProps> = (props: IProps) => {
+const InfoCard: React.FC<IInfoCardProps> = (props: IInfoCardProps) => {
     const { image, name, masterParams, detailParams, btn1Name, onClickBtn1, btn2Name, onClickBtn2, data } = props;
     return (
         <div className={'info-card'}>

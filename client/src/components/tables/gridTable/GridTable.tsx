@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { getGridData } from 'api/get/get.api';
 import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
 import {IGrid} from 'utils/interfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import './index.scss'
 
-interface GridTableProps {
+export interface GridTableProps {
     tableName: string;
     initData: any[];
     apiRef: React.MutableRefObject<GridApiCommunity>;
@@ -35,13 +35,29 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
         gridData: [],
     });
 
+    const convertColumns = useCallback((dataGrid: IGrid[]): GridColDef[] => {
+        return dataGrid.sort((a: IGrid, b: IGrid) => a.position - b.position).map((element: IGrid) => {
+            const gridColumn :GridColDef = {
+                field: element.columnName,
+                headerName: element.label,
+                type: convertTypes(element.columnType),
+                headerClassName: 'table-header',
+                editable: false,
+                flex: 1,
+                hideable: true,
+                minWidth: 180,
+            };
+            return gridColumn
+        });
+    },[]) 
+
     React.useEffect(() => {
         (async () => {
             const res = await getGridData(props.tableName);
             const gridColumns = convertColumns(res.data.data)
             setState(prep=>({...prep, columns: gridColumns, gridData: res.data.data}));
         })();
-    }, [])
+    }, [convertColumns, props.tableName])
 
 
 
@@ -56,21 +72,7 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
         }
     }
 
-    const convertColumns = (dataGrid: IGrid[]): GridColDef[] => {
-        return dataGrid.sort((a: IGrid, b: IGrid) => a.position - b.position).map((element: IGrid) => {
-            const gridColumn :GridColDef = {
-                field: element.columnName,
-                headerName: element.label,
-                type: convertTypes(element.columnType),
-                headerClassName: 'table-header',
-                editable: false,
-                flex: 1,
-                hideable: true,
-                minWidth: 180,
-            };
-            return gridColumn
-        });
-    }
+
 
     const columnVisibilityModel = () => {
         let visibles: { [key: string]: boolean } = {};

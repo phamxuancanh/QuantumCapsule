@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
     TextField,
     Grid,
-    Checkbox,
-    FormControlLabel,
     FormGroup,
     InputLabel,
     Select,
@@ -14,11 +12,11 @@ import {
 import { getGridData, getDirections } from 'api/get/get.api';
 import { ACTIONS, InputType } from 'utils/enums';
 import { convertDate } from 'utils/functions';
-import { IAction, IDataSource, IGrid } from 'utils/interfaces'
+import { IDataSource, IGrid } from 'utils/interfaces'
 
 
 
-interface ICustomFormProps {
+export interface IGridFormProps {
     tableName: string;
     // initData: {};
     action: ACTIONS;
@@ -30,7 +28,7 @@ interface IState {
     dataSources: IDataSource[];
     gridData: IGrid[];
 }
-const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
+const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
 
     const { setFormData } = props;
     const [state, setState] = useState<IState>({
@@ -51,7 +49,7 @@ const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
             }
             setState(prep => ({ ...prep, dataSources: tempDataSources, gridData: tempGridData }))
         })();
-    }, []);
+    }, [props.formData, props.tableName]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown; }> | SelectChangeEvent<never>) => {
         const { name, value } = e.target;
         setFormData({ ...props.formData, [name as string]: value });
@@ -182,6 +180,7 @@ const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                     default: return <h1>nothing</h1>
                                 }
                             }
+                            return null;
                         })
                     }
                 </Grid>
