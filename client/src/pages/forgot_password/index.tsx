@@ -11,7 +11,7 @@ const ForgotPassword = () => {
         try {
             await signOut({});
             removeAllLocalStorage()
-            navigate(ROUTES.login);
+            navigate(ROUTES.sign_in);
         } catch (error) {
             alert('Logout failed. Please try again.');
         }

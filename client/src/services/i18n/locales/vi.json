@@ -2,19 +2,51 @@
     "translation": {
         "welcome-to-react": "Xin chào",
         "login": {
-            "title_signIn": "Đăng nhập",
-            "title_signUp": "Đăng ký",
-            "username": "Tên đăng nhập",
-            "password": "Mật khẩu",
-            "confirm_password": "Mật khẩu xác nhận",
-            "submit_login": "Đăng nhập",
-            "submit_signup": "Đăng ký",
-            "forgot_password": "Quên mật khẩu?",
-            "username_not_empty": "Tên đăng nhập không được để trống",
-            "password_not_empty": "Mật khẩu không được để trống",
-            "confirm_password_must_match": "Mật khẩu xác nhận không khớp",
-            "back": "Trở về",
-            "goToSignUp": "Đi tới trang đăng ký"
+
+        },
+        "signUp": {
+            "title": "Đăng Ký",
+            "first_name": "Tên",
+            "last_name": "Họ",
+            "user_name": "Tên Đăng Nhập",
+            "email": "Email",
+            "password": "Mật Khẩu",
+            "confirm_password": "Xác Nhận Mật Khẩu",
+            "agree": "Tôi đồng ý với",
+            "terms": "Điều Khoản & Điều Kiện",
+            "submit": "Đăng Ký",
+            "or": "hoặc",
+            "have_account": "Đã có tài khoản?",
+            "login": "Đăng Nhập",
+            "first_name_required": "Tên không được để trống",
+            "last_name_required": "Họ không được để trống",
+            "user_name_required": "Tên đăng nhập không được để trống",
+            "email_required": "Email không được để trống",
+            "password_required": "Mật khẩu không được để trống",
+            "confirm_password_required": "Mật khẩu xác nhận không được để trống",
+            "term_required": "Bạn phải đồng ý với điều khoản và điều kiện",
+            "first_name_invalid": "Tên không hợp lệ",
+            "last_name_invalid": "Họ không hợp lệ",
+            "email_invalid": "Email không hợp lệ",
+            "username_invalid": "Phải chứa cả chữ và số",
+            "password_invalid": "Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số",
+            "password_must_match": "Mật khẩu xác nhận không khớp"
+        },
+        "email_verify_send": {
+            "check": "Kiểm tra email của bạn",
+            "hello": "Xin chào",
+            "vrf1": "Để bắt đầu sử dụng dịch vụ của chúng tôi, chúng tôi cần xác minh email của bạn.",
+            "vrf2_part1": "Chúng tôi đã gửi liên kết xác minh đến email.",
+            "vrf2_part2": "Vui lòng kiểm tra và xác nhận đó là bạn.",
+            "sure": "Chắc chắn!",
+            "didnt_receive": "Không nhận được email?",
+            "send_it_again": "Gửi lại"
+        },
+        "verify_success": {
+            "verified": "Xác minh thành công",
+            "message2": "Bây giờ bạn có thể sử dụng dịch vụ của chúng tôi.",
+            "message3": "Chúc bạn có trải nghiệm tốt với dịch vụ của chúng tôi!",
+            "go_to_login": "Đăng nhập"
         }
     }
 }

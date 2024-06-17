@@ -1,7 +1,8 @@
 const ROUTES = {
     home: '/',
     notfound: '*',
-    login: '/login',
+    sign_in: '/sign_in',
+    sign_up: '/sign_up',
     dev: '/dev',
     forgot_password: '/forgot_password',
     email_verify: '/verify/email',

@@ -25,7 +25,7 @@ const SignUpSuccessPage = () => {
             <button className="tw-px-4 tw-py-2 tw-font-semibold  tw-bg-blue-500 tw-rounded-md tw-mr-2">
               <Link
                 className="tw-text-white "
-                to={ROUTES.login}
+                to={ROUTES.sign_in}
                 style={{ textDecoration: "none" }}
               >
                 RETURN TO LOGIN PAGE

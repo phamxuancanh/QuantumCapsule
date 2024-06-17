@@ -13,7 +13,10 @@ import React from 'react'
 const Home = loadable(async () => await import('pages/home'), {
     fallback: <Loading />
 })
-const Login = loadable(async () => await import('pages/login'), {
+const SignIn = loadable(async () => await import('pages/sign_in'), {
+    fallback: <Loading />
+})
+const SignUp = loadable(async () => await import('pages/sign_up'), {
     fallback: <Loading />
 })
 const NotFound = loadable(async () => await import('pages/not-found'), {
@@ -39,10 +42,18 @@ const EmailVerifySuccess = loadable(async () => await import('pages/email_verify
  */
 const routes: RouteObject[] = [
     {
-        path: ROUTES.login,
+        path: ROUTES.sign_in,
         element: (
             <AuthRoute>
-                <Login />
+                <SignIn />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.sign_up,
+        element: (
+            <AuthRoute>
+                <SignUp />
             </AuthRoute>
         )
     },

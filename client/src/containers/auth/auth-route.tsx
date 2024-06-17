@@ -62,7 +62,7 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
       setIsAuthenticated(!!validAccessToken)
       setLoading(false)
     }
-    if (location.pathname !== ROUTES.login) {
+    if (location.pathname !== ROUTES.sign_in) {
       verifyAuthentication()
     } else {
       setLoading(false)
@@ -100,12 +100,12 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
     );
   }
 
-  if (isAuthenticated && location.pathname === ROUTES.login) {
+  if (isAuthenticated && location.pathname === ROUTES.sign_in) {
     return <Navigate to={ROUTES.home} />;
   }
 
-  if (!isAuthenticated && location.pathname !== ROUTES.login && location.pathname !== ROUTES.forgot_password && location.pathname !== ROUTES.email_verify && location.pathname !== ROUTES.email_verify_success && location.pathname !== ROUTES.email_verify_send) {
-    return <Navigate to={ROUTES.login} />;
+  if (!isAuthenticated && location.pathname !== ROUTES.sign_in && location.pathname !== ROUTES.forgot_password && location.pathname !== ROUTES.email_verify && location.pathname !== ROUTES.email_verify_success && location.pathname !== ROUTES.email_verify_send && location.pathname !== ROUTES.sign_up) {
+    return <Navigate to={ROUTES.sign_in} />;
   }
 
   return children;

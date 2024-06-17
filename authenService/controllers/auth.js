@@ -146,29 +146,27 @@ const signIn = async (req, res, next) => {
 // };
 const signUp = async (req, res, next) => {
     try {
-        const { username, password, email } = req.body.data;
+        const { firstName, lastName, username, email, password } = req.body.data;
 
-        // Kiểm tra xem username đã được đăng ký chưa
         const userByUsername = await models.User.findOne({ where: { username } });
         if (userByUsername) {
             return res.status(401).json({ code: 401, message: 'Username is already registered.' });
         }
 
-        // Kiểm tra xem email đã được đăng ký chưa
         const userByEmail = await models.User.findOne({ where: { email } });
         if (userByEmail) {
             return res.status(401).json({ code: 401, message: 'Email is already registered.' });
         }
 
-        // Mã hóa mật khẩu
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Lưu người dùng vào cơ sở dữ liệu với trạng thái email chưa được xác thực
         const newUser = await models.User.create({
+            firstName,
+            lastName,
             username,
             password: hashedPassword,
             email,
-            emailVerified: false  // Giả định bạn có trường này trong model
+            emailVerified: false
         });
 
         // Tạo token xác thực email
@@ -196,7 +194,7 @@ const signUp = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+}
 const verifyEmail = async (req, res, next) => {
     try {
         const { token } = req.query;
