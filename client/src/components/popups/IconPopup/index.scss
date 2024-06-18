@@ -11,7 +11,7 @@
         margin-left: 5px;
         display: none;
     }
-    
+
     &:hover {
         border-radius: 20px !important;
         transition: border-radius 0.5s;
@@ -19,16 +19,14 @@
             display: inline-flex;
             animation: fadeIn 0.8s;
         }
-        
     }
 
     @keyframes fadeIn {
-        from{
+        from {
             opacity: 0;
         }
         to {
             opacity: 1;
         }
-        
     }
 }

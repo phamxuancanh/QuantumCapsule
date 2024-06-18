@@ -1,7 +1,7 @@
 import * as Icons from '@mui/icons-material';
 
 
-import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Typography } from '@mui/material';
+import { ListItemIcon, ListItemText, MenuItem, MenuList, Paper} from '@mui/material';
 import {IconName} from 'utils/enums'
 import {IMenuItem} from 'utils/interfaces'
 

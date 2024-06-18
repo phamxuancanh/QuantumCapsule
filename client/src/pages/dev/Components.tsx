@@ -17,7 +17,7 @@ const Components: React.FC = () => {
             Age: '30',
             Country: 'USA',
             Occupation: 'Engineer',
-            Hobby: 'Photography Photography Photography Photography Photography Photography Photography '
+            Hobby: 'Photography Photography Photography '
         }
     };
     const iconMenuProps: IIconMenuProps = {
