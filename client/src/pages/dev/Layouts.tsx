@@ -18,12 +18,12 @@ const Layouts: React.FC = () => {
         }
     };
     const items = (): any[] => {
-        const array: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const array: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
         return array.map((item) => {
             return (
                 <div key={item}>
                     <InfoCard
-                        {...userProps}
+                        {...{...userProps, name: `John Doe ${item}`}}
                         btn1Name='Edit'
                         onClickBtn1={(btnName, data) => console.log(btnName, data)}
                         btn2Name='Delete'
@@ -36,7 +36,8 @@ const Layouts: React.FC = () => {
     const GridLayoutProps: GridLayoutProps ={
         items: items(),
         columnSpacing: 10,
-        itemSpacing: {xs: 10,sm: 5, md: 10/3, lg: 2.5, xl: 2}
+        itemSpacing: {xs: 10,sm: 5, md: 10/3, lg: 2.5, xl: 2},
+        itemsPerPage: 8
     }
     return (
         <div>
