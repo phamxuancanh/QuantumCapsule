@@ -1,18 +1,19 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { toast } from 'react-toastify';
-import { Link, useNavigate } from "react-router-dom";
-import { setToLocalStorage } from "utils/functions";
-import { signIn, signUp, googleSignIn, facebookSignIn } from "api/post/post.api";
+import React, { useCallback, useMemo, useState, useEffect } from "react"
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { toast } from 'react-toastify'
+import { Link, useNavigate } from "react-router-dom"
+import { setToLocalStorage } from "utils/functions"
+import { signUp, googleSignIn, facebookSignIn } from "api/post/post.api"
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
 import { useTranslation } from 'react-i18next'
 import getUnicodeFlagIcon from 'country-flag-icons/unicode'
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import loginImage from 'assets/bb.jpg'
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-const theme = createTheme();
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
+import { ClockLoader } from "react-spinners"
+const theme = createTheme()
 
 const SignUp = () => {
     const navigate = useNavigate()
@@ -32,6 +33,7 @@ const SignUp = () => {
     const [errorMessageTermCheck, setErrorMessageTermCheck] = useState("")
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
+    const [loading, setLoading] = useState(false)
     // TODO: them loading
 
     const languageOptions = useMemo(() => {
@@ -104,17 +106,25 @@ const SignUp = () => {
         }).required();
 
         try {
-            await schema.validate({ firstName, lastName, username, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false });
-            const result = await signUp({ firstName, lastName, username, email, password });
-            console.log('result')
-            console.log(result)
-            console.log('result.data:', result?.data);
-            if (result?.data) {
-                navigate(ROUTES.email_verify_send);
-            } else {
-                alert('Unexpected response from server');
-            }
+            await schema.validate({ firstName, lastName, username, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
+            setLoading(true);
+            setTimeout(async () => {
+                const result = await signUp({ firstName, lastName, username, email, password })
+                console.log('result')
+                console.log(result)
+                console.log('result.data:', result?.data)
+                if (result?.data) {
+                    setTimeout(() => {
+                        setLoading(false)
+                        navigate(ROUTES.email_verify_send)
+                        toast.success(t('signUp.success'))
+                    }, 0)
+                } else {
+                    alert('Unexpected response from server')
+                }
+            }, 3000)
         } catch (error) {
+            setLoading(false);
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
                 // Create an ordered list of error fields
@@ -188,7 +198,25 @@ const SignUp = () => {
 
     return (
         <div className="tw-flex tw-bg-gray-200">
-            <div className="tw-bg-red-500 tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
+            {loading && (
+                <div className="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-opacity-50">
+                    <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">
+                        <ClockLoader
+                            className='tw-flex tw-justify-center tw-items-center tw-w-full tw-mt-20'
+                            color='#5EEAD4'
+                            cssOverride={{
+                                display: 'block',
+                                margin: '0 auto',
+                                borderColor: 'blue'
+                            }}
+                            loading
+                            speedMultiplier={3}
+                            size={40}
+                        />
+                    </div>
+                </div>
+            )}
+            <div className="tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
                 <img src={loginImage} alt="loginImg" className="tw-h-full" />
             </div>
             <div className="tw-flex lg:tw-relative lg:tw-w-3/5 tw-w-full tw-items-center tw-justify-between">

@@ -3,7 +3,7 @@
         "welcome-to-react": "Xin chào",
         "signIn": {
             "title": "Đăng Nhập",
-            "user_name": "Tên Đăng Nhập",
+            "user_name": "Tên Đăng Nhập hoặc Email",
             "password": "Mật khẩu",
             "submit": "Đăng nhập",
             "keep_signed_in": "Ghi nhớ đăng nhập",
@@ -11,7 +11,7 @@
             "or": "hoặc",
             "no_account": "Chưa có tài khoản?",
             "signUp": "Đăng Ký",
-            "user_name_required": "Username không được để trống",
+            "user_name_required": "Username/Email không được để trống",
             "password_required": "Mật khẩu không được để trống",
             "user_name_not_found": "Không tìm thấy người dùng",
             "password_incorrect": "Mật khẩu sai"
@@ -42,7 +42,8 @@
             "email_invalid": "Email không hợp lệ",
             "username_invalid": "Username phải chứa cả chữ và số",
             "password_invalid": "Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số",
-            "password_must_match": "Mật khẩu xác nhận không khớp"
+            "password_must_match": "Mật khẩu xác nhận không khớp",
+            "success": "Đăng ký thành công"
         },
         "email_verify_send": {
             "check": "Kiểm tra email của bạn",
@@ -59,6 +60,19 @@
             "message2": "Bây giờ bạn có thể sử dụng dịch vụ của chúng tôi.",
             "message3": "Chúc bạn có trải nghiệm tốt với dịch vụ của chúng tôi!",
             "go_to_login": "Đăng nhập"
+        },
+        "forgot_password": {
+            "title": "Quên Mật Khẩu",
+            "your_register_email": "Email Bạn Đã Đăng Ký",
+            "new_password": "Mật Khẩu Mới",
+            "confirm_password": "Mật Khẩu Xác Nhận",
+            "submit": "Xác Nhận",
+            "email_required": "Yêu cầu phải có Email",
+            "password_required": "Yêu cầu phải có Mật khẩu",
+            "confirm_password_required": "Yêu cầu phải Xác nhận mật khẩu",
+            "email_not_found": "Email không được đăng ký",
+            "password_invalid": "Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, và 1 số",
+            "password_must_match": "Mật khẩu xác nhận không khớp"
         }
     }
 }

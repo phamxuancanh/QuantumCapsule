@@ -16,7 +16,7 @@ passport.use(new GoogleStrategy({
       let user = await models.User.findOne({
         where: { email: profile.emails[0].value }
       });
-
+      console.log(user)
       if (!user) {
         user = await models.User.create({
           firstName: profile.name.givenName,

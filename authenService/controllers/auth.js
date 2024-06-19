@@ -7,7 +7,7 @@ const { produceMessage } = require('../middlewares/kafkaClient');
 const nodemailer = require('nodemailer'); 
 const path = require('path');
 const fs = require('fs')
-
+const { Op } = require('sequelize')
 const {
     signAccessToken,
     signRefreshToken,
@@ -20,55 +20,18 @@ const transporter = nodemailer.createTransport({
         user: 'canhmail292@gmail.com',
         pass: 'hajcwelbzkljvsgp'
     }
-});
-// SIGN IN CHUA CO VERIFY
-// const signIn = async (req, res, next) => {
-//     try {
-//         const { username, password } = req.body.data;
-//         const user = await models.User.findOne({
-//             where: { username }
-//         });
-//         if (!user) {
-//             return res.status(401).json({
-//                 code: 401,
-//                 message: 'Username is not registered.'
-//             });
-//         }
-//         const isPasswordValid = bcrypt.compareSync(password, user.password);
-//         if (!isPasswordValid) {
-//             return res.status(401).json({
-//                 code: 401,
-//                 message: 'Username or password is incorrect.'
-//             });
-//         }
-//         const accessToken = await signAccessToken(user.id);
-//         const refreshToken = await signRefreshToken(user.id);
-
-//         const expire = new Date();
-//         expire.setDate(expire.getDate() + 1);
-//         await models.User.update({ expire }, { where: { id: user.id } });
-
-//         res.cookie("refreshToken", refreshToken, {
-//             httpOnly: true,
-//             sameSite: 'Strict',
-//             maxAge: 24 * 60 * 60 * 1000,
-//         });
-//         res.setHeader("authorization", accessToken);
-
-//         // Produce a message to Kafka with full user data
-//         await produceMessage('user-signin', user.id, user.toJSON());
-
-//         return res.status(200).json({ success: true, accessToken, user });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+})
 const signIn = async (req, res, next) => {
     try {
         const { username, password } = req.body.data;
         console.log(req.body.data, "req.body.data");
         const user = await models.User.findOne({
-            where: { username }
+            where: { 
+                [Op.or]: [
+                    { username: username },
+                    { email: username }
+                ]
+            }
         });
         if (!user) {
             return res.status(401).json({
@@ -111,40 +74,7 @@ const signIn = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
-// const signUp = async (req, res, next) => {
-//     try {
-//         const { username, password, email } = req.body.data;
-//         const userByUsername = await models.User.findOne({ where: { username } });
-//         if (userByUsername) {
-//             return res.status(401).json({ code: 401, message: 'Username is already registered.' });
-//         }
-//         const userByEmail = await models.User.findOne({ where: { email } });
-//         if (userByEmail) {
-//             return res.status(401).json({ code: 401, message: 'Email is already registered.' });
-//         }
-//         // Generate a confirmation token
-//         // const token = jwt.sign({ username, password, email }, 'your-secret-key', { expiresIn: '1h' });
-//         // Define the confirmation URL
-//         const confirmationUrl = `http://localhost:3000`
-//         // Read the HTML template
-//         const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
-//         // const templatePath = path.join(__dirname, '..', 'templates', 'forgot_pass_email_template.html')
-//         const htmlContent = fs.readFileSync(templatePath, 'utf8');
-//         const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl);
-//         // Send the email
-//         const mailOptions = {
-//             from: 'canhmail292@gmail.com',
-//             to: email,
-//             subject: 'Email Confirmation',
-//             html: htmlWithLink
-//         };
-//         await transporter.sendMail(mailOptions);
-//         return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+}
 const signUp = async (req, res, next) => {
     try {
         const { firstName, lastName, username, email, password } = req.body.data;
@@ -194,6 +124,45 @@ const signUp = async (req, res, next) => {
         return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' });
     } catch (error) {
         next(error);
+    }
+}
+const sendOTP = async (req, res, next) => {
+    try {
+        const { email } = req.body.data;
+        console.log(req.body.data, "req.body.data");
+        if (!email) {
+            return res.status(400).json({ message: 'Missing email.' });
+        }
+
+        // Find the user in the database
+        const user = await models.User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found.' });
+        }
+
+        // Generate an OTP
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        // Send the OTP to the user's email
+
+        const mailOptions = {
+            from: 'canhmail292@gmail.com',
+            to: email,
+            subject: 'Your OTP',
+            text: `Your OTP is ${otp}`
+        };
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ message: 'Failed to send OTP.' });
+            } else {
+                console.log('Email sent: ' + info.response);
+                return res.status(200).json({ success: true, message: 'OTP sent successfully.' });
+            }
+        })
+    } catch (error) {
+        next(error)
     }
 }
 const verifyEmail = async (req, res, next) => {
@@ -396,5 +365,6 @@ module.exports = {
     signInWithGoogle,
     googleCallback,
     signInWithFacebook,
-    facebookCallback
+    facebookCallback,
+    sendOTP
 };

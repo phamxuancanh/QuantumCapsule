@@ -3,7 +3,7 @@
         "welcome-to-react": "Hello",
         "signIn": {
             "title": "Login",
-            "user_name": "Username",
+            "user_name": "Username or Email",
             "password": "Password",
             "keep_signed_in": "Keep me signed in",
             "forgot_password": "Forgot your password?",
@@ -11,9 +11,9 @@
             "or": "or",
             "no_account": "Have not account yet?",
             "signUp": "Sign Up",
-            "user_name_required": "Username is required",
+            "user_name_required": "Username/Email is required",
             "password_required": "Password is required",
-            "user_name_not_found": "Username is not registered",
+            "user_name_not_found": "Username/Email is not registered",
             "password_incorrect": "Password is invalid"
         },
         "signUp": {
@@ -42,7 +42,8 @@
             "email_invalid": "Email is invalid",
             "username_invalid": "Must contain both letters and numbers",
             "password_invalid": "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number",
-            "password_must_match": "Confirm password does not match"
+            "password_must_match": "Confirm password does not match",
+            "success": "Registration successful"
         },
         "email_verify_send": {
             "check": "Check yout inbox, please!",
@@ -59,6 +60,19 @@
             "message2": "Now you can use our services.",
             "message3": "We hope you have a great experience with our services!",
             "go_to_login": "Log in"
+        },
+        "forgot_password": {
+            "title": "Forgot Password",
+            "your_register_email": "Your Register Email",
+            "new_password": "New Password",
+            "confirm_password": "Confirm Password",
+            "submit": "Confirm",
+            "email_required": "Email is required",
+            "password_required": "Password is required",
+            "confirm_password_required": "Confirm password is required",
+            "email_not_found": "Email is not registered",
+            "password_invalid": "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number",
+            "password_must_match": "Confirm password does not match"
         }
     }
 }

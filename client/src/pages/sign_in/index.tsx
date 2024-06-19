@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from "react-router-dom"
 import { setToLocalStorage } from "utils/functions"
-import { signIn, signUp, googleSignIn, facebookSignIn } from "api/post/post.api"
+import { signIn, googleSignIn, facebookSignIn } from "api/post/post.api"
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,7 @@ import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import loginImage from 'assets/bb.jpg'
-import { PacmanLoader } from "react-spinners"
+import { ClockLoader, PacmanLoader } from "react-spinners"
 
 const theme = createTheme();
 
@@ -83,11 +83,9 @@ const SignIn = () => {
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
                 const errorOrder = ['username', 'password']
-                // Clear previous error messages again
                 setErrorMessageUsername('')
                 setErrorMessagePassword('')
                 setErrorVerified('')
-                // Iterate over the errorOrder array and set errors in that order
                 errorOrder.forEach(field => {
                     if (error instanceof yup.ValidationError) {
                         const err = error.inner.find(e => e.path === field);
@@ -133,7 +131,7 @@ const SignIn = () => {
             {loading && (
                 <div className="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-opacity-50">
                     <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">
-                        <PacmanLoader
+                        <ClockLoader
                             className='tw-flex tw-justify-center tw-items-center tw-w-full tw-mt-20'
                             color='#5EEAD4'
                             cssOverride={{
@@ -142,7 +140,7 @@ const SignIn = () => {
                                 borderColor: 'blue'
                             }}
                             loading
-                            margin={10}
+                            // margin={10}
                             speedMultiplier={3}
                             size={40}
                         />
