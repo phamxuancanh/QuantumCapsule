@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { getGridData } from 'api/get/get.api';
 import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
-import {IGrid} from 'utils/interfaces';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
+import { IGrid } from 'api/api-shared';
 import './index.scss'
 
 export interface GridTableProps {
@@ -13,6 +13,7 @@ export interface GridTableProps {
     pageSizeOptions?: number[];
 
     onRowClick?: GridEventListener<"rowClick">;
+    getRowId?: (row: any) => string;
 }
 enum FieldType {
     // NUMBER, STRING, DATE, DATETIME, BOOLEAN,
@@ -79,7 +80,6 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
         state.gridData.forEach((grid) => {
             visibles[grid.columnName] = grid.isDisplayTable;
         });
-        console.log(visibles);
         
         return visibles;
     };
@@ -96,7 +96,7 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
             pageSizeOptions={props.pageSizeOptions || [10, 20]}
             onRowClick={props.onRowClick}
             getRowClassName={(params) => `super-app-theme--${params.row.status}`}
-            
+            getRowId={props.getRowId}
             autoHeight
         />
     );

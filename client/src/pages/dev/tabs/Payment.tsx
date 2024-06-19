@@ -4,31 +4,45 @@ import React, { useEffect, useState } from 'react';
 import { GridRowParams, useGridApiRef } from '@mui/x-data-grid';
 import ModalAction from 'components/modals/modalAction/ModalAction';
 import GridForm from 'components/forms/gridForm/GridForm';
-import { InProgress, IInventory } from 'api/api-shared';
+import { IVoucher, VchProgress } from 'api/api-shared';
 import { Button } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { IAction, defaultAction } from 'utils/interfaces';
 import loadable from '@loadable/component';
 import Loading from 'containers/loadable-fallback/loading';
+import PayPalProvider from 'components/payments/paypal/PayPalProvider';
+import CustomModal from 'components/modals/customModal/CustomModal';
 const TableComponent = loadable(() => import('components/tables/gridTable/GridTable'), { fallback: <Loading /> });
 interface IState {
-    tableData: IInventory[]
-    formData: IInventory
+    tableData: IVoucher[]
+    formData: IVoucher
     action: IAction
 }
+interface IPayState {
+    action: IAction
+    voucherId: string
+    totalAmount: number
 
-const CRUD: React.FC = () => {
-    const instance = new InProgress();
+}
+
+const Payment: React.FC = () => {
+    const TABLE_NAME = 'vouchers';
+    const instance = new VchProgress();
     const gridRef = useGridApiRef();
     const [state, setState] = useState<IState>({
         tableData: [],
-        formData: {},
+        formData: {} as IVoucher,
         action: defaultAction
+    });
+    const [payState, setPayState] = useState<IPayState>({
+        action: { open: false, type: ACTIONS.PAY },
+        voucherId: '',
+        totalAmount: 0
     });
 
     useEffect(() => {
         (async () => {
-            const res1 = await getTableData({ tableName: 'inventories', filter: {} });
+            const res1 = await getTableData({ tableName: TABLE_NAME, filter: {} });
             setState(prep => ({ ...prep, tableData: res1.data.data }));
         })();
     }, []);
@@ -37,16 +51,13 @@ const CRUD: React.FC = () => {
         setState(prep => ({ ...prep, formData: row.row }));
     }
     const handleValidation = () => {
-        return state.formData.name
-            && new RegExp('^([1-9]\d*(\.\d+)?)|([1-9][0-9]*)$').test(state.formData.price?.toString() || '')
-            && new RegExp('^[1-9][0-9]*$').test(state.formData.quantity?.toString() || '')
-            && new RegExp('^[A-Z][a-zA-Z]*$').test(state.formData.unit?.toString() || '')
+        return true;
     }
     async function handleClick(action: ACTIONS): Promise<void> {
 
         switch (action) {
             case ACTIONS.VIEW:
-                if (state.formData.id) {
+                if (state.formData?.id) {
                     setState(prep => ({ ...prep, action: { open: true, payload: state.formData, type: ACTIONS.VIEW } }));
                 } else {
                     alert('Please select a row to view');
@@ -72,12 +83,24 @@ const CRUD: React.FC = () => {
                     alert('Please select a row to update');
                 }
                 break;
+            case ACTIONS.COPY:
+                if (state.formData?.id) {
+                    setState(prep => ({
+                        ...prep,
+                        action: {
+                            open: true,
+                            type: ACTIONS.CREATE
+                        }
+                    }));
+                } else {
+                    alert('Please select a row to copy');
+                }
+                break;
             case ACTIONS.DELETE:
-                // const instance = new InProgress();
                 try {
-                    if (state.formData.id) {
+                    if (state.formData?.id) {
                         await instance.delete(state.formData.id);
-                        gridRef.current?.updateRows([{ id: state.formData.id, _action: 'delete' }]);
+                        gridRef.current?.updateRows([{ _action: 'delete', id: state.formData.id }])
                     }
                     else {
                         alert('Please select a row to delete');
@@ -85,6 +108,26 @@ const CRUD: React.FC = () => {
                 } catch (error) {
                     alert(error);
                 }
+                break;
+            case ACTIONS.PAY:
+                if (!state.formData?.id) {
+                    alert('Please select a row to pay');
+                    return;
+                }
+                if (state.formData?.status === 'PAID') {
+                    alert('this voucher has been paid');
+                    return;
+                }
+
+                setPayState(prep => ({
+                    ...prep,
+                    action: {
+                        open: true,
+                        type: ACTIONS.PAY
+                    },
+                    voucherId: state.formData.id,
+                    totalAmount: state.formData.totalAmount
+                }));
                 break;
             default:
                 break;
@@ -119,22 +162,36 @@ const CRUD: React.FC = () => {
             alert(error);
         }
     }
+    const handlePaySuccess = async () => {
+        try {
+            const res = await instance.pay(payState.voucherId);
+            gridRef.current?.updateRows([res.data.data]);
+            setPayState(prep => ({
+                ...prep,
+                action: defaultAction
+            }));
+        } catch (error) {
+            console.log(error);    
+        }
+    }
     return (
         <>
             <TableComponent
                 apiRef={gridRef}
-                tableName="inventories"
+                tableName={TABLE_NAME}
                 initData={state.tableData}
                 onRowClick={(row) => onRowClick(row)}
-
-                pageSizeOptions={[5, 10, 20]}
+                getRowId={(row: IVoucher) => row.id}
+                pageSizeOptions={[10, 20, 30]}
             />
             <Button onClick={() => handleClick(ACTIONS.VIEW)}>xem</Button>
             <Button onClick={() => handleClick(ACTIONS.CREATE)}>thêm</Button>
             <Button onClick={() => handleClick(ACTIONS.UPDATE)}>sửa</Button>
+            <Button onClick={() => handleClick(ACTIONS.COPY)}>sao chép</Button>
             <Button onClick={() => handleClick(ACTIONS.DELETE)}>xóa</Button>
+            <Button onClick={() => handleClick(ACTIONS.PAY)}>thanh toán</Button>
             <ModalAction
-                title='INVENTORY FORM'
+                title='Grid Setting'
                 open={state.action.open}
                 type={state.action.type}
                 onSave={() => handleSave()}
@@ -142,18 +199,34 @@ const CRUD: React.FC = () => {
 
             >
                 <GridForm
-                    tableName='inventories'
-                    // initData={action.payload}
+                    tableName={TABLE_NAME}
                     action={state.action.type}
                     formData={state.formData}
                     setFormData={(data) => {
                         setState(prep => ({ ...prep, formData: data }));
                     }}
-                // formParams={formParams}
                 />
             </ModalAction>
+            <CustomModal
+                open={payState.action.open}
+                title='Thanh toán'
+                setOpenModal={() => setPayState(prep => ({
+                    ...prep,
+                    action: defaultAction
+                
+                }))}
+
+            >
+                <PayPalProvider
+                    voucherId={payState.voucherId}
+                    totalAmount={payState.totalAmount}
+                    handleSuccess={() => handlePaySuccess()}
+                    handleFail={() => console.log('Payment fail')}
+                />
+            </CustomModal>
+
         </>
     );
 };
 
-export default CRUD;
+export default Payment;

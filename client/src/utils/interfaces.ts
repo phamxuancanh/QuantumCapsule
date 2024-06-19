@@ -13,20 +13,7 @@ export const defaultAction: IAction = {
 
 }
 
-export interface IGrid {
-    tableName: string;
-    columnName: string;
-    columnType: string;
-    inputType: string;
-    label: string;
-    editable: boolean;
-    dataSource: string;
-    isDisplayForm: boolean;
-    isDisplayTable: boolean;
-    regex: string;
-    regexMessage: string;
-    position: number;
-}
+
 
 
 

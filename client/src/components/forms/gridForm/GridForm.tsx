@@ -12,7 +12,8 @@ import {
 import { getGridData, getDirections } from 'api/get/get.api';
 import { ACTIONS, InputType } from 'utils/enums';
 import { convertDate } from 'utils/functions';
-import { IDataSource, IGrid } from 'utils/interfaces'
+import { IDataSource} from 'utils/interfaces'
+import { IGrid } from 'api/api-shared';
 
 
 
@@ -44,12 +45,14 @@ const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
             const tempDataSources: IDataSource[] = []
             for (let i = 0; i < tempGridData.length; i++) {
                 if (tempGridData[i].dataSource === null) continue;
-                const res = await getDirections(tempGridData[i].dataSource);
+                const res = await getDirections(tempGridData[i].dataSource!);
                 tempDataSources[i] = { name: tempGridData[i].columnName, values: res.data.data };
             }
+            
             setState(prep => ({ ...prep, dataSources: tempDataSources, gridData: tempGridData }))
         })();
-    }, [props.formData, props.tableName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.tableName]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown; }> | SelectChangeEvent<never>) => {
         const { name, value } = e.target;
         setFormData({ ...props.formData, [name as string]: value });

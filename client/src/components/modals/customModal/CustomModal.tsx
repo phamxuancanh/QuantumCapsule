@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme, makeStyles, Modal, Backdrop, Fade, Box, Typography, useMediaQuery, useTheme, Button } from '@mui/material';
+import { Modal, Box, Typography, useMediaQuery, useTheme, Button } from '@mui/material';
 
 interface ICustomModalProps {
     title: string;

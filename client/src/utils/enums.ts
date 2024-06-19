@@ -2,7 +2,9 @@ export enum ACTIONS {
     CREATE = 'CREATE',
     UPDATE = 'UPDATE',
     DELETE = 'DELETE',
-    VIEW = 'VIEW'
+    VIEW = 'VIEW',
+    COPY = 'COPY',
+    PAY = 'PAY',
 }
 
 export enum InputType {
