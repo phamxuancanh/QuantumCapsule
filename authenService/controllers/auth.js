@@ -13,7 +13,7 @@ const {
     signRefreshToken,
     verifyRefreshToken
 } = require('../middlewares/jwtService')
-
+// TODO: move to environment variables
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -66,6 +66,7 @@ const transporter = nodemailer.createTransport({
 const signIn = async (req, res, next) => {
     try {
         const { username, password } = req.body.data;
+        console.log(req.body.data, "req.body.data");
         const user = await models.User.findOne({
             where: { username }
         });
@@ -75,6 +76,13 @@ const signIn = async (req, res, next) => {
                 message: 'Username is not registered.'
             });
         }
+        const isPasswordValid = bcrypt.compareSync(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                code: 401,
+                message: 'Password is incorrect.'
+            });
+        }
         // Check if the email is verified
         if (!user.emailVerified) {
             return res.status(401).json({
@@ -82,19 +90,12 @@ const signIn = async (req, res, next) => {
                 message: 'Email is not verified.'
             });
         }
-        const isPasswordValid = bcrypt.compareSync(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({
-                code: 401,
-                message: 'Username or password is incorrect.'
-            });
-        }
-        const accessToken = await signAccessToken(user.id);
-        const refreshToken = await signRefreshToken(user.id);
+        const accessToken = await signAccessToken(user.id)
+        const refreshToken = await signRefreshToken(user.id)
 
         const expire = new Date();
         expire.setDate(expire.getDate() + 1);
-        await models.User.update({ expire }, { where: { id: user.id } });
+        await models.User.update({ expire }, { where: { id: user.id } })
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -104,9 +105,9 @@ const signIn = async (req, res, next) => {
         res.setHeader("authorization", accessToken);
 
         // Produce a message to Kafka with full user data
-        await produceMessage('user-signin', user.id, user.toJSON());
+        await produceMessage('user-signin', user.id, user.toJSON())
 
-        return res.status(200).json({ success: true, accessToken, user });
+        return res.status(200).json({ success: true, accessToken, user })
     } catch (error) {
         next(error);
     }

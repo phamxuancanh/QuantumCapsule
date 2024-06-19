@@ -14,7 +14,7 @@ const EmailVerifyPage: React.FC = () => {
     const { mutate: sendVerifyEmailMutate } = useMutation({
         mutationFn: (token: string) => verifyEmail(token),
         onSuccess: (res) => {
-            toast('Verify email success!');
+            toast.success('Verify email success!');
             navigate(ROUTES.email_verify_success, { replace: true });
         },
         onError: (error) => {

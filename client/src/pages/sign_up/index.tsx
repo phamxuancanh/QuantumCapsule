@@ -1,9 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useRive, useStateMachineInput } from 'rive-react'
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from "react-router-dom";
 import { setToLocalStorage } from "utils/functions";
@@ -18,7 +14,6 @@ import loginImage from 'assets/bb.jpg'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 const theme = createTheme();
 
-const STATE_MACHINE_NAME = "Login Machine";
 const SignUp = () => {
     const navigate = useNavigate()
     const [firstName, setFirstName] = useState("")
@@ -37,8 +32,7 @@ const SignUp = () => {
     const [errorMessageTermCheck, setErrorMessageTermCheck] = useState("")
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
-
-
+    // TODO: them loading
 
     const languageOptions = useMemo(() => {
         return [
@@ -184,8 +178,7 @@ const SignUp = () => {
                             }
                         }
                     } else {
-                        // alert('Registration failed')
-                        console.log(error, '203')
+                        console.log(error)
                     }
                 }
             }
@@ -200,7 +193,7 @@ const SignUp = () => {
             </div>
             <div className="tw-flex lg:tw-relative lg:tw-w-3/5 tw-w-full tw-items-center tw-justify-between">
                 <img src={loginImage} alt="loginImg" className="tw-absolute tw-h-full tw-w-full lg:tw-hidden tw-hidden sm:tw-block" />
-                <div className="tw-flex tw-z-20  tw-items-center tw-justify-center lg:tw-h-full sm:tw-h-screen tw-h-full lg:tw-w-full tw-w-full">
+                <div className="tw-flex tw-z-20 tw-items-center tw-justify-center lg:tw-h-full sm:tw-h-screen tw-min-h-screen lg:tw-w-full tw-w-full">
                     <div className="tw-w-4/5 lg:tw-w-3/5 tw-bg-gray-200 tw-bg-opacity-25 tw-rounded-3xl tw-p-5">
                         <div className="tw-text-sky-500 tw-font-bold tw-text-2xl tw-text-center">{t('signUp.title')}</div>
                         <form className="tw-mt-8 tw-space-y-6" action="#" method="POST" onSubmit={handleRegister}>

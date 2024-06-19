@@ -1,8 +1,20 @@
 {
     "translation": {
         "welcome-to-react": "Xin chào",
-        "login": {
-
+        "signIn": {
+            "title": "Đăng Nhập",
+            "user_name": "Tên Đăng Nhập",
+            "password": "Mật khẩu",
+            "submit": "Đăng nhập",
+            "keep_signed_in": "Ghi nhớ đăng nhập",
+            "forgot_password": "Quên mật khẩu?",
+            "or": "hoặc",
+            "no_account": "Chưa có tài khoản?",
+            "signUp": "Đăng Ký",
+            "user_name_required": "Username không được để trống",
+            "password_required": "Mật khẩu không được để trống",
+            "user_name_not_found": "Không tìm thấy người dùng",
+            "password_incorrect": "Mật khẩu sai"
         },
         "signUp": {
             "title": "Đăng Ký",
@@ -28,7 +40,7 @@
             "first_name_invalid": "Tên chỉ chứa chữ cái, kí tự đầu tiên phải viết hoa",
             "last_name_invalid": "Họ chỉ chứa chữ cái, kí tự đầu tiên phải viết hoa",
             "email_invalid": "Email không hợp lệ",
-            "username_invalid": "Phải chứa cả chữ và số",
+            "username_invalid": "Username phải chứa cả chữ và số",
             "password_invalid": "Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số",
             "password_must_match": "Mật khẩu xác nhận không khớp"
         },

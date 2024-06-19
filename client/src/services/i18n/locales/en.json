@@ -1,18 +1,20 @@
 {
     "translation": {
         "welcome-to-react": "Hello",
-        "login": {
+        "signIn": {
             "title": "Login",
             "user_name": "Username",
             "password": "Password",
+            "keep_signed_in": "Keep me signed in",
+            "forgot_password": "Forgot your password?",
             "submit": "Sign In",
             "or": "or",
-            "no_account": "Don't have an account?",
-            "sign_up": "Sign Up",
+            "no_account": "Have not account yet?",
+            "signUp": "Sign Up",
             "user_name_required": "Username is required",
             "password_required": "Password is required",
-            "user_name_invalid": "Username is invalid",
-            "password_invalid": "Password is invalid"
+            "user_name_not_found": "Username is not registered",
+            "password_incorrect": "Password is invalid"
         },
         "signUp": {
             "title": "Sign Up",
