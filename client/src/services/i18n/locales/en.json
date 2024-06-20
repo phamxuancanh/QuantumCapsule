@@ -1,21 +1,78 @@
 {
     "translation": {
         "welcome-to-react": "Hello",
-        "login": {
-            "title_signIn": "Login",
-            "title_signUp": "Sign Up",
-            "username": "Username",
+        "signIn": {
+            "title": "Login",
+            "user_name": "Username or Email",
             "password": "Password",
-            "confirm_password": "Confirm password",
-            "submit_login": "Sign In",
-            "submit_signup": "Sign Up",
-            "forgot_password": "Forgot password?",
-            "username_not_empty": "Username is required",
-            "password_not_empty": "Password is required",
-            "confirm_password_must_match": "Confirm password must match",
-            "back": "Back",
-            "goToSignUp": "Go to sign up page"
-
+            "keep_signed_in": "Keep me signed in",
+            "forgot_password": "Forgot your password?",
+            "submit": "Sign In",
+            "or": "or",
+            "no_account": "Have not account yet?",
+            "signUp": "Sign Up",
+            "user_name_required": "Username/Email is required",
+            "password_required": "Password is required",
+            "user_name_not_found": "Username/Email is not registered",
+            "password_incorrect": "Password is invalid"
+        },
+        "signUp": {
+            "title": "Sign Up",
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "user_name": "Username",
+            "email": "Email",
+            "password": "Password",
+            "confirm_password": "Confirm Password",
+            "agree": "I agree to the",
+            "terms": "Terms & Conditions",
+            "submit": "Register",
+            "or": "or",
+            "have_account": "Have an account?",
+            "login": "Login",
+            "first_name_required": "First name is required",
+            "last_name_required": "Last name is required",
+            "user_name_required": "Username is required",
+            "email_required": "Email is required",
+            "password_required": "Password is required",
+            "confirm_password_required": "Confirm password is required",
+            "term_required": "You must agree to the terms and conditions",
+            "first_name_invalid": "First name must contain only letters, first letter capitalized",
+            "last_name_invalid": "Last name must contain only letters, first letter capitalized",
+            "email_invalid": "Email is invalid",
+            "username_invalid": "Must contain both letters and numbers",
+            "password_invalid": "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number",
+            "password_must_match": "Confirm password does not match",
+            "success": "Registration successful"
+        },
+        "email_verify_send": {
+            "check": "Check yout inbox, please!",
+            "hello": "Hello",
+            "vrf1": "to start using our services, we need to verify your email.",
+            "vrf2_part1": "We've already sent out the verification link to your email.",
+            "vrf2_part2": "Please check it and confirm it's really you.",
+            "sure": "Sure!",
+            "didnt_receive": "Didn't get e-mail?",
+            "send_it_again": "Send it again"
+        },
+        "verify_success": {
+            "verified": "Verification successful",
+            "message2": "Now you can use our services.",
+            "message3": "We hope you have a great experience with our services!",
+            "go_to_login": "Log in"
+        },
+        "forgot_password": {
+            "title": "Forgot Password",
+            "your_register_email": "Your Register Email",
+            "new_password": "New Password",
+            "confirm_password": "Confirm Password",
+            "submit": "Confirm",
+            "email_required": "Email is required",
+            "password_required": "Password is required",
+            "confirm_password_required": "Confirm password is required",
+            "email_not_found": "Email is not registered",
+            "password_invalid": "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number",
+            "password_must_match": "Confirm password does not match"
         }
     }
 }

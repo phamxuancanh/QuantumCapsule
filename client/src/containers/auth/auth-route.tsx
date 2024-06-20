@@ -58,27 +58,27 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
 
   useEffect(() => {
     const verifyAuthentication = async () => {
-      const validAccessToken = await handleTokenRefresh();
-      setIsAuthenticated(!!validAccessToken);
-      setLoading(false);
-    };
-    if (location.pathname !== ROUTES.login) {
-      verifyAuthentication();
-    } else {
-      setLoading(false);
+      const validAccessToken = await handleTokenRefresh()
+      setIsAuthenticated(!!validAccessToken)
+      setLoading(false)
     }
-  }, [location]);
+    if (location.pathname !== ROUTES.sign_in) {
+      verifyAuthentication()
+    } else {
+      setLoading(false)
+    }
+  }, [location])
 
   // Kiểm tra và lưu accessToken từ URL
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const accessToken = params.get('accessToken');
+    const params = new URLSearchParams(location.search)
+    const accessToken = params.get('accessToken')
     if (accessToken) {
-      setToLocalStorage('tokens', JSON.stringify({ accessToken }));
-      setIsAuthenticated(true);
-      navigate(ROUTES.home);
+      setToLocalStorage('tokens', JSON.stringify({ accessToken }))
+      setIsAuthenticated(true)
+      navigate(ROUTES.home)
     }
-  }, [location]);
+  }, [location])
 
   if (loading) {
     return (
@@ -100,12 +100,12 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
     );
   }
 
-  if (isAuthenticated && location.pathname === ROUTES.login) {
+  if (isAuthenticated && location.pathname === ROUTES.sign_in) {
     return <Navigate to={ROUTES.home} />;
   }
 
-  if (!isAuthenticated && location.pathname !== ROUTES.login) {
-    return <Navigate to={ROUTES.login} />;
+  if (!isAuthenticated && location.pathname !== ROUTES.sign_in && location.pathname !== ROUTES.forgot_password && location.pathname !== ROUTES.email_verify && location.pathname !== ROUTES.email_verify_success && location.pathname !== ROUTES.email_verify_send && location.pathname !== ROUTES.sign_up) {
+    return <Navigate to={ROUTES.sign_in} />;
   }
 
   return children;

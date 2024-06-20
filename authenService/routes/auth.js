@@ -11,5 +11,6 @@ router.get('/google', authController.signInWithGoogle);
 router.get('/google/callback', authController.googleCallback);
 router.get('/facebook', authController.signInWithFacebook);
 router.get('/facebook/callback', authController.facebookCallback);
-
+router.get('/verifyEmail', authController.verifyEmail);
+router.post('/sendOTP', authController.sendOTP);
 module.exports = router;

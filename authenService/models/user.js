@@ -47,6 +47,10 @@ const User = sequelize.define(
     expire: {
       type: DataTypes.DATE
     },
+    emailVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     roleId: {
       type: DataTypes.BIGINT,
       allowNull: false,

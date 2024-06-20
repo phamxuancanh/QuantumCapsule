@@ -13,7 +13,10 @@ import React from 'react'
 const Home = loadable(async () => await import('pages/home'), {
     fallback: <Loading />
 })
-const Login = loadable(async () => await import('pages/login'), {
+const SignIn = loadable(async () => await import('pages/sign_in'), {
+    fallback: <Loading />
+})
+const SignUp = loadable(async () => await import('pages/sign_up'), {
     fallback: <Loading />
 })
 const NotFound = loadable(async () => await import('pages/not-found'), {
@@ -22,15 +25,67 @@ const NotFound = loadable(async () => await import('pages/not-found'), {
 const Dev = loadable(async () => await import('pages/dev'), {
     fallback: <Loading />
 })
+const ForgotPassword = loadable(async () => await import('pages/forgot_password'), {
+    fallback: <Loading />
+})
+const EmailVerify = loadable(async () => await import('pages/email_verify_page'), {
+    fallback: <Loading />
+})
+const EmailVerifySend = loadable(async () => await import('pages/email_veirfy_send_page'), {
+    fallback: <Loading />
+})
+const EmailVerifySuccess = loadable(async () => await import('pages/email_verify_success_page'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
 const routes: RouteObject[] = [
     {
-        path: ROUTES.login,
+        path: ROUTES.sign_in,
         element: (
             <AuthRoute>
-                <Login />
+                <SignIn />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.sign_up,
+        element: (
+            <AuthRoute>
+                <SignUp />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.forgot_password,
+        element: (
+            <AuthRoute>
+                <ForgotPassword />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.email_verify,
+        element: (
+            <AuthRoute>
+                <EmailVerify />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.email_verify_send,
+        element: (
+            <AuthRoute>
+                <EmailVerifySend />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.email_verify_success,
+        element: (
+            <AuthRoute>
+                <EmailVerifySuccess />
             </AuthRoute>
         )
     },
@@ -44,15 +99,10 @@ const routes: RouteObject[] = [
         children: [
             { index: true, element: <Home /> },
             { path: ROUTES.notfound, element: <NotFound /> },
-            // { path: ROUTES.dev, element: <Dev /> }
+            { path: ROUTES.dev, element: <Dev /> }
+            // { path: ROUTES.forgot_password, element: <ForgotPassword />}
         ]
-    },
-    {
-        path: ROUTES.dev,
-        element: (
-            <Dev />
-        )
-    },
+    }
     
 ]
 
