@@ -104,7 +104,7 @@ const signUp = async (req, res, next) => {
         const emailToken = jwt.sign({ id: newUser.id, username: newUser.username, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' });
 
         // Định nghĩa URL xác thực
-        const confirmationUrl = `http://localhost:3000/verify/email?token=${emailToken}`;
+        const confirmationUrl = `http://localhost:${process.env.CLIENT_PORT}/verify/email?token=${emailToken}`;
 
         // Đọc template HTML
         const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html');
@@ -306,7 +306,7 @@ const googleCallback = (req, res, next) => {
     passport.authenticate('google', async (err, user, info) => {
         if (err || !user) {
             console.log(err);
-            return res.redirect('http://localhost:3000');
+            return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`);
         }
         const accessToken = await signAccessToken(user.id);
         const refreshToken = await signRefreshToken(user.id);
@@ -324,7 +324,7 @@ const googleCallback = (req, res, next) => {
         await produceMessage('google-signin', user.id, user.toJSON());
 
         // Trả về accessToken dưới dạng query string để lưu trữ trên client
-        return res.redirect(`http://localhost:3000?accessToken=${accessToken}`);
+        return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`);
     })(req, res, next);
 };
 const signInWithFacebook = passport.authenticate('facebook', { scope: ['email'] });
@@ -334,7 +334,7 @@ const facebookCallback = (req, res, next) => {
         if (err || !user) {
             console.log(err);
             console.log(user);
-            return res.redirect('http://localhost:3000');
+            return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`);
         }
         const accessToken = await signAccessToken(user.id);
         const refreshToken = await signRefreshToken(user.id);
@@ -352,7 +352,7 @@ const facebookCallback = (req, res, next) => {
         await produceMessage('facebook-signin', user.id, user.toJSON());
 
         // Trả về accessToken dưới dạng query string để lưu trữ trên client
-        return res.redirect(`http://localhost:3000?accessToken=${accessToken}`);
+        return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`);
     })(req, res, next);
 };
 module.exports = {
