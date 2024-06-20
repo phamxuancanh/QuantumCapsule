@@ -1,0 +1,111 @@
+@import "styles/variables.scss";
+
+.info-form {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 80vw;
+  padding: 20px;
+  background-color: $form-bg-color;
+  box-shadow: $box-shadow;
+
+  .info-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid $border-color;
+    padding-bottom: 20px;
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+    }
+    .image-container {
+      position: relative;
+      width: 300px;
+      height: 250px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: $image-bg-color;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
+      @media (max-width: 768px) {
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+      }
+    }
+    .main-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-left: 20px;
+
+      h1 {
+        margin: 0;
+        font-size: $font-size-title;
+        color: $text-color;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 10px 0 0 0;
+
+        li {
+          font-size: $font-size-base;
+          margin: 5px 0;
+          color: $secondary-text-color;
+        }
+        @media (max-width: 768px){
+          display: flex;
+          flex-direction: column;
+          text-align: center;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+      @media (max-width: 768px) {
+        align-items: center;
+        margin-left: 0;
+        margin-top: 20px;
+      }
+    }
+  }
+
+  .details-section {
+    padding-top: 20px;
+
+    h2{
+      margin: 0;
+      font-size: $font-size-title-2;
+      color: $text-color;
+      @media (max-width: 768px){
+        text-align: center;
+      }
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 10px 0 0 0;
+
+      li {
+        margin: 5px 0;
+        color: $secondary-text-color;
+      }
+    }
+    @media (max-width: 768px) {
+      padding-top: 10px;
+    }
+  }
+}

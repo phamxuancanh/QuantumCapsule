@@ -1,17 +1,14 @@
 import React from 'react';
-import { Theme, makeStyles, Modal, Backdrop, Fade, Box, Typography, useMediaQuery, useTheme, Button } from '@mui/material';
-import { ACTIONS } from 'utils/enums';
+import { Modal, Box, Typography, useMediaQuery, useTheme, Button } from '@mui/material';
 
 interface ICustomModalProps {
     title: string;
     open: boolean;
     children: React.ReactNode;
-    action: ACTIONS;
-    onSave: () => void;
     setOpenModal: (open: boolean) => void;
 }
 
-const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
+const CustomModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
@@ -42,9 +39,6 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
                     {props.children}
                 </Typography>
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button variant="contained" color="primary" onClick={props.onSave} sx={{ mr: 2 }}>
-                        Lưu
-                    </Button>
                     <Button variant="outlined" onClick={() => props.setOpenModal(false)}>
                         Đóng
                     </Button>
@@ -55,4 +49,4 @@ const ModalAction: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
     );
 };
 
-export default ModalAction;
+export default CustomModal;

@@ -1,0 +1,13 @@
+@import 'variables.scss';
+@import 'mixins.scss';
+
+.app-container {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    color: $text-color;
+    font-size: $font-size-base;
+}

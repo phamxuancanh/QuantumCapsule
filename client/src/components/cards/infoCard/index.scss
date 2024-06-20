@@ -1,0 +1,90 @@
+@import "styles/global.scss";
+
+.info-card {
+  .card {
+    margin-bottom: 20px;
+    max-width: 400px; // Giới hạn chiều rộng tối đa của card
+    width: $width-image-container;
+    height: $height-card;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+      box-shadow: $box-shadow;
+    }
+
+    .image-container {
+      width: $width-image-container;
+      height: $height-image-container;
+      background-color: $image-bg-color;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    // img {
+    //   max-width: 100%;
+    //   max-height: 100%;
+    //   object-fit: contain;
+    //   width: 100%;
+    // }
+    .card-header {
+      background-color: #f0f0f0;
+      padding: 12px;
+    }
+
+    .card-content {
+      padding: 12px;
+      overflow-y: scroll;
+      height: $height-card-content;
+      .details {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+
+        ul {
+          padding: 0;
+          margin: 0;
+          list-style: none;
+        }
+
+        li {
+          margin-bottom: 5px;
+        }
+      }
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      align-self: flex-end;
+
+      button {
+        flex: 1;
+        margin: 0 4px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      max-width: 100%; // Đảm bảo card phù hợp với mọi chiều rộng
+    }
+
+    @media (max-width: 480px) {
+      .card-header {
+        font-size: 14px;
+      }
+
+      .card-content {
+        font-size: 12px;
+      }
+
+      .card-actions {
+        button {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
