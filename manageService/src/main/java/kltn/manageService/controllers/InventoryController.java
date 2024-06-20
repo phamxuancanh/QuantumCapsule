@@ -52,7 +52,6 @@ public class InventoryController{
     }
     @PutMapping("/update")
     public Response update(@RequestBody InventoryDTO entity) {
-        System.out.println(entity);
         return inventoryService.update(entity); 
     }
     

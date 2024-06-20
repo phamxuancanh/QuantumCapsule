@@ -1,6 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { requestWithJwt, requestWithoutJwt } from './request'
-import { convertDate } from 'utils/functions'
+import { requestWithoutJwt } from './request'
 
 
 export interface IInventory {
@@ -16,9 +15,6 @@ export interface IInventory {
     updatedDate?: Date | string;
     status?: "ENABLED" | "DISABLED"
 }
-
-
-
 export class InProgress {
 
     init = (): IInventory => {
@@ -47,5 +43,103 @@ export class InProgress {
 
     delete = async (id: string): Promise<AxiosResponse<any>> => {
         return await requestWithoutJwt.delete(`/inventories/delete`, { params: { id } })
+    }
+}
+
+export interface IGrid{
+
+    tableName: string;
+    columnName: string;
+    columnType: string;
+    inputType: string;
+    label: string;
+    editable: boolean;
+    dataSource?: string;
+    isDisplayTable: boolean;
+    isDisplayForm: boolean;
+    regex?: string;
+    regexMessage?: string;
+    position: number;
+
+
+}
+export class GridProgress {
+
+    init = (): IGrid => {
+        return {
+            tableName: '',
+            columnName: '',
+            columnType: 'STRING',
+            inputType: 'text',
+            label: '',
+            editable: true,
+            dataSource: '',
+            isDisplayTable: true,
+            isDisplayForm: true,
+            regex: '',
+            regexMessage: '',
+            position: 0
+        }
+    }
+
+    create = async (body: IGrid): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.post(`/grids/create`, body)
+    }
+
+    update = async (body: IGrid): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.put(`/grids/update`, body)
+    }
+
+    delete = async (tableName:string, columnName: string): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.delete(`/grids/delete`, { params: { tableName, columnName } })
+    }
+}
+
+export interface IVoucher{
+    
+    id: string;
+    coupon: string;
+    totalAmount: number;
+    amount: number;
+    discount: number;
+    status: "PENDING" | "PAID" | "CANCELLED";
+    createdDate: Date | string;
+    paymentDate: Date | string;
+
+
+}
+export class VchProgress {
+
+    init = (): IVoucher => {
+        return {
+            id: 'random ID',
+            coupon: 'coupon',
+            totalAmount: 0.01,
+            amount: 0.01,
+            discount: 0,
+            status: 'PENDING',
+            createdDate: new Date(),
+            paymentDate: new Date()
+        }
+    }
+
+    create = async (body: IVoucher): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.post(`/vouchers/create`, body)
+    }
+
+    update = async (body: IVoucher): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.put(`/vouchers/update`, body)
+    }
+
+    delete = async (id: string): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.delete(`/vouchers/delete`, { params: { id} })
+    }
+
+    pay = async (id: string): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.put(`/vouchers/pay`, {}, { params: {id}})
+    }
+
+    cancel = async (id: string): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.put(`/vouchers/cancel`, {}, { params: {id}})
     }
 }

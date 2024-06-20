@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
     TextField,
     Grid,
-    Checkbox,
-    FormControlLabel,
     FormGroup,
     InputLabel,
     Select,
@@ -14,11 +12,12 @@ import {
 import { getGridData, getDirections } from 'api/get/get.api';
 import { ACTIONS, InputType } from 'utils/enums';
 import { convertDate } from 'utils/functions';
-import { IAction, IDataSource, IGrid } from 'utils/interfaces'
+import { IDataSource} from 'utils/interfaces'
+import { IGrid } from 'api/api-shared';
 
 
 
-interface ICustomFormProps {
+export interface IGridFormProps {
     tableName: string;
     // initData: {};
     action: ACTIONS;
@@ -30,7 +29,7 @@ interface IState {
     dataSources: IDataSource[];
     gridData: IGrid[];
 }
-const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
+const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
 
     const { setFormData } = props;
     const [state, setState] = useState<IState>({
@@ -46,12 +45,14 @@ const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
             const tempDataSources: IDataSource[] = []
             for (let i = 0; i < tempGridData.length; i++) {
                 if (tempGridData[i].dataSource === null) continue;
-                const res = await getDirections(tempGridData[i].dataSource);
+                const res = await getDirections(tempGridData[i].dataSource!);
                 tempDataSources[i] = { name: tempGridData[i].columnName, values: res.data.data };
             }
+            
             setState(prep => ({ ...prep, dataSources: tempDataSources, gridData: tempGridData }))
         })();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.tableName]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown; }> | SelectChangeEvent<never>) => {
         const { name, value } = e.target;
         setFormData({ ...props.formData, [name as string]: value });
@@ -182,6 +183,7 @@ const GridForm: React.FC<ICustomFormProps> = (props: ICustomFormProps) => {
                                     default: return <h1>nothing</h1>
                                 }
                             }
+                            return null;
                         })
                     }
                 </Grid>

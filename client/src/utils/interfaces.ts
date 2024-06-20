@@ -1,4 +1,4 @@
-import { ACTIONS } from "./enums";
+import { ACTIONS, IconName} from "./enums";
 
 export interface IAction {
     open: boolean;
@@ -13,20 +13,7 @@ export const defaultAction: IAction = {
 
 }
 
-export interface IGrid {
-    tableName: string;
-    columnName: string;
-    columnType: string;
-    inputType: string;
-    label: string;
-    editable: boolean;
-    dataSource: string;
-    isDisplayForm: boolean;
-    isDisplayTable: boolean;
-    regex: string;
-    regexMessage: string;
-    position: number;
-}
+
 
 
 
@@ -37,4 +24,10 @@ export interface IDirection{
 export interface IDataSource{
     name: string;
     values: IDirection[];
+}
+
+export interface IMenuItem {
+    icon: IconName,
+    name: string,
+    text: string,
 }

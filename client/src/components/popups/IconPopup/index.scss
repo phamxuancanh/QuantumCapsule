@@ -1,0 +1,32 @@
+// IconButton.scss
+
+@import "styles/global.scss";
+
+.popup-iconButton {
+    position: relative;
+    background-color: $btn-popup-bg-color !important;
+    border-radius: 50% !important;
+    border: 1px solid $border-color !important;
+    .popup-text {
+        margin-left: 5px;
+        display: none;
+    }
+
+    &:hover {
+        border-radius: 20px !important;
+        transition: border-radius 0.5s;
+        .popup-text {
+            display: inline-flex;
+            animation: fadeIn 0.8s;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}

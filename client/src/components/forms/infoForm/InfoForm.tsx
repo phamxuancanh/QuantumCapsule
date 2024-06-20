@@ -1,7 +1,7 @@
 import React from 'react';
 import './index.scss'
 
-interface IProps {
+export interface IInfoFormProps {
     image: string;
     name: string;
     masterParams: string[] // names of main fields
@@ -9,7 +9,7 @@ interface IProps {
     data: any
 }
 
-const InfoForm: React.FC<IProps> = (props: IProps) => {
+const InfoForm: React.FC<IInfoFormProps> = (props: IInfoFormProps) => {
     const { image, name, masterParams, detailParams, data } = props;
     return (
         <div className="info-form">
