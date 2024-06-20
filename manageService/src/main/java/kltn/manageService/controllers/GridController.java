@@ -3,7 +3,7 @@ package kltn.manageService.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import kltn.manageService.models.Grid;
-import kltn.manageService.models.Response;
+import kltn.manageService.models.DTO.Response;
 import kltn.manageService.services.GridService;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,8 +35,9 @@ public class GridController {
         return gridService.update(entity);
     }
     // delete
-    @DeleteMapping("delete")
-    public Response delete(@RequestParam String tableName, @RequestParam String columnName) {
+    @DeleteMapping("/delete")
+    public Response delete(@RequestParam(name = "tableName") String tableName, @RequestParam(name = "columnName") String columnName) {
+        System.out.println("tableName: " + tableName + " columnName: " + columnName);
         return gridService.delete(tableName, columnName);
     }
     // // filterByTable
@@ -48,5 +49,14 @@ public class GridController {
     public Response findAll() {
         return gridService.findAll();
     }
+    @GetMapping("/getColumnTypeDirections")
+    public Response getColumnTypeDirections() {
+        return gridService.getColumnTypeDirections();
+    }
+    @GetMapping("/getInputTypeDirections")
+    public Response getInputTypeDirections() {
+        return gridService.getInputTypeDirections();
+    }
+
     
 }

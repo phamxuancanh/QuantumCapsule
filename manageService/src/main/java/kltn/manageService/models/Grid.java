@@ -38,6 +38,10 @@ public class Grid {
     private String label;
     private Boolean editable = true;
     private String dataSource;
-    private Boolean isDisplay = true;
+    private Boolean isDisplayTable = true;
+    private Boolean isDisplayForm = true;
+    private String regex;
+    private String regexMessage;
+    private Integer position;
 
 }
