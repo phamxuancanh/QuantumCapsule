@@ -127,45 +127,6 @@ const signUp = async (req, res, next) => {
     next(error)
   }
 }
-const sendOTP = async (req, res, next) => {
-  try {
-    const { email } = req.body.data
-    console.log(req.body.data, 'req.body.data')
-    if (!email) {
-      return res.status(400).json({ message: 'Missing email.' })
-    }
-
-    // Find the user in the database
-    const user = await models.User.findOne({ where: { email } })
-    if (!user) {
-      return res.status(400).json({ message: 'User not found.' })
-    }
-
-    // Generate an OTP
-    const otp = Math.floor(100000 + Math.random() * 900000)
-
-    // Send the OTP to the user's email
-
-    const mailOptions = {
-      from: 'canhmail292@gmail.com',
-      to: email,
-      subject: 'Your OTP',
-      text: `Your OTP is ${otp}`
-    }
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error)
-        return res.status(500).json({ message: 'Failed to send OTP.' })
-      } else {
-        console.log('Email sent: ' + info.response)
-        return res.status(200).json({ success: true, message: 'OTP sent successfully.' })
-      }
-    })
-  } catch (error) {
-    next(error)
-  }
-}
 const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query
@@ -263,10 +224,76 @@ const signOut = async (req, res, next) => {
     next(error)
   }
 }
+const sendOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body.data
+    console.log(req.body.data, 'req.body.data')
+    if (!email) {
+      return res.status(400).json({ message: 'Missing email.' })
+    }
+    const user = await models.User.findOne({ where: { email } })
+    if (!user) {
+      return res.status(400).json({ message: 'User not found.' })
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000)
+    const otpExpire = new Date()
+    otpExpire.setMinutes(otpExpire.getMinutes() + 5)
 
+    await models.User.update({ otp, otpExpire }, { where: { email } })
+
+    const mailOptions = {
+      from: 'canhmail292@gmail.com', // It's good practice to use a 'noreply' address for automated emails
+      to: email, // The recipient's email address
+      subject: 'Email Verification Code',
+      html: `Dear ${user.firstName},<br>
+        Thank you for using our service.<br><br>
+        Please confirm your e-mail address by entering the code below into the verification form.<br><br>
+        <strong>Your OTP is ${otp}. It will expire in 5 minutes.</strong><br><br>
+        * This is an automated e-mail. Please do not respond to this address.<br>
+        * Please disregard this message if you receive it and did not request to change your password.`
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error)
+        return res.status(500).json({ message: 'Failed to send OTP.' })
+      } else {
+        console.log('Email sent: ' + info.response)
+        // Indicate that the OTP was sent successfully
+        return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
+      }
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+const verifyOTP = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body.data
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Missing email or OTP.' })
+    }
+    const user = await models.User.findOne({ where: { email } })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' })
+    }
+    if (user.otp !== otp) {
+      return res.status(401).json({ message: 'Invalid OTP.' })
+    }
+    if (new Date() > user.otpExpire) {
+      return res.status(410).json({ message: 'OTP has expired.' })
+    }
+    await models.User.update({ otp: null, otpExpire: null }, { where: { email } })
+
+    // Send a success response
+    res.status(200).json({ message: 'OTP verified successfully.' })
+  } catch (error) {
+    next(error)
+  }
+}
 const changePassword = async (req, res, next) => {
   try {
-    const { username, oldPassword, newPassword, reNewPassword } = req.body
+    const { username, oldPassword, newPassword } = req.body
     const user = await models.User.findOne({
       where: { username }
     })
@@ -281,12 +308,6 @@ const changePassword = async (req, res, next) => {
       return res.status(401).json({
         code: 401,
         message: 'Old password is incorrect.'
-      })
-    }
-    if (newPassword !== reNewPassword) {
-      return res.status(400).json({
-        code: 400,
-        message: 'New password and re-entered password do not match.'
       })
     }
     const salt = await bcrypt.genSalt(10)
@@ -367,5 +388,6 @@ module.exports = {
   googleCallback,
   signInWithFacebook,
   facebookCallback,
-  sendOTP
+  sendOTP,
+  verifyOTP
 }

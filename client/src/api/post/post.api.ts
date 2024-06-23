@@ -25,6 +25,9 @@ export const verifyEmail = async (token: string): Promise<AxiosResponse<any>> =>
       params: { token }
   });
 };
+export const verifyOTP = async (payload: any): Promise<AxiosResponse<any>> => {
+  return await requestWithoutJwt.post<any>('/auths/verifyOTP', { data: payload }, { withCredentials: true })
+}
 export const googleSignIn = () => {
   window.location.href = 'http://localhost:8000/api/v1/auths/google/callback'
 };
