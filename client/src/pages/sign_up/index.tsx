@@ -75,31 +75,31 @@ const SignUp = () => {
         const schema = yup.object({
             firstName: yup
                 .string()
-                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.first_name_invalid'))
-                .required(messFirstName),
+                .required(messFirstName)
+                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.first_name_invalid')),
             lastName: yup
                 .string()
-                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.last_name_invalid'))
-                .required(messLastName),
+                .required(messLastName)
+                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.last_name_invalid')),
             email: yup
                 .string()
                 .email(t('signUp.email_invalid'))
                 .required(messEmail),
             username: yup
                 .string()
-                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/, t('signUp.username_invalid'))
-                .required(messUsername),
+                .required(messUsername)
+                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/, t('signUp.username_invalid')),
             password: yup
                 .string()
+                .required(messPassword)
                 .matches(
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                     t('signUp.password_invalid')
-                )
-                .required(messPassword),
+                ),
             confirm_password: yup
                 .string()
-                .oneOf([yup.ref('password')], t('signUp.password_must_match'))
-                .required(messConfirm),
+                .required(messConfirm)
+                .oneOf([yup.ref('password')], t('signUp.password_must_match')),
             termCheck: yup
                 .boolean()
                 .oneOf([true], messTermCheckBox)
@@ -124,7 +124,8 @@ const SignUp = () => {
                 }
             }, 3000)
         } catch (error) {
-            setLoading(false);
+
+
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
                 // Create an ordered list of error fields
@@ -173,25 +174,31 @@ const SignUp = () => {
                     }
                 });
             } else {
-                if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                    console.log('error.code:', error.code);
-                    // console.log('error.message:', error.message);
-                    // const message = error.message;
-                    if (error.code === 401) {
-                        if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                            console.log('error.code:', error.message);
-                            const message = String(error.message);
-                            if (message.includes('Username')) {
-                                setErrorMessageUsername(message);
-                            } else if (message.includes('Email')) {
-                                setErrorMessageEmail(message);
+                setTimeout(() => {
+                    setLoading(false);
+
+                    if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
+                        console.log('error.code:', error.code);
+                        // console.log('error.message:', error.message);
+                        // const message = error.message;
+                        if (error.code === 401) {
+                            if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
+                                console.log('error.code:', error.message);
+                                const message = String(error.message);
+                                if (message.includes('Username')) {
+                                    setErrorMessageUsername(message);
+                                } else if (message.includes('Email')) {
+                                    setErrorMessageEmail(message);
+                                }
                             }
+                        } else {
+                            console.log(error)
                         }
-                    } else {
-                        console.log(error)
                     }
-                }
+                }, 3000)
             }
+
+
         }
     }
 

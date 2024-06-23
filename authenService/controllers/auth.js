@@ -322,6 +322,31 @@ const changePassword = async (req, res, next) => {
     next(error)
   }
 }
+const resetPassword = async (req, res, next) => {
+  try {
+    const { email, newPassword } = req.body.data
+    const user = await models.User.findOne({
+      where: { email }
+    })
+    if (!user) {
+      return res.status(404).json({
+        code: 404,
+        message: 'Email is not registered.'
+      })
+    }
+    // const salt = await bcrypt.genSalt(10)
+    // const hashPassword = bcrypt.hashSync(newPassword, salt)
+    const hashPassword = await bcrypt.hash(newPassword, 10)
+    await user.update({ password: hashPassword })
+
+    // Optionally, produce a message to Kafka with full user data
+    await produceMessage('password-reset', user.id, user.toJSON())
+
+    return res.status(200).json({ success: true, message: 'Password has been reset successfully.' })
+  } catch (error) {
+    next(error)
+  }
+}
 const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
 
 const googleCallback = (req, res, next) => {
@@ -384,6 +409,7 @@ module.exports = {
   refreshToken,
   signOut,
   changePassword,
+  resetPassword,
   signInWithGoogle,
   googleCallback,
   signInWithFacebook,
