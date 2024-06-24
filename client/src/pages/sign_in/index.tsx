@@ -153,7 +153,7 @@ const SignIn = () => {
                     </div>
                 </div>
             )}
-            <div className="tw-bg-red-500 tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
+            <div className="tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
                 <img src={loginImage} alt="loginImg" className="tw-h-full" />
             </div>
             <div className="tw-flex lg:tw-relative lg:tw-w-3/5 tw-w-full tw-items-center tw-justify-between">

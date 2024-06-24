@@ -1,4 +1,5 @@
 /* eslint-disable no-template-curly-in-string */
+const axios = require('axios') // Đảm bảo đã cài đặt axios
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { models } = require('../models')
@@ -207,9 +208,8 @@ const signOut = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ error: { message: 'User not found' } })
     }
-    // Clear the refresh token in the cookie
     res.cookie('refreshToken', '', { expires: new Date(0) })
-    res.cookie('connect.sid', '', { expires: new Date(0) }) // Đặt cookie với giá trị rỗng và thời gian hết hạn là ngay lập tức
+    res.cookie('connect.sid', '', { expires: new Date(0) })
     // Clear the refresh token and expire in the database
     user.refreshToken = null
     user.expire = null
@@ -224,13 +224,83 @@ const signOut = async (req, res, next) => {
     next(error)
   }
 }
-const sendOTP = async (req, res, next) => {
+// const sendOTP = async (req, res, next) => {
+//   try {
+//     const { email } = req.body.data
+//     console.log(req.body.data, 'req.body.data')
+//     if (!email) {
+//       return res.status(400).json({ message: 'Missing email.' })
+//     }
+//     const user = await models.User.findOne({ where: { email } })
+//     if (!user) {
+//       return res.status(400).json({ message: 'User not found.' })
+//     }
+//     const otp = Math.floor(100000 + Math.random() * 900000)
+//     const otpExpire = new Date()
+//     otpExpire.setMinutes(otpExpire.getMinutes() + 5)
+
+//     await models.User.update({ otp, otpExpire }, { where: { email } })
+
+//     const mailOptions = {
+//       from: 'canhmail292@gmail.com', // It's good practice to use a 'noreply' address for automated emails
+//       to: email, // The recipient's email address
+//       subject: 'Email Verification Code',
+//       html: `Dear ${user.firstName},<br>
+//         Thank you for using our service.<br><br>
+//         Please confirm your e-mail address by entering the code below into the verification form.<br><br>
+//         <strong>Your OTP is ${otp}. It will expire in 5 minutes.</strong><br><br>
+//         * This is an automated e-mail. Please do not respond to this address.<br>
+//         * Please disregard this message if you receive it and did not request to change your password.`
+//     }
+
+//     transporter.sendMail(mailOptions, function (error, info) {
+//       if (error) {
+//         console.log(error)
+//         return res.status(500).json({ message: 'Failed to send OTP.' })
+//       } else {
+//         console.log('Email sent: ' + info.response)
+//         // Indicate that the OTP was sent successfully
+//         return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
+//       }
+//     })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
+const checkEmail = async (req, res, next) => {
   try {
     const { email } = req.body.data
-    console.log(req.body.data, 'req.body.data')
     if (!email) {
       return res.status(400).json({ message: 'Missing email.' })
     }
+    const user = await models.User.findOne({ where: { email } })
+    if (!user) {
+      return res.status(400).json({ message: 'User not found.' })
+    }
+    return res.status(200).json({ success: true, message: 'Email found.' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const sendOTP = async (req, res, next) => {
+  try {
+    const { email, captchaValue } = req.body.data
+    console.log(req.body.data, 'req.body.data')
+    if (!email || !captchaValue) {
+      return res.status(400).json({ message: 'Missing email or captcha token.' })
+    }
+    const captchaVerifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+      params: {
+        secret: process.env.SECRET_KEY_CAPTCHA,
+        response: captchaValue
+      }
+    })
+
+    if (!captchaVerifyResponse.data.success) {
+      return res.status(400).json({ message: 'Invalid CAPTCHA. Please try again.' })
+    }
+
     const user = await models.User.findOne({ where: { email } })
     if (!user) {
       return res.status(400).json({ message: 'User not found.' })
@@ -242,8 +312,8 @@ const sendOTP = async (req, res, next) => {
     await models.User.update({ otp, otpExpire }, { where: { email } })
 
     const mailOptions = {
-      from: 'canhmail292@gmail.com', // It's good practice to use a 'noreply' address for automated emails
-      to: email, // The recipient's email address
+      from: 'canhmail292@gmail.com',
+      to: email,
       subject: 'Email Verification Code',
       html: `Dear ${user.firstName},<br>
         Thank you for using our service.<br><br>
@@ -259,7 +329,6 @@ const sendOTP = async (req, res, next) => {
         return res.status(500).json({ message: 'Failed to send OTP.' })
       } else {
         console.log('Email sent: ' + info.response)
-        // Indicate that the OTP was sent successfully
         return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
       }
     })
@@ -347,6 +416,7 @@ const resetPassword = async (req, res, next) => {
     next(error)
   }
 }
+
 const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
 
 const googleCallback = (req, res, next) => {
@@ -415,5 +485,6 @@ module.exports = {
   signInWithFacebook,
   facebookCallback,
   sendOTP,
-  verifyOTP
+  verifyOTP,
+  checkEmail
 }

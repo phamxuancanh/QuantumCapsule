@@ -13,6 +13,7 @@
     "@elastic/ecs-winston-format": "^1.5.3",
     "@elastic/elasticsearch": "^7.15.2",
     "@faker-js/faker": "^8.4.1",
+    "axios": "^1.7.2",
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",

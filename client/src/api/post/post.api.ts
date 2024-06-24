@@ -16,6 +16,10 @@ export const refresh = async (payload: any): Promise<AxiosResponse<any>> => {
 export const signOut = async (payload: any): Promise<AxiosResponse<any>> => {
   return await requestWithJwt.post<any>('/auths/signOut', { data: payload }, { withCredentials: true } )
 }
+export const checkEmail = async (payload: any): Promise<AxiosResponse<any>> => {
+  return await requestWithJwt.post<any>('/auths/checkEmail', { data: payload }, { withCredentials: true } )
+}
+
 export const sendOTP = async (payload: any): Promise<AxiosResponse<any>> => {
   return await requestWithoutJwt.post<any>('/auths/sendOTP', { data: payload }, { withCredentials: true } )
 }

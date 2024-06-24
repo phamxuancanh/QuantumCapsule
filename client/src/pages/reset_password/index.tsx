@@ -23,20 +23,20 @@ const ResetPassword = () => {
         e.preventDefault();
         setErrorMessagePassword('')
         setErrorMessageConfirmPassword('')
-        const messPassword = t('signUp.password_required');
-        const messConfirm = t('signUp.confirm_password_required');
+        const messPassword = t('reset_password.password_required');
+        const messConfirm = t('reset_password.confirm_password_required');
         const schema = yup.object({
             password: yup
                 .string()
                 .required(messPassword)
                 .matches(
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                    t('signUp.password_invalid')
+                    t('reset_password.password_invalid')
                 ),
             confirm_password: yup
                 .string()
                 .required(messConfirm)
-                .oneOf([yup.ref('password')], t('signUp.password_must_match')),
+                .oneOf([yup.ref('password')], t('reset_password.password_must_match')),
         }).required();
 
         try {
@@ -51,7 +51,7 @@ const ResetPassword = () => {
                     setTimeout(() => {
                         setLoading(false)
                         navigate(ROUTES.sign_in)
-                        toast.success('reset succelsfully')
+                        toast.success(t('reset_password.reset_sucessfully'))
                     }, 0)
                 } else {
                     alert('Unexpected response from server')
@@ -131,8 +131,8 @@ const ResetPassword = () => {
                 </div>
             )}
             <div className="tw-bg-white tw-items-center tw-justify-center tw-p-10 tw-space-y-8 tw-border tw-rounded-2xl tw-shadow">
-                <div className="bg-tw-gray-500 tw-font-bold tw-text-5xl tw-text-center">Reset account password</div>
-                <div className="tw-text-center tw-font-bold">Enter a new password for {email}</div>
+                <div className="bg-tw-gray-500 tw-font-bold tw-text-5xl tw-text-center">{t('reset_password.title')}</div>
+                <div className="tw-text-center tw-font-bold">{t('reset_password.enter')} {email}</div>
                 <form action="#" method="POST" onSubmit={handleResetPassword}>
                     <div>
                         <div>
@@ -144,7 +144,7 @@ const ResetPassword = () => {
                                     autoComplete="current-password"
                                     required
                                     className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                    placeholder={t('signUp.password')}
+                                    placeholder={t('reset_password.new_password')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
@@ -162,7 +162,7 @@ const ResetPassword = () => {
                                     autoComplete="current-password"
                                     required
                                     className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                    placeholder={t('signUp.confirm_password')}
+                                    placeholder={t('reset_password.confirm_password')}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
@@ -178,7 +178,7 @@ const ResetPassword = () => {
                             type="submit"
                             className="tw-group tw-relative tw-w-full tw-flex tw-justify-center tw-py-2 tw-px-4 tw-border tw-border-transparent tw-text-sm tw-font-medium tw-rounded-md tw-text-black tw-bg-sky-400 hover:tw-bg-sky-500"
                         >
-                            Reset password
+                            {t('reset_password.reset')}
                         </button>
                     </div>
                 </form>

@@ -72,7 +72,17 @@
             "confirm_password_required": "Confirm password is required",
             "email_not_found": "Email is not registered",
             "password_invalid": "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number",
-            "password_must_match": "Confirm password does not match"
+            "password_must_match": "Confirm password does not match",
+            "captcha_error": "Captcha is invalid",
+            "successfully_sended": "OTP successfully sended"
+        },
+        "reset_password": {
+            "title": "Reset account password",
+            "enter": "Enter a new password for ",
+            "new_password": "New Password",
+            "confirm_password": "Confirm Password",
+            "reset": "Reset Password",
+            "reset_sucessfully": "Reset password successfully"
         }
     }
 }

@@ -7,14 +7,19 @@ import { ClockLoader } from 'react-spinners'
 import OTPModal from 'components/modals/OTPModal'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
-import { sendOTP } from 'api/post/post.api'
+import { sendOTP, checkEmail } from 'api/post/post.api'
+import ReCAPTCHA from 'react-google-recaptcha'
 const ForgotPassword = () => {
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+    const [showCaptcha, setShowCaptcha] = useState(false);
+    const keySite = process.env.REACT_APP_SITE_KEY
     const [email, setEmail] = useState('')
     // const [password, setPassword] = useState('')
     // const [confirmPassword, setConfirmPassword] = useState('')
     const [errorMessageEmail, setErrorMessageEmail] = useState('')
+    const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
     // const [errorMessagePassword, setErrorMessagePassword] = useState('')
     // const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState('')
     const [loading, setLoading] = useState(false)
@@ -40,6 +45,7 @@ const ForgotPassword = () => {
         console.log('handleSendOTP')
         e.preventDefault();
         setErrorMessageEmail('')
+        setErrorMessageCaptcha('')
         const messEmail = t('forgot_password.email_required')
         const schema = yup.object({
             email: yup
@@ -50,7 +56,8 @@ const ForgotPassword = () => {
         setLoading(true)
         try {
             await schema.validate({ email }, { abortEarly: false })
-            const result = await sendOTP({ email })
+            const result = await sendOTP({ email, captchaValue })
+            console.log('result:', result)
             if (result?.data) {
                 console.log('go')
                 setTimeout(() => {
@@ -68,6 +75,7 @@ const ForgotPassword = () => {
             if (error instanceof yup.ValidationError) {
                 const errorOrder = ['email']
                 setErrorMessageEmail('')
+                setErrorMessageCaptcha('')
                 errorOrder.forEach(field => {
                     if (error instanceof yup.ValidationError) {
                         const err = error.inner.find(e => e.path === field);
@@ -90,6 +98,9 @@ const ForgotPassword = () => {
                         if (message.includes('User')) {
                             setErrorMessageEmail(message)
                         }
+                        if (message.includes('captcha token')) {
+                            setErrorMessageCaptcha(t('forgot_password.captcha_error'))
+                        }
                     }
 
                 }
@@ -97,7 +108,21 @@ const ForgotPassword = () => {
         }
     }
     const handleCloseModal = () => {
+        setCaptchaValue(null)
+        setEmail('')
+        setErrorMessageCaptcha('')
+        setErrorMessageEmail('')
+        setShowCaptcha(false)
         setIsModalOpen(false)
+    };
+    const handleCaptchaChange = (value: React.SetStateAction<string | null>) => {
+        setErrorMessageCaptcha('');
+        setCaptchaValue(value);
+    };
+    const handleEmailBlur = () => {
+        if (email) {
+            setShowCaptcha(true);
+        }
     };
     return (
         <div className="tw-flex tw-bg-gray-200">
@@ -151,48 +176,22 @@ const ForgotPassword = () => {
                                             placeholder={t('forgot_password.your_register_email')}
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
+                                            onBlur={handleEmailBlur}
                                         />
                                         <EmailOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
 
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
                                 </div>
-                                {/* <div>
-                                    <div className="tw-relative tw-border-2 tw-border-orange-300 tw-rounded-2xl">
-                                        <input
-                                            id="password"
-                                            name="password"
-                                            type="password"
-                                            autoComplete="current-password"
-                                            required
-                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('forgot_password.new_password')}
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
-                                        <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
-
-                                    </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessagePassword}</div>
-                                </div>
-                                <div>
-                                    <div className="tw-relative tw-border-2 tw-border-orange-300 tw-rounded-2xl">
-                                        <input
-                                            id="password"
-                                            name="password"
-                                            type="password"
-                                            autoComplete="current-password"
-                                            required
-                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('forgot_password.confirm_password')}
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                        />
-                                        <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
-
-                                    </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageConfirmPassword}</div>
-                                </div> */}
+                                {showCaptcha && (
+                                    <ReCAPTCHA
+                                        sitekey={keySite ?? ''}
+                                        onChange={handleCaptchaChange}
+                                    />
+                                )}
+                                {errorMessageCaptcha && (
+                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
+                                )}
                             </div>
                             <div>
                                 <button
