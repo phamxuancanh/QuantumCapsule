@@ -5,6 +5,8 @@ import Components from './tabs/Components';
 import Layouts from './tabs/Layouts';
 import GridSetting from './tabs/GridSetting';
 import Payment from './tabs/Payment';
+import Excel from './tabs/Excel';
+import RoomManager from './tabs/RoomManager';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -27,12 +29,6 @@ const DevPage: React.FC = () => {
             </div>
         );
     }
-    function a11yProps(index: number) {
-        return {
-            id: `simple-tab-${index}`,
-            'aria-controls': `simple-tabpanel-${index}`,
-        };
-    }
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
@@ -40,26 +36,35 @@ const DevPage: React.FC = () => {
         <div>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="components" {...a11yProps(1)}/>
-                    <Tab label="paypal" {...a11yProps(0)} />
-                    <Tab label="table grid" {...a11yProps(2)} />
-                    <Tab label="layout grid" {...a11yProps(3)} />
-                    <Tab label="grid setting" {...a11yProps(4)} />
+                    <Tab label="rooms" />
+                    <Tab label="paypal"  />
+                    <Tab label="components" />
+                    <Tab label="table grid" />
+                    <Tab label="layout grid" />
+                    <Tab label="grid setting" />
+                    <Tab label="excel" />
+
                 </Tabs>
             </Box>
+            <CustomTabPanel value={value} index={0}>
+                <RoomManager />
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={6}>
+                <Excel />
+            </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
                 <Payment />
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={0}>
+            <CustomTabPanel value={value} index={2}>
                 <Components />
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
+            <CustomTabPanel value={value} index={3}>
                 <CRUD />
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={3}>
+            <CustomTabPanel value={value} index={4}>
                 <Layouts />
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={4}>
+            <CustomTabPanel value={value} index={5}>
                 <GridSetting />
             </CustomTabPanel>
         </div>

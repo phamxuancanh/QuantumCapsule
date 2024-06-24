@@ -36,9 +36,11 @@ export enum IconName {
     wifi_off = 'WifiOffOutlined',
     shopping_cart = 'ShoppingCartOutlined',
     chart = 'BarChartOutlined',
+    movie = 'MovieOutlined',
+    calendar = 'CalendarMonthOutlined',
+    //-------------------------------------------
     arrow_back = 'ArrowBackOutlined',
     arrow_forward = 'ArrowForwardOutlined',
-    //-------------------------------------------
     delete = 'DeleteForeverOutlined',
     download = 'DownloadOutlined',
     close = 'HighlightOffOutlined',
@@ -47,6 +49,7 @@ export enum IconName {
     file = 'InsertDriveFileOutlined',
     image = 'ImageOutlined',
     camera = 'CameraAltOutlined',
+    upload_file = 'UploadFileOutlined',
     //---------------------------------------------
     star_border = 'StarBorderOutlined',
     star = 'StarOutlined',
