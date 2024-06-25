@@ -71,7 +71,9 @@ export const removeAllLocalStorage = (): void => {
 
 export const convertDate = (originalDateTime: Date | string): string => {
   let arr = originalDateTime instanceof Date ? originalDateTime.toISOString().split(':') : originalDateTime.split(':')
-  let date = arr[0] + ':' + arr[1]
+  let date = arr[0]
+  if(arr[1])
+    date = arr[0] + ':' + arr[1]
   return date
 }
 
