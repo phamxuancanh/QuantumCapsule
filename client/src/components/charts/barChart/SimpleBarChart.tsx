@@ -44,7 +44,6 @@ const SimpleBarChart: React.FC<ISimpleBarChartChartProps> = (props: ISimpleBarCh
         const axis = axisValue;
         const index = dataIndex;
         const value = seriesValues['auto-generated-id-0'];
-        console.log(data);
         
         props.onAxisClick && props.onAxisClick(axis, index, value)
     }
@@ -54,7 +53,7 @@ const SimpleBarChart: React.FC<ISimpleBarChartChartProps> = (props: ISimpleBarCh
 
     return (
         <BarChart
-            margin = {{ left: 150 }} 
+            margin = {{ left: 100 }} 
             dataset={props.dataset}
             xAxis={[
                 !isSmallScreen? { scaleType: 'band', dataKey: props.labelField } :{label: props.yAxis},

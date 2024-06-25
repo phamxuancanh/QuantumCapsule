@@ -1,12 +1,13 @@
 import React from 'react';
-import CRUD from './tabs/CRUD'
 import { Box, Tab, Tabs } from '@mui/material';
+import CRUD from './tabs/CRUD'
 import Components from './tabs/Components';
 import Layouts from './tabs/Layouts';
 import GridSetting from './tabs/GridSetting';
 import Payment from './tabs/Payment';
 import Excel from './tabs/Excel';
 import RoomManager from './tabs/RoomManager';
+import Charts from './tabs/Charts';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -36,17 +37,21 @@ const DevPage: React.FC = () => {
         <div>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="rooms" />
+                    <Tab label="charts" />
                     <Tab label="paypal"  />
                     <Tab label="components" />
                     <Tab label="table grid" />
                     <Tab label="layout grid" />
                     <Tab label="grid setting" />
                     <Tab label="excel" />
+                    <Tab label="rooms" />
 
                 </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
+                <Charts />
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={7}>
                 <RoomManager />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={6}>

@@ -51,7 +51,7 @@ const RoomManager: React.FC<IRoomManagerProps> = (props: IRoomManagerProps) => {
     }
     
     return (
-        <div>
+        <div className='app-container'>
             <InfoForm 
                 image='https://product.hstatic.net/200000343865/product/doraemon-tieu-thuyet_nobita-va-ban-giao-huong-dia-cau_bia_62e39c436bdc4343afb79847062df2f2_master.jpg'
                 name='doremon'

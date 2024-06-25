@@ -72,7 +72,7 @@ export const removeAllLocalStorage = (): void => {
 export const convertDate = (originalDateTime: Date | string): string => {
   let arr = originalDateTime instanceof Date ? originalDateTime.toISOString().split(':') : originalDateTime.split(':')
   let date = arr[0]
-  if(arr[1])
+  if (arr[1])
     date = arr[0] + ':' + arr[1]
   return date
 }
@@ -89,7 +89,7 @@ export function generateRandomIntArray(length: number, min: number, max: number)
   return randomArray;
 }
 
-function getRandomFloat(min: number, max: number): number{
+function getRandomFloat(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
 
@@ -100,4 +100,69 @@ export function generateRandomFloatArray(length: number, min: number, max: numbe
     randomArray.push(parseFloat(getRandomFloat(min, max).toFixed(decimalPlaces)));
   }
   return randomArray;
+}
+
+export function convertDataset(dataset: any[], keyField: string, dataField: string, typeCal: 'avg' | 'sum' | 'count' = 'sum'): {index: number, key: unknown, value: number}[] {
+  const result: {index: number, key: unknown, value: number}[] = [];
+  const tempDataset = [...dataset];
+  const keySet = new Set();
+  for (const data of tempDataset) {
+    keySet.add(data[keyField]);
+  }
+  const keyArray = Array.from(keySet);
+  for(const key of keyArray){
+    const tempData = tempDataset.filter((data) => data[keyField] === key);
+    let index = keyArray.indexOf(key);
+    let value = 0;
+    switch (typeCal) {
+      case 'avg':
+        value = tempData.reduce((pre, cur) => pre + cur[dataField], 0) / tempData.length;
+        break;
+      case 'sum':
+        value = tempData.reduce((pre, cur) => pre + cur[dataField], 0);
+        break;
+      case 'count':
+        value = tempData.length;
+        break;
+      default:
+        break;
+    }
+    result.push({index, key, value});
+
+  }
+  return result;
+}
+
+
+export function calculateData(data: any, keyField: string, dataFields: string[],  typeCal: 'avg' | 'sum' | 'count' = 'sum'){
+  let result: {index: number, key: any, value: number};
+  let value = 0;
+  if(typeCal === 'avg'){
+    value = dataFields.reduce((pre, cur) => pre + data[cur], 0) / dataFields.length;
+  }
+  if(typeCal === 'sum'){
+    value = dataFields.reduce((pre, cur) => pre + data[cur], 0);
+  }
+  if(typeCal === 'count'){
+    value = dataFields.length;
+  }
+  result = {index: 0, key: data[keyField], value};
+  return result;
+
+}
+
+export function filterByField(dataset: any[], field: string, value: any): any[] {
+  return dataset.filter((data) => data[field] === value);
+}
+export function filterByFields(dataset: any[], fields: string[], value: any[]): any[] {
+  return dataset.filter((data) =>{
+    let result = true;
+    for(let i = 0; i < fields.length; i++){
+      if(data[fields[i]] !== value[i]){
+        result = false;
+        break;
+      }
+    }
+    return result;
+  });
 }
