@@ -101,6 +101,7 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
   }
 
   if (isAuthenticated && location.pathname === ROUTES.sign_in) {
+    // console.log
     return <Navigate to={ROUTES.home} />;
   }
 

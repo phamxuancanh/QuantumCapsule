@@ -11,4 +11,3 @@ const ROUTES = {
     reset_password: '/reset_password',
 }
 export default ROUTES
-  
