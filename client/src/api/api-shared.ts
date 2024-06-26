@@ -60,6 +60,7 @@ export interface IGrid{
     regex?: string;
     regexMessage?: string;
     position: number;
+    displayField: string | null;
 
 
 }
@@ -78,7 +79,8 @@ export class GridProgress {
             isDisplayForm: true,
             regex: '',
             regexMessage: '',
-            position: 0
+            position: 0,
+            displayField: null
         }
     }
 
