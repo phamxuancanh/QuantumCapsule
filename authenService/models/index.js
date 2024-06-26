@@ -15,12 +15,12 @@ Role.belongsToMany(Permission, { through: RoleToPermission, foreignKey: 'roleId'
 Permission.belongsToMany(Role, { through: RoleToPermission, foreignKey: 'permissionId' })
 
 module.exports = {
-    sequelize,
-    models: {
-        User,
-        Permission,
-        Role,
-        RoleToPermission,
-        Route
-    }
+  sequelize,
+  models: {
+    User,
+    Permission,
+    Role,
+    RoleToPermission,
+    Route
+  }
 }

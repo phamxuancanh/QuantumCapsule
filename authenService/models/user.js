@@ -51,6 +51,12 @@ const User = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    otp: {
+      type: DataTypes.STRING
+    },
+    otpExpire: {
+      type: DataTypes.DATE
+    },
     roleId: {
       type: DataTypes.BIGINT,
       allowNull: false,

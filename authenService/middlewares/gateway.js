@@ -1,65 +1,64 @@
-const { route } = require("../routes");
+// const { route } = require('../routes')
 
 const services = [
-    {
-        route: "/inventories",
-        target: "http://localhost:8001/api/v1/inventories",
-    },
-    {
-        route:"/grids",
-        target: "http://localhost:8001/api/v1/grids",
-    },
-    {
-        route:"/storages",
-        target: "http://localhost:8001/api/v1/storages",
-    },
-    {
-        route:"/base",
-        target: "http://localhost:8001/api/v1/base",
-    },
-    {
-        route:"/vouchers",
-        target: "http://localhost:8001/api/v1/vouchers",
-    },
-];
+  {
+    route: '/inventories',
+    target: 'http://localhost:8001/api/v1/inventories'
+  },
+  {
+    route: '/grids',
+    target: 'http://localhost:8001/api/v1/grids'
+  },
+  {
+    route: '/storages',
+    target: 'http://localhost:8001/api/v1/storages'
+  },
+  {
+    route: '/base',
+    target: 'http://localhost:8001/api/v1/base'
+  },
+  {
+    route: '/vouchers',
+    target: 'http://localhost:8001/api/v1/vouchers'
+  }
+]
 
+const rateLimit = 50
+const interval = 60 * 1000 // 50 requests per minute
 
-const rateLimit = 50;
-const interval = 60 * 1000; // 50 requests per minute
-
-const requestCounts = {};
+const requestCounts = {}
 
 setInterval(() => {
-    Object.keys(requestCounts).forEach((ip) => {
-        requestCounts[ip] = 0;
-    });
-}, interval);
+  Object.keys(requestCounts).forEach((ip) => {
+    requestCounts[ip] = 0
+  })
+}, interval)
 
-function rateLimitAndTimeout(req, res, next) {
-    const ip = req.ip;
-    console.log("IP: ", ip);
-    console.log("request: ", req.query);
-    requestCounts[ip] = (requestCounts[ip] || 0) + 1;
+function rateLimitAndTimeout (req, res, next) {
+  const ip = req.ip
+  console.log('IP: ', ip)
+  console.log('request: ', req.query)
+  requestCounts[ip] = (requestCounts[ip] || 0) + 1
 
-    if (requestCounts[ip] > rateLimit) {
-        return res.status(429).json({
-            code: 429,
-            message: "Rate limit exceeded.",
-        });
-    }
+  if (requestCounts[ip] > rateLimit) {
+    return res.status(429).json({
+      code: 429,
+      message: 'Rate limit exceeded.'
+    })
+  }
 
-    req.setTimeout(60000, () => {
-        res.status(504).json({
-            code: 504,
-            message: "Gateway timeout.",
-        });
-        req.abort();
-    });
+  req.setTimeout(60000, () => {
+    res.status(504).json({
+      code: 504,
+      message: 'Gateway timeout.'
+    })
+    req.abort()
+  })
 
-    next();
+  next()
 }
 
 module.exports = {
-    services,
-    rateLimitAndTimeout,
-};
+  services,
+  rateLimitAndTimeout
+}
