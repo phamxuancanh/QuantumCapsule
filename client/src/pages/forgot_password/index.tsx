@@ -42,6 +42,7 @@ const ForgotPassword = () => {
         [i18n]
     )
     async function handleSendOTP(e: { preventDefault: () => void; }) {
+        setShowCaptcha(true)
         console.log('handleSendOTP')
         e.preventDefault();
         setErrorMessageEmail('')
@@ -186,10 +187,11 @@ const ForgotPassword = () => {
                                 {showCaptcha && (
                                     <ReCAPTCHA
                                         sitekey={keySite ?? ''}
+                                        // sitekey='6LdynQEqAAAAAEj_i6vqYyZUNA54yn-oRIdC00Vy'
                                         onChange={handleCaptchaChange}
                                     />
                                 )}
-                                {errorMessageCaptcha && (
+                                {(errorMessageCaptcha && showCaptcha) && (
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
                                 )}
                             </div>

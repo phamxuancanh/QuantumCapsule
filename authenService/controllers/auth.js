@@ -77,9 +77,73 @@ const signIn = async (req, res, next) => {
     next(error)
   }
 }
+// const signUp = async (req, res, next) => {
+//   try {
+//     const { firstName, lastName, username, email, password, captchaValue } = req.body.data
+
+//     const userByUsername = await models.User.findOne({ where: { username } })
+//     if (userByUsername) {
+//       return res.status(401).json({ code: 401, message: 'Username is already registered.' })
+//     }
+
+//     const userByEmail = await models.User.findOne({ where: { email } })
+//     if (userByEmail) {
+//       return res.status(401).json({ code: 401, message: 'Email is already registered.' })
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10)
+
+//     const newUser = await models.User.create({
+//       firstName,
+//       lastName,
+//       username,
+//       password: hashedPassword,
+//       email,
+//       emailVerified: false
+//     })
+
+//     // Tạo token xác thực email
+//     const emailToken = jwt.sign({ id: newUser.id, username: newUser.username, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' })
+
+//     // Định nghĩa URL xác thực
+//     const confirmationUrl = `http://localhost:${process.env.CLIENT_PORT}/verify/email?token=${emailToken}`
+
+//     // Đọc template HTML
+//     const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
+//     const htmlContent = fs.readFileSync(templatePath, 'utf8')
+//     const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl)
+
+//     // Gửi email xác thực
+//     const mailOptions = {
+//       from: 'canhmail292@gmail.com',
+//       to: email,
+//       subject: 'Email Confirmation',
+//       html: htmlWithLink
+//     }
+
+//     await transporter.sendMail(mailOptions)
+
+//     return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
 const signUp = async (req, res, next) => {
   try {
-    const { firstName, lastName, username, email, password } = req.body.data
+    const { firstName, lastName, username, email, password, captchaValue } = req.body.data
+
+    // Kiểm tra captcha
+    const captchaVerificationUrl = 'https://www.google.com/recaptcha/api/siteverify'
+    const captchaResponse = await axios.post(captchaVerificationUrl, null, {
+      params: {
+        secret: process.env.SECRET_KEY_CAPTCHA,
+        response: captchaValue
+      }
+    })
+
+    if (!captchaResponse.data.success) {
+      return res.status(401).json({ code: 401, message: 'Captcha verification failed.' })
+    }
 
     const userByUsername = await models.User.findOne({ where: { username } })
     if (userByUsername) {

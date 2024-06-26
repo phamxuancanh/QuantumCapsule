@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import loginImage from 'assets/bb.jpg'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
 import { ClockLoader } from "react-spinners"
+import ReCAPTCHA from "react-google-recaptcha"
 const theme = createTheme()
 
 const SignUp = () => {
@@ -34,6 +35,11 @@ const SignUp = () => {
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
     const [loading, setLoading] = useState(false)
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+    const [showCaptcha, setShowCaptcha] = useState(false);
+    const keySite = process.env.REACT_APP_SITE_KEY
+    const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
+
     // TODO: them loading
 
     const languageOptions = useMemo(() => {
@@ -53,7 +59,17 @@ const SignUp = () => {
         },
         [i18n]
     )
+    const handleCaptchaChange = (value: React.SetStateAction<string | null>) => {
+        setErrorMessageCaptcha('');
+        setCaptchaValue(value);
+    };
+    // const handleEmailBlur = () => {
+    //     if (email) {
+    //         setShowCaptcha(true);
+    //     }
+    // };
     async function handleRegister(e: { preventDefault: () => void; }) {
+        setShowCaptcha(true);
         e.preventDefault();
         // Clear previous error messages
         setErrorMessageFirstName('')
@@ -63,6 +79,7 @@ const SignUp = () => {
         setErrorMessagePassword('')
         setErrorMessageConfirmPassword('')
         setErrorMessageTermCheck('')
+        setErrorMessageCaptcha('')
 
         const messFirstName = t('signUp.first_name_required');
         const messLastName = t('signUp.last_name_required');
@@ -108,21 +125,19 @@ const SignUp = () => {
         try {
             await schema.validate({ firstName, lastName, username, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
             setLoading(true);
-            setTimeout(async () => {
-                const result = await signUp({ firstName, lastName, username, email, password })
-                console.log('result')
-                console.log(result)
-                console.log('result.data:', result?.data)
-                if (result?.data) {
-                    setTimeout(() => {
-                        setLoading(false)
-                        navigate(ROUTES.email_verify_send)
-                        toast.success(t('signUp.success'))
-                    }, 0)
-                } else {
-                    alert('Unexpected response from server')
-                }
-            }, 3000)
+            const result = await signUp({ firstName, lastName, username, email, password, captchaValue })
+            console.log('result')
+            console.log(result)
+            console.log('result.data:', result?.data)
+            if (result?.data) {
+                setTimeout(() => {
+                    setLoading(false)
+                    navigate(ROUTES.email_verify_send)
+                    toast.success(t('signUp.success'))
+                }, 0)
+            } else {
+                alert('Unexpected response from server')
+            }
         } catch (error) {
 
 
@@ -139,6 +154,7 @@ const SignUp = () => {
                 setErrorMessagePassword('');
                 setErrorMessageConfirmPassword('');
                 setErrorMessageTermCheck('');
+                setErrorMessageCaptcha('')
 
                 // Iterate over the errorOrder array and set errors in that order
                 errorOrder.forEach(field => {
@@ -189,6 +205,8 @@ const SignUp = () => {
                                     setErrorMessageUsername(message);
                                 } else if (message.includes('Email')) {
                                     setErrorMessageEmail(message);
+                                } else if (message.includes('Captcha')) {
+                                    setErrorMessageCaptcha(message);
                                 }
                             }
                         } else {
@@ -368,7 +386,18 @@ const SignUp = () => {
                                 </div>
                                 <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageTermCheck}</div>
                             </div>
-
+                            <div>
+                                {showCaptcha && (
+                                    <ReCAPTCHA
+                                        sitekey={keySite ?? ''}
+                                        // sitekey='6LdynQEqAAAAAEj_i6vqYyZUNA54yn-oRIdC00Vy'
+                                        onChange={handleCaptchaChange}
+                                    />
+                                )}
+                                {(errorMessageCaptcha && showCaptcha) && (
+                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
+                                )}
+                            </div>
                             <div>
                                 <button
                                     onClick={handleRegister}
