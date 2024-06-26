@@ -7,15 +7,16 @@ export interface IInfoFormProps {
     masterParams: string[] // names of main fields
     detailParams: string[] // names of detail fields
     data: any
+    imageStyle?: React.CSSProperties
 }
 
 const InfoForm: React.FC<IInfoFormProps> = (props: IInfoFormProps) => {
-    const { image, name, masterParams, detailParams, data } = props;
+    const { image, name, masterParams, detailParams, data, imageStyle} = props;
     return (
         <div className="info-form">
             <div className="info-header">
-                <div className="image-container">
-                    <img src={image} alt={`${name}'s avatar`} />
+                <div className="image-container" style={imageStyle}>
+                    <img src={image} alt={`${name}'s avatar`}/>
                 </div>
                 <div className="main-info">
                     <h1>{name}</h1>

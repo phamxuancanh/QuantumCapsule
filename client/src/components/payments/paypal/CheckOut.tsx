@@ -15,10 +15,10 @@ export interface ICheckoutProps {
 const Checkout = (props: ICheckoutProps) => {
     const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
     const [currency, setCurrency] = useState(options.currency || "USD");
-    const [key, setKey] = useState(0);
-    React.useEffect(() => {
-        setKey(prevKey => prevKey + 1);
-    }, [props.totalAmount, currency])
+    // const [key, setKey] = useState(0);
+    // React.useEffect(() => {
+    //     setKey(prevKey => prevKey + 1);
+    // }, [props.totalAmount, currency])
 
     const onCurrencyChange = ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
         setCurrency(value);
@@ -74,10 +74,10 @@ const Checkout = (props: ICheckoutProps) => {
                         ))}
                     </select>
                     <PayPalButtons
-                        key={key}
                         style={{ layout: "vertical" }}
                         createOrder={onCreateOrder}
                         onApprove={onApproveOrder}
+                        forceReRender={[props.totalAmount, currency]}
                     />
                 </>
             )}

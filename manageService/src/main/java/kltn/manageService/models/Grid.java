@@ -43,5 +43,6 @@ public class Grid {
     private String regex;
     private String regexMessage;
     private Integer position;
+    private String displayField;
 
 }

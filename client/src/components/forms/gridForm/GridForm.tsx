@@ -8,11 +8,12 @@ import {
     MenuItem,
     Box,
     SelectChangeEvent,
+    Autocomplete,
 } from '@mui/material';
 import { getGridData, getDirections } from 'api/get/get.api';
 import { ACTIONS, InputType } from 'utils/enums';
 import { convertDate } from 'utils/functions';
-import { IDataSource} from 'utils/interfaces'
+import { IDataSource } from 'utils/interfaces'
 import { IGrid } from 'api/api-shared';
 
 
@@ -48,15 +49,22 @@ const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
                 const res = await getDirections(tempGridData[i].dataSource!);
                 tempDataSources[i] = { name: tempGridData[i].columnName, values: res.data.data };
             }
-            
+            console.log(tempDataSources);
+
             setState(prep => ({ ...prep, dataSources: tempDataSources, gridData: tempGridData }))
         })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.tableName]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown; }> | SelectChangeEvent<never>) => {
         const { name, value } = e.target;
+        // console.log(name, value);
+
         setFormData({ ...props.formData, [name as string]: value });
     };
+    const handleSelectChange = (name: string, value: any) => {
+        // console.log(name, value);
+        setFormData({ ...props.formData, [name as string]: value });
+    }
 
     return (
         <Box>
@@ -115,50 +123,37 @@ const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
                                                 />
                                             </FormGroup>
                                         </Grid>
-                                    // case InputType.CHECKBOX:
-                                    // const checkBoxParams = props.formParams.find((param) => param.name === item.columnName);
-                                    // return (
-                                    //     <Grid item xs={12} md={6} key={item.columnName}>
-                                    //         <FormGroup>
-                                    //             <InputLabel>{checkBoxParams?.label}</InputLabel>
-                                    //             <FormControlLabel
-                                    //                 control={
-                                    //                     <Checkbox
-                                    //                         name={checkBoxParams?.name || ""}
-                                    //                         value={checkBoxParams?.value || ""}
-                                    //                         disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
-                                    //                         defaultChecked={props.formData?.[item.columnName as keyof typeof props.formData] === checkBoxParams?.value}
-                                    //                         onChange={
-                                    //                             handleChange
-                                    //                         }
-                                    //                     />
-                                    //                 }
-                                    //                 label={checkBoxParams?.labelValue}
-                                    //             />
-                                    //         </FormGroup>
-                                    //     </Grid>
-                                    // );
                                     case InputType.SELECT:
+                                        const directionValues = state.dataSources.find((dataSource) => dataSource?.name === item.columnName)?.values;
                                         return (
                                             <Grid item xs={12} md={6} key={item.columnName}>
                                                 <FormGroup>
                                                     <InputLabel>{item.label}</InputLabel>
-                                                    <Select
-                                                        name={item.columnName}
-                                                        defaultValue={props.formData?.[item.columnName as keyof typeof props.formData]}
+                                                    <Autocomplete
+                                                        freeSolo
+                                                        disableClearable
+                                                        defaultValue={
+                                                            item.displayField ?
+                                                                props.formData?.[item.displayField as keyof typeof props.formData]
+                                                                : props.formData?.[item.columnName as keyof typeof props.formData]
+                                                        }
                                                         disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
-                                                        onChange={
-                                                            handleChange
-                                                        }
-                                                    >
-                                                        {
-                                                            state.dataSources.find((dataSource) => dataSource?.name === item.columnName)?.values.map((value) => {
-                                                                return (
-                                                                    <MenuItem value={value.value}>{value.label}</MenuItem>
-                                                                )
-                                                            })
-                                                        }
-                                                    </Select>
+                                                        onChange={(_, v) => {
+                                                            const name = item.columnName as string;
+                                                            const value = directionValues?.find(dict => dict.label === v)?.value
+                                                            handleSelectChange(name, value)
+                                                        }}
+                                                        options={directionValues?.map((option) => option.label) || []}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                InputProps={{
+                                                                    ...params.InputProps,
+                                                                    type: 'search',
+                                                                }}
+                                                            />
+                                                        )}
+                                                    />
                                                 </FormGroup>
                                             </Grid>
                                         );
@@ -176,6 +171,24 @@ const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
                                                         fullWidth
                                                         required
                                                         type='datetime-local'
+                                                    />
+                                                </FormGroup>
+                                            </Grid>
+                                        );
+                                        case InputType.DATE:
+                                        return (
+                                            <Grid item xs={12} md={6} key={item.columnName}>
+                                                <FormGroup>
+                                                    <InputLabel>{item.label || ""}</InputLabel>
+                                                    <TextField
+                                                        name={item.columnName || ""}
+                                                        defaultValue={convertDate(props.formData?.[item.columnName as keyof typeof props.formData])}
+                                                        onChange={handleChange}
+                                                        variant="outlined"
+                                                        disabled={props.action === ACTIONS.VIEW ? true : !item.editable}
+                                                        fullWidth
+                                                        required
+                                                        type='date'
                                                     />
                                                 </FormGroup>
                                             </Grid>

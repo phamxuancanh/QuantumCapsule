@@ -15,10 +15,11 @@ export interface GridLayoutProps {
     columnSpacing?: number
     itemSpacing?: ISpacing
     itemsPerPage?: number // Thêm thuộc tính itemsPerPage
+    pagination?: boolean // Thêm thuộc tính pagination
 }
 
 const GridLayout: React.FC<GridLayoutProps> = (props: GridLayoutProps) => {
-    const { items, columnSpacing, itemSpacing, itemsPerPage = 8 } = props;
+    const { items, columnSpacing, itemSpacing, itemsPerPage = items.length, pagination = true } = props;
 
     const [currentPage, setCurrentPage] = useState(0);
     const [pageInput, setPageInput] = useState('1');
@@ -70,6 +71,7 @@ const GridLayout: React.FC<GridLayoutProps> = (props: GridLayoutProps) => {
                     </Grid2>
                 ))}
             </Grid2>
+            <div style={pagination? undefined : {display: "none"} }>
             <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'center', gap: 2, alignItems: 'center' }}>
                 <Button variant="contained" onClick={handlePrevPage} disabled={currentPage === 0}>
                     Previous
@@ -100,6 +102,8 @@ const GridLayout: React.FC<GridLayoutProps> = (props: GridLayoutProps) => {
                     Go
                 </Button>
             </Box>
+
+            </div>
         </Box>
     );
 };

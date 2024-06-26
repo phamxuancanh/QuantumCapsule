@@ -1,11 +1,14 @@
 import React from 'react';
-import InfoForm, {IInfoFormProps} from 'components/forms/infoForm/InfoForm';
+import InfoForm, { IInfoFormProps } from 'components/forms/infoForm/InfoForm';
 import 'styles/global.scss'
 import InfoCard from 'components/cards/infoCard/InfoCard';
-import IconMenu, {IIconMenuProps} from 'components/menus/iconMenu/IconMenu';
-import {IconName} from 'utils/enums'
+import IconMenu, { IIconMenuProps } from 'components/menus/iconMenu/IconMenu';
+import { IconName } from 'utils/enums'
 import IconPopup, { IconPopupProps } from 'components/popups/IconPopup/IconPopup';
-
+import SimpleBarChart, { ISimpleBarChartChartProps } from 'components/charts/barChart/SimpleBarChart';
+import { Button } from '@mui/material';
+import { generateRandomFloatArray } from 'utils/functions';
+import SimplePieChart, { ISimplePieChartProps } from 'components/charts/pieChart/SimplePieChart';
 const Components: React.FC = () => {
 
     const userProps: IInfoFormProps = {
@@ -37,15 +40,20 @@ const Components: React.FC = () => {
         ],
         onClickItem: (itemName) => console.log(itemName)
     }
-    const iconPopupProps : IconPopupProps = {
+    const iconPopupProps: IconPopupProps = {
         icon: IconName.face_smile,
         text: 'Bất ngờ chưa?',
         placement: 'bottom-start'
     }
+
+
+
     return (
         <div className='app-container '>
+           
+
             <IconPopup {...iconPopupProps}>
-                <IconMenu {...iconMenuProps}/>
+                <IconMenu {...iconMenuProps} />
             </IconPopup>
 
             <InfoCard

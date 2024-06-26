@@ -13,7 +13,7 @@
 
   .info-header {
     display: flex;
-    align-items: center;
+    align-items: start;
     border-bottom: 1px solid $border-color;
     padding-bottom: 20px;
     @media (max-width: 768px) {
