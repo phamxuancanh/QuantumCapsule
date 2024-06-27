@@ -129,6 +129,7 @@ const signIn = async (req, res, next) => {
 //   }
 // }
 const signUp = async (req, res, next) => {
+
   try {
     const { firstName, lastName, username, email, password, captchaValue } = req.body.data
 
@@ -143,6 +144,7 @@ const signUp = async (req, res, next) => {
 
     if (!captchaResponse.data.success) {
       return res.status(401).json({ code: 401, message: 'Captcha verification failed.' })
+
     }
 
     const userByUsername = await models.User.findOne({ where: { username } })
@@ -484,6 +486,7 @@ const resetPassword = async (req, res, next) => {
 const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
 
 const googleCallback = (req, res, next) => {
+
   passport.authenticate('google', async (err, user, info) => {
     if (err || !user) {
       console.log(err)
@@ -536,6 +539,7 @@ const facebookCallback = (req, res, next) => {
     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
   })(req, res, next)
 }
+
 module.exports = {
   signIn,
   signUp,

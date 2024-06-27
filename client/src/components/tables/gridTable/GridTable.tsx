@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { getGridData } from 'api/get/get.api';
-import { DataGrid, GridColDef, GridEventListener } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridEventListener, GridToolbar } from '@mui/x-data-grid';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { IGrid } from 'api/api-shared';
 import './index.scss'
@@ -97,6 +97,12 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
             onRowClick={props.onRowClick}
             getRowClassName={(params) => `super-app-theme--${params.row.status}`}
             getRowId={props.getRowId}
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+                toolbar: {
+                    showQuickFilter: true,
+                },
+            }}
             autoHeight
         />
     );

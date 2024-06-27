@@ -40,11 +40,10 @@ const Charts: React.FC = () => {
         setChildData(tempChildData[0])
 
         const tempLineData = filterByField(dataset, 'country', parentData[columnSelectIndex].key)
-        console.log(tempLineData);
+
         
         const lineData = tempLineData.map((data) => {
-            console.log(calculateData(data, 'year', ['other', 'bio', 'solar', 'wind', 'hydro', 'nuclear', 'oil', 'gas', 'coal'], 'sum'));
-            
+
             return calculateData(data, 'year', ['other', 'bio', 'solar', 'wind', 'hydro', 'nuclear', 'oil', 'gas', 'coal'], 'sum')
         })
         setLineData(lineData)
