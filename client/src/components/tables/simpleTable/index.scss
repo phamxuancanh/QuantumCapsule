@@ -1,0 +1,15 @@
+@import "styles/variables.scss";
+
+.MuiDataGrid-columnHeader{
+    background-color: $table-header-color;
+}
+
+.table-header {
+    background-color: $table-header-color;
+    color: $basic-color;
+    font-size: $font-size-large;
+    @media (max-width: 768px) {
+        font-size: $font-size-base;
+        
+    }
+}

@@ -9,6 +9,7 @@ export interface ISimpleLineChartProps {
     width?: number
     height?: number
     valueFormatter?: (value: number | null) => string;
+    onItemClick?: (index: number) => void;
 }
 
 const SimpleLineChart: React.FC<ISimpleLineChartProps> = (props: ISimpleLineChartProps) => {
@@ -28,6 +29,9 @@ const SimpleLineChart: React.FC<ISimpleLineChartProps> = (props: ISimpleLineChar
                     [`.${axisClasses.left} .${axisClasses.label}`]: {
                         transform: 'translate(-8px, 0px)',
                     },
+                }}
+                onMarkClick={(_,item)=>{
+                    props.onItemClick && props.onItemClick(item.dataIndex!)
                 }}
             />
         </div>

@@ -5,10 +5,8 @@ import InfoCard from 'components/cards/infoCard/InfoCard';
 import IconMenu, { IIconMenuProps } from 'components/menus/iconMenu/IconMenu';
 import { IconName } from 'utils/enums'
 import IconPopup, { IconPopupProps } from 'components/popups/IconPopup/IconPopup';
-import SimpleBarChart, { ISimpleBarChartChartProps } from 'components/charts/barChart/SimpleBarChart';
-import { Button } from '@mui/material';
-import { generateRandomFloatArray } from 'utils/functions';
-import SimplePieChart, { ISimplePieChartProps } from 'components/charts/pieChart/SimplePieChart';
+import TreeMenu, { ITreeMenuProps } from 'components/menus/treeMenu/TreeMenu';
+import { useTreeViewApiRef } from '@mui/x-tree-view';
 const Components: React.FC = () => {
 
     const userProps: IInfoFormProps = {
@@ -45,12 +43,49 @@ const Components: React.FC = () => {
         text: 'Bất ngờ chưa?',
         placement: 'bottom-start'
     }
+    const treeMenuProps: ITreeMenuProps = {
+        apiRef: useTreeViewApiRef(),
+        dataTreeView: [
+            {
+                id: 'grid',
+                label: 'Data Grid',
+                children: [
+                    { id: 'grid-community', label: '@mui/x-data-grid' },
+                    { id: 'grid-pro', label: '@mui/x-data-grid-pro' },
+                    { id: 'grid-premium', label: '@mui/x-data-grid-premium' },
+                ],
+            },
+            {
+                id: 'pickers',
+                label: 'Date and Time Pickers',
+                children: [
+                    { id: 'pickers-community', label: '@mui/x-date-pickers' },
+                    { id: 'pickers-pro', label: '@mui/x-date-pickers-pro' },
+                ],
+            },
+            {
+                id: 'charts',
+                label: 'Charts',
+                children: [{ id: 'charts-community', label: '@mui/x-charts' }],
+            },
+            {
+                id: 'tree-view',
+                label: 'Tree View',
+                children: [{ id: 'tree-view-community', label: '@mui/x-tree-view'}],
+            },
 
+        ],
+        onSelectedItemsChange(itemId) {
+            console.log(itemId);
+        },
+    }
 
 
     return (
         <div className='app-container '>
-           
+
+
+            <TreeMenu {...treeMenuProps} />
 
             <IconPopup {...iconPopupProps}>
                 <IconMenu {...iconMenuProps} />
