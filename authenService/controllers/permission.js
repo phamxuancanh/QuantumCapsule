@@ -30,8 +30,8 @@ function logError (req, error) {
     message: `Error ${req.path}`,
     method: req.method,
     endpoint: req.path,
-    request: request,
-    error: error,
+    request,
+    error
     // user: req.user.id
   })
 }
@@ -42,8 +42,8 @@ function logInfo (req, response) {
     message: `Accessed ${req.path}`,
     method: req.method,
     endpoint: req.path,
-    request: request,
-    response: response,
+    request,
+    response
     // user: req.user.id
   })
 }
@@ -272,7 +272,7 @@ const getPaginatedPermissions = async (req, res) => {
 
     const dataFromDatabase = await models.Permission.findAll({
       attributes: ['id', 'name', 'description', 'url', 'method'],
-      order: order
+      order
     })
 
     const dataAfterNameSearch = applyNameSearch(

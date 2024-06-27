@@ -1,28 +1,27 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { signOut } from '../../api/post/post.api'
-import { Link, useNavigate } from 'react-router-dom'
-import ROUTES from 'routes/constant'
-import { removeAllLocalStorage } from 'utils/functions'
 import { useTranslation } from 'react-i18next'
 import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import loginImage from 'assets/bb.jpg'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { ClockLoader } from 'react-spinners'
 import OTPModal from 'components/modals/OTPModal'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
-import { sendOTP } from 'api/post/post.api'
+import { sendOTP, checkEmail } from 'api/post/post.api'
+import ReCAPTCHA from 'react-google-recaptcha'
 const ForgotPassword = () => {
-    const navigate = useNavigate()
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+    const [showCaptcha, setShowCaptcha] = useState(false);
+    const keySite = process.env.REACT_APP_SITE_KEY
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+    // const [password, setPassword] = useState('')
+    // const [confirmPassword, setConfirmPassword] = useState('')
     const [errorMessageEmail, setErrorMessageEmail] = useState('')
-    const [errorMessagePassword, setErrorMessagePassword] = useState('')
-    const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState('')
+    const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
+    // const [errorMessagePassword, setErrorMessagePassword] = useState('')
+    // const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const languageOptions = useMemo(() => {
@@ -43,47 +42,41 @@ const ForgotPassword = () => {
         [i18n]
     )
     async function handleSendOTP(e: { preventDefault: () => void; }) {
+        setShowCaptcha(true)
         console.log('handleSendOTP')
         e.preventDefault();
         setErrorMessageEmail('')
-        setErrorMessagePassword('')
-        setErrorMessageConfirmPassword('')
+        setErrorMessageCaptcha('')
         const messEmail = t('forgot_password.email_required')
-        const messPassword = t('forgotpassword.password_required')
-        const messConfirmPassword = t('forgot_password.confirm_password_required')
-
         const schema = yup.object({
             email: yup
                 .string()
-                .required(messEmail),
-            password: yup
-                .string()
-                .required(messPassword),
-            confirmPassword: yup
-                .string()
-                .required(messConfirmPassword)
+                .required(messEmail)
         }).required()
 
+        setLoading(true)
         try {
-            await schema.validate({ email, password, confirmPassword }, { abortEarly: false })
-            const result = await sendOTP({ email })
+            await schema.validate({ email }, { abortEarly: false })
+            const result = await sendOTP({ email, captchaValue })
+            console.log('result:', result)
             if (result?.data) {
-                setLoading(true)
+                console.log('go')
                 setTimeout(() => {
-                    setLoading(false);
+                    setLoading(false)
                     setIsModalOpen(true);
-                    toast.success(t('forgot_password.successfully_sended'))
-                }, 3000);
+                    toast.success(t('forgot_password.successfully_sended'));
+                }, 1000)
             } else {
-                alert('Unexpected response from server')
+                setLoading(false)
+                alert('Unexpected response from server');
             }
         } catch (error) {
+            setLoading(false)
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
-                const errorOrder = ['email', 'password', 'confirmPassword']
+                const errorOrder = ['email']
                 setErrorMessageEmail('')
-                setErrorMessagePassword('')
-                setErrorMessageConfirmPassword('')
+                setErrorMessageCaptcha('')
                 errorOrder.forEach(field => {
                     if (error instanceof yup.ValidationError) {
                         const err = error.inner.find(e => e.path === field);
@@ -92,12 +85,6 @@ const ForgotPassword = () => {
                                 case 'email':
                                     setErrorMessageEmail(err.message)
                                     break
-                                case 'password':
-                                    setErrorMessagePassword(err.message)
-                                    break
-                                case 'confirmPassword':
-                                    setErrorMessageConfirmPassword(err.message)
-                                    break
                                 default:
                                     break;
                             }
@@ -105,31 +92,42 @@ const ForgotPassword = () => {
                     }
                 });
             } else {
-                if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                    console.log('error.code:', error.code);
-                    if (error.code === 401) {
-                        if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                            console.log('error.code:', error.message)
-                            const message = String(error.message)
-                            if (message.includes('User')) {
-                                setErrorMessageEmail(message)
-                            } else if (message.includes('password')) {
-                                setErrorMessagePassword(message)
-                            }
+                if (typeof error === 'object' && error !== null && 'message' in error) {
+                    if (typeof error === 'object' && error !== null && 'message' in error) {
+                        console.log('error.code:', error.message)
+                        const message = String(error.message)
+                        if (message.includes('User')) {
+                            setErrorMessageEmail(message)
                         }
-                    } else {
-                        console.log(error)
+                        if (message.includes('captcha token')) {
+                            setErrorMessageCaptcha(t('forgot_password.captcha_error'))
+                        }
                     }
+
                 }
             }
         }
     }
     const handleCloseModal = () => {
+        setCaptchaValue(null)
+        setEmail('')
+        setErrorMessageCaptcha('')
+        setErrorMessageEmail('')
+        setShowCaptcha(false)
         setIsModalOpen(false)
-      };
+    };
+    const handleCaptchaChange = (value: React.SetStateAction<string | null>) => {
+        setErrorMessageCaptcha('');
+        setCaptchaValue(value);
+    };
+    const handleEmailBlur = () => {
+        if (email) {
+            setShowCaptcha(true);
+        }
+    };
     return (
         <div className="tw-flex tw-bg-gray-200">
-            {isModalOpen && <OTPModal onClose={handleCloseModal} />}
+            {isModalOpen && <OTPModal onClose={handleCloseModal} email={email} />}
             {loading && (
                 <div className="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-opacity-50">
                     <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">
@@ -179,48 +177,23 @@ const ForgotPassword = () => {
                                             placeholder={t('forgot_password.your_register_email')}
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
+                                            onBlur={handleEmailBlur}
                                         />
                                         <EmailOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
 
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
                                 </div>
-                                <div>
-                                    <div className="tw-relative tw-border-2 tw-border-orange-300 tw-rounded-2xl">
-                                        <input
-                                            id="password"
-                                            name="password"
-                                            type="password"
-                                            autoComplete="current-password"
-                                            required
-                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('forgot_password.new_password')}
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
-                                        <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
-
-                                    </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessagePassword}</div>
-                                </div>
-                                <div>
-                                    <div className="tw-relative tw-border-2 tw-border-orange-300 tw-rounded-2xl">
-                                        <input
-                                            id="password"
-                                            name="password"
-                                            type="password"
-                                            autoComplete="current-password"
-                                            required
-                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('forgot_password.confirm_password')}
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                        />
-                                        <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
-
-                                    </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageConfirmPassword}</div>
-                                </div>
+                                {showCaptcha && (
+                                    <ReCAPTCHA
+                                        sitekey={keySite ?? ''}
+                                        // sitekey='6LdynQEqAAAAAEj_i6vqYyZUNA54yn-oRIdC00Vy'
+                                        onChange={handleCaptchaChange}
+                                    />
+                                )}
+                                {(errorMessageCaptcha && showCaptcha) && (
+                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
+                                )}
                             </div>
                             <div>
                                 <button

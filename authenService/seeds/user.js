@@ -25,10 +25,13 @@ const generateUsers = async () => {
     password: faker.internet.password(),
     username: faker.internet.userName(),
     refreshToken: faker.random.alphaNumeric(32),
+    expire: faker.date.future(),
+    emailVerified: false,
+    otp: faker.datatype.number({ min: 100000, max: 999999 }).toString(),
+    otpExpire: faker.date.future(),
     roleId: await generateRoleId(),
     createdAt: faker.date.past(),
-    updatedAt: faker.date.recent(),
-    expire: faker.date.future()
+    updatedAt: faker.date.recent()
   })))
 }
 

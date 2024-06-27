@@ -8,7 +8,9 @@ import Payment from './tabs/Payment';
 import Excel from './tabs/Excel';
 import RoomManager from './tabs/RoomManager';
 import Charts from './tabs/Charts';
+
 import TableCustom from './tabs/TableCustom';
+
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -38,19 +40,24 @@ const DevPage: React.FC = () => {
         <div>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+
                     <Tab label="custom table" />
                     <Tab label="paypal"  />
                     <Tab label="charts" />
+
                     <Tab label="table grid" />
                     <Tab label="layout grid" />
                     <Tab label="grid setting" />
                     <Tab label="excel" />
                     <Tab label="rooms" />
+
                     <Tab label="components" />
+
 
                 </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
+
                 <TableCustom />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={8}>
@@ -74,6 +81,7 @@ const DevPage: React.FC = () => {
             <CustomTabPanel value={value} index={4}>
                 <Layouts />
             </CustomTabPanel>
+
             <CustomTabPanel value={value} index={5}>
                 <GridSetting />
             </CustomTabPanel>

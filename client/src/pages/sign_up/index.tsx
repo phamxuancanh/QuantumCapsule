@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import loginImage from 'assets/bb.jpg'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
 import { ClockLoader } from "react-spinners"
+import ReCAPTCHA from "react-google-recaptcha"
 const theme = createTheme()
 
 const SignUp = () => {
@@ -34,6 +35,11 @@ const SignUp = () => {
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
     const [loading, setLoading] = useState(false)
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+    const [showCaptcha, setShowCaptcha] = useState(false);
+    const keySite = process.env.REACT_APP_SITE_KEY
+    const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
+
     // TODO: them loading
 
     const languageOptions = useMemo(() => {
@@ -53,7 +59,17 @@ const SignUp = () => {
         },
         [i18n]
     )
+    const handleCaptchaChange = (value: React.SetStateAction<string | null>) => {
+        setErrorMessageCaptcha('');
+        setCaptchaValue(value);
+    };
+    // const handleEmailBlur = () => {
+    //     if (email) {
+    //         setShowCaptcha(true);
+    //     }
+    // };
     async function handleRegister(e: { preventDefault: () => void; }) {
+        setShowCaptcha(true);
         e.preventDefault();
         // Clear previous error messages
         setErrorMessageFirstName('')
@@ -63,6 +79,7 @@ const SignUp = () => {
         setErrorMessagePassword('')
         setErrorMessageConfirmPassword('')
         setErrorMessageTermCheck('')
+        setErrorMessageCaptcha('')
 
         const messFirstName = t('signUp.first_name_required');
         const messLastName = t('signUp.last_name_required');
@@ -75,31 +92,31 @@ const SignUp = () => {
         const schema = yup.object({
             firstName: yup
                 .string()
-                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.first_name_invalid'))
-                .required(messFirstName),
+                .required(messFirstName)
+                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.first_name_invalid')),
             lastName: yup
                 .string()
-                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.last_name_invalid'))
-                .required(messLastName),
+                .required(messLastName)
+                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.last_name_invalid')),
             email: yup
                 .string()
                 .email(t('signUp.email_invalid'))
                 .required(messEmail),
             username: yup
                 .string()
-                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/, t('signUp.username_invalid'))
-                .required(messUsername),
+                .required(messUsername)
+                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/, t('signUp.username_invalid')),
             password: yup
                 .string()
+                .required(messPassword)
                 .matches(
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                     t('signUp.password_invalid')
-                )
-                .required(messPassword),
+                ),
             confirm_password: yup
                 .string()
-                .oneOf([yup.ref('password')], t('signUp.password_must_match'))
-                .required(messConfirm),
+                .required(messConfirm)
+                .oneOf([yup.ref('password')], t('signUp.password_must_match')),
             termCheck: yup
                 .boolean()
                 .oneOf([true], messTermCheckBox)
@@ -108,23 +125,22 @@ const SignUp = () => {
         try {
             await schema.validate({ firstName, lastName, username, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
             setLoading(true);
-            setTimeout(async () => {
-                const result = await signUp({ firstName, lastName, username, email, password })
-                console.log('result')
-                console.log(result)
-                console.log('result.data:', result?.data)
-                if (result?.data) {
-                    setTimeout(() => {
-                        setLoading(false)
-                        navigate(ROUTES.email_verify_send)
-                        toast.success(t('signUp.success'))
-                    }, 0)
-                } else {
-                    alert('Unexpected response from server')
-                }
-            }, 3000)
+            const result = await signUp({ firstName, lastName, username, email, password, captchaValue })
+            console.log('result')
+            console.log(result)
+            console.log('result.data:', result?.data)
+            if (result?.data) {
+                setTimeout(() => {
+                    setLoading(false)
+                    navigate(ROUTES.email_verify_send)
+                    toast.success(t('signUp.success'))
+                }, 0)
+            } else {
+                alert('Unexpected response from server')
+            }
         } catch (error) {
-            setLoading(false);
+
+
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
                 // Create an ordered list of error fields
@@ -138,6 +154,7 @@ const SignUp = () => {
                 setErrorMessagePassword('');
                 setErrorMessageConfirmPassword('');
                 setErrorMessageTermCheck('');
+                setErrorMessageCaptcha('')
 
                 // Iterate over the errorOrder array and set errors in that order
                 errorOrder.forEach(field => {
@@ -173,25 +190,33 @@ const SignUp = () => {
                     }
                 });
             } else {
-                if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                    console.log('error.code:', error.code);
-                    // console.log('error.message:', error.message);
-                    // const message = error.message;
-                    if (error.code === 401) {
-                        if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                            console.log('error.code:', error.message);
-                            const message = String(error.message);
-                            if (message.includes('Username')) {
-                                setErrorMessageUsername(message);
-                            } else if (message.includes('Email')) {
-                                setErrorMessageEmail(message);
+                setTimeout(() => {
+                    setLoading(false);
+
+                    if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
+                        console.log('error.code:', error.code);
+                        // console.log('error.message:', error.message);
+                        // const message = error.message;
+                        if (error.code === 401) {
+                            if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
+                                console.log('error.code:', error.message);
+                                const message = String(error.message);
+                                if (message.includes('Username')) {
+                                    setErrorMessageUsername(message);
+                                } else if (message.includes('Email')) {
+                                    setErrorMessageEmail(message);
+                                } else if (message.includes('Captcha')) {
+                                    setErrorMessageCaptcha(message);
+                                }
                             }
+                        } else {
+                            console.log(error)
                         }
-                    } else {
-                        console.log(error)
                     }
-                }
+                }, 3000)
             }
+
+
         }
     }
 
@@ -361,7 +386,18 @@ const SignUp = () => {
                                 </div>
                                 <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageTermCheck}</div>
                             </div>
-
+                            <div>
+                                {showCaptcha && (
+                                    <ReCAPTCHA
+                                        sitekey={keySite ?? ''}
+                                        // sitekey='6LdynQEqAAAAAEj_i6vqYyZUNA54yn-oRIdC00Vy'
+                                        onChange={handleCaptchaChange}
+                                    />
+                                )}
+                                {(errorMessageCaptcha && showCaptcha) && (
+                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
+                                )}
+                            </div>
                             <div>
                                 <button
                                     onClick={handleRegister}

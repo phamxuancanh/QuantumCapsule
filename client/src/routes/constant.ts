@@ -8,7 +8,6 @@ const ROUTES = {
     email_verify: '/verify/email',
     email_verify_send: '/verify/email/send',
     email_verify_success: '/verify/email/success',
-
+    reset_password: '/reset_password',
 }
 export default ROUTES
-  

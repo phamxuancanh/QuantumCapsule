@@ -5,8 +5,10 @@ import InfoCard from 'components/cards/infoCard/InfoCard';
 import IconMenu, { IIconMenuProps } from 'components/menus/iconMenu/IconMenu';
 import { IconName } from 'utils/enums'
 import IconPopup, { IconPopupProps } from 'components/popups/IconPopup/IconPopup';
+
 import TreeMenu, { ITreeMenuProps } from 'components/menus/treeMenu/TreeMenu';
 import { useTreeViewApiRef } from '@mui/x-tree-view';
+
 const Components: React.FC = () => {
 
     const userProps: IInfoFormProps = {
@@ -43,6 +45,7 @@ const Components: React.FC = () => {
         text: 'Bất ngờ chưa?',
         placement: 'bottom-start'
     }
+
     const treeMenuProps: ITreeMenuProps = {
         apiRef: useTreeViewApiRef(),
         dataTreeView: [
@@ -81,11 +84,14 @@ const Components: React.FC = () => {
     }
 
 
+
     return (
         <div className='app-container '>
 
 
+
             <TreeMenu {...treeMenuProps} />
+
 
             <IconPopup {...iconPopupProps}>
                 <IconMenu {...iconMenuProps} />

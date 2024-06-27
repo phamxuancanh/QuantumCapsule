@@ -27,7 +27,6 @@ const SignIn = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('en')
     const [loading, setLoading] = useState(false)
     // TODO: them loading
-
     const languageOptions = useMemo(() => {
         return [
             { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
@@ -61,12 +60,13 @@ const SignIn = () => {
                 .string()
                 .required(messPassword)
         }).required()
-
+        setLoading(true)
         try {
             await schema.validate({ username, password }, { abortEarly: false })
             const result = await signIn({ username, password })
             console.log(result)
             console.log('result.data:', result?.data)
+
             if (result?.data) {
                 setLoading(true)
                 const tokens = JSON.stringify(result.data)
@@ -75,13 +75,15 @@ const SignIn = () => {
                     setToLocalStorage('tokens', tokens)
                     navigate(ROUTES.home)
                     toast.success(t('signIn.success'))
-                }, 3000);
+                }, 2000);
             } else {
+                setLoading(false)
                 alert('Unexpected response from server')
             }
         } catch (error) {
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
+                setLoading(false)
                 const errorOrder = ['username', 'password']
                 setErrorMessageUsername('')
                 setErrorMessagePassword('')
@@ -104,25 +106,29 @@ const SignIn = () => {
                     }
                 });
             } else {
-                if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                    console.log('error.code:', error.code);
-                    if (error.code === 401) {
-                        if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
-                            console.log('error.code:', error.message)
-                            const message = String(error.message)
-                            if (message.includes('Username')) {
-                                setErrorMessageUsername(message)
-                            } else if (message.includes('Password')) {
-                                setErrorMessagePassword(message)
-                            } else if (message.includes('Email')) {
-                                setErrorVerified(message)
+                setTimeout(() => {
+                    setLoading(false)
+                    if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
+                        console.log('error.code:', error.code);
+                        if (error.code === 401) {
+                            if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
+                                console.log('error.code:', error.message)
+                                const message = String(error.message)
+                                if (message.includes('Username')) {
+                                    setErrorMessageUsername(message)
+                                } else if (message.includes('Password')) {
+                                    setErrorMessagePassword(message)
+                                } else if (message.includes('Email')) {
+                                    setErrorVerified(message)
+                                }
                             }
+                        } else {
+                            console.log(error)
                         }
-                    } else {
-                        console.log(error)
                     }
-                }
+                }, 2000)
             }
+
         }
     }
 
@@ -147,7 +153,7 @@ const SignIn = () => {
                     </div>
                 </div>
             )}
-            <div className="tw-bg-red-500 tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
+            <div className="tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
                 <img src={loginImage} alt="loginImg" className="tw-h-full" />
             </div>
             <div className="tw-flex lg:tw-relative lg:tw-w-3/5 tw-w-full tw-items-center tw-justify-between">

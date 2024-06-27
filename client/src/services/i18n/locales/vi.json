@@ -72,7 +72,17 @@
             "confirm_password_required": "Yêu cầu phải Xác nhận mật khẩu",
             "email_not_found": "Email không được đăng ký",
             "password_invalid": "Mật khẩu phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, và 1 số",
-            "password_must_match": "Mật khẩu xác nhận không khớp"
+            "password_must_match": "Mật khẩu xác nhận không khớp",
+            "captcha_error": "Lỗi captcha",
+            "successfully_sended": "Đã gửi OTP thành công"
+        },
+        "reset_password": {
+            "title": "Đặt Lại Mật Khẩu",
+            "enter": "Nhập mật khẩu mới cho ",
+            "new_password": "Mật Khẩu Mới",
+            "confirm_password": "Mật Khẩu Xác Nhận",
+            "reset": "Đổi mật khẩu",
+            "reset_sucessfully": "Đổi mật khẩu thành công"
         }
     }
 }

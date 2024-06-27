@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const permissionController = require('../controllers/permission')
-const { verifyAccessToken  } = require('../middlewares/jwtService')
+const { verifyAccessToken } = require('../middlewares/jwtService')
 
 router.get('/', verifyAccessToken, permissionController.getAllPermissions)
 router.post('/', verifyAccessToken, permissionController.createPermission)

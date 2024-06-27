@@ -101,10 +101,11 @@ const AuthRoute = ({ children }: IAuthRouteProps) => {
   }
 
   if (isAuthenticated && location.pathname === ROUTES.sign_in) {
+    // console.log
     return <Navigate to={ROUTES.home} />;
   }
 
-  if (!isAuthenticated && location.pathname !== ROUTES.sign_in && location.pathname !== ROUTES.forgot_password && location.pathname !== ROUTES.email_verify && location.pathname !== ROUTES.email_verify_success && location.pathname !== ROUTES.email_verify_send && location.pathname !== ROUTES.sign_up) {
+  if (!isAuthenticated && location.pathname !== ROUTES.sign_in && location.pathname !== ROUTES.forgot_password && location.pathname !== ROUTES.email_verify && location.pathname !== ROUTES.email_verify_success && location.pathname !== ROUTES.email_verify_send && location.pathname !== ROUTES.sign_up && location.pathname !== ROUTES.reset_password) {
     return <Navigate to={ROUTES.sign_in} />;
   }
 
