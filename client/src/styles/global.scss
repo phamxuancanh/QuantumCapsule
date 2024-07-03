@@ -6,8 +6,9 @@
     padding: 0;
     display: flex;
     flex-direction: column;
+    background-color: $app-bg-color;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     color: $text-color;
     font-size: $font-size-base;
 }

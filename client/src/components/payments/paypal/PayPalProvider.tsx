@@ -14,7 +14,7 @@ const PayPalProvider: React.FC<IPayPalProviderProps> = (props: IPayPalProviderPr
     const initialOptions: ReactPayPalScriptOptions = {
         currency: "USD",
         intent: "capture",
-        clientId: 'ARBsVjEVgTdbX2JdEe7rCiQgYCyPMJvf1lO68noU45dtbtPNgUHsy05soQitpUNgnVZTtarneZswHq1F'
+        clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID!,
 
     }
     

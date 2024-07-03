@@ -20,26 +20,29 @@ import {
     GridRowModel,
     GridRowEditStopReasons,
     GridSlots,
-    GridToolbar,
+    GridToolbarColumnsButton,
+    GridToolbarDensitySelector,
+    GridToolbarExport,
+    GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
-import { IAction } from 'utils/interfaces';
-import { GridApiCommunity, rowsMetaStateInitializer } from '@mui/x-data-grid/internals';
+import { GridApiCommunity } from '@mui/x-data-grid/internals';
+import { ACTIONS } from 'utils/enums';
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
     setRowModesModel: (
         newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
     ) => void;
+    initNewRow: any;
 }
 
 function EditToolbar(props: EditToolbarProps) {
-    const { setRows, setRowModesModel } = props;
+    const { setRows, setRowModesModel, initNewRow } = props;
 
     const handleClick = () => {
-        const id = Date.now();
-        setRows((oldRows) => [{ id, name: '', age: 20, isNew: true }, ...oldRows]);
+        setRows((oldRows) => [{...initNewRow, isNew: true}, ...oldRows]);
         setRowModesModel((oldModel) => ({
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+            [initNewRow.id]: { mode: GridRowModes.Edit },
             ...oldModel,
         }));
     };
@@ -49,34 +52,35 @@ function EditToolbar(props: EditToolbarProps) {
             <Button color="primary" startIcon={<AddIcon />} onClick={handleClick} variant='outlined'>
                 Add record
             </Button>
-            <GridToolbar />
+            <GridToolbarColumnsButton />
+            <GridToolbarDensitySelector/>
+            <GridToolbarExport/>
+            <Box sx={{ flexGrow: 1 }} />
+            <GridToolbarQuickFilter />
         </GridToolbarContainer>
     );
 }
 
 export interface ISimpleTableProps {
-    apiRef: React.MutableRefObject<GridApiCommunity>; //useGridApiRef()
     initData: any[];
     columns: GridColDef[];
-    keys: string[]
-
+    initNewRow: any;
+    
+    apiRef?: React.MutableRefObject<GridApiCommunity>; //useGridApiRef()
     pageSizeOptions?: number[];
     rowHeight?: number;
     minWidth?: number;
     checkboxSelection?: boolean;
     columnVisibilityModel?: { [key: string]: boolean };
 
-    onUpdateRow?: (updatedRow: any, action: IAction) => void;
     processRowAdd?: (newRow: any) => void;
     onRowClick?: (param: any) => void;
-    // getRowId?: (row: any) => string;
+    onUpdateRow?: (data: any, action: ACTIONS) => void;
 }
 
 export default function SimpleTable(props: ISimpleTableProps) {
     const [rows, setRows] = React.useState(
-        props.initData.map((row, index) => ({ 
-            ...row, isNew: false
-        })),
+        props.initData
     );
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
@@ -95,11 +99,8 @@ export default function SimpleTable(props: ISimpleTableProps) {
     };
 
     const handleDeleteClick = (id: GridRowId) => () => {
-        const tempRows = rows.filter((row) => {
-            const idRow = props.keys.map((key) => row[key]).join('');
-            return idRow !== id
-        });
-        setRows(tempRows);
+        props.onUpdateRow && props.onUpdateRow(id, ACTIONS.DELETE);
+        setRows(rows.filter((row) => row.id !== id));
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
@@ -115,8 +116,15 @@ export default function SimpleTable(props: ISimpleTableProps) {
     };
 
     const processRowUpdate = (newRow: GridRowModel) => {
-        console.log('newRow', newRow);
+        // const row = rows.find((r) => r.id === newRow.id);
         
+        if(newRow.isNew){
+            props.onUpdateRow && props.onUpdateRow(newRow, ACTIONS.CREATE);
+        }
+        if(!newRow.isNew){
+            props.onUpdateRow && props.onUpdateRow(newRow, ACTIONS.UPDATE);
+        }
+
         const updatedRow = { ...newRow, isNew: false };
         setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
@@ -205,9 +213,6 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 },
             }}
         >
-            <Button onClick={() => {
-                console.log(rows)
-            }}>log</Button>
             <DataGrid
                 apiRef={props.apiRef}
                 rows={rows}
@@ -218,10 +223,11 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 slots={{
+                    // baseButton: EditToolbar as GridSlots['baseButton'],
                     toolbar: EditToolbar as GridSlots['toolbar'],
                 }}
                 slotProps={{
-                    toolbar: { setRows, setRowModesModel, showQuickFilter: true},
+                    toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow },
                 }}
                 columnVisibilityModel={props.columnVisibilityModel}
                 initialState={{
@@ -229,9 +235,9 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 }}
                 pageSizeOptions={props.pageSizeOptions || [10, 20]}
                 onRowClick={props.onRowClick}
-                getRowId={(row) => {
-                    return props.keys.map((key) => row[key]).join('');
-                }}
+                // getRowId={(row) => {
+                //     return props.keys.map((key) => row[key]).join('');
+                // }}
                 rowHeight={props.rowHeight || 60}
                 checkboxSelection={props.checkboxSelection || true}
             />

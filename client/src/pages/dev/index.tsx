@@ -1,90 +1,65 @@
 import React from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
-import CRUD from './tabs/CRUD'
-import Components from './tabs/Components';
-import Layouts from './tabs/Layouts';
+import { Box } from '@mui/material';
+import CRUD from './tabs/testComponents/CRUD'
+import Components from './tabs/testComponents/Components';
+import Layouts from './tabs/testComponents/Layouts';
 import GridSetting from './tabs/GridSetting';
-import Payment from './tabs/Payment';
-import Excel from './tabs/Excel';
-import RoomManager from './tabs/RoomManager';
-import Charts from './tabs/Charts';
+import Payment from './tabs/testComponents/Payment';
+import RoomManager from './tabs/testComponents/RoomManager';
+import Charts from './tabs/testComponents/Charts';
 
-import TableCustom from './tabs/TableCustom';
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
+import TableCustom from './tabs/testComponents/TableCustom';
+import TabMenu from 'components/menus/tabMenu/TabMenu';
+import ExamSystem from './tabs/examination/ExamSystem';
 const DevPage: React.FC = () => {
-    const [value, setValue] = React.useState(0);
-    function CustomTabPanel(props: TabPanelProps) {
-        const { children, value, index, ...other } = props;
-
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`simple-tabpanel-${index}`}
-                aria-labelledby={`simple-tab-${index}`}
-                {...other}
-            >
-                {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-            </div>
-        );
-    }
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+    
     return (
         <div>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-
-                    <Tab label="custom table" />
-                    <Tab label="paypal"  />
-                    <Tab label="charts" />
-
-                    <Tab label="table grid" />
-                    <Tab label="layout grid" />
-                    <Tab label="grid setting" />
-                    <Tab label="excel" />
-                    <Tab label="rooms" />
-
-                    <Tab label="components" />
-
-
-                </Tabs>
+                <TabMenu
+                    listItems={[
+                        {
+                            index: 0, label: 'tables',
+                            item: <TabMenu listItems={[
+                                { index: 0, label: 'table custom', item: <TableCustom /> },
+                                { index: 1, label: 'table CRUD', item: <CRUD /> },
+                            ]} defaultIndex={0} />
+                        },
+                        {
+                            index: 1, label: 'payment',
+                            item: <Payment />
+                        },
+                        {
+                            index: 2, label: 'Examination System',
+                            item: <ExamSystem />
+                        },
+                        {
+                            index: 3, label: 'charts',
+                            item: <Charts />
+                        },
+                        {
+                            index: 4, label: 'layouts',
+                            item: <TabMenu 
+                                listItems= {[
+                                    {index: 0,label: 'grids', item: <Layouts />},
+                                    {index: 1, label: 'buttons',item: <RoomManager />}
+                                ]} 
+                                defaultIndex={0}
+                            /> 
+                        },
+                        {
+                            index: 5, label: 'grid setting',
+                            item: <GridSetting />
+                        },
+                        {
+                            index: 6, label: 'components',
+                            item: <Components />
+                        }
+                    ]}
+                    defaultIndex={2}
+                />
             </Box>
-            <CustomTabPanel value={value} index={0}>
 
-                <TableCustom />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={8}>
-                <Components />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-                <Charts />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={7}>
-                <RoomManager />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={6}>
-                <Excel />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-                <Payment />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={3}>
-                <CRUD />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={4}>
-                <Layouts />
-            </CustomTabPanel>
-
-            <CustomTabPanel value={value} index={5}>
-                <GridSetting />
-            </CustomTabPanel>
         </div>
     );
 };

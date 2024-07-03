@@ -38,6 +38,9 @@ export enum IconName {
     chart = 'BarChartOutlined',
     movie = 'MovieOutlined',
     calendar = 'CalendarMonthOutlined',
+    radio = 'RadioButtonUncheckedOutlined',
+    radio_checked = 'RadioButtonCheckedOutlined',
+    check = 'CheckOutlined',
     //-------------------------------------------
     arrow_back = 'ArrowBackOutlined',
     arrow_forward = 'ArrowForwardOutlined',

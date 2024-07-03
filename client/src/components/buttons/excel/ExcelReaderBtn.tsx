@@ -46,13 +46,18 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
             const keys = jsonData[0] as string[];
+
             const rows = jsonData.slice(1).map((row: any) => {
-                const obj: { [key: string]: any } = {};
-                keys?.forEach((key, index) => {
-                    obj[key] = row[index];
-                });
-                return obj;
-            });
+                if (row.length > 0) {
+                    const obj: { [key: string]: any } = {};
+                    keys?.forEach((key, index) => {
+                        obj[key] = row[index];
+                    });
+                    return obj;
+                }
+                else return;
+            }).filter(row=>row !== undefined);
+            
 
             props.onUpload && props.onUpload(rows);
         };
@@ -72,7 +77,7 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
                 const obj: { [key: string]: any } = {};
                 keys.forEach((key, index) => {
                     let cleanKey = key.replace(/\r/g, '');
-                    let cleanValue = values[index].replace(/\r/g, ''); 
+                    let cleanValue = values[index].replace(/\r/g, '');
                     obj[cleanKey] = cleanValue;
                 });
                 return obj;
@@ -91,10 +96,10 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
         <div>
             <input
                 type="file"
-                accept=".xlsx, .xls, .txt"
+                accept=".xlsx, .xls"
                 onChange={(e) => { handleFileUpload(e) }}
                 id="contained-button-file"
-                multiple
+                // multiple
                 className={classes.input}
             />
             <IconBtn

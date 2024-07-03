@@ -30,7 +30,7 @@ const RoomManager: React.FC<IRoomManagerProps> = (props: IRoomManagerProps) => {
         iconName: IconName.movie,
         disableIconName: IconName.block,
         dataBtn: data.times,
-        handleClick: (id: any) => {
+        onBtnClick: (id: any) => {
             console.log(id);
         },
         sx: {

@@ -8,6 +8,9 @@ import IconPopup, { IconPopupProps } from 'components/popups/IconPopup/IconPopup
 
 import TreeMenu, { ITreeMenuProps } from 'components/menus/treeMenu/TreeMenu';
 import { useTreeViewApiRef } from '@mui/x-tree-view';
+import DateFilter, { IDateFilterProps } from 'components/fifters/dateFilter/DateFilter';
+import Flashcard, { IFlashcardProps } from 'components/cards/flashCard/FlashCard';
+import TabMenu from 'components/menus/tabMenu/TabMenu';
 
 const Components: React.FC = () => {
 
@@ -74,7 +77,7 @@ const Components: React.FC = () => {
             {
                 id: 'tree-view',
                 label: 'Tree View',
-                children: [{ id: 'tree-view-community', label: '@mui/x-tree-view'}],
+                children: [{ id: 'tree-view-community', label: '@mui/x-tree-view' }],
             },
 
         ],
@@ -83,29 +86,55 @@ const Components: React.FC = () => {
         },
     }
 
+    const dateFilterProps: IDateFilterProps = {
+        onChange: (filter) => console.log(filter)
+    }
 
+    const flastCardProps: IFlashcardProps = {
+        question: 'What is React?',
+        answer: 'A library for building user interfaces',
+    }
 
     return (
         <div className='app-container '>
-
-
-
-            <TreeMenu {...treeMenuProps} />
-
-
-            <IconPopup {...iconPopupProps}>
-                <IconMenu {...iconMenuProps} />
-            </IconPopup>
-
-            <InfoCard
-                {...userProps}
-                btn1Name='Edit'
-                onClickBtn1={(btnName, data) => console.log(btnName, data)}
-                btn2Name='Delete'
-                onClickBtn2={(btnName, data) => console.log(btnName, data)}
-            />
-            <InfoForm
-                {...userProps}
+            <TabMenu
+                listItems={[
+                    {
+                        index: 0, label: 'flashcard',
+                        item: <Flashcard {...flastCardProps} />
+                    },
+                    {
+                        index: 1, label: 'date filter',
+                        item: <DateFilter {...dateFilterProps} />
+                    },
+                    {
+                        index: 2, label: 'tree menu',
+                        item: <TreeMenu {...treeMenuProps} />
+                    },
+                    {
+                        index: 3, label: 'icon popup',
+                        item: <IconPopup {...iconPopupProps}>
+                            <IconMenu {...iconMenuProps} />
+                        </IconPopup>
+                    },
+                    {
+                        index: 4, label: 'info card',
+                        item: <InfoCard
+                            {...userProps}
+                            btn1Name='Edit'
+                            onClickBtn1={(btnName, data) => console.log(btnName, data)}
+                            btn2Name='Delete'
+                            onClickBtn2={(btnName, data) => console.log(btnName, data)}
+                        />
+                    },
+                    {
+                        index: 5, label: 'info form',
+                        item: <InfoForm
+                            {...userProps}
+                        />
+                    },
+                ]}
+                // vertical = {true}
             />
 
         </div>
