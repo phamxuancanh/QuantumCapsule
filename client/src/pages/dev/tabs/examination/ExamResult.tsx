@@ -15,7 +15,7 @@ const ExamResult: React.FC<IExamResult> = (props: IExamResult) => {
     const totalScore = answers?.reduce((acc, cur) => acc + (cur.isCorrect ? cur.question.score : 0), 0) + '/' + answers?.reduce((acc, cur) => acc + cur.question.score, 0);
     const totalCorrect = answers?.filter((ans) => ans.isCorrect).length;
     const totalQuestion = answers?.length;
-    const your_answer = answers?.map((ans) => {
+    const yourAnswer = answers?.map((ans) => {
         return <QuizCard 
             mode='result'
             question={ans.question}
@@ -29,7 +29,7 @@ const ExamResult: React.FC<IExamResult> = (props: IExamResult) => {
         totalScore,
         totalCorrect,
         totalQuestion,
-        your_answer,
+        yourAnswer,
     }
 
     return (
@@ -37,7 +37,7 @@ const ExamResult: React.FC<IExamResult> = (props: IExamResult) => {
             <InfoForm 
                 data={formData}
                 masterParams={['idUser', 'idExam', 'totalScore', 'totalCorrect']}
-                detailParams={['your_answer']}
+                detailParams={['yourAnswer']}
                 image=''
                 name='Exam Result'
             />

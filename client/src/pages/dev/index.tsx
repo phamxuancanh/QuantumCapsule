@@ -56,7 +56,7 @@ const DevPage: React.FC = () => {
                             item: <Components />
                         }
                     ]}
-                    defaultIndex={2}
+                    defaultIndex={6}
                 />
             </Box>
 

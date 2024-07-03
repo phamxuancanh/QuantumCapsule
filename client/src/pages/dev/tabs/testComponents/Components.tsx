@@ -11,6 +11,9 @@ import { useTreeViewApiRef } from '@mui/x-tree-view';
 import DateFilter, { IDateFilterProps } from 'components/fifters/dateFilter/DateFilter';
 import Flashcard, { IFlashcardProps } from 'components/cards/flashCard/FlashCard';
 import TabMenu from 'components/menus/tabMenu/TabMenu';
+import DrawerMenu, { IDrawerMenuProps } from 'components/menus/drawerMenu/DrawerMenu';
+import { Card, CardContent, Divider } from '@mui/material';
+import SelectFilter from 'components/fifters/selectFilter/SelectFilter';
 
 const Components: React.FC = () => {
 
@@ -87,7 +90,8 @@ const Components: React.FC = () => {
     }
 
     const dateFilterProps: IDateFilterProps = {
-        onChange: (filter) => console.log(filter)
+        onChange: (filter) => console.log(filter),
+        // fixedMode: DateFilterMode.DATE
     }
 
     const flastCardProps: IFlashcardProps = {
@@ -95,9 +99,17 @@ const Components: React.FC = () => {
         answer: 'A library for building user interfaces',
     }
 
+    const drawerProps: IDrawerMenuProps = {
+        width: 200,
+        labels: ['Item 1', 'Item 2', 'Item 3', 'Item 4'],
+        onClick(text: string) {
+            console.log(text);
+        }
+    }
     return (
         <div className='app-container '>
             <TabMenu
+                defaultIndex={1}
                 listItems={[
                     {
                         index: 0, label: 'flashcard',
@@ -105,7 +117,21 @@ const Components: React.FC = () => {
                     },
                     {
                         index: 1, label: 'date filter',
-                        item: <DateFilter {...dateFilterProps} />
+                        item: <Card>
+                            <CardContent>
+                                <DateFilter {...dateFilterProps} />
+                                <Divider />
+                                <SelectFilter 
+                                    options = {[
+                                        { label: 'Option 1', value: 'option1' },
+                                        { label: 'Option 2', value: 'option2' },
+                                        { label: 'Option 3', value: 'option3' },
+                                        { label: 'Option 4', value: 'option4' },
+                                    ]}
+                                    onSelected={(value) => console.log(value)}
+                                />
+                            </CardContent>
+                        </Card>
                     },
                     {
                         index: 2, label: 'tree menu',
@@ -133,8 +159,14 @@ const Components: React.FC = () => {
                             {...userProps}
                         />
                     },
+                    {
+                        index: 6, label: 'drawer menu',
+                        item: <DrawerMenu
+                            {...drawerProps}
+                        />
+                    },
                 ]}
-                // vertical = {true}
+            // vertical = {true}
             />
 
         </div>

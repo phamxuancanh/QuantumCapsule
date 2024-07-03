@@ -69,11 +69,14 @@ export const removeAllLocalStorage = (): void => {
   return window.localStorage.clear()
 }
 
-export const convertDate = (originalDateTime: Date | string): string => {
+export const convertDate = (originalDateTime: Date | string, withoutTime?: boolean): string => {
   let arr = originalDateTime instanceof Date ? originalDateTime.toISOString().split(':') : originalDateTime.split(':')
   let date = arr[0]
   if (arr[1])
     date = arr[0] + ':' + arr[1]
+  if (withoutTime) {
+    date = date.split('T')[0]
+  }
   return date
 }
 

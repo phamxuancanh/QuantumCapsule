@@ -91,7 +91,7 @@ const Exam: React.FC<IExamProps> = (props: IExamProps) => {
                                 iconName={IconName.radio}
                                 onBtnClick={(id) => { scrollToCard(id) }}
                                 // onBtnClick={(id) => {  }}
-                                position='center'
+                                // position='center'
                                 sx={{ color: 'black' }}
                                 listIdSx1={answeredIds}
                                 iconNameSx1={IconName.check}

@@ -12,6 +12,10 @@ export interface IInfoFormProps {
 
 const InfoForm: React.FC<IInfoFormProps> = (props: IInfoFormProps) => {
     const { image, name, masterParams, detailParams, data, imageStyle} = props;
+    const convertTitle = (title: string) => {
+        // updatedDate => Updated Date
+        return title.split(/(?=[A-Z])/).join(' ').replace(/^\w/, c => c.toUpperCase());
+    }
     return (
         <div className="info-form">
             <div className="info-header">
@@ -23,18 +27,17 @@ const InfoForm: React.FC<IInfoFormProps> = (props: IInfoFormProps) => {
                     <ul>
                         {masterParams.map((param, index) => (
                             <li key={index}>
-                                <strong>{param}: </strong>{data[param]}
+                                <strong>{convertTitle(param)}: </strong>{data[param]}
                             </li>
                         ))}
                     </ul>
                 </div>
             </div>
             <div className="details-section">
-                <h2>Details</h2>
                 <ul>
                     {detailParams.map((param, index) => (
                         <li key={index}>
-                            <strong>{param}: </strong>{data[param]}
+                            <strong>{convertTitle(param)}: </strong>{data[param]}
                         </li>
                     ))}
                 </ul>
