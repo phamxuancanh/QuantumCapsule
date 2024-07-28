@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material';
 import ExcelReaderBtn from 'components/buttons/excel/ExcelReaderBtn';
 import QuizCard from 'components/cards/quizCard/QuizCard';
 import React from 'react';

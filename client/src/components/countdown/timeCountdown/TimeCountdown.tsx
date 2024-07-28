@@ -21,7 +21,7 @@ const TimeCountdown: React.FC<ITimeCountdownProps> = (props: ITimeCountdownProps
     } else if (seconds === 0 && props.onCountdownEnd) {
       props.onCountdownEnd();
     }
-  }, [seconds]);
+  }, [seconds, props.onCountdownEnd]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);

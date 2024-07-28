@@ -52,8 +52,15 @@ const DrawerMenu: React.FC<IDrawerMenuProps> = (props: IDrawerMenuProps) => {
     );
 
     return (
-        <Card>
-            <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
+        <Box sx={{
+
+        }}>
+            <IconButton edge="start" color="default"  aria-label="menu" onClick={toggleDrawer(true)} sx={{
+                backgroundColor: 'primary.main',
+                ":hover": {
+                    backgroundColor: 'primary.dark'
+                }
+            }}>
                 <MenuIcon fontSize='large' />
             </IconButton>
             <Drawer anchor={props.archor} open={isOpen} onClose={toggleDrawer(false)}
@@ -63,7 +70,7 @@ const DrawerMenu: React.FC<IDrawerMenuProps> = (props: IDrawerMenuProps) => {
             >
                 {drawerContent}
             </Drawer>
-        </Card >
+        </Box >
     );
 };
 
