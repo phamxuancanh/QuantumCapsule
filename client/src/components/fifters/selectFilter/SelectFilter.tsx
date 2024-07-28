@@ -30,7 +30,7 @@ const SelectFilter: React.FC<ISelectFilterProps> = (props: ISelectFilterProps) =
                 renderInput={(params) => (
                     <TextField {...params} label="Search" variant="outlined" />
                 )}
-                style={{ width: 300 }}
+                // style={{ width: 300 }}
             />
         </Card>
     );

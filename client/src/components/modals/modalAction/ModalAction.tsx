@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme, makeStyles, Modal, Backdrop, Fade, Box, Typography, useMediaQuery, useTheme, Button } from '@mui/material';
+import { Modal, Box, Typography, Button } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import './index.scss'
 

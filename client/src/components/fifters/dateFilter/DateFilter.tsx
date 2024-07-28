@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { convertDate } from 'utils/functions';
 // import GridLayout from 'components/layouts/grid/GridLayout';
-import { Box, Card, CardContent, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Box, Card, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 export enum DateFilterMode {
     MONTH = 'month',
