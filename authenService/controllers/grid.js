@@ -31,10 +31,10 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     await models.Grid.update(req.body, {
-      where: { id: req.params.id }
+      where: { id: req.body.id }
     })
     const updatedData = await models.Grid.findOne({
-      where: { id: req.params.id }
+      where: { id: req.body.id }
     })
     return res.json(updatedData)
   } catch (error) {
@@ -43,8 +43,9 @@ const update = async (req, res) => {
 }
 const remove = async (req, res) => {
   try {
+    console.log('>>>>>>>>', req.query)
     await models.Grid.destroy({
-      where: { id: req.params.id }
+      where: { id: req.query.id }
     })
     return res.json({
       message: messages.deleted

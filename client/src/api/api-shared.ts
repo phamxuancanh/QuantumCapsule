@@ -93,8 +93,8 @@ export class GridProgress {
         return await requestWithoutJwt.put(`/grids/update`, body)
     }
 
-    delete = async (tableName:string, columnName: string): Promise<AxiosResponse<any>> => {
-        return await requestWithoutJwt.delete(`/grids/delete`, { params: { tableName, columnName } })
+    delete = async (id: any): Promise<AxiosResponse<any>> => {
+        return await requestWithoutJwt.delete(`/grids/delete`, { params: { id: id} })
     }
 }
 

@@ -87,10 +87,9 @@ const GridSetting: React.FC = () => {
                 // const instance = new InProgress();
                 try {
                     if (state.formData?.tableName && state.formData?.columnName) {
-                        await instance.delete(state.formData.tableName, state.formData.columnName);
-                        const idData = state.formData.tableName + state.formData.columnName;
-                        const row = gridRef.current?.getRow(idData);
-                        gridRef.current?.updateRows([{_action: 'delete', tableName: row?.tableName, columnName: row?.columnName}])
+                        await instance.delete(state.formData.id);
+                        // const row = gridRef.current?.getRow(idData);
+                        gridRef.current?.updateRows([{_action: 'delete', id: state.formData.id}]);
                     }
                     else {
                         alert('Please select a row to delete');
