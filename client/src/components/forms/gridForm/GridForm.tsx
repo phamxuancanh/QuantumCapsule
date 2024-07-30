@@ -42,12 +42,12 @@ const GridForm: React.FC<IGridFormProps> = (props: IGridFormProps) => {
 
         (async () => {
             const res = await getGridData(props.tableName);
-            const tempGridData: IGrid[] = res.data.data
+            const tempGridData: IGrid[] = res.data
             const tempDataSources: IDataSource[] = []
             for (let i = 0; i < tempGridData.length; i++) {
                 if (tempGridData[i].dataSource === null) continue;
                 const res = await getDirections(tempGridData[i].dataSource!);
-                tempDataSources[i] = { name: tempGridData[i].columnName, values: res.data.data };
+                tempDataSources[i] = { name: tempGridData[i].columnName, values: res.data };
             }
             console.log(tempDataSources);
 

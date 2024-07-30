@@ -1,3 +1,4 @@
+const seedGrids = require('./grid')
 const seedPermissions = require('./permission')
 const seedRoles = require('./role')
 const seedRoleToPermissions = require('./role_to_permission')
@@ -8,6 +9,7 @@ const seedDatabase = async () => {
     await seedRoles()
     await seedUsers()
     await seedRoleToPermissions()
+    await seedGrids()
   } catch (error) {
     console.log(`Failed to seed database: ${error}`)
   }

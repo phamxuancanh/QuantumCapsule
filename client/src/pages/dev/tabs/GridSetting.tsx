@@ -30,7 +30,7 @@ const GridSetting: React.FC = () => {
     useEffect(() => {
         (async () => {
             const res1 = await getTableData({ tableName: TABLE_NAME, filter: {} });
-            setState(prep => ({ ...prep, tableData: res1.data.data }));
+            setState(prep => ({ ...prep, tableData: res1.data }));
         })();
     }, []);
 
@@ -109,7 +109,7 @@ const GridSetting: React.FC = () => {
                 case ACTIONS.CREATE:
                     if (handleValidation()) {
                         const resCreate = await instance.create(state.formData);
-                        gridRef.current?.updateRows([resCreate.data.data]);
+                        gridRef.current?.updateRows([resCreate.data]);
                         setState(prep => ({ ...prep, action: defaultAction }));
                     } else {
                         alert('Please check your input');
@@ -118,7 +118,7 @@ const GridSetting: React.FC = () => {
                 case ACTIONS.UPDATE:
                     if (handleValidation()) {
                         const resUpdate = await instance.update(state.formData);
-                        gridRef.current?.updateRows([resUpdate.data.data]);
+                        gridRef.current?.updateRows([resUpdate.data]);
                         setState(prep => ({ ...prep, action: defaultAction }));
                     }
                     else {
@@ -139,7 +139,7 @@ const GridSetting: React.FC = () => {
                 tableName={TABLE_NAME}
                 initData={state.tableData}
                 onRowClick={(row) => onRowClick(row)}
-                getRowId={(row: IGrid) => row.tableName + row.columnName}
+                // getRowId={(row: IGrid) => row.tableName + row.columnName}
                 pageSizeOptions={[10, 20, 30]}
             />
             <Button onClick={() => handleClick(ACTIONS.VIEW)}>xem</Button>

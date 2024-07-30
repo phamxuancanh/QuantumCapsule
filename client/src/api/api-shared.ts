@@ -47,7 +47,7 @@ export class InProgress {
 }
 
 export interface IGrid{
-
+    id?: number;
     tableName: string;
     columnName: string;
     columnType: string;
@@ -68,6 +68,7 @@ export class GridProgress {
 
     init = (): IGrid => {
         return {
+            // id: undefined,
             tableName: '',
             columnName: '',
             columnType: 'STRING',

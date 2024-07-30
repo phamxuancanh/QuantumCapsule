@@ -4,6 +4,7 @@ const Permission = require('./permission')
 const Role = require('./role')
 const RoleToPermission = require('./role_to_permission')
 const Route = require('./route')
+const Grid = require('./grid')
 
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
@@ -21,6 +22,7 @@ module.exports = {
     Permission,
     Role,
     RoleToPermission,
-    Route
+    Route,
+    Grid
   }
 }

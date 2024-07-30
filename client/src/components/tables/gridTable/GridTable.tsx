@@ -55,8 +55,10 @@ const GridTable: React.FC<GridTableProps> = (props: GridTableProps) => {
     React.useEffect(() => {
         (async () => {
             const res = await getGridData(props.tableName);
-            const gridColumns = convertColumns(res.data.data)
-            setState(prep=>({...prep, columns: gridColumns, gridData: res.data.data}));
+            const gridColumns = convertColumns(res.data)
+            console.log(gridColumns);
+            
+            setState(prep=>({...prep, columns: gridColumns, gridData: res.data}));
         })();
     }, [convertColumns, props.tableName])
 
