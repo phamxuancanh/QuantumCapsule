@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { verifyOTP, sendOTP } from 'api/post/post.api'
+import { verifyOTP, sendOTP } from 'api/user/api'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import ROUTES from 'routes/constant'
