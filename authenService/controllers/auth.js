@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 const { models } = require('../models')
 // const client = require('../middlewares/connectRedis')
 const passport = require('../middlewares/passport-setup')
-const { produceMessage } = require('../middlewares/kafkaClient')
 const nodemailer = require('nodemailer')
 const path = require('path')
 const fs = require('fs')
@@ -69,67 +68,20 @@ const signIn = async (req, res, next) => {
     })
     res.setHeader('authorization', accessToken)
 
-    // Produce a message to Kafka with full user data
-    await produceMessage('user-signin', user.id, user.toJSON())
-
-    return res.status(200).json({ success: true, accessToken, user })
+    const userResult = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar
+    }
+    return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
     next(error)
   }
 }
-// const signUp = async (req, res, next) => {
-//   try {
-//     const { firstName, lastName, username, email, password, captchaValue } = req.body.data
-
-//     const userByUsername = await models.User.findOne({ where: { username } })
-//     if (userByUsername) {
-//       return res.status(401).json({ code: 401, message: 'Username is already registered.' })
-//     }
-
-//     const userByEmail = await models.User.findOne({ where: { email } })
-//     if (userByEmail) {
-//       return res.status(401).json({ code: 401, message: 'Email is already registered.' })
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10)
-
-//     const newUser = await models.User.create({
-//       firstName,
-//       lastName,
-//       username,
-//       password: hashedPassword,
-//       email,
-//       emailVerified: false
-//     })
-
-//     // Tạo token xác thực email
-//     const emailToken = jwt.sign({ id: newUser.id, username: newUser.username, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' })
-
-//     // Định nghĩa URL xác thực
-//     const confirmationUrl = `http://localhost:${process.env.CLIENT_PORT}/verify/email?token=${emailToken}`
-
-//     // Đọc template HTML
-//     const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
-//     const htmlContent = fs.readFileSync(templatePath, 'utf8')
-//     const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl)
-
-//     // Gửi email xác thực
-//     const mailOptions = {
-//       from: 'canhmail292@gmail.com',
-//       to: email,
-//       subject: 'Email Confirmation',
-//       html: htmlWithLink
-//     }
-
-//     await transporter.sendMail(mailOptions)
-
-//     return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' })
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 const signUp = async (req, res, next) => {
-
   try {
     const { firstName, lastName, username, email, password, captchaValue } = req.body.data
 
@@ -144,7 +96,6 @@ const signUp = async (req, res, next) => {
 
     if (!captchaResponse.data.success) {
       return res.status(401).json({ code: 401, message: 'Captcha verification failed.' })
-
     }
 
     const userByUsername = await models.User.findOne({ where: { username } })
@@ -282,8 +233,6 @@ const signOut = async (req, res, next) => {
     await user.save()
 
     // Produce a message to Kafka with full user data
-    await produceMessage('user-signout', user.id, user.toJSON())
-
     return res.status(200).json({ success: true })
   } catch (error) {
     console.log(error)
@@ -450,7 +399,6 @@ const changePassword = async (req, res, next) => {
     await user.update({ password: hashPassword })
 
     // Produce a message to Kafka with full user data
-    await produceMessage('password-change', user.id, user.toJSON())
 
     return res.status(200).json({ success: true })
   } catch (error) {
@@ -475,7 +423,6 @@ const resetPassword = async (req, res, next) => {
     await user.update({ password: hashPassword })
 
     // Optionally, produce a message to Kafka with full user data
-    await produceMessage('password-reset', user.id, user.toJSON())
 
     return res.status(200).json({ success: true, message: 'Password has been reset successfully.' })
   } catch (error) {
@@ -486,7 +433,6 @@ const resetPassword = async (req, res, next) => {
 const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
 
 const googleCallback = (req, res, next) => {
-
   passport.authenticate('google', async (err, user, info) => {
     if (err || !user) {
       console.log(err)
@@ -505,7 +451,6 @@ const googleCallback = (req, res, next) => {
     })
 
     // Produce a message to Kafka with full user data
-    await produceMessage('google-signin', user.id, user.toJSON())
 
     // Trả về accessToken dưới dạng query string để lưu trữ trên client
     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
@@ -531,10 +476,6 @@ const facebookCallback = (req, res, next) => {
       sameSite: 'Strict',
       maxAge: 24 * 60 * 60 * 1000
     })
-
-    // Produce a message to Kafka with full user data
-    await produceMessage('facebook-signin', user.id, user.toJSON())
-
     // Trả về accessToken dưới dạng query string để lưu trữ trên client
     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
   })(req, res, next)

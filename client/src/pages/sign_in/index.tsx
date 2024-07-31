@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from "react-router-dom"
 import { setToLocalStorage } from "utils/functions"
-import { signIn, googleSignIn, facebookSignIn } from "api/post/post.api"
+import { signIn, googleSignIn, facebookSignIn } from "api/user/api"
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
 import { useTranslation } from 'react-i18next'
@@ -12,10 +12,13 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import loginImage from 'assets/bb.jpg'
 import { ClockLoader, PacmanLoader } from "react-spinners"
-
+import { loginState } from '../../redux/auth/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
 const theme = createTheme();
 
 const SignIn = () => {
+    const dispatch = useDispatch()
+    const user = useSelector((state: any) => state.auth)
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [rememberChecked, setRememberChecked] = useState(false)
@@ -64,19 +67,23 @@ const SignIn = () => {
         try {
             await schema.validate({ username, password }, { abortEarly: false })
             const result = await signIn({ username, password })
-            console.log(result)
-            console.log('result.data:', result?.data)
-
             if (result?.data) {
                 setLoading(true)
-                const tokens = JSON.stringify(result.data)
                 setTimeout(() => {
                     setLoading(false);
-                    setToLocalStorage('tokens', tokens)
+                    const currentUser = {
+                        accessToken: result.data.accessToken,
+                        currentUser: result.data.user
+                    }
+                    console.log(currentUser)
+                    setToLocalStorage('persist:auth', JSON.stringify(currentUser))
+                    loginState(currentUser.currentUser)
+                    dispatch(loginState(currentUser.currentUser))
                     navigate(ROUTES.home)
                     toast.success(t('signIn.success'))
                 }, 2000);
-            } else {
+            }
+            else {
                 setLoading(false)
                 alert('Unexpected response from server')
             }
