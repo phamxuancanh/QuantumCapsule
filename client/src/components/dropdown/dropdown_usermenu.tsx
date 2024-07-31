@@ -25,10 +25,10 @@ import { useTranslation } from 'services/i18n'
 import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import { useDispatch } from 'react-redux'
 import ChoiceModal from 'components/modals/choiceModal'
-//    import CryptoJS from 'crypto-js'
-   import { signOut } from 'api/user/api'
-   import { toast } from 'react-toastify'
-   import {logoutState} from '../../redux/auth/authSlice'
+import CryptoJS from 'crypto-js'
+import { signOut } from 'api/user/api'
+import { toast } from 'react-toastify'
+import { logoutState } from '../../redux/auth/authSlice'
 interface DropdownProfileProps {
   align: string
 }
@@ -46,9 +46,6 @@ function DropdownProfile({ align }: DropdownProfileProps) {
     }
   }, [])
   const dispatch = useDispatch()
-  const userLastName = tokens?.lastName
-  const userFirstName = tokens?.firstName
-  const userEmail = tokens?.email
   const { t, i18n } = useTranslation()
   //  const { theme, setTheme } = useTheme()
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -57,6 +54,20 @@ function DropdownProfile({ align }: DropdownProfileProps) {
   const [selectedLanguage, setSelectedLanguage] = useState('en')
   const [choiceModalOpen, setChoiceModalOpen] = useState(false)
   // close on click outside
+  const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'))
+  const userLastName = currentUser?.currentUser.lastName
+  const userFirstName = currentUser?.currentUser.firstName
+  const userEmail = currentUser?.currentUser.email
+  const userRole = currentUser?.currentUser.key
+  let data: string | undefined
+  if (userRole) {
+    try {
+      const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication')
+      data = giaiMa.toString(CryptoJS.enc.Utf8)
+    } catch (error) {
+      console.error('Decryption error:', error)
+    }
+  }
   useEffect(() => {
     const clickHandler = ({ target }: { target: EventTarget | null }) => {
       if (!dropdown.current) return
@@ -114,17 +125,6 @@ function DropdownProfile({ align }: DropdownProfileProps) {
       { label: 'VN', value: 'vi', flag: getUnicodeFlagIcon('VN') }
     ]
   }, [])
-
-  const userRole = tokens?.key
-  let data: string | undefined
-  //  if (userRole) {
-  //    try {
-  //      const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication')
-  //      data = giaiMa.toString(CryptoJS.enc.Utf8)
-  //    } catch (error) {
-  //      console.error('Decryption error:', error)
-  //    }
-  //  }
 
   //  const handleChange = useCallback(
   //    async (e: { target: { value: React.SetStateAction<string> | undefined } }) => {
@@ -240,12 +240,12 @@ function DropdownProfile({ align }: DropdownProfileProps) {
                 to="/profile"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                <AccountCircleIcon className="mr-2" />
+                <AccountCircleIcon className="tw-mr-2" />
                 {t('dropdown.profile')}
               </Link>
             </li>
 
-            {(data === 'ADMIN' || data === 'MANAGER') && (
+            {(data === 'R1' || data === 'R2') && (
 
               <li>
                 <Link
@@ -299,7 +299,7 @@ function DropdownProfile({ align }: DropdownProfileProps) {
               </button>
             </li>
             <hr className="tw-bg-slate-200 tw-my-2" />
-            {(data === 'ADMIN' || data === 'MANAGER') && (
+            {(data === 'R1' || data === 'R2') && (
               <li>
                 <Link
                   className="tw-font-medium tw-text-sm tw-text-gray-500 hover:tw-text-teal-600 tw-flex tw-items-center tw-py-1 tw-px-6"

@@ -1,6 +1,6 @@
 const { models } = require('../models')
 const bcrypt = require('bcrypt')
-
+const CryptoJS = require('crypto-js')
 const editUserById = async (req, res, next) => {
   try {
     const { id } = req.params
@@ -38,12 +38,28 @@ const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params
     const user = await models.User.findByPk(id, {
-      attributes: ['avatar', 'email', 'firstName', 'id', 'lastName', 'username']
+      attributes: ['avatar', 'email', 'firstName', 'id', 'lastName', 'username', 'roleId']
     })
+
     if (!user) {
       return res.status(404).json({ message: 'not found' })
     }
-    res.json(user)
+
+    const role = await models.Role.findOne({
+      where: { id: user.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
+      key: encryptedRole
+    }
+
+    res.json(userResult)
   } catch (error) {
     res.status(500).json({ message: 'not found' })
   }

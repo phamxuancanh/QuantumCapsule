@@ -14,6 +14,7 @@ const {
   signRefreshToken,
   verifyRefreshToken
 } = require('../middlewares/jwtService')
+const CryptoJS = require('crypto-js')
 // TODO: move to environment variables
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -67,14 +68,18 @@ const signIn = async (req, res, next) => {
       maxAge: 24 * 60 * 60 * 1000
     })
     res.setHeader('authorization', accessToken)
-
+    const role = await models.Role.findOne({
+      where: { id: user.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
     const userResult = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
       email: user.email,
-      avatar: user.avatar
+      avatar: user.avatar,
+      key: encryptedRole
     }
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
