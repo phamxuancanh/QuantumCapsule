@@ -189,8 +189,7 @@ const verifyEmail = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
   console.log('REFRESH TOKENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
   try {
-    console.log(req.cookies, 'req.cookies')
-    const refreshToken = req.cookies.refreshToken // Lấy refreshToken từ cookie
+    const refreshToken = req.cookies.refreshToken
     console.log(refreshToken, 'refreshToken')
     if (!refreshToken) {
       return res.status(403).json({ error: { message: 'Unauthorized' } })
@@ -208,6 +207,7 @@ const refreshToken = async (req, res, next) => {
     res.setHeader('authorization', accessToken)
     return res.status(200).json({ success: true, accessToken })
   } catch (error) {
+    console.log(error)
     next(error)
   }
 }

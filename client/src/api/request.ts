@@ -36,6 +36,7 @@ export const requestWithJwt = axios.create({
 const checkTokenValidity = (token: string) => {
   try {
     const { exp } = jwtDecode<{ exp: number }>(token)
+    console.log(exp*1000 > Date.now(), 'exp')
     return exp * 1000 > Date.now()
   } catch (error) {
     return false
@@ -53,18 +54,40 @@ const handleTokenRefresh = async () => {
   try {
     const response = await refresh()
     const newAccessToken = response.data.accessToken
-    setToLocalStorage('tokens', JSON.stringify(response.data))
+    console.log(response)
+    // Lấy dữ liệu hiện tại từ Local Storage
+    const persistAuth = getFromLocalStorage<any>('persist:auth')
+    console.log(persistAuth, 'persistAuth')
+    if (persistAuth) {
+      // Parse dữ liệu thành đối tượng JavaScript
+      // const authData = JSON.parse(persistAuth)
+      // Cập nhật trường accessToken
+      persistAuth.accessToken = newAccessToken
+      console.log(persistAuth, 'authData')
+      const currentUser = {
+        accessToken: persistAuth.accessToken,
+        currentUser: persistAuth.currentUser
+    } 
+      // Lưu lại đối tượng đã cập nhật vào Local Storage
+      // setToLocalStorage('persist:auth', (persistAuth))
+
+      console.log(currentUser)
+      setToLocalStorage('persist:auth', JSON.stringify(currentUser))
+    }
+
     return newAccessToken
   } catch (error) {
+    console.error(error)
+    alert(error)
     removeAllLocalStorage()
     reload()
     // navigate(ROUTES.login)
     return null
   }
 }
+
 requestWithJwt.interceptors.request.use(async (config) => {
   const { accessToken } = getFromLocalStorage<any>('persist:auth');
-
   if (accessToken != null) {
     config.headers['Authorization'] = `Bearer ${accessToken}`
   }
@@ -73,6 +96,7 @@ requestWithJwt.interceptors.request.use(async (config) => {
 })
 requestWithJwt.interceptors.response.use(
   (response) => {
+    console.log('chay')
     return response
   },
   async (error: AxiosError<IBaseErrorResponse>) => {
