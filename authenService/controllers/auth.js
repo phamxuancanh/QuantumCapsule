@@ -14,6 +14,7 @@ const {
   signRefreshToken,
   verifyRefreshToken
 } = require('../middlewares/jwtService')
+const CryptoJS = require('crypto-js')
 // TODO: move to environment variables
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -67,14 +68,18 @@ const signIn = async (req, res, next) => {
       maxAge: 24 * 60 * 60 * 1000
     })
     res.setHeader('authorization', accessToken)
-
+    const role = await models.Role.findOne({
+      where: { id: user.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
     const userResult = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
       email: user.email,
-      avatar: user.avatar
+      avatar: user.avatar,
+      key: encryptedRole
     }
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
@@ -189,8 +194,7 @@ const verifyEmail = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
   console.log('REFRESH TOKENNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
   try {
-    console.log(req.cookies, 'req.cookies')
-    const refreshToken = req.cookies.refreshToken // Lấy refreshToken từ cookie
+    const refreshToken = req.cookies.refreshToken
     console.log(refreshToken, 'refreshToken')
     if (!refreshToken) {
       return res.status(403).json({ error: { message: 'Unauthorized' } })
@@ -208,6 +212,7 @@ const refreshToken = async (req, res, next) => {
     res.setHeader('authorization', accessToken)
     return res.status(200).json({ success: true, accessToken })
   } catch (error) {
+    console.log(error)
     next(error)
   }
 }
