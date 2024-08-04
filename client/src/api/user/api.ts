@@ -51,3 +51,6 @@ export const updateUser = async (id: string, payload: any): Promise<AxiosRespons
   console.log(payload, 'payload');
   return await requestWithJwt.put<any>(`/users/${id}`, { data: payload })
 }
+export const changeAVT = async (id: string, payload: any): Promise<AxiosResponse<any>> => {
+  return await requestWithJwt.put<any>(`/users/${id}/changeAVT`, payload);
+}

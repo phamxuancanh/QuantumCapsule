@@ -7,18 +7,19 @@
 /* PAGE: AccountPanel
    ========================================================================== */
 import React, { useEffect, useState, useRef, useCallback } from 'react'
-import Image from '../../../assets/userAVT.png'
 import ImageCover from '../../../assets/userCover.png'
-import { findUserById, updateUser } from '../../../api/user/api'
+import { findUserById, updateUser, changeAVT } from '../../../api/user/api'
 import { getFromLocalStorage } from 'utils/functions'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../../redux/store'
-import { fetchUser, selectUser } from '../../../redux/auth/authSlice'
+import { fetchUser, selectUser, updateStateInfo } from '../../../redux/auth/authSlice'
 import CameraAltIcon from '@mui/icons-material/CameraAlt'
-import AVTChangeModal from 'components/modals/imageChangeModal'
+import AVTChangeModal from 'components/modals/changeAVTModal'
+import ZoomModal from 'components/modals/zoomAVTModal'
+import AvatarEditor from 'react-avatar-editor'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 interface User {
     id: string
@@ -48,7 +49,12 @@ interface PayloadType {
 function AccountPanel() {
     const { t } = useTranslation()
     const [choiceModalAVTOpen, setChoiceModalAVTOpen] = useState(false)
-
+    const [zoomModalAVTOpen, setZoomModalAVTOpen] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [imageSrc, setImageSrc] = useState('')
+    const [zoom, setZoom] = useState(1)
+    const [rotate, setRotate] = useState(0)
+    const cropRef = useRef<AvatarEditor>(null)
     const [user, setUser] = useState<User>({
         id: '',
         firstName: '',
@@ -78,6 +84,75 @@ function AccountPanel() {
         }
     }, []);
     const [isEditing, setIsEditing] = useState(false)
+    const handleUploadClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.stopPropagation()
+        if (fileInputRef.current) {
+            fileInputRef.current.click()
+        }
+    }
+    const handleEditClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.stopPropagation()
+        setChoiceModalAVTOpen(false)
+        setImageSrc(userRedux?.avatar || '')
+        setZoomModalAVTOpen(true)
+    }
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif']
+            if (validTypes.includes(file.type)) {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                    setImageSrc(reader.result as string)
+                    setChoiceModalAVTOpen(false)
+                    setZoomModalAVTOpen(true)
+                }
+                reader.readAsDataURL(file)
+                console.log('Selected file:', file)
+            } else {
+                toast.error('Invalid file type. Please select a JPG, JPEG, PNG, or GIF file.')
+            }
+        }
+    }
+    const handleInputZoomChange = (event: { target: { value: any } }) => {
+        const zoomValue = event.target.value
+        setZoom(zoomValue)
+    }
+
+    const handleInputRotateChange = (event: { target: { value: any } }) => {
+        const rotateValue = event.target.value
+        setRotate(rotateValue)
+    }
+    const handleSaveAVT = async () => {
+        if (cropRef.current) {
+          const dataUrl = cropRef.current.getImage().toDataURL()
+          const result = await fetch(dataUrl)
+          const blob = await result.blob()
+          const formData = new FormData()
+          formData.append('avatar', blob, 'avatar.png')
+          let response = { status: 400 }
+          if (userRedux?.id) {
+            response = await changeAVT(userRedux.id, formData)
+          }
+          if (response.status === 200) {
+            toast.success('Change AVT successfully')
+            if (userRedux) {
+              dispatch(updateStateInfo({
+                ...userRedux,
+                avatar: dataUrl
+              }));
+            }
+            setImageSrc(userRedux?.avatar || '')
+            setZoomModalAVTOpen(false);
+            setZoom(1)
+            setRotate(0)
+          } else {
+            toast.error('Change AVT failed')
+          }
+        }
+      };
+      
+
     const handleEditProfile = () => {
         setIsEditing(true)
     }
@@ -116,7 +191,6 @@ function AccountPanel() {
     const handleOpenChangeAVTModal = useCallback(() => {
         setChoiceModalAVTOpen(true)
     }, [])
-    // function validate
     const isValidInputs = () => {
         setObjCheckInput(defaultObjCheckInput)
         if (user.firstName === '' || user.firstName === null) {
@@ -259,14 +333,10 @@ function AccountPanel() {
                         toast.success('Update successfully')
                         setIsEditing(false)
                         setIsSettingNewPassword(false)
-                        const tokens = getFromLocalStorage<any>('tokens')
-                        tokens.firstName = response.data.firstName
-                        tokens.lastName = response.data.lastName
-                        tokens.email = response.data.email
-                        localStorage.setItem('tokens', JSON.stringify(tokens))
+                        dispatch(updateStateInfo({ ...userRedux, ...payload }))
                         window.dispatchEvent(new Event('storage'))
                     } else {
-                        toast.error('Update failed 1')
+                        toast.error('Update failed')
                     }
                 }
             }
@@ -290,7 +360,7 @@ function AccountPanel() {
                        </div> */}
                     <div className="tw-relative tw-inline-block" onClick={handleOpenChangeAVTModal}>
                         <div className="tw-rounded-full tw-border-4 tw-border-teal-400 tw-overflow-hidden tw-w-20 tw-h-20 sm:tw-w-28 sm:tw-h-28 md:tw-w-32 md:tw-h-32 lg:tw-w-40 lg:tw-h-40 tw-flex-shrink-0">
-                            <img className="tw-w-full tw-h-full tw-object-cover tw-cursor-pointer" src={Image} alt="User upload" />
+                            <img className="tw-w-full tw-h-full tw-object-cover tw-cursor-pointer" src={userRedux?.avatar} alt="User upload" />
                         </div>
                         <div className="tw-absolute tw-bottom-2 tw-right-2 tw-w-8 tw-h-8 tw-cursor-pointer tw-bg-slate-300 hover:tw-bg-slate-400 tw-rounded-full tw-flex tw-justify-center tw-items-center">
                             <CameraAltIcon />
@@ -493,26 +563,97 @@ function AccountPanel() {
                 setModalOpen={setChoiceModalAVTOpen}
             >
                 <div className='tw-flex tw-space-x-3'>
-                    <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3'>
-                        <div className='tw-rounded-full tw-bg-blue-800 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
-                            <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large'/>
+                    <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleUploadClick}>
+                        <div className='tw-rounded-full tw-bg-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
+                            <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large' />
                         </div>
                         <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Upload Image</div>
                     </div>
-                    <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3'>
-                        <div className='tw-rounded-full tw-bg-blue-800 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
-                            {/* <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large'/> */}
-                            <img className='tw-rounded-full tw-w-full tw-h-full' src={Image}></img>
+                    <input
+                        type='file'
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        accept='.jpg,.jpeg,.png,.gif'
+                        onChange={handleFileChange}
+                    />
+                    <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleEditClick}>
+                        <div className='tw-rounded-full tw-border-4 tw-border-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
+                            <img className='tw-rounded-full tw-w-full tw-h-full' src={userRedux?.avatar}></img>
                         </div>
                         <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Edit Image</div>
                     </div>
                 </div>
-                {/* <div className="tw-flex tw-flex-wrap tw-justify-end tw-space-x-2">
-          <div className='tw-space-x-2 tw-flex'>
-            <button>Upload image</button>
-          </div>
-        </div> */}
             </AVTChangeModal>
+            <ZoomModal
+                title={t('profile.zoom')}
+                modalOpen={zoomModalAVTOpen}
+                setModalOpen={setZoomModalAVTOpen}
+            >
+                <>
+                    <AvatarEditor
+                        ref={cropRef}
+                        className="tw-col-span-9 tw-mx-auto tw-mb-5 tw-rounded-sm"
+                        image={imageSrc}
+                        width={320}
+                        height={320}
+                        border={50}
+                        borderRadius={250}
+                        scale={zoom}
+                        rotate={rotate}
+                    />
+                    <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
+                        Zoom
+                    </label>
+                    <input
+                        type="range"
+                        className="tw-col-span-5 tw-transparent tw-h-[4px] tw-w-full tw-cursor-pointer tw-appearance-none tw-border-transparent tw-bg-neutral-200 dark:tw-bg-neutral-600 tw-mt-2"
+                        id="customRange1"
+                        min={0}
+                        max={2}
+                        step={0.05}
+                        value={zoom}
+                        onChange={handleInputZoomChange}
+                    />
+                    <input
+                        type="number"
+                        className="tw-bg-dark-2 tw-text-dark-2 tw-col-span-2 tw-py-1.5 tw-rounded-md tw-text-sm tw-font-semibold tw-text-center"
+                        min={0}
+                        max={2}
+                        step={0.05}
+                        value={zoom}
+                        onChange={handleInputZoomChange}
+                    />
+                    <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
+                        Rotate
+                    </label>
+                    <input
+                        type="range"
+                        className="tw-col-span-5 tw-transparent tw-h-[4px] tw-w-full tw-cursor-pointer tw-appearance-none tw-border-transparent tw-bg-neutral-200 dark:tw-bg-neutral-600 tw-mt-2"
+                        id="customRange1"
+                        min={-180}
+                        max={180}
+                        value={rotate}
+                        step={1}
+                        onChange={handleInputRotateChange}
+                    />
+                    <input
+                        type="number"
+                        className="tw-bg-dark-2 tw-text-dark-2 tw-col-span-2 tw-py-1.5 tw-rounded-md tw-text-sm tw-font-semibold tw-text-center"
+                        min={-180}
+                        max={180}
+                        step={1}
+                        value={rotate}
+                        onChange={handleInputRotateChange}
+                    />
+                </>
+                <div className='tw-flex tw-justify-between tw-m-3 tw-font-bold'>
+                    <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Skip</div>
+                    <div className='tw-flex tw-space-x-4'>
+                        <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Cancel</div>
+                        <div className='tw-cursor-pointer hover:tw-text-gray-700 tw-bg-teal-300 hover:tw-bg-teal-500 tw-rounded-md tw-px-3 tw-py-1' onClick={handleSaveAVT}>Save</div>
+                    </div>
+                </div>
+            </ZoomModal>
         </div >
     )
 }
