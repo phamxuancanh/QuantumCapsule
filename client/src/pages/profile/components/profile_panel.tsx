@@ -91,11 +91,14 @@ function AccountPanel() {
         }
     }
     const handleEditClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        event.stopPropagation()
-        setChoiceModalAVTOpen(false)
-        setImageSrc(userRedux?.avatar || '')
-        setZoomModalAVTOpen(true)
-    }
+        event.stopPropagation();
+        setChoiceModalAVTOpen(false);
+        setImageSrc(userRedux?.avatar || '');
+        setZoomModalAVTOpen(true);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = userRedux?.avatar || ''; // Cập nhật giá trị của input file với userRedux.img
+        }
+    };
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (file) {
@@ -123,35 +126,77 @@ function AccountPanel() {
         const rotateValue = event.target.value
         setRotate(rotateValue)
     }
+    // const handleSaveAVT = async () => {
+    //     if (cropRef.current) {
+    //       const dataUrl = cropRef.current.getImage().toDataURL()
+    //       const result = await fetch(dataUrl)
+    //       const blob = await result.blob()
+    //       const formData = new FormData()
+    //       formData.append('avatar', blob, 'avatar.png')
+    //       let response = { status: 400 }
+    //       if (userRedux?.id) {
+    //         response = await changeAVT(userRedux.id, formData)
+    //       }
+    //       if (response.status === 200) {
+    //         toast.success('Change AVT successfully')
+    //         if (userRedux) {
+    //           dispatch(updateStateInfo({
+    //             ...userRedux,
+    //             avatar: dataUrl
+    //           }));
+    //         }
+    //         setImageSrc(userRedux?.avatar || '')
+    //         setZoomModalAVTOpen(false);
+    //         setZoom(1)
+    //         setRotate(0)
+    //       } else {
+    //         console.log('Change AVT failed')
+    //         toast.error('Change AVT failed')
+    //       }
+    //     }
+    //   };
+
     const handleSaveAVT = async () => {
-        if (cropRef.current) {
-          const dataUrl = cropRef.current.getImage().toDataURL()
-          const result = await fetch(dataUrl)
-          const blob = await result.blob()
-          const formData = new FormData()
-          formData.append('avatar', blob, 'avatar.png')
-          let response = { status: 400 }
-          if (userRedux?.id) {
-            response = await changeAVT(userRedux.id, formData)
+        try {
+          let dataUrl = userRedux?.avatar || '';
+          if (cropRef.current) {
+            const canvas = cropRef.current.getImage();
+            dataUrl = canvas.toDataURL();
           }
-          if (response.status === 200) {
-            toast.success('Change AVT successfully')
-            if (userRedux) {
-              dispatch(updateStateInfo({
-                ...userRedux,
-                avatar: dataUrl
-              }));
+          
+          if (dataUrl) {
+            const result = await fetch(dataUrl);
+            const blob = await result.blob();
+            const formData = new FormData();
+            formData.append('avatar', blob, 'avatar.png');
+            let response = { status: 400 };
+            if (userRedux?.id) {
+              response = await changeAVT(userRedux.id, formData);
             }
-            setImageSrc(userRedux?.avatar || '')
-            setZoomModalAVTOpen(false);
-            setZoom(1)
-            setRotate(0)
+            if (response.status === 200) {
+              toast.success('Change AVT successfully');
+              if (userRedux) {
+                dispatch(updateStateInfo({
+                  ...userRedux,
+                  avatar: dataUrl
+                }));
+              }
+              setImageSrc(userRedux?.avatar || '');
+              setZoomModalAVTOpen(false);
+              setZoom(1);
+              setRotate(0);
+            } else {
+              console.log('Change AVT failed');
+              toast.error('Change AVT failed');
+            }
           } else {
-            toast.error('Change AVT failed')
+            toast.error('No avatar available for saving');
           }
+        } catch (error) {
+          console.error('An error occurred while changing the avatar:', error);
+          toast.error('An error occurred while changing the avatar');
         }
       };
-      
 
     const handleEditProfile = () => {
         setIsEditing(true)
@@ -563,7 +608,7 @@ function AccountPanel() {
                 setModalOpen={setChoiceModalAVTOpen}
             >
                 <div className='tw-flex tw-space-x-3'>
-                    <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleUploadClick}>
+                    <div className='tw-bg-teal-300 tw-w-full tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleUploadClick}>
                         <div className='tw-rounded-full tw-bg-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
                             <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large' />
                         </div>
@@ -576,12 +621,12 @@ function AccountPanel() {
                         accept='.jpg,.jpeg,.png,.gif'
                         onChange={handleFileChange}
                     />
-                    <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleEditClick}>
+                    {/* <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleEditClick}>
                         <div className='tw-rounded-full tw-border-4 tw-border-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
                             <img className='tw-rounded-full tw-w-full tw-h-full' src={userRedux?.avatar}></img>
                         </div>
                         <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Edit Image</div>
-                    </div>
+                    </div> */}
                 </div>
             </AVTChangeModal>
             <ZoomModal
