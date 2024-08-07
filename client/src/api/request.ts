@@ -9,29 +9,17 @@
 import axios, { AxiosError } from 'axios'
 import { getFromLocalStorage, setToLocalStorage, removeAllLocalStorage, reload } from 'utils/functions'
 import { refresh } from 'api/user/api'
-// import { useTranslation } from 'services/i18n'
-// import Swal from 'sweetalert2'
-// import { t } from 'i18next'
 import { jwtDecode } from 'jwt-decode'
 import { toast } from 'react-toastify'
-// import { useNavigate } from 'react-router-dom'
-// import ROUTES from 'routes/constant'
-// import { useNavigate } from 'react-router-dom'
-// import ROUTES from 'routes/constant'
-// const navigate = useNavigate()
 interface IBaseErrorResponse {
   code: string
   status: number
   message: string
 }
-// const navigate = useNavigate()
-/**
- * Authenticated Request Interceptors config
- */
 export const requestWithJwt = axios.create({
   baseURL: process.env.REACT_APP_API,
   timeout: 10000,
-  withCredentials: false
+  withCredentials: true
 })
 
 const checkTokenValidity = (token: string) => {
@@ -44,6 +32,44 @@ const checkTokenValidity = (token: string) => {
   }
 }
 
+
+// requestWithJwt.interceptors.response.use(
+//   (response) => {
+//     console.log('Request successful');
+//     return response;
+//   },
+//   async (error: AxiosError<IBaseErrorResponse>) => {
+//     const originalRequest: any = error.config;
+
+//     // If the request fails with a 401
+//     if (error.response?.status === 401) {
+//       try {
+//         const newAccessToken = await handleTokenRefresh();
+//         if (newAccessToken) {
+//           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+//           return requestWithJwt(originalRequest);
+//         }
+//       } catch (refreshError) {
+//         console.error('Token refresh error:', refreshError);
+//         alert('Session expired. Please login again');
+//         toast.error('Session expired. Please login again');
+//         removeAllLocalStorage();
+//         return Promise.reject(refreshError);
+//       }
+//     }
+
+//     if (!error.response?.data) {
+//       console.error('Unknown server error');
+//       return Promise.reject({
+//         code: 'Unknown',
+//         status: 500,
+//         message: 'Server error',
+//       });
+//     }
+
+//     return Promise.reject(error.response.data);
+//   }
+// );
 requestWithJwt.interceptors.response.use(
   (response) => {
     console.log('Request successful');
@@ -52,9 +78,8 @@ requestWithJwt.interceptors.response.use(
   async (error: AxiosError<IBaseErrorResponse>) => {
     const originalRequest: any = error.config;
 
-    // If the request fails with a 401 and it hasn't been retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;  // Set the retry flag
+      originalRequest._retry = true;
 
       try {
         const newAccessToken = await handleTokenRefresh();
@@ -62,14 +87,35 @@ requestWithJwt.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return requestWithJwt(originalRequest);
         }
-      } catch (refreshError) {
-        console.error('Token refresh error:', refreshError);
-        alert('Session expired. Please login again');
-        toast.error('Session expired. Please login again');
-        removeAllLocalStorage();
-        reload();
+      } catch (refreshError: any) {
+        if (refreshError.response?.status === 401) {
+          console.error('Token refresh failed with 401:', refreshError);
+          alert('Session expired. Please login again');
+          toast.error('Session expired. Please login again');
+          removeAllLocalStorage();
+          reload();
+        } else {
+          console.error('Token refresh error:', refreshError);
+        }
         return Promise.reject(refreshError);
       }
+    } else if (originalRequest._retry) {
+      console.error('Retry attempt failed:', error);
+      alert('Session expired. Please login again');
+      toast.error('Session expired. Please login again');
+      removeAllLocalStorage();
+      reload();
+      return Promise.reject(error);
+    }
+
+    // Xử lý lỗi 403
+    if (error.response?.status === 403) {
+      console.error('Access forbidden:', error);
+      alert('Access forbidden. Please contact support or try logging in again.');
+      toast.error('Access forbidden. Please contact support or try logging in again.');
+      removeAllLocalStorage();
+      reload();
+      return Promise.reject(error);
     }
 
     if (!error.response?.data) {
@@ -85,10 +131,11 @@ requestWithJwt.interceptors.response.use(
   }
 );
 
+
 const handleTokenRefresh = async () => {
   console.log('handleTokenRefresh');
   const tokens = getFromLocalStorage<any>('persist:auth');
-  
+
   if (!tokens) {
     console.warn('No tokens found in local storage');
     return null;
@@ -112,17 +159,18 @@ const handleTokenRefresh = async () => {
       };
       setToLocalStorage('persist:auth', JSON.stringify(currentUser));
     }
-    
+
     return newAccessToken;
   } catch (error) {
     console.error('Token refresh failed:', error);
     alert('Session expired. Please login again');
     toast.error('Session expired. Please login again');
     removeAllLocalStorage();
-    reload();
     return null;
   }
 };
+
+
 requestWithJwt.interceptors.request.use(async (config) => {
   const { accessToken } = getFromLocalStorage<any>('persist:auth');
   if (accessToken != null) {

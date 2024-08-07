@@ -202,14 +202,8 @@ const refreshToken = async (req, res, next) => {
     const userId = await verifyRefreshToken(refreshToken)
     console.log(userId, 'userId')
     const accessToken = await signAccessToken(userId)
-    // const newRefreshToken = await signRefreshToken(userId);
-
-    // res.cookie("refreshToken", newRefreshToken, { // Đặt lại refreshToken mới
-    //     httpOnly: true,
-    //     maxAge: 60 * 60 * 1000,
-    // });
-
     res.setHeader('authorization', accessToken)
+    console.log(accessToken)
     return res.status(200).json({ success: true, accessToken })
   } catch (error) {
     console.log(error)
