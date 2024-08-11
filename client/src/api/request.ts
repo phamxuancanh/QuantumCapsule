@@ -11,6 +11,7 @@ import { getFromLocalStorage, setToLocalStorage, removeAllLocalStorage, reload }
 import { refresh } from 'api/user/api'
 import { jwtDecode } from 'jwt-decode'
 import { toast } from 'react-toastify'
+import Swal from 'sweetalert2'
 interface IBaseErrorResponse {
   code: string
   status: number
@@ -32,44 +33,6 @@ const checkTokenValidity = (token: string) => {
   }
 }
 
-
-// requestWithJwt.interceptors.response.use(
-//   (response) => {
-//     console.log('Request successful');
-//     return response;
-//   },
-//   async (error: AxiosError<IBaseErrorResponse>) => {
-//     const originalRequest: any = error.config;
-
-//     // If the request fails with a 401
-//     if (error.response?.status === 401) {
-//       try {
-//         const newAccessToken = await handleTokenRefresh();
-//         if (newAccessToken) {
-//           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-//           return requestWithJwt(originalRequest);
-//         }
-//       } catch (refreshError) {
-//         console.error('Token refresh error:', refreshError);
-//         alert('Session expired. Please login again');
-//         toast.error('Session expired. Please login again');
-//         removeAllLocalStorage();
-//         return Promise.reject(refreshError);
-//       }
-//     }
-
-//     if (!error.response?.data) {
-//       console.error('Unknown server error');
-//       return Promise.reject({
-//         code: 'Unknown',
-//         status: 500,
-//         message: 'Server error',
-//       });
-//     }
-
-//     return Promise.reject(error.response.data);
-//   }
-// );
 requestWithJwt.interceptors.response.use(
   (response) => {
     console.log('Request successful');
@@ -111,10 +74,20 @@ requestWithJwt.interceptors.response.use(
     // Xử lý lỗi 403
     if (error.response?.status === 403) {
       console.error('Access forbidden:', error);
-      alert('Access forbidden. Please contact support or try logging in again.');
-      toast.error('Access forbidden. Please contact support or try logging in again.');
-      removeAllLocalStorage();
-      reload();
+      Swal.fire({
+        title: 'Warning',
+        text: 'Your session has expired. Please log in again.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeAllLocalStorage()
+          reload()
+        }
+      })
+      // alert('Access forbidden. Please contact support or try logging in again.');
+      // toast.error('Access forbidden. Please contact support or try logging in again.');
       return Promise.reject(error);
     }
 
@@ -163,7 +136,7 @@ const handleTokenRefresh = async () => {
     return newAccessToken;
   } catch (error) {
     console.error('Token refresh failed:', error);
-    alert('Session expired. Please login again');
+    // alert('Session expired. Please login again');
     toast.error('Session expired. Please login again');
     removeAllLocalStorage();
     return null;
