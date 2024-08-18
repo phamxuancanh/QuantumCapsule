@@ -35,7 +35,7 @@
      if (isAuthenticated && location.pathname === ROUTES.sign_in) {
        return <Navigate to={ROUTES.home} />
      }
-     if (!isAuthenticated && location.pathname !== ROUTES.sign_in) {
+     if (!isAuthenticated && location.pathname !== ROUTES.sign_in && location.pathname !== ROUTES.sign_up) {
        return <Navigate to={ROUTES.sign_in} />
      }
     //  if (allowedRoles && data && !allowedRoles.includes(data)) {
