@@ -7,7 +7,7 @@ import { ClockLoader } from 'react-spinners'
 import OTPModal from 'components/modals/OTPModal'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
-import { sendOTP, checkEmail } from 'api/post/post.api'
+import { sendOTP, checkEmail } from "api/user/api"
 import ReCAPTCHA from 'react-google-recaptcha'
 const ForgotPassword = () => {
     const { t, i18n } = useTranslation()
