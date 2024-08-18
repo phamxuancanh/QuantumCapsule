@@ -5,7 +5,9 @@ import literature_on from '../../assets/icon_vietnamese_literature_on.png';
 import literature_off from '../../assets/icon_vietnamese_literature_off.png';
 import eng_math_on from '../../assets/icon_math_english_on.png';
 import eng_math_off from '../../assets/icon_math_english_off.png';
+import icon_category from '../../assets/icon_category.png';
 import Select from 'react-select'
+import ProgressBar from '@ramonak/react-progress-bar'
 const SkillList = () => {
     const [selectedClass, setSelectedClass] = useState('');
     const [classes, setClasses] = useState([
@@ -28,11 +30,11 @@ const SkillList = () => {
     };
     return (
         <div className='tw-flex tw-items-center tw-justify-center tw-bg-slate-50'>
-            <div className='tw-w-3/5 tw-bg-red-100 tw-mt-16'>
+            <div className='tw-w-3/5 tw-mt-16 tw-space-y-16'>
                 <div className='tw-flex tw-space-x-10'>
                     {/* Math */}
                     <div
-                        className={`tw-flex tw-flex-col tw-justify-center tw-items-center tw-w-40 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${skillType === 'math' ? 'tw-bg-white' : ''}`}
+                        className={`tw-flex tw-space-y-2 tw-flex-col tw-justify-center tw-items-center tw-w-48 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${skillType === 'math' ? 'tw-bg-white' : ''}`}
                         onClick={() => handleSelectSkill('math')}
                     >
                         <img src={skillType === 'math' ? math_on : math_off} alt="Math" />
@@ -41,7 +43,7 @@ const SkillList = () => {
 
                     {/* Literature */}
                     <div
-                        className={`tw-flex tw-flex-col tw-justify-center tw-items-center tw-w-40 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${skillType === 'literature' ? 'tw-bg-white' : ''}`}
+                        className={`tw-flex tw-space-y-2 tw-flex-col tw-justify-center tw-items-center tw-w-48 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${skillType === 'literature' ? 'tw-bg-white' : ''}`}
                         onClick={() => handleSelectSkill('literature')}
                     >
                         <img src={skillType === 'literature' ? literature_on : literature_off} alt="Literature" />
@@ -50,148 +52,81 @@ const SkillList = () => {
 
                     {/* English Math */}
                     <div
-                        className={`tw-flex tw-flex-col tw-justify-center tw-items-center tw-w-40 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${skillType === 'eng_math' ? 'tw-bg-white' : ''}`}
+                        className={`tw-flex tw-space-y-2 tw-flex-col tw-justify-center tw-items-center tw-w-48 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${skillType === 'eng_math' ? 'tw-bg-white' : ''}`}
                         onClick={() => handleSelectSkill('eng_math')}
                     >
                         <img src={skillType === 'eng_math' ? eng_math_on : eng_math_off} alt="English Math" />
-                        <div className='tw-font-bold tw-text-lg'>Toán Anh</div>
+                        <div className='tw-font-bold tw-text-lg'>Toán Tiếng Anh</div>
                     </div>
                 </div>
-                <div className='tw-flex'>
-                    <div>Danh sach chu diem</div>
-                    <Select
-                        id="class"
-                        value={classes.find(cls => cls.Id === selectedClass) ? { value: selectedClass, label: classes.find(cls => cls.Id === selectedClass)?.Name } : null}
-                        onChange={(option) => setSelectedClass(option?.value ?? '')}
-                        className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
-                        options={classes.map(cls => ({ value: cls.Id, label: cls.Name }))}
-                        placeholder="Chọn lớp"
-                    />
-                    <Select
-                        id="class"
-                        value={classes.find(cls => cls.Id === selectedClass) ? { value: selectedClass, label: classes.find(cls => cls.Id === selectedClass)?.Name } : null}
-                        onChange={(option) => setSelectedClass(option?.value ?? '')}
-                        className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
-                        options={classes.map(cls => ({ value: cls.Id, label: cls.Name }))}
-                        placeholder="Chọn lớp"
-                    />
+                <div className='tw-flex tw-justify-between'>
+                    <div className='tw-text-4xl tw-font-bold'>Danh sach chu diem</div>
+                    <div className='tw-flex tw-space-x-5'>
+                        <Select
+                            id="class"
+                            value={classes.find(cls => cls.Id === selectedClass) ? { value: selectedClass, label: classes.find(cls => cls.Id === selectedClass)?.Name } : null}
+                            onChange={(option) => setSelectedClass(option?.value ?? '')}
+                            className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                            options={classes.map(cls => ({ value: cls.Id, label: cls.Name }))}
+                            placeholder="Chọn lớp"
+                        />
+                        <Select
+                            id="class"
+                            value={classes.find(cls => cls.Id === selectedClass) ? { value: selectedClass, label: classes.find(cls => cls.Id === selectedClass)?.Name } : null}
+                            onChange={(option) => setSelectedClass(option?.value ?? '')}
+                            className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                            options={classes.map(cls => ({ value: cls.Id, label: cls.Name }))}
+                            placeholder="Chọn lớp"
+                        />
+                    </div>
                 </div>
 
                 <div className='tw-flex tw-w-full tw-space-x-20'>
                     <div className='tw-w-1/4 tw-border tw-rounded-2xl tw-bg-white'>FSDFSD</div>
-                    <div className='tw-flex-col tw-w-3/4 tw-border tw-space-y-10 tw-bg-yellow-300'>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
+                    <div className='tw-flex-col tw-w-3/4 tw-border tw-space-y-10'>
+                        <div className='tw-w-full tw-border tw-rounded-2xl tw-bg-white'>
+                            <div className='tw-flex tw-justify-between tw-border-b tw-border-dashed tw-p-5 tw-mx-4'>
+                                <div className='tw-flex tw-space-x-3 tw-w-1/2'>
+                                    <img src={icon_category} alt="icon_category" />
+                                    <div className='tw-text-2xl tw-font-bold'>Cac so tu 11 den 20</div>
+                                </div>
+                                <ProgressBar
+                                    bgColor='orange'
+                                    className='tw-w-1/3'
+                                    maxCompleted={100}
+                                    completed={70}
+                                />
+                            </div>
+                            <div className='tw-flex tw-justify-between tw-p-5'>
+                                <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                    <div className='tw-font-bold tw-text-2xl'>0/2</div>
+                                    <div>Chu diem</div>
+                                </div>
+                                <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                    <div className='tw-font-bold tw-text-2xl'>0/2</div>
+                                    <div>Bai kiem tra</div>
+                                </div>
+                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                    <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                    <div>Chua thuc hanh</div>
+                                </div>
+                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                    <div className="tw-border-4 tw-border-sky-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                    <div>Dang thuc hanh</div>
+                                </div>
+                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                    <div className="tw-border-4 tw-border-green-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                    <div>Da hoan thanh</div>
+                                </div>
+                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                    <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                    <div>Chu diem con yeu</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-                        <div className='tw-bg-red-200 tw-border tw-rounded-2xl'>Aaaaa</div>
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
+
                     </div>
                 </div>
             </div>
