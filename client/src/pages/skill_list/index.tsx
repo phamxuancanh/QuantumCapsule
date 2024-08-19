@@ -6,6 +6,7 @@ import literature_off from '../../assets/icon_vietnamese_literature_off.png';
 import eng_math_on from '../../assets/icon_math_english_on.png';
 import eng_math_off from '../../assets/icon_math_english_off.png';
 import icon_category from '../../assets/icon_category.png';
+import earth from '../../assets/userCover.png';
 import Select from 'react-select'
 import ProgressBar from '@ramonak/react-progress-bar'
 const SkillList = () => {
@@ -106,27 +107,44 @@ const SkillList = () => {
                                     <div className='tw-font-bold tw-text-2xl'>0/2</div>
                                     <div>Bai kiem tra</div>
                                 </div>
-                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
                                     <div>Chua thuc hanh</div>
                                 </div>
-                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-sky-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
                                     <div>Dang thuc hanh</div>
                                 </div>
-                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-green-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
                                     <div>Da hoan thanh</div>
                                 </div>
-                                <div className='tw-flex tw-items-center tw-justify-center'>
+                                <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
                                     <div>Chu diem con yeu</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className='tw-bg-blue-200 tw-border tw-rounded-2xl'>bbbb</div>
-
+                        <div className='tw-bg-white tw-border tw-rounded-2xl'>
+                            <div className="tw-grid tw-grid-cols-2 tw-gap-4 tw-p-5">
+                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
+                                    <img src={earth}/>
+                                </div>
+                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
+                                    Nội dung của cột 2
+                                </div>
+                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
+                                    Nội dung của cột 3
+                                </div>
+                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
+                                    Nội dung của cột 4
+                                </div>
+                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
+                                    Nội dung của cột 4
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
