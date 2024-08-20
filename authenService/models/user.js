@@ -18,7 +18,8 @@ const User = sequelize.define(
       type: DataTypes.STRING
     },
     avatar: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      defaultValue: 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/defaultAVT.jpg'
     },
     description: {
       type: DataTypes.STRING

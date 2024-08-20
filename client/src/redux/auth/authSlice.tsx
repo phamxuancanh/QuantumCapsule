@@ -71,8 +71,14 @@ const authSlice = createSlice({
       // localStorage.setItem('persist:auth', JSON.stringify(action.payload));
     },
     updateStateInfo(state: AuthState, action: PayloadAction<User>) {
+      const persistAuth = localStorage.getItem('persist:auth');
+      if (persistAuth) {
+        const authData = JSON.parse(persistAuth);
+        // Cập nhật chỉ thông tin người dùng mà không thay đổi token
+        authData.currentUser = action.payload;
+        localStorage.setItem('persist:auth', JSON.stringify(authData));
+      }
       state.user = action.payload;
-      localStorage.setItem('persist:auth', JSON.stringify(action.payload));
     },
     logoutState(state: AuthState) {
       state.user = null;

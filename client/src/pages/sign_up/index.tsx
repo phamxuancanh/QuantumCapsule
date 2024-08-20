@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react"
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import Select from 'react-select'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from "react-router-dom"
-import { setToLocalStorage } from "utils/functions"
 import { signUp, googleSignIn, facebookSignIn } from "api/user/api"
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
@@ -12,8 +12,13 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import loginImage from 'assets/bb.jpg'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
+import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined'
 import { ClockLoader } from "react-spinners"
 import ReCAPTCHA from "react-google-recaptcha"
+import PeopleIcon from '@mui/icons-material/People'
+import ChildCareIcon from '@mui/icons-material/ChildCare'
+import SchoolIcon from '@mui/icons-material/School'
+import { fetchLocations, City, District, Ward } from './locationData'
 const theme = createTheme()
 
 const SignUp = () => {
@@ -22,6 +27,7 @@ const SignUp = () => {
     const [lastName, setLastName] = useState("")
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
+    const [phone, setPhone] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [termCheck, setTermCheck] = useState(false)
@@ -39,7 +45,68 @@ const SignUp = () => {
     const [showCaptcha, setShowCaptcha] = useState(false);
     const keySite = process.env.REACT_APP_SITE_KEY
     const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
+    const [typeAccount, setTypeAccount] = useState('student')
+    const [cities, setCities] = useState<City[]>([])
+    const [selectedCity, setSelectedCity] = useState<string>('')
+    const [districts, setDistricts] = useState<District[]>([])
+    const [selectedDistrict, setSelectedDistrict] = useState<string>('')
+    const [wards, setWards] = useState<Ward[]>([])
+    const [selectedWard, setSelectedWard] = useState<string>('')
+    const [selectedClass, setSelectedClass] = useState('');
+    const [classes, setClasses] = useState([
+        { Id: '1', Name: 'Khối 1' },
+        { Id: '2', Name: 'Khối 2' },
+        { Id: '3', Name: 'Khối 3' },
+        { Id: '4', Name: 'Khối 4' },
+        { Id: '5', Name: 'Khối 5' },
+        { Id: '6', Name: 'Khối 6' },
+        { Id: '7', Name: 'Khối 7' },
+        { Id: '8', Name: 'Khối 8' },
+        { Id: '9', Name: 'Khối 9' },
+        { Id: '10', Name: 'Khối 10' },
+        { Id: '11', Name: 'Khối 11' },
+        { Id: '12', Name: 'Khối 12' }
+    ])
+    useEffect(() => {
+        const loadData = async () => {
+            const data = await fetchLocations();
+            setCities(data);
+        };
+        loadData();
+    }, []);
 
+    useEffect(() => {
+        if (selectedCity) {
+            const city = cities.find(city => city.Id === selectedCity);
+            setDistricts(city?.Districts || []);
+            setSelectedDistrict(''); // Reset district selection
+            setWards([]); // Clear wards
+            setSelectedWard(''); // Reset ward selection
+        } else {
+            setDistricts([]);
+        }
+    }, [selectedCity]);
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            const district = districts.find(district => district.Id === selectedDistrict);
+            setWards(district?.Wards || []);
+            setSelectedWard('');
+        } else {
+            setWards([]);
+        }
+    }, [selectedDistrict]);
+
+    // Update classes when a ward is selected
+    useEffect(() => {
+        if (selectedWard) {
+            const ward = wards.find(ward => ward.Id === selectedWard);
+        } else {
+        }
+    }, [selectedWard]);
+    const handleAccountTypeChange = (type: any) => {
+        setTypeAccount(type);
+    }
     // TODO: them loading
 
     const languageOptions = useMemo(() => {
@@ -241,8 +308,8 @@ const SignUp = () => {
                     </div>
                 </div>
             )}
-            <div className="tw-h-screen lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden">
-                <img src={loginImage} alt="loginImg" className="tw-h-full" />
+            <div className="lg:tw-w-2/5 tw-shadow-2xl tw-shadow-black tw-w-full lg:tw-block tw-hidden tw-bg-black">
+                <img src={loginImage} alt="loginImg" className="tw-h-screen" />
             </div>
             <div className="tw-flex lg:tw-relative lg:tw-w-3/5 tw-w-full tw-items-center tw-justify-between">
                 <img src={loginImage} alt="loginImg" className="tw-absolute tw-h-full tw-w-full lg:tw-hidden tw-hidden sm:tw-block" />
@@ -257,6 +324,35 @@ const SignUp = () => {
                                     </option>
                                 ))}
                             </select>
+                            <div className="tw-w-full tw-text-center tw-font-bold tw-text-neutral-800">Hay chon loai tai khoan phu hop voi ban</div>
+                            <div className="tw-flex tw-w-full">
+                                <div className="tw-flex tw-w-full tw-justify-between tw-space-x-20">
+                                    <div
+                                        className={`tw-w-1/3 tw-rounded-lg tw-border-2 tw-border-slate-800 tw-p-5 tw-flex tw-flex-col tw-items-center tw-justify-center tw-cursor-pointer ${typeAccount === 'student' ? 'tw-bg-green-200 tw-border-green-500 tw-text-green-500' : ''
+                                            }`}
+                                        onClick={() => handleAccountTypeChange('student')}
+                                    >
+                                        <ChildCareIcon fontSize="large" style={{ color: 'black' }} />
+                                        <div className="tw-font-bold">Hoc sinh</div>
+                                    </div>
+                                    <div
+                                        className={`tw-w-1/3 tw-rounded-lg tw-border-2 tw-border-slate-800 tw-p-5 tw-flex tw-flex-col tw-items-center tw-justify-center tw-cursor-pointer ${typeAccount === 'parent' ? 'tw-bg-green-200 tw-border-green-500 tw-text-green-500' : ''
+                                            }`}
+                                        onClick={() => handleAccountTypeChange('parent')}
+                                    >
+                                        <PeopleIcon fontSize="large" style={{ color: 'black' }} />
+                                        <div className="tw-font-bold">Phu huynh</div>
+                                    </div>
+                                    <div
+                                        className={`tw-w-1/3 tw-rounded-lg tw-border-2 tw-border-slate-800 tw-p-5 tw-flex tw-flex-col tw-items-center tw-justify-center tw-cursor-pointer ${typeAccount === 'school' ? 'tw-bg-green-200 tw-border-green-500 tw-text-green-500' : ''
+                                            }`}
+                                        onClick={() => handleAccountTypeChange('school')}
+                                    >
+                                        <SchoolIcon fontSize="large" style={{ color: 'black' }} />
+                                        <div className="tw-font-bold">Nha truong</div>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="tw-space-y-7">
                                 <div className="sm:tw-flex sm:tw-space-x-5 sm:tw-space-y-0 tw-space-y-10">
                                     <div className="sm:tw-w-1/2">
@@ -328,7 +424,23 @@ const SignUp = () => {
                                         <EmailOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
-
+                                </div>
+                                <div>
+                                    <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
+                                        <input
+                                            id="phone"
+                                            name="phone"
+                                            type="phone"
+                                            autoComplete="phone"
+                                            required
+                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                                            placeholder={t('signUp.phone')}
+                                            value={email}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                        />
+                                        <LocalPhoneOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                                    </div>
+                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
                                 </div>
                                 <div>
                                     <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
@@ -364,8 +476,68 @@ const SignUp = () => {
                                         <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageConfirmPassword}</div>
-
                                 </div>
+                                {typeAccount === 'student' && (
+                                    <div>
+                                        <div className="tw-space-y-3 tw-font-bold">Noi hoc tap</div>
+                                        <div className="tw-space-y-4 tw-mt-2">
+                                            <div className="tw-grid tw-grid-cols-2 tw-gap-4">
+                                                {/* Selector for City */}
+                                                <div className="tw-flex tw-flex-col">
+                                                    <Select
+                                                        id="city"
+                                                        className="tw-shadow-sm tw-border-sky-500 tw-rounded-2xl"
+                                                        options={cities.map(city => ({ value: city.Id, label: city.Name }))}
+                                                        value={cities.find(city => city.Id === selectedCity) ? { value: selectedCity, label: cities.find(city => city.Id === selectedCity)?.Name } : null}
+                                                        onChange={(option) => setSelectedCity(option?.value ?? '')}
+                                                        placeholder="Chọn thành phố"
+                                                    />
+                                                </div>
+
+                                                {/* Selector for District */}
+                                                <div className="tw-flex tw-flex-col">
+                                                    <Select
+                                                        id="district"
+                                                        value={districts.find(district => district.Id === selectedDistrict) ? { value: selectedDistrict, label: districts.find(district => district.Id === selectedDistrict)?.Name } : null}
+                                                        onChange={(option) => setSelectedDistrict(option?.value ?? '')}
+                                                        isDisabled={!selectedCity}
+                                                        className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                                                        options={districts.map(district => ({ value: district.Id, label: district.Name }))}
+                                                        placeholder="Chọn quận/huyện"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="tw-grid tw-grid-cols-2 tw-gap-4">
+                                                {/* Selector for Ward */}
+                                                <div className="tw-flex tw-flex-col">
+                                                    <Select
+                                                        id="ward"
+                                                        value={wards.find(ward => ward.Id === selectedWard) ? { value: selectedWard, label: wards.find(ward => ward.Id === selectedWard)?.Name } : null}
+                                                        onChange={(option) => setSelectedWard(option?.value ?? '')}
+                                                        isDisabled={!selectedDistrict}
+                                                        className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                                                        options={wards.map(ward => ({ value: ward.Id, label: ward.Name }))}
+                                                        placeholder="Chọn phường/xã"
+                                                    />
+                                                </div>
+
+                                                {/* Selector for Class */}
+                                                <div className="tw-flex tw-flex-col">
+                                                    <Select
+                                                        id="class"
+                                                        value={classes.find(cls => cls.Id === selectedClass) ? { value: selectedClass, label: classes.find(cls => cls.Id === selectedClass)?.Name } : null}
+                                                        onChange={(option) => setSelectedClass(option?.value ?? '')}
+                                                        isDisabled={!selectedWard}
+                                                        className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                                                        options={classes.map(cls => ({ value: cls.Id, label: cls.Name }))}
+                                                        placeholder="Chọn lớp"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <div className="tw-flex tw-items-center tw-justify-between">

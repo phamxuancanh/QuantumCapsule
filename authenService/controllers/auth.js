@@ -59,13 +59,13 @@ const signIn = async (req, res, next) => {
     const refreshToken = await signRefreshToken(user.id)
 
     const expire = new Date()
-    expire.setDate(expire.getDate() + 1)
+    expire.setMinutes(expire.getMinutes() + 1)
     await models.User.update({ expire }, { where: { id: user.id } })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 60 * 60 * 1000
     })
     res.setHeader('authorization', accessToken)
     const role = await models.Role.findOne({
@@ -202,14 +202,8 @@ const refreshToken = async (req, res, next) => {
     const userId = await verifyRefreshToken(refreshToken)
     console.log(userId, 'userId')
     const accessToken = await signAccessToken(userId)
-    // const newRefreshToken = await signRefreshToken(userId);
-
-    // res.cookie("refreshToken", newRefreshToken, { // Đặt lại refreshToken mới
-    //     httpOnly: true,
-    //     maxAge: 60 * 60 * 1000,
-    // });
-
     res.setHeader('authorization', accessToken)
+    console.log(accessToken)
     return res.status(200).json({ success: true, accessToken })
   } catch (error) {
     console.log(error)
