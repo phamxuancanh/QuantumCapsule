@@ -13,9 +13,9 @@ export interface IQuestion {
     explainAnswer?: string
     score?: number
     grade?:  number // lớp
-    idSubject?: string
-    idLesson?: string
-    idTopic?: string
+    subjectId?: string
+    lessonId?: string
+    topicId?: string
 }
 
 export interface IAnswer {
@@ -23,12 +23,14 @@ export interface IAnswer {
     yourAnswer?: string
     correctAnswer?: string
     explainAnswer?: string
+    isCorrect?: boolean
     score?: number
     time?: number
-    idQuestion?: string
-    idStudent?: string
-    idSubject?: string
-    idLesson?: string
-    idTopic?: string
+    questionId?: string
+    studentId?: string
+    subjectId?: string
+    lessonId?: string
+    topicId?: string
 }
+
 

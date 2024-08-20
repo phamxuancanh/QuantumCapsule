@@ -41,6 +41,9 @@ const QuestionV1: React.FC<IProps> = (props) => {
             return <></>
         })
     }
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        event.target.value && onAnswer && onAnswer(event.target.value)
+    }
     return (
         <Card sx={{ p: 10 }}>
             <Typography color={"#FF8A8A"} fontWeight={800}>
@@ -51,7 +54,7 @@ const QuestionV1: React.FC<IProps> = (props) => {
             </Typography>
             <img src={question.imgContent} alt="question" />
             <FormControl>
-                <RadioGroup name="radio-buttons-group" >
+                <RadioGroup name="radio-buttons-group" onChange={(e)=>{handleChange(e)}}>
                     {renderAllAnswerNotNull(question)}
                 </RadioGroup>
             </FormControl>

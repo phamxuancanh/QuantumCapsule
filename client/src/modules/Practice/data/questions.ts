@@ -1,6 +1,6 @@
 import { IQuestion } from "api/practice/question.interfaces";
 
-export const questions: IQuestion[] = [
+export const data: IQuestion[] = [
     //init questions
     {
         title: "Câu hỏi 1",
@@ -16,9 +16,9 @@ export const questions: IQuestion[] = [
         correctAnswer: "2",
         explainAnswer: "Kotaiete kudasai",
         score: 10,
-        idSubject: "1",
-        idLesson: "1",
-        idTopic: "1"
+        subjectId: "1",
+        lessonId: "1",
+        topicId: "1"
     },
     {
         content: "Câu hỏi 2",
@@ -33,9 +33,9 @@ export const questions: IQuestion[] = [
         correctAnswer: "Đáp án 1",
         explainAnswer: "Giải thích câu trả lời",
         score: 10,
-        idSubject: "1",
-        idLesson: "1",
-        idTopic: "1"
+        subjectId: "1",
+        lessonId: "1",
+        topicId: "1"
     },
 
 ]

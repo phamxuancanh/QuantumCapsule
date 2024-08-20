@@ -1,20 +1,23 @@
 import React, { useEffect } from 'react';
-import { useListAnswer, useListQuestion, useTotalScore } from './context/context';
+import { useCurrentQuestion, useListAnswer, useListQuestion, useTotalScore } from './context/context';
 import QuestionBox from 'modules/Practice/components/question-box/QuestionBox';
-import { questions } from './data/questions';
+import { data } from './data/questions';
+import { InitListAnswerFromListQuestion } from 'helpers/PracticeHelper/QuestionHelper';
+import { Button, Grid } from '@mui/material';
 
 const Practice: React.FC = () => {
     const {totalScore, setTotalScore} = useTotalScore();
     const {listQuestion, setListQuestion} = useListQuestion();
     const {listAnswer, setListAnswer} = useListAnswer();
+    const {currentQuestion, setCurrentQuestion} = useCurrentQuestion();
     useEffect(() => {
-        setListQuestion(questions)
+        setListQuestion(data)
+        setListAnswer(InitListAnswerFromListQuestion(data))
+        setCurrentQuestion(data[0])
     }, []);
     return (
         <div>
-            {listQuestion.map((question, index) => {
-                return <QuestionBox  question={question} key={index}/>
-            })}
+            <QuestionBox question={currentQuestion}/>
         </div>
     );
 };

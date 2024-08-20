@@ -10,7 +10,6 @@ import Charts from './tabs/testComponents/Charts';
 
 import TableCustom from './tabs/testComponents/TableCustom';
 import TabMenu from 'components/menus/tabMenu/TabMenu';
-import ExamSystem from './tabs/examination/ExamSystem';
 const DevPage: React.FC = () => {
     
     return (
@@ -28,10 +27,6 @@ const DevPage: React.FC = () => {
                         {
                             index: 1, label: 'payment',
                             item: <Payment />
-                        },
-                        {
-                            index: 2, label: 'Examination System',
-                            item: <ExamSystem />
                         },
                         {
                             index: 3, label: 'charts',

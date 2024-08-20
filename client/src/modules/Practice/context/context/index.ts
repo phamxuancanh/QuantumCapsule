@@ -26,6 +26,13 @@ export const useListAnswer = () => {
   }
   return context.listAnswer;
 }
+export const useCurrentQuestion = () => {
+  const context = useContext(Context);
+  if (!context) {
+    throw new Error('uselistAnswer must be used within a Provider');
+  }
+  return context.currentQuestion;
+}
 
 
 export default Context;
