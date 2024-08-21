@@ -10,6 +10,7 @@ const ROUTES = {
     email_verify_send: '/verify/email/send',
     email_verify_success: '/verify/email/success',
     reset_password: '/reset_password',
-    profile: '/profile'
+    profile: '/profile',
+    skill_practice: '/skill_practice',
 }
 export default ROUTES

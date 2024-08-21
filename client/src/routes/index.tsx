@@ -46,6 +46,9 @@ const ResetPassword = loadable(async () => await import('pages/reset_password'),
 const Profile = loadable(async () => await import('pages/profile'), {
     fallback: <Loading />
 })
+const SkillPractice = loadable(async () => await import('modules/Practice/PracticeProvider'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -128,8 +131,16 @@ const routes: RouteObject[] = [
             <LayoutDefault />
         ),
         children: [
-           
             { path: ROUTES.dev, element: <Dev /> }
+        ]
+    },
+    {
+        path: ROUTES.skill_practice,
+        element: (
+            <LayoutDefault />
+        ),
+        children: [
+            { path: ROUTES.skill_practice, element: <SkillPractice /> }
         ]
     }
     
