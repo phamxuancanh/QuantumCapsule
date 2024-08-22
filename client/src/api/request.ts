@@ -12,6 +12,7 @@ import { refresh } from 'api/user/api'
 import { jwtDecode } from 'jwt-decode'
 import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
+import { countReset } from 'console'
 interface IBaseErrorResponse {
   code: string
   status: number
@@ -32,7 +33,6 @@ const checkTokenValidity = (token: string) => {
     return false
   }
 }
-
 requestWithJwt.interceptors.response.use(
   (response) => {
     console.log('Request successful');

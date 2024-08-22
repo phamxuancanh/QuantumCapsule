@@ -9,6 +9,11 @@ import icon_category from '../../assets/icon_category.png';
 import earth from '../../assets/userCover.png';
 import Select from 'react-select'
 import ProgressBar from '@ramonak/react-progress-bar'
+import VideocamIcon from '@mui/icons-material/Videocam'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import DonutLargeIcon from '@mui/icons-material/DonutLarge'
+import QuizIcon from '@mui/icons-material/Quiz'
+import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye'
 const SkillList = () => {
     const [selectedClass, setSelectedClass] = useState('');
     const [classes, setClasses] = useState([
@@ -82,8 +87,32 @@ const SkillList = () => {
                     </div>
                 </div>
 
-                <div className='tw-flex tw-w-full tw-space-x-20'>
-                    <div className='tw-w-1/4 tw-border tw-rounded-2xl tw-bg-white'>FSDFSD</div>
+                <div className='tw-flex tw-w-full tw-space-x-16'>
+                    <div className='tw-w-1/4 tw-border tw-rounded-2xl tw-bg-white tw-h-fit'>
+                        <div className='tw-bg-green-400 tw-font-bold tw-text-lg tw-text-center tw-rounded-t-2xl tw-p-3'>Nội dung</div>
+                        <div className='tw-border tw-rounded-md tw-p-1 tw-m-2'>
+                            <input placeholder='Tim nhanh ki nang'></input>
+                        </div>
+                        <div className='tw-p-2 tw-h-[1000px] tw-rounded-2xl tw-overflow-y-auto tw-space-y-2'>
+                            <div className='tw-bg-blue-200 tw-border tw-rounded-2xl tw-flex tw-p-5 tw-space-x-2'>
+                                <PanoramaFishEyeIcon />
+                                <div className='tw-flex tw-flex-col'>
+                                    <div className='tw-font-bold tw-text-lg'>Cac so tu 0 toi 10</div>
+                                    <div className='tw-text-slate-500'>Chu diem: 5</div>
+                                    <div className='tw-text-slate-500'>Chu diem: 5</div>
+                                </div>
+                            </div>
+                            <div className='tw-bg-blue-200 tw-border tw-rounded-2xl tw-flex tw-p-5 tw-space-x-2'>
+                                <PanoramaFishEyeIcon />
+                                <div className='tw-flex tw-flex-col'>
+                                    <div className='tw-font-bold tw-text-lg'>Cac so tu 0 toi 10</div>
+                                    <div className='tw-text-slate-500'>Chu diem: 5</div>
+                                    <div className='tw-text-slate-500'>Chu diem: 5</div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
                     <div className='tw-flex-col tw-w-3/4 tw-border tw-space-y-10'>
                         <div className='tw-w-full tw-border tw-rounded-2xl tw-bg-white'>
                             <div className='tw-flex tw-justify-between tw-border-b tw-border-dashed tw-p-5 tw-mx-4'>
@@ -128,20 +157,123 @@ const SkillList = () => {
 
                         <div className='tw-bg-white tw-border tw-rounded-2xl'>
                             <div className="tw-grid tw-grid-cols-2 tw-gap-4 tw-p-5">
-                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
-                                    <img src={earth}/>
+                                <div className="tw-bg-white tw-border tw-rounded-2xl tw-space-y-3">
+                                    <div className="tw-relative tw-rounded-t-2xl overflow-hidden">
+                                        <img src={earth} className="tw-rounded-t-2xl tw-transition-opacity tw-duration-300 tw-w-full tw-h-auto" />
+                                        <div className="tw-absolute tw-inset-0 tw-bg-black tw-opacity-0 hover:tw-opacity-50 tw-transition-opacity tw-duration-300 tw-flex tw-justify-center tw-items-center tw-rounded-t-2xl">
+                                            <VideocamIcon className="tw-mx-2 tw-text-white tw-cursor-pointer" />
+                                            <AssignmentIcon className="tw-mx-2 tw-text-white tw-cursor-pointer" />
+                                        </div>
+                                    </div>
+                                    <div className='tw-mx-5 tw-font-bold tw-text-lg'>1. Cac so 1 2 3</div>
+                                    <div className='tw-flex tw-justify-between tw-items-center tw-p-4'>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer'>
+                                            <VideocamIcon />
+                                            <div className='tw-text-center tw-text-sm'>VIDEO LY THUYET</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer'>
+                                            <AssignmentIcon />
+                                            <div className='tw-text-center tw-text-sm'>THUC HANH</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center tw-cursor-pointer'>
+                                            <DonutLargeIcon />
+                                            <div className='tw-text-center tw-text-sm'>TIEN DO</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
-                                    Nội dung của cột 2
+
+                                <div className="tw-bg-white tw-border tw-rounded-2xl tw-space-y-3">
+                                    <img src={earth} className="tw-rounded-t-2xl" />
+                                    <div className='tw-mx-5 tw-font-bold tw-text-lg'>1. Cac so 1 2 3</div>
+                                    <div className='tw-flex tw-justify-between tw-items-center tw-p-4'>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <VideocamIcon />
+                                            <div className='tw-text-center tw-text-sm tw-cursor-pointer'>VIDEO LY THUYET</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <AssignmentIcon />
+                                            <div className='tw-text-center tw-text-sm tw-cursor-pointer'>THUC HANH</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <DonutLargeIcon />
+                                            <div className='tw-text-center tw-text-sm tw-cursor-pointer'>TIEN DO</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
-                                    Nội dung của cột 3
+                                <div className="tw-bg-white tw-border tw-rounded-2xl tw-space-y-3">
+                                    <img src={earth} className="tw-rounded-t-2xl" />
+                                    <div className='tw-mx-5 tw-font-bold tw-text-lg'>1. Cac so 1 2 3</div>
+                                    <div className='tw-flex tw-justify-between tw-items-center tw-p-4'>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <VideocamIcon />
+                                            <div className='tw-text-center tw-text-sm tw-cursor-pointer'>VIDEO LY THUYET</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <AssignmentIcon />
+                                            <div className='tw-text-center tw-text-sm'>THUC HANH</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <DonutLargeIcon />
+                                            <div className='tw-text-center tw-text-sm'>TIEN DO</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
-                                    Nội dung của cột 4
+                            </div>
+                            <div className='tw-font-bold tw-text-xl tw-px-6 tw-py-2'><QuizIcon fontSize='large' />BAI KIEM TRA</div>
+                            <div className="tw-grid tw-grid-cols-2 tw-gap-4 tw-p-5">
+                                <div className="tw-bg-white tw-border tw-rounded-2xl tw-space-y-3">
+                                    <img src={earth} className="tw-rounded-t-2xl" />
+                                    <div className='tw-mx-5 tw-font-bold tw-text-lg'>1. Cac so 1 2 3</div>
+                                    <div className='tw-flex tw-justify-between tw-items-center tw-p-4'>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <VideocamIcon />
+                                            <div className='tw-text-center tw-text-sm'>VIDEO LY THUYET</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <AssignmentIcon />
+                                            <div className='tw-text-center tw-text-sm'>THUC HANH</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <DonutLargeIcon />
+                                            <div className='tw-text-center tw-text-sm'>TIEN DO</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="tw-bg-blue-200 tw-border tw-rounded-2xl">
-                                    Nội dung của cột 4
+                                <div className="tw-bg-white tw-border tw-rounded-2xl tw-space-y-3">
+                                    <img src={earth} className="tw-rounded-t-2xl" />
+                                    <div className='tw-mx-5 tw-font-bold tw-text-lg'>1. Cac so 1 2 3</div>
+                                    <div className='tw-flex tw-justify-between tw-items-center tw-p-4'>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <VideocamIcon />
+                                            <div className='tw-text-center tw-text-sm'>VIDEO LY THUYET</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <AssignmentIcon />
+                                            <div className='tw-text-center tw-text-sm'>THUC HANH</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <DonutLargeIcon />
+                                            <div className='tw-text-center tw-text-sm'>TIEN DO</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="tw-bg-white tw-border tw-rounded-2xl tw-space-y-3">
+                                    <img src={earth} className="tw-rounded-t-2xl" />
+                                    <div className='tw-mx-5 tw-font-bold tw-text-lg'>1. Cac so 1 2 3</div>
+                                    <div className='tw-flex tw-justify-between tw-items-center tw-p-4'>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <VideocamIcon />
+                                            <div className='tw-text-center tw-text-sm'>VIDEO LY THUYET</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <AssignmentIcon />
+                                            <div className='tw-text-center tw-text-sm'>THUC HANH</div>
+                                        </div>
+                                        <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
+                                            <DonutLargeIcon />
+                                            <div className='tw-text-center tw-text-sm'>TIEN DO</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

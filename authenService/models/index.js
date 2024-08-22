@@ -5,6 +5,9 @@ const Role = require('./role')
 const RoleToPermission = require('./role_to_permission')
 const Route = require('./route')
 const Grid = require('./grid')
+const Subject = require('./subject')
+const Skill = require('./skill')
+const Topic = require('./topic')
 
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
@@ -15,6 +18,12 @@ RoleToPermission.belongsTo(Permission, { foreignKey: 'permissionId' })
 Role.belongsToMany(Permission, { through: RoleToPermission, foreignKey: 'roleId' })
 Permission.belongsToMany(Role, { through: RoleToPermission, foreignKey: 'permissionId' })
 
+Subject.hasMany(Skill, { foreignKey: 'subjectId' })
+Skill.belongsTo(Subject, { foreignKey: 'subjectId' })
+
+Skill.hasMany(Topic, { foreignKey: 'skillId' })
+Topic.belongsTo(Skill, { foreignKey: 'skillId' })
+
 module.exports = {
   sequelize,
   models: {
@@ -23,6 +32,9 @@ module.exports = {
     Role,
     RoleToPermission,
     Route,
-    Grid
+    Grid,
+    Subject,
+    Skill,
+    Topic
   }
 }

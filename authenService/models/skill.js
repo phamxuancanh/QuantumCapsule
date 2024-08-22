@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Role = sequelize.define(
-  'Role',
+const Skill = sequelize.define(
+  'Skill',
   {
     id: {
       type: DataTypes.BIGINT,
@@ -11,18 +11,27 @@ const Role = sequelize.define(
       unique: true,
       primaryKey: true
     },
-    name: {
-      type: DataTypes.STRING,
+    subjectId: {
+      type: DataTypes.BIGINT,
       allowNull: false
+    },
+    name: {
+      type: DataTypes.STRING
     },
     description: {
       type: DataTypes.STRING
+    },
+    grade: {
+      type: DataTypes.INTEGER
+    },
+    order: {
+      type: DataTypes.INTEGER
     }
   },
   {
-    tableName: 'roles',
+    tableName: 'skills',
     timestamps: true
   }
 )
 
-module.exports = Role
+module.exports = Skill

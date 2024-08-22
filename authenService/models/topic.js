@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Permission = sequelize.define(
-  'Permission',
+const Topic = sequelize.define(
+  'Topic',
   {
     id: {
       type: DataTypes.BIGINT,
@@ -11,24 +11,31 @@ const Permission = sequelize.define(
       unique: true,
       primaryKey: true
     },
+    skillId: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      primaryKey: true
+    },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: DataTypes.STRING
     },
     description: {
       type: DataTypes.STRING
     },
-    method: {
-      type: DataTypes.STRING
+    order: {
+      type: DataTypes.INTEGER
     },
     url: {
+      type: DataTypes.STRING
+    },
+    picture: {
       type: DataTypes.STRING
     }
   },
   {
-    tableName: 'permission',
+    tableName: 'topics',
     timestamps: true
   }
 )
 
-module.exports = Permission
+module.exports = Topic
