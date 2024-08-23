@@ -25,7 +25,7 @@ const seedDatabase = async () => {
     await seedNotificationRecipients()
     await seedComments()
     await seedConversations()
-    await seedUserConversations
+    await seedUserConversations()
   } catch (error) {
     console.log(`Failed to seed database: ${error}`)
   }
