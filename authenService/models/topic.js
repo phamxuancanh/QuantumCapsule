@@ -22,6 +22,10 @@ const Topic = sequelize.define(
     description: {
       type: DataTypes.STRING
     },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     order: {
       type: DataTypes.INTEGER
     },
@@ -30,6 +34,10 @@ const Topic = sequelize.define(
     },
     picture: {
       type: DataTypes.STRING
+    },
+    uploadedBy: {
+      type: DataTypes.BIGINT,
+      allowNull: true
     }
   },
   {

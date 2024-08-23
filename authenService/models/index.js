@@ -8,7 +8,9 @@ const Grid = require('./grid')
 const Subject = require('./subject')
 const Skill = require('./skill')
 const Topic = require('./topic')
-
+const Comment = require('./comment')
+const Notification = require('./notification')
+const NotificationRecipient = require('./notification_recipient')
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
 
@@ -24,6 +26,18 @@ Skill.belongsTo(Subject, { foreignKey: 'subjectId' })
 Skill.hasMany(Topic, { foreignKey: 'skillId' })
 Topic.belongsTo(Skill, { foreignKey: 'skillId' })
 
+Comment.belongsTo(Topic, { foreignKey: 'topicId' })
+Comment.belongsTo(User, { foreignKey: 'userId' })
+
+Topic.belongsToMany(User, { through: Comment, foreignKey: 'topicId' })
+User.belongsToMany(Topic, { through: Comment, foreignKey: 'userId' })
+
+NotificationRecipient.belongsTo(User, { foreignKey: 'userId' })
+NotificationRecipient.belongsTo(Notification, { foreignKey: 'notificationId' })
+
+User.belongsToMany(Notification, { through: NotificationRecipient, foreignKey: 'userId' })
+Notification.belongsToMany(User, { through: NotificationRecipient, foreignKey: 'notificationId' })
+
 module.exports = {
   sequelize,
   models: {
@@ -35,6 +49,9 @@ module.exports = {
     Grid,
     Subject,
     Skill,
-    Topic
+    Topic,
+    Comment,
+    Notification,
+    NotificationRecipient
   }
 }

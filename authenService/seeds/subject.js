@@ -4,26 +4,26 @@ const Subject = require('../models/subject')
 const sampleNames = ['Toán', 'Tiếng Việt', 'Toán Tiếng Anh']
 
 const generateSubject = async () => {
-  const categoryCourses = []
+  const subjects = []
 
   for (let i = 0; i < sampleNames.length; i++) {
     const name = sampleNames[i]
-    categoryCourses.push({
+    subjects.push({
       name,
       createdAt: faker.date.past(),
       updatedAt: faker.date.recent()
     })
   }
 
-  return categoryCourses
+  return subjects
 }
 
 const seedSubjects = async () => {
-  const categoryCourses = await generateSubject()
+  const subjects = await generateSubject()
   try {
     const count = await Subject.count()
     if (count === 0) {
-      await Subject.bulkCreate(categoryCourses, { validate: true })
+      await Subject.bulkCreate(subjects, { validate: true })
     } else {
       console.log('Subject table is not empty.')
     }

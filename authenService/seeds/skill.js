@@ -1,57 +1,97 @@
 const { fakerEN: faker } = require('@faker-js/faker')
-const Course = require('../models/course')
-const CategoryLession = require('../models/category_lession')
+const Subject = require('../models/subject')
+const Skill = require('../models/skill')
 
 const sampleNames = [
-  'Các số từ 0 đến 10', 'So sánh vị trí, nhiều ít, lớn bé', 'Hình học', 'Phép cộng trong phạm vi đến 10', 'Ôn tập chủ để "Hình học, đo lường"', 'Phép trừ trong phạm vi đến 10',
-  'Ôn tập các số đến 10', 'Bài kiểm tra', 'Thi giữa kì 1', 'Thi cuối học kì'
+  'Frontend', 'Backend', 'NodeJS', 'Docker', 'Golang', 'Python',
+  'UX/UI Design', 'Digital Marketing', 'Project Management', 'Testing',
+  'Data Science', 'Machine Learning', 'Cybersecurity', 'Cloud Computing',
+  'Mobile Development', 'Artificial Intelligence', 'Blockchain',
+  'Big Data', 'Web Development', 'iOS Development', 'Android Development',
+  'Network Security', 'Game Development', 'DevOps', 'UI/UX Design',
+  'Software Engineering', 'Internet of Things', 'Agile Development',
+  'Database Management', 'Computer Vision', 'Natural Language Processing',
+  'UI Design Fundamentals', 'Web Security', 'Server Administration',
+  'Network Engineering', 'Embedded Systems', 'Software Testing',
+  'Content Management Systems', 'IoT Protocols', 'Cloud Security',
+  'eCommerce Platforms', 'Data Analysis', 'Algorithm Design',
+  'Project Planning', 'API Development', 'Machine Learning Algorithms',
+  'Mobile App Design'
 ]
 
-const generateCategoryLession = async () => {
-  const categoryLessions = []
-  const courses = await Course.findAll()
+const generateSkill = async () => {
+  const skills = []
+  const subjects = await Subject.findAll()
 
-  for (let i = 0; i < courses.length; i++) {
-    const course = courses[i]
-    const courseId = course.id
+  for (let i = 0; i < subjects.length; i++) {
+    const subject = subjects[i]
+    const subjectId = subject.id
     let sampleNamesCopy = [...sampleNames]
-    const numLessons = Math.floor(Math.random() * 4) + 3
-    let order = 1
-    const checkUpDate = new Date()
-    for (let j = 0; j < numLessons; j++) {
+    let totalSkillsForSubject = 0
+    const gradeCount = Array(12).fill(0)
+
+    for (let grade = 1; grade <= 12; grade++) {
+      for (let j = 0; j < 10; j++) {
+        const randomIndex = Math.floor(Math.random() * sampleNamesCopy.length)
+        const categoryLessonName = sampleNamesCopy[randomIndex]
+        sampleNamesCopy = sampleNamesCopy.filter((_, index) => index !== randomIndex)
+
+        skills.push({
+          subjectId,
+          name: categoryLessonName,
+          desciption: faker.lorem.sentence(),
+          grade,
+          order: totalSkillsForSubject + 1,
+          createAt: faker.date.past(),
+          updatedAt: faker.date.recent()
+        })
+        gradeCount[grade - 1] += 1
+        totalSkillsForSubject += 1
+
+        if (sampleNamesCopy.length === 0) {
+          sampleNamesCopy = [...sampleNames]
+        }
+      }
+    }
+
+    while (totalSkillsForSubject < 100) {
       const randomIndex = Math.floor(Math.random() * sampleNamesCopy.length)
       const categoryLessonName = sampleNamesCopy[randomIndex]
       sampleNamesCopy = sampleNamesCopy.filter((_, index) => index !== randomIndex)
 
-      categoryLessions.push({
-        courseId,
+      const grade = Math.floor(Math.random() * 12) + 1
+
+      skills.push({
+        subjectId,
         name: categoryLessonName,
-        order,
-        checkUpDate,
+        desciption: faker.lorem.sentence(),
+        grade,
+        order: totalSkillsForSubject + 1,
         createAt: faker.date.past(),
         updatedAt: faker.date.recent()
       })
-      order += 1
+      gradeCount[grade - 1] += 1
+      totalSkillsForSubject += 1
       if (sampleNamesCopy.length === 0) {
         sampleNamesCopy = [...sampleNames]
       }
     }
   }
-  return categoryLessions
+  return skills
 }
 
-const seedCategoryLession = async () => {
+const seedSkill = async () => {
   try {
-    const count = await CategoryLession.count()
+    const count = await Skill.count()
     if (count === 0) {
-      const categorylessions = await generateCategoryLession()
-      await CategoryLession.bulkCreate(categorylessions, { validate: true })
+      const skills = await generateSkill()
+      await Skill.bulkCreate(skills, { validate: true })
     } else {
-      console.log('CategoryLession table is not empty.')
+      console.log('Skill table is not empty.')
     }
   } catch (error) {
-    console.log(`Failed to seed CategoryLession data: ${error}`)
+    console.log(`Failed to seed Skill data: ${error}`)
   }
 }
 
-module.exports = seedCategoryLession
+module.exports = seedSkill
