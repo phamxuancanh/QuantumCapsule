@@ -20,6 +20,10 @@ export interface IProvider {
     listAnswer: IAnswer[]
     setListAnswer: React.Dispatch<React.SetStateAction<IAnswer[]>>
   }
+  currentQuestion: {
+    currentQuestion: IQuestion
+    setCurrentQuestion: React.Dispatch<React.SetStateAction<IQuestion>>
+  }
 }
 
 const Provider: React.FC<IProps> = ({ children }) => {
@@ -28,6 +32,7 @@ const Provider: React.FC<IProps> = ({ children }) => {
     const [totalScore, setTotalScore] = React.useState<number>(0)
     const [listQuestion, setListQuestion] = React.useState<IQuestion[]>([])
     const [listAnswer, setListAnswer] = React.useState<IAnswer[]>([])
+    const [currentQuestion, setCurrentQuestion] = React.useState<IQuestion>({})
 
     const state: IProvider = {
         totalScore: {
@@ -41,6 +46,10 @@ const Provider: React.FC<IProps> = ({ children }) => {
         listAnswer:{
             listAnswer,
             setListAnswer,  
+        },
+        currentQuestion: {
+            currentQuestion,
+            setCurrentQuestion,
         }
     }
     return (
