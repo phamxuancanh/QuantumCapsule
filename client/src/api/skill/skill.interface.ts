@@ -11,6 +11,11 @@ import { IBaseResponse } from '../interfaces'
 // export interface IPostListResponse extends IBaseResponse {
 //     data: IPostData[]
 // }
+export interface ISkill{
+    id?: string
+    name?: string
+    subjectId?: string
+}
 
 export interface IGetTableData {
     tableName: string;
