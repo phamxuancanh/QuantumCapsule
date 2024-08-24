@@ -1,7 +1,8 @@
 import React from "react"
 // import { IProvider } from "../context"
 import Context from "../context"
-import { IQuestion, IAnswer } from "api/practice/question.interfaces"
+import { IQuestion } from "api/question/question.interfaces"
+import { IAnswer } from "api/answer/answer.interfaces"
 
 interface IProps {
     children: React.ReactNode

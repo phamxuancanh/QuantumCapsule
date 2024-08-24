@@ -1,5 +1,6 @@
 import { Card, Typography } from '@mui/material';
-import { IAnswer, IQuestion } from 'api/practice/question.interfaces';
+import { IAnswer } from 'api/answer/answer.interfaces';
+import { IQuestion } from 'api/question/question.interfaces';
 import React from 'react';
 
 interface IProps {
@@ -18,7 +19,7 @@ const ExplainAnswerV1: React.FC<IProps> = (props) => {
             <Typography color={"#1E201E"} fontWeight={600}>
                 {question.content}
             </Typography>
-            <img src={question.imgContent} alt="question" />
+            <img src={question.contentImg} alt="question" />
             <Typography color={answer.isCorrect? "#06D001": "#C80036"} fontWeight={600}>
                 Câu trả lời của bạn là: {answer.yourAnswer}
             </Typography>

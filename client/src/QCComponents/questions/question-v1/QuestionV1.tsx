@@ -8,7 +8,7 @@ import {
     RadioGroup,
     Typography,
 } from "@mui/material"
-import { IQuestion } from "api/practice/question.interfaces"
+import { IQuestion } from "api/question/question.interfaces"
 import React from "react"
 
 interface IProps {
@@ -21,11 +21,11 @@ const QuestionV1: React.FC<IProps> = (props) => {
     const { question, onAnswer } = props
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
-            question.answer1,
-            question.answer2,
-            question.answer3,
-            question.answer4,
-            question.answer5,
+            question.answerA,
+            question.answerB,
+            question.answerC,
+            question.answerD,
+            question.answerE,
         ]
         return answers.map((answer, index) => {
             if (answer) {
@@ -52,7 +52,7 @@ const QuestionV1: React.FC<IProps> = (props) => {
             <Typography color={"#1E201E"} fontWeight={600}>
                 {question.content}
             </Typography>
-            <img src={question.imgContent} alt="question" />
+            <img src={question.contentImg} alt="question" />
             <FormControl>
                 <RadioGroup name="radio-buttons-group" onChange={(e)=>{handleChange(e)}}>
                     {renderAllAnswerNotNull(question)}
