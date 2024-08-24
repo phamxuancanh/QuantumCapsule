@@ -36,9 +36,11 @@ const generateComment = async () => {
   }
 
   // Nếu muốn thêm nhiều comment ngẫu nhiên hơn, thêm logic này sau đó
-  while (comments.length < 6) { // hoặc số lượng comment bạn muốn tạo thêm
+  while (comments.length < 2) { // hoặc số lượng comment bạn muốn tạo thêm
     const userId = await generateUserId()
     const topicId = topics[Math.floor(Math.random() * topics.length)].id
+    console.log(topicId)
+    console.log(topicId)
     const pair = `${userId}-${topicId}`
 
     if (!usedPairs.has(pair)) {
