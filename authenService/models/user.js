@@ -28,9 +28,8 @@ const User = sequelize.define(
       type: DataTypes.STRING
     },
     type: {
-      type: DataTypes.ENUM,
-      values: ['parent', 'student'],
-      allowNull: false
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     address: {
       type: DataTypes.STRING

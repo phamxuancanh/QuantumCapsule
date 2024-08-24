@@ -14,6 +14,12 @@ const NotificationRecipient = require('./notification_recipient')
 const Conversation = require('./conversation')
 const UserConversations = require('./user_conversation')
 const Message = require('./message')
+const Exam = require('./exam')
+const Practice = require('./practice')
+const Question = require('./question')
+const Answer = require('./answer')
+const Result = require('./result')
+
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
 
@@ -53,6 +59,18 @@ Message.belongsTo(Conversation, { foreignKey: 'conversationId' })
 User.belongsToMany(Conversation, { through: Message, foreignKey: 'userId' })
 Conversation.belongsToMany(User, { through: Message, foreignKey: 'conversationId' })
 
+Exam.hasMany(Question, { foreignKey: 'examId' })
+Question.belongsTo(Exam, { foreignKey: 'questionId' })
+
+Practice.hasMany(Question, { foreignKey: 'practiceId' })
+Question.belongsTo(Practice, { foreignKey: 'questionId' })
+
+Question.hasMany(Answer, { foreignKey: 'questionId' })
+Answer.belongsTo(Question, { foreignKey: 'answerId' })
+
+Answer.hasMany(Result, { foreignKey: 'answerId' })
+Result.belongsTo(Answer, { foreignKey: 'resultId' })
+
 module.exports = {
   sequelize,
   models: {
@@ -68,6 +86,11 @@ module.exports = {
     Comment,
     Notification,
     NotificationRecipient,
-    Message
+    Message,
+    Exam,
+    Practice,
+    Question,
+    Answer,
+    Result
   }
 }

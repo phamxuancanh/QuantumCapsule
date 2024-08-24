@@ -11,6 +11,8 @@ const seedNotificationRecipients = require('./notification_recipient')
 const seedComments = require('./comment')
 const seedConversations = require('./conversation')
 const seedUserConversations = require('./user_conversation')
+const seedExams = require('./exam')
+const seedPractices = require('./practice')
 const seedDatabase = async () => {
   try {
     await seedPermissions()
@@ -26,6 +28,8 @@ const seedDatabase = async () => {
     await seedComments()
     await seedConversations()
     await seedUserConversations()
+    await seedExams()
+    await seedPractices()
   } catch (error) {
     console.log(`Failed to seed database: ${error}`)
   }

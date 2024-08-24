@@ -1,7 +1,7 @@
 const { fakerEN: faker } = require('@faker-js/faker')
 const Subject = require('../models/subject')
 
-const sampleNames = ['Toán', 'Tiếng Việt', 'Toán Tiếng Anh']
+const sampleNames = ['Toan', 'Tieng viet', 'Toan Tieng Anh']
 
 const generateSubject = async () => {
   const subjects = []
