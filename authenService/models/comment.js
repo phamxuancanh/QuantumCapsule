@@ -1,29 +1,35 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const RoleToPermission = sequelize.define(
-  'RoleToPermission',
+const Comment = sequelize.define(
+  'Comment',
   {
-    roleId: {
+    topicId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    permissionId: {
+    userId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
+    },
+    status: {
+      type: DataTypes.BOOLEAN
+    },
+    content: {
+      type: DataTypes.STRING
     }
   },
   {
-    tableName: 'role_to_permission',
+    tableName: 'comment',
     indexes: [
       {
         unique: true,
-        fields: ['roleId', 'permissionId']
+        fields: ['topicId', 'userId']
       }
     ],
     timestamps: true
   }
 )
-module.exports = RoleToPermission
+module.exports = Comment

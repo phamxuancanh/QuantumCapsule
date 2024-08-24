@@ -1,29 +1,29 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const RoleToPermission = sequelize.define(
-  'RoleToPermission',
+const UserConversations = sequelize.define(
+  'UserConversations',
   {
-    roleId: {
+    userId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    permissionId: {
+    conversationId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     }
   },
   {
-    tableName: 'role_to_permission',
+    tableName: 'user_conversations',
     indexes: [
       {
         unique: true,
-        fields: ['roleId', 'permissionId']
+        fields: ['userId', 'conversationId']
       }
     ],
     timestamps: true
   }
 )
-module.exports = RoleToPermission
+module.exports = UserConversations

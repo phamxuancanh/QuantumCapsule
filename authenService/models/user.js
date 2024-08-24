@@ -27,6 +27,17 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING
     },
+    type: {
+      type: DataTypes.ENUM,
+      values: ['parent', 'student'],
+      allowNull: false
+    },
+    address: {
+      type: DataTypes.STRING
+    },
+    phone: {
+      type: DataTypes.STRING
+    },
     gender: {
       type: DataTypes.STRING
     },
@@ -63,9 +74,11 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: 3
     }
+
   },
   {
-    tableName: 'users'
+    tableName: 'users',
+    timestamps: true
   }
 )
 

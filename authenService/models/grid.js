@@ -66,7 +66,8 @@ const Grid = sequelize.define(
     }
   },
   {
-    tableName: 'grids'
+    tableName: 'grids',
+    timestamps: true
   }
 )
 

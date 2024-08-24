@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Permission = sequelize.define(
-  'Permission',
+const Notification = sequelize.define(
+  'Notification',
   {
     id: {
       type: DataTypes.BIGINT,
@@ -11,24 +11,24 @@ const Permission = sequelize.define(
       unique: true,
       primaryKey: true
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
-    description: {
-      type: DataTypes.STRING
-    },
-    method: {
-      type: DataTypes.STRING
+    message: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     url: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '/canhdeptrai'
     }
   },
   {
-    tableName: 'permission',
+    tableName: 'notifications',
     timestamps: true
   }
 )
 
-module.exports = Permission
+module.exports = Notification

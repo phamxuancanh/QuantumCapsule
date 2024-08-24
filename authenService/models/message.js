@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Role = sequelize.define(
-  'Role',
+const Message = sequelize.define(
+  'Message',
   {
     id: {
       type: DataTypes.BIGINT,
@@ -11,18 +11,25 @@ const Role = sequelize.define(
       unique: true,
       primaryKey: true
     },
-    name: {
+    conversationId: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+    userId: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    description: {
+    content: {
+      type: DataTypes.STRING
+    },
+    status: {
       type: DataTypes.STRING
     }
   },
   {
-    tableName: 'roles',
+    tableName: 'messages',
     timestamps: true
   }
 )
 
-module.exports = Role
+module.exports = Message

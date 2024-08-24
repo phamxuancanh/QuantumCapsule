@@ -15,7 +15,8 @@ const sequelize = new Sequelize(
   {
     host: databaseInfo.host,
     dialect: 'mysql',
-    port: databaseInfo.port
+    port: databaseInfo.port,
+    timezone: '+07:00'
   }
 )
 
