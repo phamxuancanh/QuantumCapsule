@@ -15,8 +15,16 @@ const Practice = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
-    lessonId: {
-      type: DataTypes.STRING,
+    subjectId: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+    skillId: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+    topicId: {
+      type: DataTypes.BIGINT,
       allowNull: false
     },
     uploadedBy: {

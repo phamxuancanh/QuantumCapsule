@@ -27,7 +27,16 @@ const Result = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false
     },
+    subjectId: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+
     skillId: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+    topicId: {
       type: DataTypes.BIGINT,
       allowNull: false
     },
@@ -38,10 +47,6 @@ const Result = sequelize.define(
     examId: {
       type: DataTypes.BIGINT,
       allowNull: false
-    },
-    uploadedBy: {
-      type: DataTypes.BIGINT,
-      allowNull: true
     }
   },
   {

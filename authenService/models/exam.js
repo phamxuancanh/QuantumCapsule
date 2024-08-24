@@ -15,6 +15,14 @@ const Exam = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
+    skillId: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    topicId: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     subjectId: {
       type: DataTypes.STRING,
       allowNull: false

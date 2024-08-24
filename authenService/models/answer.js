@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Question = sequelize.define(
-  'Question',
+const Answer = sequelize.define(
+  'Answer',
   {
     id: {
       type: DataTypes.BIGINT,
@@ -52,6 +52,19 @@ const Question = sequelize.define(
     score: {
       type: DataTypes.INTEGER
     },
+    yourAnswer: {
+      type: DataTypes.STRING
+    },
+    isCorrect: {
+      type: DataTypes.BOOLEAN
+    },
+    userId: {
+      type: DataTypes.BIGINT
+    },
+    resultId: {
+      type: DataTypes.STRING
+    },
+
     subjectId: {
       type: DataTypes.BIGINT
     },
@@ -66,12 +79,15 @@ const Question = sequelize.define(
     },
     examId: {
       type: DataTypes.BIGINT
+    },
+    questionId: {
+      type: DataTypes.BIGINT
     }
   },
   {
-    tableName: 'questions',
+    tableName: 'answers',
     timestamps: true
   }
 )
 
-module.exports = Question
+module.exports = Answer
