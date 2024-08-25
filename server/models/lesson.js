@@ -6,15 +6,14 @@ const Lesson = sequelize.define(
   {
     id: {
       type: DataTypes.STRING,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       unique: true,
       primaryKey: true
     },
     chapterId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      primaryKey: true
+      type: DataTypes.STRING,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING

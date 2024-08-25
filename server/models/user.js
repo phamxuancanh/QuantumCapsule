@@ -6,7 +6,7 @@ const User = sequelize.define(
   {
     id: {
       type: DataTypes.STRING,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       unique: true,
       primaryKey: true
@@ -71,7 +71,7 @@ const User = sequelize.define(
     roleId: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 3
+      defaultValue: 'user'
     }
 
   },

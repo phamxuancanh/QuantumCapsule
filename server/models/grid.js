@@ -8,7 +8,7 @@ const Grid = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      defaultValue: DataTypes.UUIDV4
     },
     tableName: {
       type: DataTypes.STRING,

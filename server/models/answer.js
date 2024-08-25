@@ -6,7 +6,7 @@ const Answer = sequelize.define(
   {
     id: {
       type: DataTypes.STRING,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       unique: true,
       primaryKey: true
