@@ -19,6 +19,10 @@ const Exam = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
+    order: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
     chapterId: {
       type: DataTypes.STRING,
       allowNull: true
