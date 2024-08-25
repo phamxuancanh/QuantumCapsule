@@ -1,35 +1,29 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Comment = sequelize.define(
-  'Comment',
+const ChapterKeyword = sequelize.define(
+  'ChapterKeyword',
   {
-    theoryId: {
+    keywordId: {
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true
     },
-    userId: {
+    chapterId: {
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true
-    },
-    status: {
-      type: DataTypes.BOOLEAN
-    },
-    content: {
-      type: DataTypes.STRING
     }
   },
   {
-    tableName: 'comment',
+    tableName: 'chapter_keyword',
     indexes: [
       {
         unique: true,
-        fields: ['theoryId', 'userId']
+        fields: ['keywordId', 'chapterId']
       }
     ],
     timestamps: true
   }
 )
-module.exports = Comment
+module.exports = ChapterKeyword

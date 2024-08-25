@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Role = sequelize.define(
-  'Role',
+const Keyword = sequelize.define(
+  'Keyword',
   {
     id: {
       type: DataTypes.STRING,
@@ -14,15 +14,12 @@ const Role = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false
-    },
-    description: {
-      type: DataTypes.STRING
     }
   },
   {
-    tableName: 'roles',
+    tableName: 'keywords',
     timestamps: true
   }
 )
 
-module.exports = Role
+module.exports = Keyword
