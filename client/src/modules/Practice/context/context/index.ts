@@ -1,6 +1,4 @@
-import { IAnswer } from 'api/practice/question.interfaces';
 import { createContext, useContext } from 'react';
-import { IQuestion } from 'api/practice/question.interfaces';
 import { IProvider } from '../provider';
 
 

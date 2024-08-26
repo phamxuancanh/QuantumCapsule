@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useCurrentQuestion, useListAnswer, useListQuestion, useTotalScore } from './context/context';
 import QuestionBox from 'modules/Practice/components/question-box/QuestionBox';
 import { data } from './data/questions';
-import { InitListAnswerFromListQuestion } from 'helpers/PracticeHelper/QuestionHelper';
+import { InitListAnswerFromListQuestion } from 'helpers/Nam-helper/ConvertHelper';
 import { Button, Grid } from '@mui/material';
 
 const Practice: React.FC = () => {

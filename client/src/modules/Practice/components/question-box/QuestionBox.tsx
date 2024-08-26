@@ -1,8 +1,14 @@
 import { Box, Button, Card } from "@mui/material"
-import { IAnswer, IQuestion } from "api/practice/question.interfaces"
-import { useCurrentQuestion, useListAnswer, useListQuestion } from "modules/Practice/context/context"
+import { IAnswer } from "api/answer/answer.interfaces"
+import { IQuestion } from "api/question/question.interfaces"
+import {
+    useCurrentQuestion,
+    useListAnswer,
+    useListQuestion,
+} from "modules/Practice/context/context"
 import ExplainAnswerV1 from "QCComponents/explain-answer/explain-answer-v1/ExplainAnswerV1"
 import QuestionV1 from "QCComponents/questions/question-v1/QuestionV1"
+import SpeakerV1 from "QCComponents/speakers/speaker-v1/SpeakerV1"
 import React from "react"
 
 interface IProps {
@@ -11,15 +17,15 @@ interface IProps {
 
 const QuestionBox: React.FC<IProps> = ({ question }) => {
     const { listAnswer, setListAnswer } = useListAnswer()
-    const {currentQuestion, setCurrentQuestion} = useCurrentQuestion()
-    const {listQuestion, setListQuestion} = useListQuestion()
+    const { currentQuestion, setCurrentQuestion } = useCurrentQuestion()
+    const { listQuestion, setListQuestion } = useListQuestion()
     const [openExplain, setOpenExplain] = React.useState(false)
     const [yourAnswer, setYourAnswer] = React.useState("")
     const handleAnswer = (answer: string) => {
         setYourAnswer(answer)
     }
     const handleClickAnswer = () => {
-        const newListAnswer = listAnswer.map((item) => {
+        const newListAnswer = listAnswer.map((item: IAnswer) => {
             if (item.questionId === question.id) {
                 return {
                     ...item,
@@ -34,8 +40,8 @@ const QuestionBox: React.FC<IProps> = ({ question }) => {
     }
     const handleClickNextQuestion = () => {
         setOpenExplain(false)
-        const index = listAnswer.findIndex(
-            (item) => item.questionId === question.id,
+        const index = listQuestion.findIndex(
+            (item: IQuestion) => item.id === question.id,
         )
         if (index < listAnswer.length - 1) {
             setYourAnswer("")
@@ -71,6 +77,11 @@ const QuestionBox: React.FC<IProps> = ({ question }) => {
                 </Box>
             ) : (
                 <Box>
+                    <SpeakerV1
+                        text={question.content!}
+                        label="Đọc câu hỏi"
+                        autoSpeak
+                    />
                     {renderQuestion(question)}
                     <Button
                         variant="contained"
