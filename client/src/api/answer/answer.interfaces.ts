@@ -15,13 +15,11 @@ export interface IAnswer {
     score?: number
     yourAnswer?: string
     isCorrect?: boolean
-    studentId?: string
+    userId?: string
     resultId?: string
     subjectId?: string
-    grade?: number
-    skillId?: string
-    topicId?: string
-    practiceId?: string
+    chapterId?: string
+    lessonId?: string
     examId?: string
     questionId?: string
 }

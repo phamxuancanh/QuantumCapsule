@@ -13,10 +13,8 @@ export interface IQuestion {
     explainAnswer?: string
     score?: number
     subjectId?: string
-    grade?: number
-    skillId?: string
-    topicId?: string
-    practiceId?: string
+    chapterId?: string
+    lessonId?: string
     examId?: string
 }
 
