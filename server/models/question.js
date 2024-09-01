@@ -48,19 +48,7 @@ const Question = sequelize.define(
       type: DataTypes.STRING
     },
     score: {
-      type: DataTypes.INTEGER
-    },
-    subjectId: {
-      type: DataTypes.STRING
-    },
-    chapterId: {
-      type: DataTypes.STRING
-    },
-    lessonId: {
-      type: DataTypes.STRING
-    },
-    examId: {
-      type: DataTypes.STRING
+      type: DataTypes.FLOAT
     }
   },
   {

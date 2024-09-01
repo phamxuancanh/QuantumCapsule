@@ -13,6 +13,10 @@ const Subject = sequelize.define(
     },
     name: {
       type: DataTypes.STRING
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   },
   {

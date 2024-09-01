@@ -26,6 +26,10 @@ const Chapter = sequelize.define(
     },
     order: {
       type: DataTypes.INTEGER
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   },
   {

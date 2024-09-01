@@ -5,19 +5,20 @@ const Grid = require('./grid')
 const Subject = require('./subject')
 const Keyword = require('./keyword')
 const Chapter = require('./chapter')
-const ChapterKeyword = require('./chapter_keyword')
+const TheoryKeyword = require('./theory_keyword')
 const Lesson = require('./lesson')
 const Theory = require('./theory')
 const Exam = require('./exam')
 const Question = require('./question')
 const Answer = require('./answer')
-const Result = require('./result')
+const Scoresheet = require('./scoresheet')
 const Comment = require('./comment')
 const Notification = require('./notification')
 const NotificationRecipient = require('./notification_recipient')
 const Conversation = require('./conversation')
 const UserConversations = require('./user_conversation')
 const Message = require('./message')
+const ExamQuestion = require('./exam_question')
 
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
@@ -28,29 +29,35 @@ Chapter.belongsTo(Subject, { foreignKey: 'subjectId' })
 Chapter.hasMany(Lesson, { foreignKey: 'chapterId' })
 Lesson.belongsTo(Chapter, { foreignKey: 'chapterId' })
 
-ChapterKeyword.belongsTo(Chapter, { foreignKey: 'chapterId' })
-ChapterKeyword.belongsTo(Keyword, { foreignKey: 'keywordId' })
+TheoryKeyword.belongsTo(Theory, { foreignKey: 'theoryId' })
+TheoryKeyword.belongsTo(Keyword, { foreignKey: 'keywordId' })
 
-Chapter.belongsToMany(Keyword, { through: ChapterKeyword, foreignKey: 'chapterId' })
-Keyword.belongsToMany(Chapter, { through: ChapterKeyword, foreignKey: 'keywordId' })
+Theory.belongsToMany(Keyword, { through: TheoryKeyword, foreignKey: 'theoryId' })
+Keyword.belongsToMany(Theory, { through: TheoryKeyword, foreignKey: 'keywordId' })
+
+ExamQuestion.belongsTo(Exam, { foreignKey: 'examId' })
+ExamQuestion.belongsTo(Question, { foreignKey: 'questionId' })
+
+Exam.belongsToMany(Question, { through: ExamQuestion, foreignKey: 'examId' })
+Question.belongsToMany(Exam, { through: ExamQuestion, foreignKey: 'questionId' })
 
 Chapter.hasMany(Exam, { foreignKey: 'chapterId' })
 Exam.belongsTo(Chapter, { foreignKey: 'chapterId' })
 
+Theory.hasMany(Exam, { foreignKey: 'theoryId' })
+Exam.belongsTo(Theory, { foreignKey: 'theoryId' })
+
 Lesson.hasMany(Theory, { foreignKey: 'lessonId' })
 Theory.belongsTo(Chapter, { foreignKey: 'lessonId' })
-
-Lesson.hasMany(Exam, { foreignKey: 'lessonId' })
-Exam.belongsTo(Chapter, { foreignKey: 'lessonId' })
-
-Exam.hasMany(Question, { foreignKey: 'examId' })
-Question.belongsTo(Exam, { foreignKey: 'examId' })
 
 Question.hasMany(Answer, { foreignKey: 'questionId' })
 Answer.belongsTo(Question, { foreignKey: 'questionId' })
 
-Answer.hasMany(Result, { foreignKey: 'answerId' })
-Result.belongsTo(Answer, { foreignKey: 'answerId' })
+Scoresheet.hasMany(Answer, { foreignKey: 'scoresheetId' })
+Answer.belongsTo(Scoresheet, { foreignKey: 'scoresheetId' })
+
+User.hasMany(Scoresheet, { foreignKey: 'userId' })
+Scoresheet.belongsTo(User, { foreignKey: 'userId' })
 
 Comment.belongsTo(Theory, { foreignKey: 'theoryId' })
 Comment.belongsTo(User, { foreignKey: 'userId' })
@@ -84,14 +91,14 @@ module.exports = {
     Grid,
     Subject,
     Chapter,
-    Keyword,
-    ChapterKeyword,
-    Lesson,
     Theory,
+    Keyword,
+    TheoryKeyword,
+    Lesson,
     Exam,
     Question,
     Answer,
-    Result,
+    Scoresheet,
     Notification,
     NotificationRecipient,
     Comment,

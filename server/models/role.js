@@ -17,6 +17,10 @@ const Role = sequelize.define(
     },
     description: {
       type: DataTypes.STRING
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   },
   {

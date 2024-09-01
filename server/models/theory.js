@@ -13,8 +13,7 @@ const Theory = sequelize.define(
     },
     lessonId: {
       type: DataTypes.STRING,
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING
@@ -33,6 +32,10 @@ const Theory = sequelize.define(
     },
     order: {
       type: DataTypes.INTEGER
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   },
   {

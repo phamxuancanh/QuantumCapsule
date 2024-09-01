@@ -4,6 +4,13 @@ const sequelize = require('./init')
 const Comment = sequelize.define(
   'Comment',
   {
+    id: {
+      type: DataTypes.STRING,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      unique: true,
+      primaryKey: true
+    },
     theoryId: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -14,11 +21,15 @@ const Comment = sequelize.define(
       allowNull: false,
       primaryKey: true
     },
-    status: {
+    isView: {
       type: DataTypes.BOOLEAN
     },
     content: {
       type: DataTypes.STRING
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   },
   {
