@@ -72,8 +72,11 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'user'
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
-
   },
   {
     tableName: 'users',

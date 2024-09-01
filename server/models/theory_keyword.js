@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Lesson = sequelize.define(
-  'Lesson',
+const TheoryKeyword = sequelize.define(
+  'TheoryKeyword',
   {
     id: {
       type: DataTypes.STRING,
@@ -11,15 +11,15 @@ const Lesson = sequelize.define(
       unique: true,
       primaryKey: true
     },
-    chapterId: {
+    keywordId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      primaryKey: true
     },
-    name: {
-      type: DataTypes.STRING
-    },
-    order: {
-      type: DataTypes.INTEGER
+    theoryId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true
     },
     status: {
       type: DataTypes.BOOLEAN,
@@ -27,9 +27,14 @@ const Lesson = sequelize.define(
     }
   },
   {
-    tableName: 'lessons',
+    tableName: 'theory_keywords',
+    indexes: [
+      {
+        unique: true,
+        fields: ['keywordId', 'theoryId']
+      }
+    ],
     timestamps: true
   }
 )
-
-module.exports = Lesson
+module.exports = TheoryKeyword

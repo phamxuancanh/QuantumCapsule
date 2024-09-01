@@ -41,7 +41,7 @@ app.use('/', IndexRouter)
 
 async function startServer () {
   try {
-    await sequelize.sync()
+    await sequelize.sync({ logging: console.log })
     console.log('Database synchronized successfully')
     // await seedDatabase()
     console.log('Data seeded successfully')
