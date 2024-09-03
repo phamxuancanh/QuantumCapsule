@@ -21,11 +21,11 @@ const QuestionV1: React.FC<IProps> = (props) => {
     const { question, onAnswer } = props
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
-            question.answerA,
-            question.answerB,
-            question.answerC,
-            question.answerD,
-            question.answerE,
+            question.A,
+            question.B,
+            question.C,
+            question.D,
+            question.E,
         ]
         return answers.map((answer, index) => {
             if (answer) {

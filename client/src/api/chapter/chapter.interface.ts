@@ -5,4 +5,5 @@ export interface IChapter {
     description?: string
     grade?: number
     order?: number
+    status?: boolean
 }

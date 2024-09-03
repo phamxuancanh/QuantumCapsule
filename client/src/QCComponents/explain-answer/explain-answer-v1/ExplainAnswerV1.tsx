@@ -25,7 +25,7 @@ const ExplainAnswerV1: React.FC<IProps> = (props) => {
             </Typography>
             
             <Typography color={"#1E201E"} fontWeight={600}>
-                Câu trả lời đúng là : {answer.correctAnswer}
+                Câu trả lời đúng là : {question.correctAnswer}
             </Typography>
             <Typography color={"#1E201E"} fontWeight={600}>
                 Giải thích: {question.explainAnswer}

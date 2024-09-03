@@ -7,4 +7,5 @@ export interface ITheory {
     url?: string
     type?: string
     order?: number
+    status?: boolean
 }

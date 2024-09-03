@@ -4,4 +4,5 @@ export interface ILesson {
     chapterId?: string
     name?: string
     order?: number
+    status?: boolean
 }
