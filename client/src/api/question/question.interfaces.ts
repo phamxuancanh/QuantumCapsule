@@ -4,18 +4,16 @@ export interface IQuestion {
     title?: string
     content?: string
     contentImg?: string
-    answerA?: string
-    answerB?: string
-    answerC?: string
-    answerD?: string
-    answerE?: string
+    A?: string
+    B?: string
+    C?: string
+    D?: string
+    E?: string
     correctAnswer?: string
     explainAnswer?: string
     score?: number
-    subjectId?: string
-    chapterId?: string
-    lessonId?: string
-    examId?: string
+    status?: boolean
+    theoryId?: string
 }
 
 

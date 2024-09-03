@@ -12,41 +12,27 @@ import SpeakerV1 from "QCComponents/speakers/speaker-v1/SpeakerV1"
 import React from "react"
 
 interface IProps {
-    question: IQuestion
+    isOpen?: boolean
+    onNextQuestionClick?: () => void
 }
 
-const QuestionBox: React.FC<IProps> = ({ question }) => {
+const QuestionBox: React.FC<IProps> = ({isOpen = true, onNextQuestionClick}) => {
     const { listAnswer, setListAnswer } = useListAnswer()
     const { currentQuestion, setCurrentQuestion } = useCurrentQuestion()
     const { listQuestion, setListQuestion } = useListQuestion()
-    const [openExplain, setOpenExplain] = React.useState(false)
-    const [yourAnswer, setYourAnswer] = React.useState("")
-    const handleAnswer = (answer: string) => {
-        setYourAnswer(answer)
-    }
-    const handleClickAnswer = () => {
-        const newListAnswer = listAnswer.map((item: IAnswer) => {
-            if (item.questionId === question.id) {
+
+    const handleAnswer = (yourAnswer: string) => {
+        const newListAnswer = listAnswer.map((answer: IAnswer) => {
+            if (answer.questionId === currentQuestion.id) {
                 return {
-                    ...item,
+                    ...answer,
                     yourAnswer: yourAnswer,
-                    isCorrect: item.correctAnswer === yourAnswer,
+                    isCorrect: currentQuestion.correctAnswer === yourAnswer,
                 } as IAnswer
             }
-            return item
+            return answer
         })
         setListAnswer(newListAnswer)
-        setOpenExplain(true)
-    }
-    const handleClickNextQuestion = () => {
-        setOpenExplain(false)
-        const index = listQuestion.findIndex(
-            (item: IQuestion) => item.id === question.id,
-        )
-        if (index < listAnswer.length - 1) {
-            setYourAnswer("")
-            setCurrentQuestion(listQuestion[index + 1])
-        }
     }
     const renderQuestion = (question: IQuestion) => {
         if (question.questionType === 1) {
@@ -55,44 +41,17 @@ const QuestionBox: React.FC<IProps> = ({ question }) => {
         return <></>
     }
     return (
-        <Box>
-            {openExplain ? (
-                <Box>
-                    <ExplainAnswerV1
-                        question={question}
-                        answer={
-                            listAnswer.find(
-                                (item) => item.questionId === question.id,
-                            ) || {}
-                        }
-                    />
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        color="primary"
-                        onClick={handleClickNextQuestion}
-                    >
-                        câu tiếp theo
-                    </Button>
-                </Box>
-            ) : (
-                <Box>
-                    <SpeakerV1
-                        text={question.content!}
-                        label="Đọc câu hỏi"
-                        autoSpeak
-                    />
-                    {renderQuestion(question)}
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        color="success"
-                        onClick={handleClickAnswer}
-                    >
-                        Trả lời
-                    </Button>
-                </Box>
-            )}
+        <Box display={isOpen ? "block" : "none"}>
+            <SpeakerV1 text={currentQuestion.content!} label="Đọc câu hỏi" autoSpeak />
+            {renderQuestion(currentQuestion)}
+            <Button
+                variant="contained"
+                fullWidth
+                color="success"
+                onClick={onNextQuestionClick}
+            >
+                Câu tiếp theo
+            </Button>
         </Box>
     )
 }

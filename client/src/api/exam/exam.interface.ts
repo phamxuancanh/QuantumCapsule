@@ -4,5 +4,12 @@ export interface IExam {
     order?: number
     lessonId?: string
     chapterId?: string
-    uploadedBy?: string
+    status?: boolean
+}
+
+export interface IExamQuestion {
+    id?: string
+    examId?: string
+    questionId?: string
+    status?: boolean
 }
