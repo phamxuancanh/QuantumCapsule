@@ -6,21 +6,29 @@ const client = require('../middlewares/connectRedis')
 const crypto = require('crypto')
 const { models } = require('../models')
 const signAccessToken = async (userId) => {
-  return new Promise((resolve, reject) => {
-    const payload = {
-      userId
-    }
-    const secret = process.env.ACCESS_TOKEN_SECRET
-    const options = {
-      expiresIn: '30s'
-    }
-    JWT.sign(payload, secret, options, (err, token) => {
-      if (err) reject(err)
-      client.set(userId.toString(), token, 'EX', 30)
-      resolve(token)
+  const payload = {
+    userId
+  }
+  const secret = process.env.ACCESS_TOKEN_SECRET
+  const options = {
+    expiresIn: '2h'
+  }
+
+  try {
+    const token = await new Promise((resolve, reject) => {
+      JWT.sign(payload, secret, options, (err, token) => {
+        if (err) return reject(err)
+        resolve(token)
+      })
     })
-  })
+
+    await client.set(userId.toString(), token, 'EX', 2 * 60 * 60)
+    return token
+  } catch (error) {
+    throw new Error('Error signing access token')
+  }
 }
+
 const verifyAccessToken = (req, res, next) => {
   const [, Authorization] = req.headers.authorization.split(' ')
   console.log(Authorization, 'Authorization')

@@ -3,13 +3,13 @@ const morgan = require('morgan')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const { sequelize } = require('./models')
-// const seedDatabase = require('./seeds/index')
+const seedDatabase = require('./seeds/index')
 const IndexRouter = require('./routes/index')
 const bodyParser = require('body-parser')
 const app = express()
-const passport = require('./middlewares/passport-setup')
+// const passport = require('./middlewares/passport-setup')
 const session = require('express-session')
-// const cors = require('cors')
+const cors = require('cors')
 app.set('trust proxy', true)
 
 app.use(session({
@@ -17,19 +17,28 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }))
-app.use(passport.initialize())
-app.use(passport.session())
+// app.use(passport.initialize())
+// app.use(passport.session())
 
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', `http://localhost:${process.env.CLIENT_PORT}`)
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization')
   res.setHeader('Access-Control-Allow-Credentials', true)
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200)
   }
   next()
 })
+app.use(cors({
+  origin: `http://localhost:${process.env.CLIENT_PORT}`,
+  methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+  allowedHeaders: 'X-Requested-With,Content-Type,Authorization',
+  credentials: true
+}))
 app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -43,7 +52,7 @@ async function startServer () {
   try {
     await sequelize.sync({ logging: console.log })
     console.log('Database synchronized successfully')
-    // await seedDatabase()
+    await seedDatabase()
     console.log('Data seeded successfully')
 
     app.listen(process.env.PORT, () => {

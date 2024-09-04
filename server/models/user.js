@@ -28,8 +28,7 @@ const User = sequelize.define(
       type: DataTypes.STRING
     },
     type: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+      type: DataTypes.STRING
     },
     address: {
       type: DataTypes.STRING
@@ -45,7 +44,7 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     username: {
       type: DataTypes.STRING,
@@ -69,9 +68,9 @@ const User = sequelize.define(
       type: DataTypes.DATE
     },
     roleId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 'user'
+      defaultValue: 3
     },
     status: {
       type: DataTypes.BOOLEAN,

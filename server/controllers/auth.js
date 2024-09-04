@@ -4,17 +4,21 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { models } = require('../models')
 // const client = require('../middlewares/connectRedis')
-const passport = require('../middlewares/passport-setup')
+// const passport = require('../middlewares/passport-setup')
 const nodemailer = require('nodemailer')
 const path = require('path')
 const fs = require('fs')
 const { Op } = require('sequelize')
+// const { Octokit } = require('@octokit/rest')
 const {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken
 } = require('../middlewares/jwtService')
 const CryptoJS = require('crypto-js')
+// const { auth, googleProvider } = require('../config/firebase-config')
+const admin = require('../config/firebase-admin-setup') // Khởi tạo Firebase Admin SDK
+
 // TODO: move to environment variables
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -25,8 +29,9 @@ const transporter = nodemailer.createTransport({
 })
 const signIn = async (req, res, next) => {
   try {
-    const { username, password } = req.body.data
+    const { username, password, rememberChecked } = req.body.data
     console.log(req.body.data, 'req.body.data')
+
     const user = await models.User.findOne({
       where: {
         [Op.or]: [
@@ -41,6 +46,18 @@ const signIn = async (req, res, next) => {
         message: 'Username is not registered.'
       })
     }
+    if (user.type === 'google') {
+      return res.status(401).json({
+        code: 401,
+        message: 'Please sign in using Google.'
+      })
+    }
+    if (user.type === 'github') {
+      return res.status(401).json({
+        code: 401,
+        message: 'Please sign in using GitHub.'
+      })
+    }
     const isPasswordValid = bcrypt.compareSync(password, user.password)
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -48,25 +65,27 @@ const signIn = async (req, res, next) => {
         message: 'Password is incorrect.'
       })
     }
-    // Check if the email is verified
     if (!user.emailVerified) {
       return res.status(401).json({
         code: 401,
         message: 'Email is not verified.'
       })
     }
+
     const accessToken = await signAccessToken(user.id)
-    const refreshToken = await signRefreshToken(user.id)
+    let refreshToken = null
 
+    if (rememberChecked) {
+      refreshToken = await signRefreshToken(user.id)
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        sameSite: 'Strict',
+        maxAge: 60 * 60 * 1000
+      })
+    }
     const expire = new Date()
-    expire.setMinutes(expire.getMinutes() + 1)
+    expire.setDate(expire.getDate() + 5)
     await models.User.update({ expire }, { where: { id: user.id } })
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'Strict',
-      maxAge: 60 * 60 * 1000
-    })
     res.setHeader('authorization', accessToken)
     const role = await models.Role.findOne({
       where: { id: user.roleId }
@@ -86,6 +105,7 @@ const signIn = async (req, res, next) => {
     next(error)
   }
 }
+
 const signUp = async (req, res, next) => {
   try {
     const { firstName, lastName, username, email, password, captchaValue } = req.body.data
@@ -121,6 +141,7 @@ const signUp = async (req, res, next) => {
       username,
       password: hashedPassword,
       email,
+      type: 'local',
       emailVerified: false
     })
 
@@ -238,49 +259,6 @@ const signOut = async (req, res, next) => {
     next(error)
   }
 }
-// const sendOTP = async (req, res, next) => {
-//   try {
-//     const { email } = req.body.data
-//     console.log(req.body.data, 'req.body.data')
-//     if (!email) {
-//       return res.status(400).json({ message: 'Missing email.' })
-//     }
-//     const user = await models.User.findOne({ where: { email } })
-//     if (!user) {
-//       return res.status(400).json({ message: 'User not found.' })
-//     }
-//     const otp = Math.floor(100000 + Math.random() * 900000)
-//     const otpExpire = new Date()
-//     otpExpire.setMinutes(otpExpire.getMinutes() + 5)
-
-//     await models.User.update({ otp, otpExpire }, { where: { email } })
-
-//     const mailOptions = {
-//       from: 'canhmail292@gmail.com', // It's good practice to use a 'noreply' address for automated emails
-//       to: email, // The recipient's email address
-//       subject: 'Email Verification Code',
-//       html: `Dear ${user.firstName},<br>
-//         Thank you for using our service.<br><br>
-//         Please confirm your e-mail address by entering the code below into the verification form.<br><br>
-//         <strong>Your OTP is ${otp}. It will expire in 5 minutes.</strong><br><br>
-//         * This is an automated e-mail. Please do not respond to this address.<br>
-//         * Please disregard this message if you receive it and did not request to change your password.`
-//     }
-
-//     transporter.sendMail(mailOptions, function (error, info) {
-//       if (error) {
-//         console.log(error)
-//         return res.status(500).json({ message: 'Failed to send OTP.' })
-//       } else {
-//         console.log('Email sent: ' + info.response)
-//         // Indicate that the OTP was sent successfully
-//         return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
-//       }
-//     })
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 const checkEmail = async (req, res, next) => {
   try {
     const { email } = req.body.data
@@ -428,56 +406,199 @@ const resetPassword = async (req, res, next) => {
     next(error)
   }
 }
+// use Google OAuth 2.0
+// const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
 
-const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
+// const googleCallback = (req, res, next) => {
+//   passport.authenticate('google', async (err, user, info) => {
+//     if (err || !user) {
+//       console.log(err)
+//       return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
+//     }
+//     const accessToken = await signAccessToken(user.id)
+//     const refreshToken = await signRefreshToken(user.id)
+//     const expire = new Date()
+//     expire.setDate(expire.getDate() + 1)
+//     await models.User.update({ expire }, { where: { id: user.id } })
 
-const googleCallback = (req, res, next) => {
-  passport.authenticate('google', async (err, user, info) => {
-    if (err || !user) {
-      console.log(err)
-      return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
+//     res.cookie('refreshToken', refreshToken, {
+//       httpOnly: true,
+//       sameSite: 'Strict',
+//       maxAge: 24 * 60 * 60 * 1000
+//     })
+
+//     // Produce a message to Kafka with full user data
+
+//     // Trả về accessToken dưới dạng query string để lưu trữ trên client
+//     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
+//   })(req, res, next)
+// }
+// const signInWithFacebook = passport.authenticate('facebook', { scope: ['email'] })
+
+// const facebookCallback = (req, res, next) => {
+//   passport.authenticate('facebook', async (err, user, info) => {
+//     if (err || !user) {
+//       console.log(err)
+//       console.log(user)
+//       return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
+//     }
+//     const accessToken = await signAccessToken(user.id)
+//     const refreshToken = await signRefreshToken(user.id)
+//     const expire = new Date()
+//     expire.setDate(expire.getDate() + 1)
+//     await models.User.update({ expire }, { where: { id: user.id } })
+
+//     res.cookie('refreshToken', refreshToken, {
+//       httpOnly: true,
+//       sameSite: 'Strict',
+//       maxAge: 24 * 60 * 60 * 1000
+//     })
+//     // Trả về accessToken dưới dạng query string để lưu trữ trên client
+//     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
+//   })(req, res, next)
+// }
+// use Firebase Authentication
+const signInOrRegisterWithGoogle = async (req, res) => {
+  try {
+    const { idToken } = req.body
+    if (!idToken) {
+      return res.status(400).json({ message: 'Missing idToken' })
     }
-    const accessToken = await signAccessToken(user.id)
-    const refreshToken = await signRefreshToken(user.id)
-    const expire = new Date()
-    expire.setDate(expire.getDate() + 1)
-    await models.User.update({ expire }, { where: { id: user.id } })
 
+    const decodedToken = await admin.auth().verifyIdToken(idToken)
+    const email = decodedToken.email
+
+    const userInfo = {
+      firstName: decodedToken.name.split(' ')[0] || '',
+      lastName: decodedToken.name.split(' ')[1] || '',
+      email,
+      avatar: decodedToken.picture,
+      username: email.split('@')[0],
+      roleId: 3,
+      type: 'google'
+    }
+
+    let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
+
+    if (existingUser) {
+      // Kiểm tra xem loại đăng nhập hiện tại có trùng khớp không
+      if (existingUser.type !== 'google') {
+        return res.status(400).json({
+          message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
+        })
+      }
+      // Nếu phương thức là Google và tài khoản đã tồn tại, cập nhật thông tin nếu cần
+      await existingUser.update(userInfo)
+    } else {
+      // Tạo tài khoản mới nếu email chưa tồn tại
+      existingUser = await models.User.create(userInfo)
+    }
+
+    const accessToken = await signAccessToken(existingUser.id)
+    const refreshToken = await signRefreshToken(existingUser.id)
+
+    // Set refresh token in cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 60 * 60 * 1000
     })
 
-    // Produce a message to Kafka with full user data
+    res.setHeader('authorization', accessToken)
 
-    // Trả về accessToken dưới dạng query string để lưu trữ trên client
-    return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
-  })(req, res, next)
+    const role = await models.Role.findOne({
+      where: { id: existingUser.roleId }
+    })
+
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: existingUser.id,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      username: existingUser.username,
+      email: existingUser.email,
+      avatar: existingUser.avatar,
+      key: encryptedRole
+    }
+
+    return res.status(200).json({ success: true, accessToken, user: userResult })
+  } catch (error) {
+    console.error('Lỗi khi đăng ký với Google:', error)
+    res.status(500).json({ message: 'Lỗi khi đăng ký với Google' })
+  }
 }
-const signInWithFacebook = passport.authenticate('facebook', { scope: ['email'] })
 
-const facebookCallback = (req, res, next) => {
-  passport.authenticate('facebook', async (err, user, info) => {
-    if (err || !user) {
-      console.log(err)
-      console.log(user)
-      return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
+const signInOrRegisterWithGitHub = async (req, res) => {
+  try {
+    const { githubToken } = req.body
+    console.log(req.body, 'accessToken')
+    if (!githubToken) {
+      return res.status(400).json({ message: 'Missing accessToken' })
     }
-    const accessToken = await signAccessToken(user.id)
-    const refreshToken = await signRefreshToken(user.id)
-    const expire = new Date()
-    expire.setDate(expire.getDate() + 1)
-    await models.User.update({ expire }, { where: { id: user.id } })
 
+    const { Octokit } = await import('@octokit/rest')
+    const octokit = new Octokit({ auth: githubToken })
+    const { data: userData } = await octokit.rest.users.getAuthenticated()
+    console.log(userData, 'userData')
+
+    const { data: emailData } = await octokit.request('GET /user/emails')
+    const primaryEmail = emailData.find((email) => email.primary).email
+
+    const userInfo = {
+      firstName: (userData.name && userData.name.split(' ')[0]) || '',
+      lastName: (userData.name && userData.name.split(' ')[1]) || '',
+      email: primaryEmail,
+      avatar: userData.avatar_url,
+      username: userData.login,
+      roleId: 3,
+      type: 'github'
+    }
+
+    let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
+
+    if (existingUser) {
+      if (existingUser.type !== 'github') {
+        return res.status(400).json({
+          message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
+        })
+      }
+      await existingUser.update(userInfo)
+    } else {
+      existingUser = await models.User.create(userInfo)
+    }
+
+    const accessToken = await signAccessToken(existingUser.id)
+    const refreshToken = await signRefreshToken(existingUser.id)
+
+    // Set refresh token in cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 60 * 60 * 1000
     })
-    // Trả về accessToken dưới dạng query string để lưu trữ trên client
-    return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
-  })(req, res, next)
+
+    res.setHeader('authorization', accessToken)
+
+    const role = await models.Role.findOne({
+      where: { id: existingUser.roleId }
+    })
+
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: existingUser.id,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      username: existingUser.username,
+      email: existingUser.email,
+      avatar: existingUser.avatar,
+      key: encryptedRole
+    }
+
+    return res.status(200).json({ success: true, accessToken, user: userResult })
+  } catch (error) {
+    console.error('Error during GitHub sign in or registration:', error)
+    res.status(500).json({ message: 'GitHub sign in or registration failed' })
+  }
 }
 
 module.exports = {
@@ -488,10 +609,8 @@ module.exports = {
   signOut,
   changePassword,
   resetPassword,
-  signInWithGoogle,
-  googleCallback,
-  signInWithFacebook,
-  facebookCallback,
+  signInOrRegisterWithGoogle,
+  signInOrRegisterWithGitHub,
   sendOTP,
   verifyOTP,
   checkEmail
