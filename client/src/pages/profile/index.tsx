@@ -6,7 +6,6 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* PAGE: Profile
    ========================================================================== */
-import AccountPanel from '../profile/components/profile_panel'
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import ImageCover from '../../assets/tt.jpg'
 import { findUserById, updateUser, changeAVT } from '../../api/user/api'
@@ -22,6 +21,14 @@ import AVTChangeModal from 'components/modals/changeAVTModal'
 import ZoomModal from 'components/modals/zoomAVTModal'
 import AvatarEditor from 'react-avatar-editor'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import SchoolIcon from '@mui/icons-material/School';
+import LockIcon from '@mui/icons-material/Lock'
+import LinkIcon from '@mui/icons-material/Link'
+import QrCodeIcon from '@mui/icons-material/QrCode'
+import LogoutIcon from '@mui/icons-material/Logout'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import EditIcon from '@mui/icons-material/Edit'
 interface User {
   id: string
   firstName: string
@@ -47,6 +54,7 @@ interface PayloadType {
   currentPassword?: string
 }
 function Profile() {
+  const [selectedSection, setSelectedSection] = useState(1)
   const { t } = useTranslation()
   const [choiceModalAVTOpen, setChoiceModalAVTOpen] = useState(false)
   const [zoomModalAVTOpen, setZoomModalAVTOpen] = useState(false)
@@ -67,6 +75,9 @@ function Profile() {
     newPassword: '',
     currentPassword: ''
   })
+  const handleSectionSelect = (section: number) => {
+    setSelectedSection(section);
+  };
   const dispatch = useDispatch<AppDispatch>()
   const userRedux = useSelector(selectUser)
 
@@ -371,7 +382,8 @@ function Profile() {
   return (
     <div className="tw-flex tw-justify-center">
       <div className='tw-w-10/12 tw-flex tw-space-x-4 tw-mt-5'>
-        <div className="tw-w-3/12 tw-p-4 tw-border tw-border-gray-300 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-white tw-space-y-2">
+        {/* <div className="tw-w-3/12 tw-p-4 tw-border tw-border-gray-300 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-white tw-space-y-2"> */}
+        <div className="tw-w-3/12 tw-p-4 tw-border tw-border-gray-300 tw-border-b-4 tw-border-b-green-500 tw-rounded-md tw-rounded-b-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-white tw-space-y-2 tw-shadow-2xl">
           <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-border-b-2 tw-p-4'>
             <div className='tw-rounded-full tw-border-4 tw-border-orange-400 tw-overflow-hidden tw-w-20 tw-h-20 sm:tw-w-28 sm:tw-h-28 md:tw-w-32 md:tw-h-32 lg:tw-w-20 lg:tw-h-20 tw-flex-shrink-0'>
               <img className="tw-w-full tw-h-full tw-object-cover tw-cursor-pointer" src={ImageCover} alt="User upload" />
@@ -383,15 +395,194 @@ function Profile() {
           <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-2'>
             <div className='tw-font-bold tw-text-lg'>Cai dat tai khoan</div>
             <div className='tw-text-slate-600 tw-text-sm tw-pl-2'>Thong tin ca nhan, cai dat bao mat, quan ly thong bao, v.v</div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Thong tin ca nhan</div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Mat khau va bao mat</div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Tao tai khoan cho con</div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Lien ket tai khoan</div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Nhap ma kich hoat</div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Dang xuat</div>
+
+            {/* Mục sidebar */}
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1' onClick={() => handleSectionSelect(1)}>
+              <AccountCircleIcon className='tw-mr-2' />
+              Thong tin ca nhan
+            </div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(2)}>
+              <LockIcon className='tw-mr-2' />
+              Mat khau va bao mat
+            </div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1' onClick={() => handleSectionSelect(3)}>
+              <SchoolIcon className='tw-mr-2' />
+              Khoa hoc cua ban
+            </div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(4)}>
+              Tao tai khoan cho con
+            </div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(5)}>
+              <LinkIcon className='tw-mr-2' />
+              Lien ket tai khoan
+            </div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(6)}>
+              <QrCodeIcon className='tw-mr-2' />
+              Nhap ma kich hoat
+            </div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(7)}>
+              <LogoutIcon className='tw-mr-2' />
+              Dang xuat
+            </div>
           </div>
         </div>
-        <div className="tw-w-9/12 tw-p-4 border tw-border-gray-300 tw-rounded-md tw-flex tw-bg-blue-200">Column 2</div>
+        <div className="tw-w-9/12 tw-p-4 tw-border tw-border-gray-300 tw-rounded-md tw-flex tw-bg-white tw-shadow-2xl">
+          {/* thong tin ca nhan */}
+          {selectedSection === 1 &&
+            <div className='tw-w-full tw-space-y-4'>
+              <div className='tw-mx-5'>
+                <div className='tw-flex'>
+                  <div className='tw-flex-1 tw-font-bold tw-text-green-500 tw-text-xl'>Thong tin ca nhan</div>
+                  <div className='tw-flex-1 tw-flex tw-justify-end'>
+                    <div className='tw-border tw-rounded-3xl tw-px-8 tw-py-2 tw-flex tw-items-center tw-cursor-pointer'>
+                      <EditIcon className='tw-mr-2' />
+                      Cap nhat
+                    </div>
+                  </div>
+                </div>
+                <div className="tw-grid tw-grid-cols-2 tw-gap-4">
+                  <div className="tw-p-4 tw-space-y-2">
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Ho ten:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Ten dang nhap:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Loai tai khoan:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Khoi:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                  </div>
+                  <div className="tw-p-4 tw-space-y-2">
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Ngay sinh:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Dien thoai:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Email:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div>
+                      <div className='tw-text-gray-500 tw-text-sm'>Dia chi:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                  </div>
+                </div>
+                <div className='tw-space-y-4'>
+                  <div className='tw-px-4'>
+                    <div className='tw-text-gray-500 tw-text-sm'>Lop:</div>
+                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+                  </div>
+                  <div className='tw-px-4'>
+                    <div className='tw-text-gray-500 tw-text-sm'>Truong hoc:</div>
+                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+                  </div>
+                  <div className='tw-px-4'>
+                    <div className='tw-text-gray-500 tw-text-sm'>Quan:</div>
+                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+                  </div>
+                  <div className='tw-px-4'>
+                    <div className='tw-text-gray-500 tw-text-sm'>Tinh:</div>
+                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+                  </div>
+                </div>
+              </div>
+              <div className='tw-bg-blue-200 tw-mx-5 tw-p-2 tw-rounded-lg'>
+                <div className='tw-font-bold'>Lưu ý:</div>
+                <div>Hệ thống sẽ tự động nâng lớp cho học sinh vào năm học mới.</div>
+              </div>
+            </div>}
+          {/* mat khau va bao mat */}
+          {selectedSection === 2 &&
+            <div className='tw-w-full'>
+              <div className='tw-ml-5'>
+                <div className='tw-font-bold tw-text-green-500 tw-text-xl'>Mat khau va bao mat</div>
+                <div className='tw-text-slate-500 tw-text-sm'>Quan ly mat khau</div>
+                <div className='tw-font-bold tw-pl-5 tw-text-lg'>Doi mat khau</div>
+                <div className='tw-text-slate-500 tw-text-sm tw-pl-5'>Lan doi gan nhat: 26 ngay truoc</div>
+                <div className='tw-pl-5 tw-py-3 tw-space-y-3 tw-w-3/5'>
+                  <div className='tw-space-y-1'>
+                    <div className='tw-font-bold'>Mat khau cu</div>
+                    <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                        placeholder={t('signIn.password')}
+                      // value={password}
+                      // onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                    </div>
+                  </div>
+                  <div className='tw-space-y-1'>
+                    <div className='tw-font-bold'>Mat khau moi</div>
+                    <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                        placeholder={t('signIn.password')}
+                      />
+                      <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                    </div>
+                  </div>
+                  <div className='tw-space-y-1'>
+                    <div className='tw-font-bold'>Nhap lai mat khau moi</div>
+                    <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                        placeholder={t('signIn.password')}
+                      // value={password}
+                      // onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+
+                    </div>
+                  </div>
+                  <div className='tw-flex tw-space-x-8 tw-pr-8'>
+                    <div className='tw-flex-1 tw-p-2 tw-rounded-3xl tw-border tw-border-green-500 tw-font-bold tw-bg-green-500 tw-flex tw-justify-center tw-items-center tw-text-white'>
+                      Doi mat khau
+                    </div>
+                    <div className='tw-flex-1 tw-p-2 tw-rounded-3xl tw-border tw-border-gray-500 tw-bg-white tw-flex tw-justify-center tw-items-center'>
+                      Huy bo
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>}
+          {/* khoa hoc cua ban */}
+          {selectedSection === 3 && <div>Khóa học của bạn</div>}
+          {/* tao tai khoan cho con */}
+          {selectedSection === 4 && <div>Tạo tài khoản cho con</div>}
+          {/* lien ket tai khoan */}
+          {selectedSection === 5 && <div>Liên kết tài khoản</div>}
+          {/* nhap ma kich hoat */}
+          {selectedSection === 6 && <div>Nhập mã kích hoạt</div>}
+          {/* dang xuat */}
+          {selectedSection === 7 && <div>Đăng xuất</div>}
+        </div>
       </div>
     </div>
     // <div className="tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-max-w-9xl tw-mx-auto">
