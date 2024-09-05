@@ -376,18 +376,19 @@ function Profile() {
             <div className='tw-rounded-full tw-border-4 tw-border-orange-400 tw-overflow-hidden tw-w-20 tw-h-20 sm:tw-w-28 sm:tw-h-28 md:tw-w-32 md:tw-h-32 lg:tw-w-20 lg:tw-h-20 tw-flex-shrink-0'>
               <img className="tw-w-full tw-h-full tw-object-cover tw-cursor-pointer" src={ImageCover} alt="User upload" />
             </div>
-            <div className="tw-text-center">{userRedux?.firstName}Pham Xuan Canh</div>
+            <div className="tw-text-center">{userRedux?.firstName}</div>
             <div className='tw-text-slate-600'>Khoi null</div>
-            <div className='tw-bg-orange-200 tw-text-orange-500 tw-p-2 tw-cursor-pointer tw-font-bold tw-rounded-lg'> Cap nhat avatar</div>
+            <div className='tw-bg-orange-200 tw-text-orange-500 tw-p-2 tw-cursor-pointer tw-font-bold tw-rounded-lg'>Cap nhat avatar</div>
           </div>
           <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-2'>
             <div className='tw-font-bold tw-text-lg'>Cai dat tai khoan</div>
-            <div className='tw-text-slate-600'>Thong tin ca nhan, cai dat bao mat, quan ly thong bao, v.v</div>
-            <div>Thong tin ca nhan</div>
-            <div>Mat khau va bao mat</div>
-            <div>Lien ket tai khoan</div>
-            <div>Nhap ma kich hoat</div>
-            <div>Dang xuat</div>
+            <div className='tw-text-slate-600 tw-text-sm tw-pl-2'>Thong tin ca nhan, cai dat bao mat, quan ly thong bao, v.v</div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Thong tin ca nhan</div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Mat khau va bao mat</div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Tao tai khoan cho con</div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Lien ket tai khoan</div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Nhap ma kich hoat</div>
+            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1'>Dang xuat</div>
           </div>
         </div>
         <div className="tw-w-9/12 tw-p-4 border tw-border-gray-300 tw-rounded-md tw-flex tw-bg-blue-200">Column 2</div>

@@ -70,13 +70,13 @@ function AccountPanel() {
     const dispatch = useDispatch<AppDispatch>()
     const userRedux = useSelector(selectUser)
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('persist:auth')
-        if (storedUser) {
-            const user = JSON.parse(storedUser).currentUser;
-            dispatch(fetchUser());
-        }
-    }, [dispatch]);
+    // useEffect(() => {
+    //     const storedUser = localStorage.getItem('persist:auth')
+    //     if (storedUser) {
+    //         const user = JSON.parse(storedUser).currentUser;
+    //         dispatch(fetchUser());
+    //     }
+    // }, [dispatch]);
 
     useEffect(() => {
         if (userRedux?.id) {
@@ -126,36 +126,6 @@ function AccountPanel() {
         const rotateValue = event.target.value
         setRotate(rotateValue)
     }
-    // const handleSaveAVT = async () => {
-    //     if (cropRef.current) {
-    //       const dataUrl = cropRef.current.getImage().toDataURL()
-    //       const result = await fetch(dataUrl)
-    //       const blob = await result.blob()
-    //       const formData = new FormData()
-    //       formData.append('avatar', blob, 'avatar.png')
-    //       let response = { status: 400 }
-    //       if (userRedux?.id) {
-    //         response = await changeAVT(userRedux.id, formData)
-    //       }
-    //       if (response.status === 200) {
-    //         toast.success('Change AVT successfully')
-    //         if (userRedux) {
-    //           dispatch(updateStateInfo({
-    //             ...userRedux,
-    //             avatar: dataUrl
-    //           }));
-    //         }
-    //         setImageSrc(userRedux?.avatar || '')
-    //         setZoomModalAVTOpen(false);
-    //         setZoom(1)
-    //         setRotate(0)
-    //       } else {
-    //         console.log('Change AVT failed')
-    //         toast.error('Change AVT failed')
-    //       }
-    //     }
-    //   };
-
     const handleSaveAVT = async () => {
         try {
           let dataUrl = userRedux?.avatar || '';
