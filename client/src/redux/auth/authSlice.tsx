@@ -44,6 +44,7 @@ export const fetchUser = createAsyncThunk('auth/fetchUser', async () => {
   }
   
   const response: AxiosResponse<User> = await findUserById(userId);
+  console.log(response, 'response');
   const persistAuth = localStorage.getItem('persist:auth');
 
 if (persistAuth) {

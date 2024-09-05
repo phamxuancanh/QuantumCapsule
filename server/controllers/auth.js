@@ -178,29 +178,19 @@ const verifyEmail = async (req, res, next) => {
     if (!token) {
       return res.status(400).json({ message: 'Missing token.' })
     }
-
-    // Verify the token
     const decoded = jwt.verify(token, 'your-secret-key')
     const { id, username, email } = decoded
 
-    // Find the user in the database
     const user = await models.User.findOne({ where: { id, username, email } })
     if (!user) {
       return res.status(400).json({ message: 'Invalid token.' })
     }
-
-    // Check if the email is already verified
     if (user.emailVerified) {
       return res.status(400).json({ message: 'Email is already verified.' })
     }
-
-    // Update the user's emailVerified status
     user.emailVerified = true
     await user.save()
-
-    // Optionally, generate an access token for the user
     const accessToken = jwt.sign({ id: user.id, username: user.username, email: user.email }, 'your-secret-key', { expiresIn: '1h' })
-
     return res.status(200).json({ success: true, message: 'Email verified successfully.', accessToken })
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
@@ -231,28 +221,25 @@ const refreshToken = async (req, res, next) => {
     next(error)
   }
 }
+
 const signOut = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies
-    console.log('TOKENNNNNNNNNNNNNNN')
     console.log(refreshToken)
     if (!refreshToken) {
-      return res.status(403).json({ error: { message: 'Unauthorized' } })
+      console.log('No refresh token provided')
+    } else {
+      const userId = await verifyRefreshToken(refreshToken)
+      const user = await models.User.findByPk(userId)
+      if (!user) {
+        return res.status(404).json({ error: { message: 'User not found' } })
+      }
+      res.cookie('refreshToken', '', { expires: new Date(0) })
+      res.cookie('connect.sid', '', { expires: new Date(0) })
+      user.refreshToken = null
+      user.expire = null
+      await user.save()
     }
-    const userId = await verifyRefreshToken(refreshToken)
-    console.log(userId, 'userId')
-    const user = await models.User.findByPk(userId)
-    if (!user) {
-      return res.status(404).json({ error: { message: 'User not found' } })
-    }
-    res.cookie('refreshToken', '', { expires: new Date(0) })
-    res.cookie('connect.sid', '', { expires: new Date(0) })
-    // Clear the refresh token and expire in the database
-    user.refreshToken = null
-    user.expire = null
-    await user.save()
-
-    // Produce a message to Kafka with full user data
     return res.status(200).json({ success: true })
   } catch (error) {
     console.log(error)
@@ -345,8 +332,6 @@ const verifyOTP = async (req, res, next) => {
       return res.status(410).json({ message: 'OTP has expired.' })
     }
     await models.User.update({ otp: null, otpExpire: null }, { where: { email } })
-
-    // Send a success response
     res.status(200).json({ message: 'OTP verified successfully.' })
   } catch (error) {
     next(error)
@@ -374,9 +359,6 @@ const changePassword = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10)
     const hashPassword = bcrypt.hashSync(newPassword, salt)
     await user.update({ password: hashPassword })
-
-    // Produce a message to Kafka with full user data
-
     return res.status(200).json({ success: true })
   } catch (error) {
     next(error)
@@ -394,122 +376,59 @@ const resetPassword = async (req, res, next) => {
         message: 'Email is not registered.'
       })
     }
-    // const salt = await bcrypt.genSalt(10)
-    // const hashPassword = bcrypt.hashSync(newPassword, salt)
     const hashPassword = await bcrypt.hash(newPassword, 10)
     await user.update({ password: hashPassword })
-
-    // Optionally, produce a message to Kafka with full user data
-
     return res.status(200).json({ success: true, message: 'Password has been reset successfully.' })
   } catch (error) {
     next(error)
   }
 }
-// use Google OAuth 2.0
-// const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
-
-// const googleCallback = (req, res, next) => {
-//   passport.authenticate('google', async (err, user, info) => {
-//     if (err || !user) {
-//       console.log(err)
-//       return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
-//     }
-//     const accessToken = await signAccessToken(user.id)
-//     const refreshToken = await signRefreshToken(user.id)
-//     const expire = new Date()
-//     expire.setDate(expire.getDate() + 1)
-//     await models.User.update({ expire }, { where: { id: user.id } })
-
-//     res.cookie('refreshToken', refreshToken, {
-//       httpOnly: true,
-//       sameSite: 'Strict',
-//       maxAge: 24 * 60 * 60 * 1000
-//     })
-
-//     // Produce a message to Kafka with full user data
-
-//     // Trả về accessToken dưới dạng query string để lưu trữ trên client
-//     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
-//   })(req, res, next)
-// }
-// const signInWithFacebook = passport.authenticate('facebook', { scope: ['email'] })
-
-// const facebookCallback = (req, res, next) => {
-//   passport.authenticate('facebook', async (err, user, info) => {
-//     if (err || !user) {
-//       console.log(err)
-//       console.log(user)
-//       return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
-//     }
-//     const accessToken = await signAccessToken(user.id)
-//     const refreshToken = await signRefreshToken(user.id)
-//     const expire = new Date()
-//     expire.setDate(expire.getDate() + 1)
-//     await models.User.update({ expire }, { where: { id: user.id } })
-
-//     res.cookie('refreshToken', refreshToken, {
-//       httpOnly: true,
-//       sameSite: 'Strict',
-//       maxAge: 24 * 60 * 60 * 1000
-//     })
-//     // Trả về accessToken dưới dạng query string để lưu trữ trên client
-//     return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
-//   })(req, res, next)
-// }
 // use Firebase Authentication
-const signInOrRegisterWithGoogle = async (req, res) => {
+const signInOrRegisterWithFacebook = async (req, res) => {
   try {
     const { idToken } = req.body
     if (!idToken) {
       return res.status(400).json({ message: 'Missing idToken' })
     }
-
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const email = decodedToken.email
-
+    console.log(decodedToken.name, 'decodedToken')
+    const nameParts = decodedToken.name.split(' ')
     const userInfo = {
-      firstName: decodedToken.name.split(' ')[0] || '',
-      lastName: decodedToken.name.split(' ')[1] || '',
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
       email,
       avatar: decodedToken.picture,
       username: email.split('@')[0],
       roleId: 3,
-      type: 'google'
+      type: 'facebook',
+      emailVerified: true
     }
-
     let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
-
     if (existingUser) {
-      // Kiểm tra xem loại đăng nhập hiện tại có trùng khớp không
-      if (existingUser.type !== 'google') {
+      if (existingUser.type !== 'facebook') {
         return res.status(400).json({
           message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
         })
       }
-      // Nếu phương thức là Google và tài khoản đã tồn tại, cập nhật thông tin nếu cần
       await existingUser.update(userInfo)
     } else {
-      // Tạo tài khoản mới nếu email chưa tồn tại
       existingUser = await models.User.create(userInfo)
     }
-
     const accessToken = await signAccessToken(existingUser.id)
     const refreshToken = await signRefreshToken(existingUser.id)
-
-    // Set refresh token in cookie
+    console.log(refreshToken, 'refreshToken')
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
       maxAge: 60 * 60 * 1000
     })
-
-    res.setHeader('authorization', accessToken)
-
+    const expire = new Date()
+    expire.setDate(expire.getDate() + 5)
+    await models.User.update({ expire }, { where: { id: existingUser.id } })
     const role = await models.Role.findOne({
       where: { id: existingUser.roleId }
     })
-
     const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
     const userResult = {
       id: existingUser.id,
@@ -518,9 +437,73 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       username: existingUser.username,
       email: existingUser.email,
       avatar: existingUser.avatar,
-      key: encryptedRole
+      key: encryptedRole,
+      emailVerified: true
     }
+    return res.status(200).json({ success: true, accessToken, user: userResult })
+  } catch (error) {
+    console.error('Lỗi khi đăng ký với Facebook:', error)
+    return res.status(500).json({ message: 'Lỗi khi đăng ký với Facebook' })
+  }
+}
 
+const signInOrRegisterWithGoogle = async (req, res) => {
+  try {
+    const { idToken } = req.body
+    if (!idToken) {
+      return res.status(400).json({ message: 'Missing idToken' })
+    }
+    const decodedToken = await admin.auth().verifyIdToken(idToken)
+    const email = decodedToken.email
+    const userInfo = {
+      firstName: decodedToken.name.split(' ')[0] || '',
+      lastName: decodedToken.name.split(' ')[1] || '',
+      email,
+      avatar: decodedToken.picture,
+      username: email.split('@')[0],
+      roleId: 3,
+      type: 'google',
+      emailVerified: true
+    }
+    let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
+    if (existingUser) {
+      if (existingUser.type !== 'google') {
+        return res.status(400).json({
+          message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
+        })
+      }
+      await existingUser.update(userInfo)
+    } else {
+      existingUser = await models.User.create(userInfo)
+    }
+    const accessToken = await signAccessToken(existingUser.id)
+    const refreshToken = await signRefreshToken(existingUser.id)
+    console.log(refreshToken, 'refreshToken')
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'Strict',
+      maxAge: 60 * 60 * 1000
+    })
+    const expire = new Date()
+    expire.setDate(expire.getDate() + 5)
+    await models.User.update({ expire }, { where: { id: existingUser.id } })
+
+    res.setHeader('authorization', accessToken)
+    const role = await models.Role.findOne({
+      where: { id: existingUser.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: existingUser.id,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      username: existingUser.username,
+      email: existingUser.email,
+      avatar: existingUser.avatar,
+      key: encryptedRole,
+      emailVerified: true
+    }
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
     console.error('Lỗi khi đăng ký với Google:', error)
@@ -535,15 +518,12 @@ const signInOrRegisterWithGitHub = async (req, res) => {
     if (!githubToken) {
       return res.status(400).json({ message: 'Missing accessToken' })
     }
-
     const { Octokit } = await import('@octokit/rest')
     const octokit = new Octokit({ auth: githubToken })
     const { data: userData } = await octokit.rest.users.getAuthenticated()
     console.log(userData, 'userData')
-
     const { data: emailData } = await octokit.request('GET /user/emails')
     const primaryEmail = emailData.find((email) => email.primary).email
-
     const userInfo = {
       firstName: (userData.name && userData.name.split(' ')[0]) || '',
       lastName: (userData.name && userData.name.split(' ')[1]) || '',
@@ -553,9 +533,7 @@ const signInOrRegisterWithGitHub = async (req, res) => {
       roleId: 3,
       type: 'github'
     }
-
     let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
-
     if (existingUser) {
       if (existingUser.type !== 'github') {
         return res.status(400).json({
@@ -566,23 +544,22 @@ const signInOrRegisterWithGitHub = async (req, res) => {
     } else {
       existingUser = await models.User.create(userInfo)
     }
-
     const accessToken = await signAccessToken(existingUser.id)
     const refreshToken = await signRefreshToken(existingUser.id)
-
-    // Set refresh token in cookie
+    console.log(refreshToken, 'refreshToken')
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
       maxAge: 60 * 60 * 1000
     })
+    const expire = new Date()
+    expire.setDate(expire.getDate() + 5)
+    await models.User.update({ expire }, { where: { id: existingUser.id } })
 
     res.setHeader('authorization', accessToken)
-
     const role = await models.Role.findOne({
       where: { id: existingUser.roleId }
     })
-
     const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
     const userResult = {
       id: existingUser.id,
@@ -593,7 +570,6 @@ const signInOrRegisterWithGitHub = async (req, res) => {
       avatar: existingUser.avatar,
       key: encryptedRole
     }
-
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
     console.error('Error during GitHub sign in or registration:', error)
@@ -609,6 +585,7 @@ module.exports = {
   signOut,
   changePassword,
   resetPassword,
+  signInOrRegisterWithFacebook,
   signInOrRegisterWithGoogle,
   signInOrRegisterWithGitHub,
   sendOTP,

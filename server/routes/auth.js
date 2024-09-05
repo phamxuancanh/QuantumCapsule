@@ -13,6 +13,7 @@ router.post('/changePassword', authController.changePassword)
 // router.get('/facebook/callback', authController.facebookCallback)
 router.post('/google', authController.signInOrRegisterWithGoogle)
 router.post('/github', authController.signInOrRegisterWithGitHub)
+router.post('/facebook', authController.signInOrRegisterWithFacebook)
 router.use('/protected', verifyToken, (req, res) => {
   res.status(200).json({ message: 'Access granted', user: req.user })
 })

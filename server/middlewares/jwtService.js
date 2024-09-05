@@ -29,13 +29,44 @@ const signAccessToken = async (userId) => {
   }
 }
 
+// const verifyAccessToken = (req, res, next) => {
+//   const [, Authorization] = req.headers.authorization.split(' ')
+//   console.log(Authorization, 'Authorization')
+//   if (!Authorization) {
+//     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
+//   }
+//   JWT.verify(Authorization, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+//     if (err) {
+//       console.log(err, 'err')
+//       if (err.name === 'JsonWebTokenError') {
+//         return res.status(401).json({ error: { message: 'Unauthorized 2' } })
+//       }
+//       return res.status(401).json({ error: { message: err.message } })
+//     }
+//     req.payload = payload
+//     setTimeout(() => {
+//       next()
+//     }, 100)
+//   })
+// }
 const verifyAccessToken = (req, res, next) => {
-  const [, Authorization] = req.headers.authorization.split(' ')
-  console.log(Authorization, 'Authorization')
-  if (!Authorization) {
+  const authHeader = req.headers.authorization
+
+  // Kiểm tra xem header authorization có tồn tại hay không
+  if (!authHeader) {
     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
   }
-  JWT.verify(Authorization, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+
+  // Tách chuỗi 'Bearer' và token
+  const [scheme, token] = authHeader.split(' ')
+
+  // Kiểm tra định dạng token có đúng là 'Bearer <token>' hay không
+  if (scheme !== 'Bearer' || !token) {
+    return res.status(401).json({ error: { message: 'Unauthorized 1' } })
+  }
+
+  // Xác minh token bằng JWT và chỉ định thuật toán
+  JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, { algorithms: ['HS256'] }, (err, payload) => {
     if (err) {
       console.log(err, 'err')
       if (err.name === 'JsonWebTokenError') {
@@ -43,7 +74,11 @@ const verifyAccessToken = (req, res, next) => {
       }
       return res.status(401).json({ error: { message: err.message } })
     }
+
+    // Gán payload của token vào req để các middleware khác có thể sử dụng
     req.payload = payload
+
+    // Chuyển sang middleware tiếp theo
     setTimeout(() => {
       next()
     }, 100)
@@ -57,7 +92,6 @@ const signRefreshToken = async (userId) => {
       const user = await models.User.findByPk(userId)
       user.refreshToken = refreshToken
       await user.save()
-      console.log('token', refreshToken)
       resolve(refreshToken)
     } catch (err) {
       reject(err)
