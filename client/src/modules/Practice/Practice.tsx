@@ -29,7 +29,7 @@ const Practice: React.FC = () => {
         if (index < listQuestion.length - 1) {
             setCurrentQuestion(listQuestion[index + 1])
         } else {
-            // setí
+            alert("Mày trả lời đúng: " + listAnswer.filter((answer) => answer.isCorrect).length + " câu")
         }
     }
     return (
