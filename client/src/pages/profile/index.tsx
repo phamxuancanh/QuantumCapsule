@@ -7,6 +7,7 @@
 /* PAGE: Profile
    ========================================================================== */
 import React, { useEffect, useState, useRef, useCallback } from 'react'
+import Select from 'react-select'
 import ImageCover from '../../assets/tt.jpg'
 import { findUserById, updateUser, changeAVT } from '../../api/user/api'
 import { getFromLocalStorage } from 'utils/functions'
@@ -15,7 +16,7 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../redux/store'
-import { fetchUser, selectUser, updateStateInfo } from '../../redux/auth/authSlice'
+import { fetchUser, loginState, selectUser, updateStateInfo } from '../../redux/auth/authSlice'
 import CameraAltIcon from '@mui/icons-material/CameraAlt'
 import AVTChangeModal from 'components/modals/changeAVTModal'
 import ZoomModal from 'components/modals/zoomAVTModal'
@@ -29,6 +30,8 @@ import QrCodeIcon from '@mui/icons-material/QrCode'
 import LogoutIcon from '@mui/icons-material/Logout'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import EditIcon from '@mui/icons-material/Edit'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { fetchLocations, City, District, Ward } from './locationData'
 interface User {
   id: string
   firstName: string
@@ -55,6 +58,7 @@ interface PayloadType {
 }
 function Profile() {
   const [selectedSection, setSelectedSection] = useState(1)
+  const [isEditingPersonalInfo, setIsEditingPersonalInfo] = useState(false)
   const { t } = useTranslation()
   const [choiceModalAVTOpen, setChoiceModalAVTOpen] = useState(false)
   const [zoomModalAVTOpen, setZoomModalAVTOpen] = useState(false)
@@ -63,6 +67,49 @@ function Profile() {
   const [zoom, setZoom] = useState(1)
   const [rotate, setRotate] = useState(0)
   const cropRef = useRef<AvatarEditor>(null)
+  const [cities, setCities] = useState<City[]>([])
+  const [selectedCity, setSelectedCity] = useState<string>('')
+  const [districts, setDistricts] = useState<District[]>([])
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('')
+  const [wards, setWards] = useState<Ward[]>([])
+  const [selectedWard, setSelectedWard] = useState<string>('')
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchLocations();
+      setCities(data);
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCity) {
+      const city = cities.find(city => city.Id === selectedCity);
+      setDistricts(city?.Districts || []);
+      setSelectedDistrict(''); // Reset district selection
+      setWards([]); // Clear wards
+      setSelectedWard(''); // Reset ward selection
+    } else {
+      setDistricts([]);
+    }
+  }, [selectedCity]);
+
+  useEffect(() => {
+    if (selectedDistrict) {
+      const district = districts.find(district => district.Id === selectedDistrict);
+      setWards(district?.Wards || []);
+      setSelectedWard('');
+    } else {
+      setWards([]);
+    }
+  }, [selectedDistrict]);
+
+  // Update classes when a ward is selected
+  useEffect(() => {
+    if (selectedWard) {
+      const ward = wards.find(ward => ward.Id === selectedWard);
+    } else {
+    }
+  }, [selectedWard]);
   const [user, setUser] = useState<User>({
     id: '',
     firstName: '',
@@ -83,14 +130,17 @@ function Profile() {
 
   console.log(userRedux, 'userRedux');
   useEffect(() => {
-    const storedUser = localStorage.getItem('persist:auth')
+    const storedUser = localStorage.getItem('persist:auth');
     if (storedUser) {
-      const user = JSON.parse(storedUser).currentUser;
-      console.log(user, 'user');
-      dispatch(fetchUser());
+      const parsedData = JSON.parse(storedUser);
+      const user = parsedData?.currentUser;
+      if (user) {
+        dispatch(loginState(user));
+      } else {
+        dispatch(fetchUser());
+      }
     }
   }, [dispatch]);
-
   useEffect(() => {
     if (userRedux?.id) {
       dispatch(fetchUser())
@@ -220,6 +270,11 @@ function Profile() {
   const handleOpenChangeAVTModal = useCallback(() => {
     setChoiceModalAVTOpen(true)
   }, [])
+
+  const handleEditPersonalInfo = () => {
+    setIsEditingPersonalInfo(!isEditingPersonalInfo);
+  };
+
   const isValidInputs = () => {
     setObjCheckInput(defaultObjCheckInput)
     if (user.firstName === '' || user.firstName === null) {
@@ -390,7 +445,7 @@ function Profile() {
             </div>
             <div className="tw-text-center">{userRedux?.firstName}</div>
             <div className='tw-text-slate-600'>Khoi null</div>
-            <div className='tw-bg-orange-200 tw-text-orange-500 tw-p-2 tw-cursor-pointer tw-font-bold tw-rounded-lg'>Cap nhat avatar</div>
+            <div className='tw-bg-orange-200 tw-text-orange-500 tw-p-2 tw-cursor-pointer tw-font-bold tw-rounded-lg' onClick={handleOpenChangeAVTModal}>Cap nhat avatar</div>
           </div>
           <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-2'>
             <div className='tw-font-bold tw-text-lg'>Cai dat tai khoan</div>
@@ -427,82 +482,233 @@ function Profile() {
           </div>
         </div>
         <div className="tw-w-9/12 tw-p-4 tw-border tw-border-gray-300 tw-rounded-md tw-flex tw-bg-white tw-shadow-2xl">
-          {/* thong tin ca nhan */}
-          {selectedSection === 1 &&
-            <div className='tw-w-full tw-space-y-4'>
-              <div className='tw-mx-5'>
-                <div className='tw-flex'>
-                  <div className='tw-flex-1 tw-font-bold tw-text-green-500 tw-text-xl'>Thong tin ca nhan</div>
-                  <div className='tw-flex-1 tw-flex tw-justify-end'>
-                    <div className='tw-border tw-rounded-3xl tw-px-8 tw-py-2 tw-flex tw-items-center tw-cursor-pointer'>
-                      <EditIcon className='tw-mr-2' />
-                      Cap nhat
+          {/* THONG TIN CA NHAN */}
+          {selectedSection === 1 && (
+            !isEditingPersonalInfo ? (
+              <div className='tw-w-full tw-space-y-4'>
+                <div className='tw-mx-5'>
+                  <div className='tw-flex'>
+                    <div className='tw-flex-1 tw-font-bold tw-text-green-500 tw-text-xl'>Thông tin cá nhân</div>
+                    <div className='tw-flex-1 tw-flex tw-justify-end'>
+                      <div
+                        className='tw-border tw-rounded-3xl tw-px-8 tw-py-2 tw-flex tw-items-center tw-cursor-pointer'
+                        onClick={handleEditPersonalInfo}
+                      >
+                        <EditIcon className='tw-mr-2' />
+                        Cập nhật
+                      </div>
+                    </div>
+                  </div>
+                  <div className="tw-grid tw-grid-cols-2 tw-gap-4">
+                    <div className="tw-p-4 tw-space-y-2">
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Họ tên:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Tên đăng nhập:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Loại tài khoản:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Khối:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                    </div>
+                    <div className="tw-p-4 tw-space-y-2">
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Ngày sinh:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Điện thoại:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Email:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                      <div>
+                        <div className='tw-text-gray-500 tw-text-sm'>Địa chỉ:</div>
+                        <div className='tw-font-bold text-text-sm'>Pxc</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='tw-space-y-4'>
+                    <div className='tw-px-4'>
+                      <div className='tw-text-gray-500 tw-text-sm'>Lớp:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div className='tw-px-4'>
+                      <div className='tw-text-gray-500 tw-text-sm'>Trường học:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div className='tw-px-4'>
+                      <div className='tw-text-gray-500 tw-text-sm'>Quận:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
+                    </div>
+                    <div className='tw-px-4'>
+                      <div className='tw-text-gray-500 tw-text-sm'>Tỉnh:</div>
+                      <div className='tw-font-bold text-text-sm'>Pxc</div>
                     </div>
                   </div>
                 </div>
-                <div className="tw-grid tw-grid-cols-2 tw-gap-4">
-                  <div className="tw-p-4 tw-space-y-2">
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Ho ten:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Ten dang nhap:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Loai tai khoan:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Khoi:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                  </div>
-                  <div className="tw-p-4 tw-space-y-2">
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Ngay sinh:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Dien thoai:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Email:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                    <div>
-                      <div className='tw-text-gray-500 tw-text-sm'>Dia chi:</div>
-                      <div className='tw-font-bold text-text-sm'>Pxc</div>
-                    </div>
-                  </div>
+                <div className='tw-bg-blue-200 tw-mx-5 tw-p-2 tw-rounded-lg'>
+                  <div className='tw-font-bold'>Lưu ý:</div>
+                  <div>Hệ thống sẽ tự động nâng lớp cho học sinh vào năm học mới.</div>
                 </div>
-                <div className='tw-space-y-4'>
-                  <div className='tw-px-4'>
-                    <div className='tw-text-gray-500 tw-text-sm'>Lop:</div>
-                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+              </div>
+            ) : (
+              <div className='tw-w-full tw-space-y-4'>
+                <div className='tw-mx-5 tw-space-y-3'>
+                  <div className='tw-flex'>
+                    <div className='tw-font-bold tw-text-green-500 tw-text-base tw-cursor-pointer' onClick={handleEditPersonalInfo}>
+                      <ArrowBackIcon className='tw-mr-2' />Quay lại
+                    </div>
                   </div>
-                  <div className='tw-px-4'>
-                    <div className='tw-text-gray-500 tw-text-sm'>Truong hoc:</div>
-                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+                  <div className='tw-flex tw-justify-center tw-font-bold tw-text-2xl'>Cap nhat thong tin ca nhan</div>
+                  <div className="tw-grid tw-grid-cols-2 tw-gap-4">
+                    <div className="tw-p-4 tw-space-y-2">
+                      <div>
+                        <div className='tw-font-bold tw-text-sm'>Họ tên:</div>
+                        <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                          <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                            placeholder={t('signIn.password')}
+                          // value={password}
+                          // onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                        </div>
+                      </div>
+                      <div>
+                          <div className='tw-font-bold tw-text-sm'>Truong hoc:</div>
+                          <Select
+                            id="ward"
+                            value={wards.find(ward => ward.Id === selectedWard) ? { value: selectedWard, label: wards.find(ward => ward.Id === selectedWard)?.Name } : null}
+                            onChange={(option) => setSelectedWard(option?.value ?? '')}
+                            isDisabled={!selectedDistrict}
+                            className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                            options={wards.map(ward => ({ value: ward.Id, label: ward.Name }))}
+                            placeholder="Chọn phường/xã"
+                          />
+                        </div>
+                        <div>
+                        <div className='tw-font-bold tw-text-sm'>Quan huyen:</div>
+                        <Select
+                          id="district"
+                          className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
+                          value={districts.find(district => district.Id === selectedDistrict) ? { value: selectedDistrict, label: districts.find(district => district.Id === selectedDistrict)?.Name } : null}
+                          onChange={(option) => setSelectedDistrict(option?.value ?? '')}
+                          isDisabled={!selectedCity}
+                          options={districts.map(district => ({ value: district.Id, label: district.Name }))}
+                          placeholder="Chọn quận/huyện"
+                        />
+                      </div>
+                      <div>
+                        <div className='tw-font-bold tw-text-sm'>Tinh thanh:</div>
+                        <Select
+                          id="city"
+                          className="tw-shadow-sm tw-border-sky-500 tw-rounded-2xl"
+                          options={cities.map(city => ({ value: city.Id, label: city.Name }))}
+                          value={cities.find(city => city.Id === selectedCity) ? { value: selectedCity, label: cities.find(city => city.Id === selectedCity)?.Name } : null}
+                          onChange={(option) => setSelectedCity(option?.value ?? '')}
+                          placeholder="Chọn thành phố"
+                        />
+                      </div>
+                    </div>
+                    <div className="tw-p-4 tw-space-y-2">
+                      <div>
+                        <div className='tw-font-bold tw-text-sm'>Ngày sinh:</div>
+                        <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                          <input
+                            id="dob"
+                            name="dob"
+                            type="date"
+                            required
+                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <div className='tw-font-bold tw-text-sm'>Điện thoại:</div>
+                        <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                          <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                            placeholder={t('signIn.password')}
+                          // value={password}
+                          // onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                        </div>
+                      </div>
+                      <div>
+                        <div className='tw-font-bold tw-text-sm'>Email:</div>
+                        <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                          <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                            placeholder={t('signIn.password')}
+                          // value={password}
+                          // onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                        </div>
+                      </div>
+                      <div>
+                        <div className='tw-font-bold tw-text-sm'>Địa chỉ:</div>
+                        <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
+                          <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
+                            placeholder={t('signIn.password')}
+                          // value={password}
+                          // onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className='tw-px-4'>
-                    <div className='tw-text-gray-500 tw-text-sm'>Quan:</div>
-                    <div className='tw-font-bold text-text-sm'>Pxc</div>
-                  </div>
-                  <div className='tw-px-4'>
-                    <div className='tw-text-gray-500 tw-text-sm'>Tinh:</div>
-                    <div className='tw-font-bold text-text-sm'>Pxc</div>
+                  <div className="tw-grid tw-grid-cols-2 tw-gap-8">
+                    <div className='tw-flex tw-justify-end tw-items-center'>
+                      <div className='tw-bg-green-500 tw-border-green-500 tw-text-white tw-font-bold tw-px-3 tw-py-2 tw-rounded-3xl'>
+                        Cap nhat thong tin
+                      </div>
+                    </div>
+                    <div className='tw-flex tw-justify-start tw-items-center'>
+                      <div className='tw-bg-white tw-border-gray-500 tw-border tw-rounded-3xl tw-px-3 tw-py-2'>
+                        Huy bo
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className='tw-bg-blue-200 tw-mx-5 tw-p-2 tw-rounded-lg'>
-                <div className='tw-font-bold'>Lưu ý:</div>
-                <div>Hệ thống sẽ tự động nâng lớp cho học sinh vào năm học mới.</div>
-              </div>
-            </div>}
-          {/* mat khau va bao mat */}
+            )
+          )}
+
+          {/* MAT KHAU VA BAO MAT */}
           {selectedSection === 2 &&
             <div className='tw-w-full'>
               <div className='tw-ml-5'>
@@ -572,18 +778,109 @@ function Profile() {
                 </div>
               </div>
             </div>}
-          {/* khoa hoc cua ban */}
+          {/* KHOA HOC CUA BAN */}
           {selectedSection === 3 && <div>Khóa học của bạn</div>}
-          {/* tao tai khoan cho con */}
+          {/* TAO TAI KHOAN CHO CON */}
           {selectedSection === 4 && <div>Tạo tài khoản cho con</div>}
-          {/* lien ket tai khoan */}
+          {/* LIEN KET TAI KHOAN */}
           {selectedSection === 5 && <div>Liên kết tài khoản</div>}
-          {/* nhap ma kich hoat */}
+          {/* NHAP MA KICH HOAT */}
           {selectedSection === 6 && <div>Nhập mã kích hoạt</div>}
-          {/* dang xuat */}
+          {/* DANG XUAT */}
           {selectedSection === 7 && <div>Đăng xuất</div>}
         </div>
       </div>
+      <AVTChangeModal
+        title={t('profile.selectAnImage')}
+        modalOpen={choiceModalAVTOpen}
+        setModalOpen={setChoiceModalAVTOpen}
+      >
+        <div className='tw-flex tw-space-x-3'>
+          <div className='tw-bg-teal-300 tw-w-full tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleUploadClick}>
+            <div className='tw-rounded-full tw-bg-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
+              <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large' />
+            </div>
+            <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Upload Image</div>
+          </div>
+          <input
+            type='file'
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept='.jpg,.jpeg,.png,.gif'
+            onChange={handleFileChange}
+          />
+        </div>
+      </AVTChangeModal>
+      <ZoomModal
+        title={t('profile.zoom')}
+        modalOpen={zoomModalAVTOpen}
+        setModalOpen={setZoomModalAVTOpen}
+      >
+        <>
+          <AvatarEditor
+            ref={cropRef}
+            className="tw-col-span-9 tw-mx-auto tw-mb-5 tw-rounded-sm"
+            image={imageSrc}
+            width={320}
+            height={320}
+            border={50}
+            borderRadius={250}
+            scale={zoom}
+            rotate={rotate}
+          />
+          <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
+            Zoom
+          </label>
+          <input
+            type="range"
+            className="tw-col-span-5 tw-transparent tw-h-[4px] tw-w-full tw-cursor-pointer tw-appearance-none tw-border-transparent tw-bg-neutral-200 dark:tw-bg-neutral-600 tw-mt-2"
+            id="customRange1"
+            min={0}
+            max={2}
+            step={0.05}
+            value={zoom}
+            onChange={handleInputZoomChange}
+          />
+          <input
+            type="number"
+            className="tw-bg-dark-2 tw-text-dark-2 tw-col-span-2 tw-py-1.5 tw-rounded-md tw-text-sm tw-font-semibold tw-text-center"
+            min={0}
+            max={2}
+            step={0.05}
+            value={zoom}
+            onChange={handleInputZoomChange}
+          />
+          <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
+            Rotate
+          </label>
+          <input
+            type="range"
+            className="tw-col-span-5 tw-transparent tw-h-[4px] tw-w-full tw-cursor-pointer tw-appearance-none tw-border-transparent tw-bg-neutral-200 dark:tw-bg-neutral-600 tw-mt-2"
+            id="customRange1"
+            min={-180}
+            max={180}
+            value={rotate}
+            step={1}
+            onChange={handleInputRotateChange}
+          />
+          <input
+            type="number"
+            className="tw-bg-dark-2 tw-text-dark-2 tw-col-span-2 tw-py-1.5 tw-rounded-md tw-text-sm tw-font-semibold tw-text-center"
+            min={-180}
+            max={180}
+            step={1}
+            value={rotate}
+            onChange={handleInputRotateChange}
+          />
+        </>
+        <div className='tw-flex tw-justify-between tw-m-3 tw-font-bold'>
+          <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Skip</div>
+          <div className='tw-flex tw-space-x-4'>
+            <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Cancel</div>
+            <div className='tw-cursor-pointer hover:tw-text-gray-700 tw-bg-teal-300 hover:tw-bg-teal-500 tw-rounded-md tw-px-3 tw-py-1' onClick={handleSaveAVT}>Save</div>
+          </div>
+        </div>
+      </ZoomModal>
     </div>
     // <div className="tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-max-w-9xl tw-mx-auto">
     //   <div className="tw-bg-white tw-shadow-lg tw-rounded-sm tw-mb-8">
@@ -795,103 +1092,6 @@ function Profile() {
     //             </div>
     //           </div>
     //         </div>
-    //         <AVTChangeModal
-    //           title={t('profile.selectAnImage')}
-    //           modalOpen={choiceModalAVTOpen}
-    //           setModalOpen={setChoiceModalAVTOpen}
-    //         >
-    //           <div className='tw-flex tw-space-x-3'>
-    //             <div className='tw-bg-teal-300 tw-w-full tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleUploadClick}>
-    //               <div className='tw-rounded-full tw-bg-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
-    //                 <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large' />
-    //               </div>
-    //               <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Upload Image</div>
-    //             </div>
-    //             <input
-    //               type='file'
-    //               ref={fileInputRef}
-    //               style={{ display: 'none' }}
-    //               accept='.jpg,.jpeg,.png,.gif'
-    //               onChange={handleFileChange}
-    //             />
-    //             {/* <div className='tw-bg-teal-300 tw-w-1/2 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-5 tw-space-y-3' onClick={handleEditClick}>
-    //                     <div className='tw-rounded-full tw-border-4 tw-border-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
-    //                         <img className='tw-rounded-full tw-w-full tw-h-full' src={userRedux?.avatar}></img>
-    //                     </div>
-    //                     <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Edit Image</div>
-    //                 </div> */}
-    //           </div>
-    //         </AVTChangeModal>
-    //         <ZoomModal
-    //           title={t('profile.zoom')}
-    //           modalOpen={zoomModalAVTOpen}
-    //           setModalOpen={setZoomModalAVTOpen}
-    //         >
-    //           <>
-    //             <AvatarEditor
-    //               ref={cropRef}
-    //               className="tw-col-span-9 tw-mx-auto tw-mb-5 tw-rounded-sm"
-    //               image={imageSrc}
-    //               width={320}
-    //               height={320}
-    //               border={50}
-    //               borderRadius={250}
-    //               scale={zoom}
-    //               rotate={rotate}
-    //             />
-    //             <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
-    //               Zoom
-    //             </label>
-    //             <input
-    //               type="range"
-    //               className="tw-col-span-5 tw-transparent tw-h-[4px] tw-w-full tw-cursor-pointer tw-appearance-none tw-border-transparent tw-bg-neutral-200 dark:tw-bg-neutral-600 tw-mt-2"
-    //               id="customRange1"
-    //               min={0}
-    //               max={2}
-    //               step={0.05}
-    //               value={zoom}
-    //               onChange={handleInputZoomChange}
-    //             />
-    //             <input
-    //               type="number"
-    //               className="tw-bg-dark-2 tw-text-dark-2 tw-col-span-2 tw-py-1.5 tw-rounded-md tw-text-sm tw-font-semibold tw-text-center"
-    //               min={0}
-    //               max={2}
-    //               step={0.05}
-    //               value={zoom}
-    //               onChange={handleInputZoomChange}
-    //             />
-    //             <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
-    //               Rotate
-    //             </label>
-    //             <input
-    //               type="range"
-    //               className="tw-col-span-5 tw-transparent tw-h-[4px] tw-w-full tw-cursor-pointer tw-appearance-none tw-border-transparent tw-bg-neutral-200 dark:tw-bg-neutral-600 tw-mt-2"
-    //               id="customRange1"
-    //               min={-180}
-    //               max={180}
-    //               value={rotate}
-    //               step={1}
-    //               onChange={handleInputRotateChange}
-    //             />
-    //             <input
-    //               type="number"
-    //               className="tw-bg-dark-2 tw-text-dark-2 tw-col-span-2 tw-py-1.5 tw-rounded-md tw-text-sm tw-font-semibold tw-text-center"
-    //               min={-180}
-    //               max={180}
-    //               step={1}
-    //               value={rotate}
-    //               onChange={handleInputRotateChange}
-    //             />
-    //           </>
-    //           <div className='tw-flex tw-justify-between tw-m-3 tw-font-bold'>
-    //             <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Skip</div>
-    //             <div className='tw-flex tw-space-x-4'>
-    //               <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Cancel</div>
-    //               <div className='tw-cursor-pointer hover:tw-text-gray-700 tw-bg-teal-300 hover:tw-bg-teal-500 tw-rounded-md tw-px-3 tw-py-1' onClick={handleSaveAVT}>Save</div>
-    //             </div>
-    //           </div>
-    //         </ZoomModal>
     //       </div >
     //     </div>
     //   </div>

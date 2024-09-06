@@ -136,9 +136,11 @@ const SignUp = () => {
     //     }
     // };
     async function handleRegister(e: { preventDefault: () => void; }) {
-        setShowCaptcha(true);
         e.preventDefault();
-        // Clear previous error messages
+        if (!showCaptcha) {
+            setShowCaptcha(true);
+            return;
+        }
         setErrorMessageFirstName('')
         setErrorMessageLastName('')
         setErrorMessageUsername('')
@@ -223,7 +225,6 @@ const SignUp = () => {
                 setErrorMessageTermCheck('');
                 setErrorMessageCaptcha('')
 
-                // Iterate over the errorOrder array and set errors in that order
                 errorOrder.forEach(field => {
                     if (error instanceof yup.ValidationError) {
                         const err = error.inner.find(e => e.path === field);

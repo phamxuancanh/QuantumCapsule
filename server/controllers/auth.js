@@ -108,7 +108,7 @@ const signIn = async (req, res, next) => {
 
 const signUp = async (req, res, next) => {
   try {
-    const { firstName, lastName, username, email, password, captchaValue } = req.body.data
+    const { firstName, lastName, username, email, password, city, district, ward, grade, captchaValue } = req.body.data
 
     // Kiểm tra captcha
     const captchaVerificationUrl = 'https://www.google.com/recaptcha/api/siteverify'
@@ -141,8 +141,11 @@ const signUp = async (req, res, next) => {
       username,
       password: hashedPassword,
       email,
+      address: `${ward}, ${district}, ${city}`,
       type: 'local',
-      emailVerified: false
+      emailVerified: false,
+      grade,
+      roleId: 3
     })
 
     // Tạo token xác thực email

@@ -39,6 +39,9 @@ const User = sequelize.define(
     gender: {
       type: DataTypes.STRING
     },
+    grade: {
+      type: DataTypes.INTEGER
+    },
     age: {
       type: DataTypes.INTEGER
     },
