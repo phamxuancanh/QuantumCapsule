@@ -1,5 +1,6 @@
 import { IAnswer } from "api/answer/answer.interfaces";
 import { IQuestion } from "api/question/question.interfaces";
+import { IResult } from "api/result/result.interface";
 
 
 const randomOrderAnswer = (): string =>{
@@ -21,4 +22,13 @@ export const  InitAnswerFromQuestion = (question: IQuestion, resultId?: string):
 }
 export const  InitListAnswerFromListQuestion = (questions: IQuestion[], resultId?: string): IAnswer[] => {
     return questions.map((question) => InitAnswerFromQuestion(question, resultId));
+}
+
+export const InitResult = (totalScore: number, timeStart: Date, timeEnd: Date): IResult => {
+    return {
+        yourScore: 0,
+        totalScore: totalScore,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+    }
 }
