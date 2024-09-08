@@ -57,7 +57,7 @@ const ForgotPassword = () => {
         setLoading(true)
         try {
             await schema.validate({ email }, { abortEarly: false })
-            const result = await sendOTP({ email, captchaValue })
+            const result = await sendOTP({ email, captchaValue, type: 'forgot_password' })
             console.log('result:', result)
             if (result?.data) {
                 console.log('go')
@@ -187,7 +187,6 @@ const ForgotPassword = () => {
                                 {showCaptcha && (
                                     <ReCAPTCHA
                                         sitekey={keySite ?? ''}
-                                        // sitekey='6LdynQEqAAAAAEj_i6vqYyZUNA54yn-oRIdC00Vy'
                                         onChange={handleCaptchaChange}
                                     />
                                 )}

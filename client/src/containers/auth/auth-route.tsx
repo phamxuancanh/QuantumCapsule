@@ -17,36 +17,25 @@
    }
    
    const AuthRoute = ({ children, allowedRoles }: IAuthRouteProps) => {
-     const location = useLocation()
-     const tokens = getFromLocalStorage<any>('persist:auth')
-     const userRole = tokens?.key
-     let data
-    //  if (userRole) {
-    //    try {
-    //      const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication')
-    //      data = giaiMa.toString(CryptoJS.enc.Utf8)
-    //    } catch (error) {
-    //      console.error('Decryption error:', error)
-    //    }
-    //  }
-     const isAuthenticated = useMemo(() => {
-       return !!tokens?.accessToken
-     }, [tokens?.accessToken])
-     if (isAuthenticated && location.pathname === ROUTES.sign_in) {
-       return <Navigate to={ROUTES.home} />
-     }
-     if (!isAuthenticated && location.pathname !== ROUTES.sign_in && location.pathname !== ROUTES.sign_up) {
-       return <Navigate to={ROUTES.sign_in} />
-     }
-    //  if (allowedRoles && data && !allowedRoles.includes(data)) {
-    //    return <Navigate to={ROUTES.notfound} />
-    //  }
-   
-     return (
-          <>
-            {children}
-          </>
-     )
-   }
+    const location = useLocation();
+    const tokens = getFromLocalStorage<any>('persist:auth');
+    const userRole = tokens?.key;
+  
+    const isAuthenticated = useMemo(() => {
+      return !!tokens?.accessToken;
+    }, [tokens?.accessToken]);
+  
+    const publicRoutes = [ROUTES.sign_in, ROUTES.sign_up, ROUTES.forgot_password, ROUTES.reset_password, ROUTES.email_verify, ROUTES.email_verify_send, ROUTES.email_verify_success];
+  
+    if (isAuthenticated && location.pathname === ROUTES.sign_in) {
+      return <Navigate to={ROUTES.home} />;
+    }
+  
+    if (!isAuthenticated && !publicRoutes.includes(location.pathname)) {
+      return <Navigate to={ROUTES.sign_in} />;
+    }
+  
+    return <>{children}</>;
+  };
    export default AuthRoute
    

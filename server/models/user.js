@@ -28,29 +28,29 @@ const User = sequelize.define(
       type: DataTypes.STRING
     },
     type: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+      type: DataTypes.STRING
     },
-    address: {
+    city: {
+      type: DataTypes.STRING
+    },
+    district: {
+      type: DataTypes.STRING
+    },
+    ward: {
       type: DataTypes.STRING
     },
     phone: {
       type: DataTypes.STRING
     },
-    gender: {
-      type: DataTypes.STRING
-    },
-    age: {
+    grade: {
       type: DataTypes.INTEGER
+    },
+    birthOfDate: {
+      type: DataTypes.DATE
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: true
     },
     refreshToken: {
       type: DataTypes.STRING
@@ -69,9 +69,9 @@ const User = sequelize.define(
       type: DataTypes.DATE
     },
     roleId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 'user'
+      defaultValue: 3
     },
     status: {
       type: DataTypes.BOOLEAN,

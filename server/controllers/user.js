@@ -1,5 +1,4 @@
 const { models } = require('../models')
-const bcrypt = require('bcrypt')
 const CryptoJS = require('crypto-js')
 const AWS = require('aws-sdk')
 AWS.config.update({
@@ -44,7 +43,7 @@ const changeAVT = async (req, res, next) => {
 const editUserById = async (req, res, next) => {
   try {
     const { id } = req.params
-    const { firstName, lastName, email, gender, age, password, currentPassword } = req.body.data
+    const { firstName, lastName, dob, phone, email, city, district, ward } = req.body.data
     const userToEdit = await models.User.findByPk(id)
     console.log('------------------------------------------------------')
     console.log('check payload', req.body.data)
@@ -53,21 +52,7 @@ const editUserById = async (req, res, next) => {
     if (!userToEdit) {
       return res.status(404).json({ message: 'MASSAGE.USER_NOT_FOUND' })
     }
-    let updatedUser
-    console.log('check password', password)
-    console.log('check current password', currentPassword)
-    console.log('check user to edit password', userToEdit.password)
-
-    if (password) {
-      const isPasswordValid = bcrypt.compareSync(currentPassword, userToEdit.password)
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: 'MASSAGE.NO_UPDATE', field: 'currentPassword' })
-      }
-      const hashPassword = bcrypt.hashSync(password, 10)
-      updatedUser = await userToEdit.update({ firstName, lastName, email, gender, age, password: hashPassword })
-    } else {
-      updatedUser = await userToEdit.update({ firstName, lastName, email, gender, age })
-    }
+    const updatedUser = await userToEdit.update({ firstName, lastName, dob, phone, email, city, district, ward })
 
     return res.json(updatedUser)
   } catch (error) {

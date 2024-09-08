@@ -3,7 +3,7 @@
         "welcome-to-react": "Xin chào",
         "signIn": {
             "title": "Đăng Nhập",
-            "user_name": "Tên Đăng Nhập hoặc Email",
+            "user_name": "Email",
             "password": "Mật khẩu",
             "submit": "Đăng nhập",
             "keep_signed_in": "Ghi nhớ đăng nhập",
@@ -11,7 +11,7 @@
             "or": "hoặc",
             "no_account": "Chưa có tài khoản?",
             "signUp": "Đăng Ký",
-            "user_name_required": "Username/Email không được để trống",
+            "user_name_required": "Email không được để trống",
             "password_required": "Mật khẩu không được để trống",
             "user_name_not_found": "Không tìm thấy người dùng",
             "password_incorrect": "Mật khẩu sai"

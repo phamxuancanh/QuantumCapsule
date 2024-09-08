@@ -34,7 +34,7 @@ const OTPModal: React.FC<OTPModalProps> = ({ onClose, email }) => {
     console.log('start')
     setLoading(true)
 
-    const result = await sendOTP({ email })
+    const result = await sendOTP({ email, type: 'resend' })
     if (result?.data) {
         setTimeout(() => {
             setLoading(false)

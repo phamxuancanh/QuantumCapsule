@@ -3,7 +3,7 @@
         "welcome-to-react": "Hello",
         "signIn": {
             "title": "Login",
-            "user_name": "Username or Email",
+            "user_name": "Email",
             "password": "Password",
             "keep_signed_in": "Keep me signed in",
             "forgot_password": "Forgot your password?",
@@ -11,9 +11,9 @@
             "or": "or",
             "no_account": "Have not account yet?",
             "signUp": "Sign Up",
-            "user_name_required": "Username/Email is required",
+            "email_required": "Email is required",
             "password_required": "Password is required",
-            "user_name_not_found": "Username/Email is not registered",
+            "user_name_not_found": "Email is not registered",
             "password_incorrect": "Password is invalid"
         },
         "signUp": {

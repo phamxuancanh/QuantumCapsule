@@ -1,21 +1,19 @@
 /* eslint-disable no-template-curly-in-string */
-const axios = require('axios') // Đảm bảo đã cài đặt axios
+const axios = require('axios')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { models } = require('../models')
-// const client = require('../middlewares/connectRedis')
-const passport = require('../middlewares/passport-setup')
 const nodemailer = require('nodemailer')
 const path = require('path')
 const fs = require('fs')
-const { Op } = require('sequelize')
 const {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken
 } = require('../middlewares/jwtService')
 const CryptoJS = require('crypto-js')
-// TODO: move to environment variables
+const admin = require('../config/firebase-admin-setup')
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -25,20 +23,33 @@ const transporter = nodemailer.createTransport({
 })
 const signIn = async (req, res, next) => {
   try {
-    const { username, password } = req.body.data
-    console.log(req.body.data, 'req.body.data')
-    const user = await models.User.findOne({
-      where: {
-        [Op.or]: [
-          { username },
-          { email: username }
-        ]
-      }
-    })
+    const { email, password, rememberChecked } = req.body.data
+    console.log(req.body.data)
+    console.log(req.body)
+    console.log(email)
+    if (!email || !password) {
+      return res.status(400).json({
+        code: 400,
+        message: 'Email and password are required.'
+      })
+    }
+    const user = await models.User.findOne({ where: { email } })
     if (!user) {
       return res.status(401).json({
         code: 401,
         message: 'Username is not registered.'
+      })
+    }
+    if (user.type === 'google') {
+      return res.status(401).json({
+        code: 401,
+        message: 'Please sign in using Google.'
+      })
+    }
+    if (user.type === 'github') {
+      return res.status(401).json({
+        code: 401,
+        message: 'Please sign in using GitHub.'
       })
     }
     const isPasswordValid = bcrypt.compareSync(password, user.password)
@@ -48,25 +59,27 @@ const signIn = async (req, res, next) => {
         message: 'Password is incorrect.'
       })
     }
-    // Check if the email is verified
     if (!user.emailVerified) {
       return res.status(401).json({
         code: 401,
         message: 'Email is not verified.'
       })
     }
+
     const accessToken = await signAccessToken(user.id)
-    const refreshToken = await signRefreshToken(user.id)
+    let refreshToken = null
 
+    if (rememberChecked) {
+      refreshToken = await signRefreshToken(user.id)
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        sameSite: 'Strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000
+      })
+    }
     const expire = new Date()
-    expire.setMinutes(expire.getMinutes() + 1)
+    expire.setDate(expire.getDate() + 5)
     await models.User.update({ expire }, { where: { id: user.id } })
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'Strict',
-      maxAge: 60 * 60 * 1000
-    })
     res.setHeader('authorization', accessToken)
     const role = await models.Role.findOne({
       where: { id: user.roleId }
@@ -76,19 +89,26 @@ const signIn = async (req, res, next) => {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      username: user.username,
       email: user.email,
       avatar: user.avatar,
-      key: encryptedRole
+      key: encryptedRole,
+      grade: user.grade,
+      phone: user.phone,
+      city: user.city,
+      district: user.district,
+      ward: user.ward,
+      dob: user.birthOfDate ? user.birthOfDate.toISOString().split('T')[0] : ''
     }
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
+    console.log(error)
     next(error)
   }
 }
+
 const signUp = async (req, res, next) => {
   try {
-    const { firstName, lastName, username, email, password, captchaValue } = req.body.data
+    const { firstName, lastName, email, phone, password, city, district, ward, grade, captchaValue } = req.body.data
 
     // Kiểm tra captcha
     const captchaVerificationUrl = 'https://www.google.com/recaptcha/api/siteverify'
@@ -103,11 +123,6 @@ const signUp = async (req, res, next) => {
       return res.status(401).json({ code: 401, message: 'Captcha verification failed.' })
     }
 
-    const userByUsername = await models.User.findOne({ where: { username } })
-    if (userByUsername) {
-      return res.status(401).json({ code: 401, message: 'Username is already registered.' })
-    }
-
     const userByEmail = await models.User.findOne({ where: { email } })
     if (userByEmail) {
       return res.status(401).json({ code: 401, message: 'Email is already registered.' })
@@ -118,14 +133,20 @@ const signUp = async (req, res, next) => {
     const newUser = await models.User.create({
       firstName,
       lastName,
-      username,
       password: hashedPassword,
       email,
-      emailVerified: false
+      phone,
+      city,
+      district,
+      ward,
+      type: 'local',
+      emailVerified: false,
+      grade,
+      roleId: 3
     })
 
     // Tạo token xác thực email
-    const emailToken = jwt.sign({ id: newUser.id, username: newUser.username, email: newUser.email }, 'your-secret-key', { expiresIn: '1h' })
+    const emailToken = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
 
     // Định nghĩa URL xác thực
     const confirmationUrl = `http://localhost:${process.env.CLIENT_PORT}/verify/email?token=${emailToken}`
@@ -147,41 +168,36 @@ const signUp = async (req, res, next) => {
 
     return res.status(200).json({ success: true, message: 'Confirmation email sent. Please check your email.' })
   } catch (error) {
+    console.log(error)
     next(error)
   }
 }
 const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query
-    console.log(req.data, 'token')
+    console.log(token, 'token')
     if (!token) {
       return res.status(400).json({ message: 'Missing token.' })
     }
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+    console.log(decoded, 'decoded')
+    const { id, email } = decoded
 
-    // Verify the token
-    const decoded = jwt.verify(token, 'your-secret-key')
-    const { id, username, email } = decoded
-
-    // Find the user in the database
-    const user = await models.User.findOne({ where: { id, username, email } })
+    const user = await models.User.findOne({ where: { id, email } })
     if (!user) {
       return res.status(400).json({ message: 'Invalid token.' })
     }
-
-    // Check if the email is already verified
     if (user.emailVerified) {
       return res.status(400).json({ message: 'Email is already verified.' })
     }
-
-    // Update the user's emailVerified status
     user.emailVerified = true
     await user.save()
-
-    // Optionally, generate an access token for the user
-    const accessToken = jwt.sign({ id: user.id, username: user.username, email: user.email }, 'your-secret-key', { expiresIn: '1h' })
+    // const accessToken = jwt.sign({ id: user.id, email: user.email }, 'your-secret-key', { expiresIn: '1h' })
+    const accessToken = await signAccessToken({ id: user.id, email: user.email })
 
     return res.status(200).json({ success: true, message: 'Email verified successfully.', accessToken })
   } catch (error) {
+    console.log(error)
     if (error.name === 'TokenExpiredError') {
       return res.status(400).json({ message: 'Token has expired.' })
     }
@@ -210,77 +226,31 @@ const refreshToken = async (req, res, next) => {
     next(error)
   }
 }
+
 const signOut = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies
-    console.log('TOKENNNNNNNNNNNNNNN')
     console.log(refreshToken)
     if (!refreshToken) {
-      return res.status(403).json({ error: { message: 'Unauthorized' } })
+      console.log('No refresh token provided')
+    } else {
+      const userId = await verifyRefreshToken(refreshToken)
+      const user = await models.User.findByPk(userId)
+      if (!user) {
+        return res.status(404).json({ error: { message: 'User not found' } })
+      }
+      res.cookie('refreshToken', '', { expires: new Date(0) })
+      res.cookie('connect.sid', '', { expires: new Date(0) })
+      user.refreshToken = null
+      user.expire = null
+      await user.save()
     }
-    const userId = await verifyRefreshToken(refreshToken)
-    console.log(userId, 'userId')
-    const user = await models.User.findByPk(userId)
-    if (!user) {
-      return res.status(404).json({ error: { message: 'User not found' } })
-    }
-    res.cookie('refreshToken', '', { expires: new Date(0) })
-    res.cookie('connect.sid', '', { expires: new Date(0) })
-    // Clear the refresh token and expire in the database
-    user.refreshToken = null
-    user.expire = null
-    await user.save()
-
-    // Produce a message to Kafka with full user data
     return res.status(200).json({ success: true })
   } catch (error) {
     console.log(error)
     next(error)
   }
 }
-// const sendOTP = async (req, res, next) => {
-//   try {
-//     const { email } = req.body.data
-//     console.log(req.body.data, 'req.body.data')
-//     if (!email) {
-//       return res.status(400).json({ message: 'Missing email.' })
-//     }
-//     const user = await models.User.findOne({ where: { email } })
-//     if (!user) {
-//       return res.status(400).json({ message: 'User not found.' })
-//     }
-//     const otp = Math.floor(100000 + Math.random() * 900000)
-//     const otpExpire = new Date()
-//     otpExpire.setMinutes(otpExpire.getMinutes() + 5)
-
-//     await models.User.update({ otp, otpExpire }, { where: { email } })
-
-//     const mailOptions = {
-//       from: 'canhmail292@gmail.com', // It's good practice to use a 'noreply' address for automated emails
-//       to: email, // The recipient's email address
-//       subject: 'Email Verification Code',
-//       html: `Dear ${user.firstName},<br>
-//         Thank you for using our service.<br><br>
-//         Please confirm your e-mail address by entering the code below into the verification form.<br><br>
-//         <strong>Your OTP is ${otp}. It will expire in 5 minutes.</strong><br><br>
-//         * This is an automated e-mail. Please do not respond to this address.<br>
-//         * Please disregard this message if you receive it and did not request to change your password.`
-//     }
-
-//     transporter.sendMail(mailOptions, function (error, info) {
-//       if (error) {
-//         console.log(error)
-//         return res.status(500).json({ message: 'Failed to send OTP.' })
-//       } else {
-//         console.log('Email sent: ' + info.response)
-//         // Indicate that the OTP was sent successfully
-//         return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
-//       }
-//     })
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 const checkEmail = async (req, res, next) => {
   try {
     const { email } = req.body.data
@@ -296,29 +266,37 @@ const checkEmail = async (req, res, next) => {
     next(error)
   }
 }
-
 const sendOTP = async (req, res, next) => {
   try {
-    const { email, captchaValue } = req.body.data
+    const { email, captchaValue, type } = req.body.data
     console.log(req.body.data, 'req.body.data')
-    if (!email || !captchaValue) {
-      return res.status(400).json({ message: 'Missing email or captcha token.' })
-    }
-    const captchaVerifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-      params: {
-        secret: process.env.SECRET_KEY_CAPTCHA,
-        response: captchaValue
-      }
-    })
 
-    if (!captchaVerifyResponse.data.success) {
-      return res.status(400).json({ message: 'Invalid CAPTCHA. Please try again.' })
+    if (!email) {
+      return res.status(400).json({ message: 'Missing email.' })
+    }
+
+    if (type === 'forgot_password') {
+      if (!captchaValue) {
+        return res.status(400).json({ message: 'Missing captcha token.' })
+      }
+
+      const captchaVerifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+        params: {
+          secret: process.env.SECRET_KEY_CAPTCHA,
+          response: captchaValue
+        }
+      })
+
+      if (!captchaVerifyResponse.data.success) {
+        return res.status(400).json({ message: 'Invalid CAPTCHA. Please try again.' })
+      }
     }
 
     const user = await models.User.findOne({ where: { email } })
     if (!user) {
       return res.status(400).json({ message: 'User not found.' })
     }
+
     const otp = Math.floor(100000 + Math.random() * 900000)
     const otpExpire = new Date()
     otpExpire.setMinutes(otpExpire.getMinutes() + 5)
@@ -350,6 +328,59 @@ const sendOTP = async (req, res, next) => {
     next(error)
   }
 }
+// const sendOTP = async (req, res, next) => {
+//   try {
+//     const { email, captchaValue, type } = req.body.data
+//     console.log(req.body.data, 'req.body.data')
+//     if (!email || !captchaValue) {
+//       return res.status(400).json({ message: 'Missing email or captcha token.' })
+//     }
+//     const captchaVerifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+//       params: {
+//         secret: process.env.SECRET_KEY_CAPTCHA,
+//         response: captchaValue
+//       }
+//     })
+
+//     if (!captchaVerifyResponse.data.success) {
+//       return res.status(400).json({ message: 'Invalid CAPTCHA. Please try again.' })
+//     }
+
+//     const user = await models.User.findOne({ where: { email } })
+//     if (!user) {
+//       return res.status(400).json({ message: 'User not found.' })
+//     }
+//     const otp = Math.floor(100000 + Math.random() * 900000)
+//     const otpExpire = new Date()
+//     otpExpire.setMinutes(otpExpire.getMinutes() + 5)
+
+//     await models.User.update({ otp, otpExpire }, { where: { email } })
+
+//     const mailOptions = {
+//       from: 'canhmail292@gmail.com',
+//       to: email,
+//       subject: 'Email Verification Code',
+//       html: `Dear ${user.firstName},<br>
+//         Thank you for using our service.<br><br>
+//         Please confirm your e-mail address by entering the code below into the verification form.<br><br>
+//         <strong>Your OTP is ${otp}. It will expire in 5 minutes.</strong><br><br>
+//         * This is an automated e-mail. Please do not respond to this address.<br>
+//         * Please disregard this message if you receive it and did not request to change your password.`
+//     }
+
+//     transporter.sendMail(mailOptions, function (error, info) {
+//       if (error) {
+//         console.log(error)
+//         return res.status(500).json({ message: 'Failed to send OTP.' })
+//       } else {
+//         console.log('Email sent: ' + info.response)
+//         return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
+//       }
+//     })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
 const verifyOTP = async (req, res, next) => {
   try {
     const { email, otp } = req.body.data
@@ -367,8 +398,6 @@ const verifyOTP = async (req, res, next) => {
       return res.status(410).json({ message: 'OTP has expired.' })
     }
     await models.User.update({ otp: null, otpExpire: null }, { where: { email } })
-
-    // Send a success response
     res.status(200).json({ message: 'OTP verified successfully.' })
   } catch (error) {
     next(error)
@@ -376,16 +405,9 @@ const verifyOTP = async (req, res, next) => {
 }
 const changePassword = async (req, res, next) => {
   try {
-    const { username, oldPassword, newPassword } = req.body
-    const user = await models.User.findOne({
-      where: { username }
-    })
-    if (!user) {
-      return res.status(401).json({
-        code: 401,
-        message: 'Username is not registered.'
-      })
-    }
+    const { id } = req.params
+    const { oldPassword, newPassword } = req.body
+    const user = await models.User.findByPk(id)
     const isPasswordValid = bcrypt.compareSync(oldPassword, user.password)
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -396,9 +418,6 @@ const changePassword = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10)
     const hashPassword = bcrypt.hashSync(newPassword, salt)
     await user.update({ password: hashPassword })
-
-    // Produce a message to Kafka with full user data
-
     return res.status(200).json({ success: true })
   } catch (error) {
     next(error)
@@ -416,68 +435,199 @@ const resetPassword = async (req, res, next) => {
         message: 'Email is not registered.'
       })
     }
-    // const salt = await bcrypt.genSalt(10)
-    // const hashPassword = bcrypt.hashSync(newPassword, salt)
     const hashPassword = await bcrypt.hash(newPassword, 10)
     await user.update({ password: hashPassword })
-
-    // Optionally, produce a message to Kafka with full user data
-
     return res.status(200).json({ success: true, message: 'Password has been reset successfully.' })
   } catch (error) {
     next(error)
   }
 }
-
-const signInWithGoogle = passport.authenticate('google', { scope: ['profile', 'email'] })
-
-const googleCallback = (req, res, next) => {
-  passport.authenticate('google', async (err, user, info) => {
-    if (err || !user) {
-      console.log(err)
-      return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
+// use Firebase Authentication
+const signInOrRegisterWithFacebook = async (req, res) => {
+  try {
+    const { idToken } = req.body
+    if (!idToken) {
+      return res.status(400).json({ message: 'Missing idToken' })
     }
-    const accessToken = await signAccessToken(user.id)
-    const refreshToken = await signRefreshToken(user.id)
-    const expire = new Date()
-    expire.setDate(expire.getDate() + 1)
-    await models.User.update({ expire }, { where: { id: user.id } })
-
+    const decodedToken = await admin.auth().verifyIdToken(idToken)
+    console.log(decodedToken, 'decodedToken')
+    const email = decodedToken.email
+    const nameParts = decodedToken.name.split(' ')
+    const userInfo = {
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
+      email,
+      avatar: decodedToken.picture,
+      roleId: 3,
+      type: 'facebook',
+      emailVerified: true
+    }
+    let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
+    if (existingUser) {
+      if (existingUser.type !== 'facebook') {
+        return res.status(400).json({
+          message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
+        })
+      }
+      await existingUser.update(userInfo)
+    } else {
+      existingUser = await models.User.create(userInfo)
+    }
+    const accessToken = await signAccessToken(existingUser.id)
+    const refreshToken = await signRefreshToken(existingUser.id)
+    console.log(refreshToken, 'refreshToken')
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
-
-    // Produce a message to Kafka with full user data
-
-    // Trả về accessToken dưới dạng query string để lưu trữ trên client
-    return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
-  })(req, res, next)
+    const expire = new Date()
+    expire.setDate(expire.getDate() + 5)
+    await models.User.update({ expire }, { where: { id: existingUser.id } })
+    const role = await models.Role.findOne({
+      where: { id: existingUser.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: existingUser.id,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      email: existingUser.email,
+      avatar: existingUser.avatar,
+      key: encryptedRole,
+      emailVerified: true
+    }
+    return res.status(200).json({ success: true, accessToken, user: userResult })
+  } catch (error) {
+    console.error('Lỗi khi đăng ký với Facebook:', error)
+    return res.status(500).json({ message: 'Lỗi khi đăng ký với Facebook' })
+  }
 }
-const signInWithFacebook = passport.authenticate('facebook', { scope: ['email'] })
 
-const facebookCallback = (req, res, next) => {
-  passport.authenticate('facebook', async (err, user, info) => {
-    if (err || !user) {
-      console.log(err)
-      console.log(user)
-      return res.redirect(`http://localhost:${process.env.CLIENT_PORT}`)
+const signInOrRegisterWithGoogle = async (req, res) => {
+  try {
+    const { idToken } = req.body
+    if (!idToken) {
+      return res.status(400).json({ message: 'Missing idToken' })
     }
-    const accessToken = await signAccessToken(user.id)
-    const refreshToken = await signRefreshToken(user.id)
-    const expire = new Date()
-    expire.setDate(expire.getDate() + 1)
-    await models.User.update({ expire }, { where: { id: user.id } })
+    const decodedToken = await admin.auth().verifyIdToken(idToken)
+    const email = decodedToken.email
+    const userInfo = {
+      firstName: decodedToken.name.split(' ')[0] || '',
+      lastName: decodedToken.name.split(' ')[1] || '',
+      email,
+      avatar: decodedToken.picture,
+      roleId: 3,
+      type: 'google',
+      emailVerified: true
+    }
+    let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
+    if (existingUser) {
+      if (existingUser.type !== 'google') {
+        return res.status(400).json({
+          message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
+        })
+      }
+      await existingUser.update(userInfo)
+    } else {
+      existingUser = await models.User.create(userInfo)
+    }
+    const accessToken = await signAccessToken(existingUser.id)
+    const refreshToken = await signRefreshToken(existingUser.id)
+    console.log(refreshToken, 'refreshToken')
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'Strict',
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
-    // Trả về accessToken dưới dạng query string để lưu trữ trên client
-    return res.redirect(`http://localhost:${process.env.CLIENT_PORT}?accessToken=${accessToken}`)
-  })(req, res, next)
+    const expire = new Date()
+    expire.setDate(expire.getDate() + 5)
+    await models.User.update({ expire }, { where: { id: existingUser.id } })
+
+    res.setHeader('authorization', accessToken)
+    const role = await models.Role.findOne({
+      where: { id: existingUser.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: existingUser.id,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      email: existingUser.email,
+      avatar: existingUser.avatar,
+      key: encryptedRole,
+      emailVerified: true
+    }
+    return res.status(200).json({ success: true, accessToken, user: userResult })
+  } catch (error) {
+    console.error('Lỗi khi đăng ký với Google:', error)
+    res.status(500).json({ message: 'Lỗi khi đăng ký với Google' })
+  }
+}
+
+const signInOrRegisterWithGitHub = async (req, res) => {
+  try {
+    const { githubToken } = req.body
+    console.log(req.body, 'accessToken')
+    if (!githubToken) {
+      return res.status(400).json({ message: 'Missing accessToken' })
+    }
+    const { Octokit } = await import('@octokit/rest')
+    const octokit = new Octokit({ auth: githubToken })
+    const { data: userData } = await octokit.rest.users.getAuthenticated()
+    console.log(userData, 'userData')
+    const { data: emailData } = await octokit.request('GET /user/emails')
+    const primaryEmail = emailData.find((email) => email.primary).email
+    const userInfo = {
+      firstName: (userData.name && userData.name.split(' ')[0]) || '',
+      lastName: (userData.name && userData.name.split(' ')[1]) || '',
+      email: primaryEmail,
+      avatar: userData.avatar_url,
+      roleId: 3,
+      type: 'github'
+    }
+    let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
+    if (existingUser) {
+      if (existingUser.type !== 'github') {
+        return res.status(400).json({
+          message: `Email đã được sử dụng với phương thức đăng nhập khác (${existingUser.type}). Vui lòng đăng nhập bằng phương thức đó.`
+        })
+      }
+      await existingUser.update(userInfo)
+    } else {
+      existingUser = await models.User.create(userInfo)
+    }
+    const accessToken = await signAccessToken(existingUser.id)
+    const refreshToken = await signRefreshToken(existingUser.id)
+    console.log(refreshToken, 'refreshToken')
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'Strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    })
+    const expire = new Date()
+    expire.setDate(expire.getDate() + 5)
+    await models.User.update({ expire }, { where: { id: existingUser.id } })
+
+    res.setHeader('authorization', accessToken)
+    const role = await models.Role.findOne({
+      where: { id: existingUser.roleId }
+    })
+    const encryptedRole = CryptoJS.AES.encrypt(role.name, process.env.ACCESS_TOKEN_SECRET).toString()
+    const userResult = {
+      id: existingUser.id,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      email: existingUser.email,
+      avatar: existingUser.avatar,
+      key: encryptedRole
+    }
+    return res.status(200).json({ success: true, accessToken, user: userResult })
+  } catch (error) {
+    console.error('Error during GitHub sign in or registration:', error)
+    res.status(500).json({ message: 'GitHub sign in or registration failed' })
+  }
 }
 
 module.exports = {
@@ -488,10 +638,9 @@ module.exports = {
   signOut,
   changePassword,
   resetPassword,
-  signInWithGoogle,
-  googleCallback,
-  signInWithFacebook,
-  facebookCallback,
+  signInOrRegisterWithFacebook,
+  signInOrRegisterWithGoogle,
+  signInOrRegisterWithGitHub,
   sendOTP,
   verifyOTP,
   checkEmail

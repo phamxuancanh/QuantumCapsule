@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import Select from 'react-select'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from "react-router-dom"
-import { signUp, googleSignIn, facebookSignIn } from "api/user/api"
+import { signUp, googleSignIn } from "api/user/api"
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
 import { useTranslation } from 'react-i18next'
@@ -25,7 +25,6 @@ const SignUp = () => {
     const navigate = useNavigate()
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
-    const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [phone, setPhone] = useState("")
     const [password, setPassword] = useState("")
@@ -33,7 +32,6 @@ const SignUp = () => {
     const [termCheck, setTermCheck] = useState(false)
     const [errorMessageFirstName, setErrorMessageFirstName] = useState("")
     const [errorMessageLastName, setErrorMessageLastName] = useState("")
-    const [errorMessageUsername, setErrorMessageUsername] = useState("")
     const [errorMessageEmail, setErrorMessageEmail] = useState("")
     const [errorMessagePassword, setErrorMessagePassword] = useState("")
     const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState("")
@@ -53,7 +51,7 @@ const SignUp = () => {
     const [wards, setWards] = useState<Ward[]>([])
     const [selectedWard, setSelectedWard] = useState<string>('')
     const [selectedClass, setSelectedClass] = useState('');
-    const [classes, setClasses] = useState([
+    const [classes] = useState([
         { Id: '1', Name: 'Khối 1' },
         { Id: '2', Name: 'Khối 2' },
         { Id: '3', Name: 'Khối 3' },
@@ -77,11 +75,11 @@ const SignUp = () => {
 
     useEffect(() => {
         if (selectedCity) {
-            const city = cities.find(city => city.Id === selectedCity);
+            const city = cities.find(city => city.Name === selectedCity); // Tìm kiếm theo Name
             setDistricts(city?.Districts || []);
-            setSelectedDistrict(''); // Reset district selection
-            setWards([]); // Clear wards
-            setSelectedWard(''); // Reset ward selection
+            setSelectedDistrict('');
+            setWards([]);
+            setSelectedWard('');
         } else {
             setDistricts([]);
         }
@@ -89,7 +87,7 @@ const SignUp = () => {
 
     useEffect(() => {
         if (selectedDistrict) {
-            const district = districts.find(district => district.Id === selectedDistrict);
+            const district = districts.find(district => district.Name === selectedDistrict); // Tìm kiếm theo Name
             setWards(district?.Wards || []);
             setSelectedWard('');
         } else {
@@ -97,7 +95,6 @@ const SignUp = () => {
         }
     }, [selectedDistrict]);
 
-    // Update classes when a ward is selected
     useEffect(() => {
         if (selectedWard) {
             const ward = wards.find(ward => ward.Id === selectedWard);
@@ -107,8 +104,6 @@ const SignUp = () => {
     const handleAccountTypeChange = (type: any) => {
         setTypeAccount(type);
     }
-    // TODO: them loading
-
     const languageOptions = useMemo(() => {
         return [
             { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
@@ -130,18 +125,14 @@ const SignUp = () => {
         setErrorMessageCaptcha('');
         setCaptchaValue(value);
     };
-    // const handleEmailBlur = () => {
-    //     if (email) {
-    //         setShowCaptcha(true);
-    //     }
-    // };
     async function handleRegister(e: { preventDefault: () => void; }) {
-        setShowCaptcha(true);
         e.preventDefault();
-        // Clear previous error messages
+        if (!showCaptcha) {
+            setShowCaptcha(true);
+            return;
+        }
         setErrorMessageFirstName('')
         setErrorMessageLastName('')
-        setErrorMessageUsername('')
         setErrorMessageEmail('')
         setErrorMessagePassword('')
         setErrorMessageConfirmPassword('')
@@ -150,12 +141,11 @@ const SignUp = () => {
 
         const messFirstName = t('signUp.first_name_required');
         const messLastName = t('signUp.last_name_required');
-        const messUsername = t('signUp.user_name_required');
         const messEmail = t('signUp.email_required');
         const messPassword = t('signUp.password_required');
         const messConfirm = t('signUp.confirm_password_required');
         const messTermCheckBox = t('signUp.term_required');
-
+        const messPhone = t('signUp.phone_required');
         const schema = yup.object({
             firstName: yup
                 .string()
@@ -169,10 +159,10 @@ const SignUp = () => {
                 .string()
                 .email(t('signUp.email_invalid'))
                 .required(messEmail),
-            username: yup
+            phone: yup
                 .string()
-                .required(messUsername)
-                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/, t('signUp.username_invalid')),
+                .required(messPhone)
+                .matches(/^[0-9]{10}$/, t('signUp.phone_invalid')),
             password: yup
                 .string()
                 .required(messPassword)
@@ -190,9 +180,9 @@ const SignUp = () => {
         }).required();
 
         try {
-            await schema.validate({ firstName, lastName, username, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
+            await schema.validate({ firstName, lastName, email, phone, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
             setLoading(true);
-            const result = await signUp({ firstName, lastName, username, email, password, captchaValue })
+            const result = await signUp({ firstName, lastName, email, phone, password, city: selectedCity, district: selectedDistrict, ward: selectedWard, grade: selectedClass, captchaValue })
             console.log('result')
             console.log(result)
             console.log('result.data:', result?.data)
@@ -216,14 +206,12 @@ const SignUp = () => {
                 // Clear previous error messages again
                 setErrorMessageFirstName('');
                 setErrorMessageLastName('');
-                setErrorMessageUsername('');
                 setErrorMessageEmail('');
                 setErrorMessagePassword('');
                 setErrorMessageConfirmPassword('');
                 setErrorMessageTermCheck('');
                 setErrorMessageCaptcha('')
 
-                // Iterate over the errorOrder array and set errors in that order
                 errorOrder.forEach(field => {
                     if (error instanceof yup.ValidationError) {
                         const err = error.inner.find(e => e.path === field);
@@ -234,9 +222,6 @@ const SignUp = () => {
                                     break;
                                 case 'lastName':
                                     setErrorMessageLastName(err.message);
-                                    break;
-                                case 'username':
-                                    setErrorMessageUsername(err.message);
                                     break;
                                 case 'email':
                                     setErrorMessageEmail(err.message);
@@ -268,9 +253,7 @@ const SignUp = () => {
                             if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
                                 console.log('error.code:', error.message);
                                 const message = String(error.message);
-                                if (message.includes('Username')) {
-                                    setErrorMessageUsername(message);
-                                } else if (message.includes('Email')) {
+                                if (message.includes('Email')) {
                                     setErrorMessageEmail(message);
                                 } else if (message.includes('Captcha')) {
                                     setErrorMessageCaptcha(message);
@@ -394,24 +377,6 @@ const SignUp = () => {
                                     <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
                                         <input
                                             id="email-address"
-                                            name="userName"
-                                            type="userName"
-                                            autoComplete="userName"
-                                            required
-                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('signUp.user_name')}
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                        />
-                                        <AccountCircleOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
-                                    </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageUsername}</div>
-
-                                </div>
-                                <div>
-                                    <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
-                                        <input
-                                            id="email-address"
                                             name="email"
                                             type="email"
                                             autoComplete="email"
@@ -435,7 +400,7 @@ const SignUp = () => {
                                             required
                                             className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
                                             placeholder={t('signUp.phone')}
-                                            value={email}
+                                            value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                         />
                                         <LocalPhoneOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
@@ -487,8 +452,8 @@ const SignUp = () => {
                                                     <Select
                                                         id="city"
                                                         className="tw-shadow-sm tw-border-sky-500 tw-rounded-2xl"
-                                                        options={cities.map(city => ({ value: city.Id, label: city.Name }))}
-                                                        value={cities.find(city => city.Id === selectedCity) ? { value: selectedCity, label: cities.find(city => city.Id === selectedCity)?.Name } : null}
+                                                        options={cities.map(city => ({ value: city.Name, label: city.Name }))}
+                                                        value={cities.find(city => city.Name === selectedCity) ? { value: selectedCity, label: selectedCity } : null}
                                                         onChange={(option) => setSelectedCity(option?.value ?? '')}
                                                         placeholder="Chọn thành phố"
                                                     />
@@ -498,11 +463,11 @@ const SignUp = () => {
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="district"
-                                                        value={districts.find(district => district.Id === selectedDistrict) ? { value: selectedDistrict, label: districts.find(district => district.Id === selectedDistrict)?.Name } : null}
+                                                        value={districts.find(district => district.Name === selectedDistrict) ? { value: selectedDistrict, label: selectedDistrict } : null}
                                                         onChange={(option) => setSelectedDistrict(option?.value ?? '')}
                                                         isDisabled={!selectedCity}
                                                         className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
-                                                        options={districts.map(district => ({ value: district.Id, label: district.Name }))}
+                                                        options={districts.map(district => ({ value: district.Name, label: district.Name }))}
                                                         placeholder="Chọn quận/huyện"
                                                     />
                                                 </div>
@@ -513,15 +478,14 @@ const SignUp = () => {
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="ward"
-                                                        value={wards.find(ward => ward.Id === selectedWard) ? { value: selectedWard, label: wards.find(ward => ward.Id === selectedWard)?.Name } : null}
-                                                        onChange={(option) => setSelectedWard(option?.value ?? '')}
+                                                        value={wards.find(ward => ward.Name === selectedWard) ? { value: selectedWard, label: selectedWard } : null}
+                                                        onChange={(option) => setSelectedWard(option?.label ?? '')}
                                                         isDisabled={!selectedDistrict}
                                                         className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
-                                                        options={wards.map(ward => ({ value: ward.Id, label: ward.Name }))}
+                                                        options={wards.map(ward => ({ value: ward.Name, label: ward.Name }))}
                                                         placeholder="Chọn phường/xã"
                                                     />
                                                 </div>
-
                                                 {/* Selector for Class */}
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
@@ -590,16 +554,8 @@ const SignUp = () => {
                                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48"> <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path> </svg>
                                 </div>
                                 <div className="tw-bg-white tw-rounded-full tw-p-1 tw-cursor-pointer">
-                                    <svg width="48" height="48" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <g clip-path="url(#clip0_5_8066)">
-                                            <path d="M45 22.5C45 10.0737 34.9263 0 22.5 0C10.0737 0 0 10.0737 0 22.5C0 33.7303 8.22797 43.0388 18.9844 44.7267V29.0039H13.2715V22.5H18.9844V17.543C18.9844 11.9039 22.3436 8.78906 27.483 8.78906C29.9447 8.78906 32.5195 9.22851 32.5195 9.22851V14.7656H29.6824C26.8873 14.7656 26.0156 16.5001 26.0156 18.2795V22.5H32.2559L31.2583 29.0039H26.0156V44.7267C36.772 43.0388 45 33.7305 45 22.5Z" fill="#1877F2" />
-                                            <path d="M31.2583 29.0039L32.2559 22.5H26.0156V18.2795C26.0156 16.4999 26.8873 14.7656 29.6824 14.7656H32.5195V9.22852C32.5195 9.22852 29.9447 8.78906 27.4829 8.78906C22.3436 8.78906 18.9844 11.9039 18.9844 17.543V22.5H13.2715V29.0039H18.9844V44.7267C20.1474 44.9089 21.3228 45.0003 22.5 45C23.6772 45.0004 24.8526 44.909 26.0156 44.7267V29.0039H31.2583Z" fill="white" />
-                                        </g>
-                                        <defs>
-                                            <clipPath id="clip0_5_8066">
-                                                <rect width="45" height="45" fill="white" />
-                                            </clipPath>
-                                        </defs>
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 64 64">
+                                        <path d="M32 6C17.641 6 6 17.641 6 32c0 12.277 8.512 22.56 19.955 25.286-.592-.141-1.179-.299-1.755-.479V50.85c0 0-.975.325-2.275.325-3.637 0-5.148-3.245-5.525-4.875-.229-.993-.827-1.934-1.469-2.509-.767-.684-1.126-.686-1.131-.92-.01-.491.658-.471.975-.471 1.625 0 2.857 1.729 3.429 2.623 1.417 2.207 2.938 2.577 3.721 2.577.975 0 1.817-.146 2.397-.426.268-1.888 1.108-3.57 2.478-4.774-6.097-1.219-10.4-4.716-10.4-10.4 0-2.928 1.175-5.619 3.133-7.792C19.333 23.641 19 22.494 19 20.625c0-1.235.086-2.751.65-4.225 0 0 3.708.026 7.205 3.338C28.469 19.268 30.196 19 32 19s3.531.268 5.145.738c3.497-3.312 7.205-3.338 7.205-3.338.567 1.474.65 2.99.65 4.225 0 2.015-.268 3.19-.432 3.697C46.466 26.475 47.6 29.124 47.6 32c0 5.684-4.303 9.181-10.4 10.4 1.628 1.43 2.6 3.513 2.6 5.85v8.557c-.576.181-1.162.338-1.755.479C49.488 54.56 58 44.277 58 32 58 17.641 46.359 6 32 6zM33.813 57.93C33.214 57.972 32.61 58 32 58 32.61 58 33.213 57.971 33.813 57.93zM37.786 57.346c-1.164.265-2.357.451-3.575.554C35.429 57.797 36.622 57.61 37.786 57.346zM32 58c-.61 0-1.214-.028-1.813-.07C30.787 57.971 31.39 58 32 58zM29.788 57.9c-1.217-.103-2.411-.289-3.574-.554C27.378 57.61 28.571 57.797 29.788 57.9z"></path>
                                     </svg>
                                 </div>
                             </div>

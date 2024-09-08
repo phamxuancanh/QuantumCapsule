@@ -11,6 +11,12 @@ interface User {
   lastName: string;
   avatar: string;
   email: string;
+  grade: number;
+  city: string;
+  district: string;
+  ward: string;
+  phone: string;
+  dob: string;
 }
 
 interface AuthState {
@@ -42,20 +48,15 @@ export const fetchUser = createAsyncThunk('auth/fetchUser', async () => {
   } catch (error) {
     throw new Error('Invalid token'); 
   }
-  
   const response: AxiosResponse<User> = await findUserById(userId);
+  console.log(response, 'response');
   const persistAuth = localStorage.getItem('persist:auth');
 
 if (persistAuth) {
   const authData = JSON.parse(persistAuth);
   authData.currentUser = response.data;
   console.log(authData, 'authData');
-//   const currentUser = {
-//     currentUser: result.data.user,
-//     accessToken: result.data.accessToken
-// }
 console.log(currentUser)
-// setToLocalStorage('persist:auth', JSON.stringify(currentUser))
   localStorage.setItem('persist:auth', JSON.stringify(authData));
 }
   return response.data;
