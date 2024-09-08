@@ -30,29 +30,27 @@ const User = sequelize.define(
     type: {
       type: DataTypes.STRING
     },
-    address: {
+    city: {
+      type: DataTypes.STRING
+    },
+    district: {
+      type: DataTypes.STRING
+    },
+    ward: {
       type: DataTypes.STRING
     },
     phone: {
       type: DataTypes.STRING
     },
-    gender: {
-      type: DataTypes.STRING
-    },
     grade: {
       type: DataTypes.INTEGER
     },
-    age: {
-      type: DataTypes.INTEGER
+    birthOfDate: {
+      type: DataTypes.DATE
     },
     password: {
       type: DataTypes.STRING,
       allowNull: true
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
     },
     refreshToken: {
       type: DataTypes.STRING

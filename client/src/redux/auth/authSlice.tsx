@@ -11,6 +11,12 @@ interface User {
   lastName: string;
   avatar: string;
   email: string;
+  grade: number;
+  city: string;
+  district: string;
+  ward: string;
+  phone: string;
+  dob: string;
 }
 
 interface AuthState {

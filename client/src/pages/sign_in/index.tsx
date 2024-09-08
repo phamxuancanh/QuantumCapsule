@@ -18,10 +18,10 @@ const theme = createTheme();
 const SignIn = () => {
     const dispatch = useDispatch()
     const user = useSelector((state: any) => state.auth)
-    const [username, setUsername] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [rememberChecked, setRememberChecked] = useState(false)
-    const [errorMessageUsername, setErrorMessageUsername] = useState("")
+    const [errorMessageEmail, setErrorMessageEmail] = useState("")
     const [errorMessagePassword, setErrorMessagePassword] = useState("")
     const [errorVerified, setErrorVerified] = useState("")
     const navigate = useNavigate()
@@ -103,14 +103,14 @@ const SignIn = () => {
     )
     async function handleLogin(e: { preventDefault: () => void; }) {
         e.preventDefault();
-        setErrorMessageUsername('')
+        setErrorMessageEmail('')
         setErrorMessagePassword('')
         setErrorVerified('')
         const messUsername = t('signIn.user_name_required')
         const messPassword = t('signIn.password_required')
 
         const schema = yup.object({
-            username: yup
+            email: yup
                 .string()
                 .required(messUsername),
             password: yup
@@ -119,8 +119,8 @@ const SignIn = () => {
         }).required()
         setLoading(true)
         try {
-            await schema.validate({ username, password }, { abortEarly: false })
-            const result = await signIn({ username, password, rememberChecked })
+            await schema.validate({ email, password }, { abortEarly: false })
+            const result = await signIn({ email, password, rememberChecked })
             if (result?.data) {
                 setLoading(true)
                 setTimeout(() => {
@@ -146,7 +146,7 @@ const SignIn = () => {
             if (error instanceof yup.ValidationError) {
                 setLoading(false)
                 const errorOrder = ['username', 'password']
-                setErrorMessageUsername('')
+                setErrorMessageEmail('')
                 setErrorMessagePassword('')
                 setErrorVerified('')
                 errorOrder.forEach(field => {
@@ -155,7 +155,7 @@ const SignIn = () => {
                         if (err) {
                             switch (field) {
                                 case 'username':
-                                    setErrorMessageUsername(err.message)
+                                    setErrorMessageEmail(err.message)
                                     break
                                 case 'password':
                                     setErrorMessagePassword(err.message)
@@ -176,7 +176,7 @@ const SignIn = () => {
                                 console.log('error.code:', error.message)
                                 const message = String(error.message)
                                 if (message.includes('Username')) {
-                                    setErrorMessageUsername(message)
+                                    setErrorMessageEmail(message)
                                 } else if (message.includes('Password')) {
                                     setErrorMessagePassword(message)
                                 } else if (message.includes('Email')) {
@@ -242,13 +242,13 @@ const SignIn = () => {
                                             required
                                             className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
                                             placeholder={t('signIn.user_name')}
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
                                         />
                                         <AccountCircleOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
 
                                     </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageUsername}</div>
+                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
                                 </div>
                                 <div>
                                     <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">

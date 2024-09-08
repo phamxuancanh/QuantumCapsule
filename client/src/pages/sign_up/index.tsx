@@ -25,7 +25,6 @@ const SignUp = () => {
     const navigate = useNavigate()
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
-    const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [phone, setPhone] = useState("")
     const [password, setPassword] = useState("")
@@ -33,7 +32,6 @@ const SignUp = () => {
     const [termCheck, setTermCheck] = useState(false)
     const [errorMessageFirstName, setErrorMessageFirstName] = useState("")
     const [errorMessageLastName, setErrorMessageLastName] = useState("")
-    const [errorMessageUsername, setErrorMessageUsername] = useState("")
     const [errorMessageEmail, setErrorMessageEmail] = useState("")
     const [errorMessagePassword, setErrorMessagePassword] = useState("")
     const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState("")
@@ -53,7 +51,7 @@ const SignUp = () => {
     const [wards, setWards] = useState<Ward[]>([])
     const [selectedWard, setSelectedWard] = useState<string>('')
     const [selectedClass, setSelectedClass] = useState('');
-    const [classes, setClasses] = useState([
+    const [classes] = useState([
         { Id: '1', Name: 'Khối 1' },
         { Id: '2', Name: 'Khối 2' },
         { Id: '3', Name: 'Khối 3' },
@@ -77,11 +75,11 @@ const SignUp = () => {
 
     useEffect(() => {
         if (selectedCity) {
-            const city = cities.find(city => city.Id === selectedCity);
+            const city = cities.find(city => city.Name === selectedCity); // Tìm kiếm theo Name
             setDistricts(city?.Districts || []);
-            setSelectedDistrict(''); // Reset district selection
-            setWards([]); // Clear wards
-            setSelectedWard(''); // Reset ward selection
+            setSelectedDistrict('');
+            setWards([]);
+            setSelectedWard('');
         } else {
             setDistricts([]);
         }
@@ -89,7 +87,7 @@ const SignUp = () => {
 
     useEffect(() => {
         if (selectedDistrict) {
-            const district = districts.find(district => district.Id === selectedDistrict);
+            const district = districts.find(district => district.Name === selectedDistrict); // Tìm kiếm theo Name
             setWards(district?.Wards || []);
             setSelectedWard('');
         } else {
@@ -97,7 +95,6 @@ const SignUp = () => {
         }
     }, [selectedDistrict]);
 
-    // Update classes when a ward is selected
     useEffect(() => {
         if (selectedWard) {
             const ward = wards.find(ward => ward.Id === selectedWard);
@@ -107,8 +104,6 @@ const SignUp = () => {
     const handleAccountTypeChange = (type: any) => {
         setTypeAccount(type);
     }
-    // TODO: them loading
-
     const languageOptions = useMemo(() => {
         return [
             { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
@@ -130,11 +125,6 @@ const SignUp = () => {
         setErrorMessageCaptcha('');
         setCaptchaValue(value);
     };
-    // const handleEmailBlur = () => {
-    //     if (email) {
-    //         setShowCaptcha(true);
-    //     }
-    // };
     async function handleRegister(e: { preventDefault: () => void; }) {
         e.preventDefault();
         if (!showCaptcha) {
@@ -143,7 +133,6 @@ const SignUp = () => {
         }
         setErrorMessageFirstName('')
         setErrorMessageLastName('')
-        setErrorMessageUsername('')
         setErrorMessageEmail('')
         setErrorMessagePassword('')
         setErrorMessageConfirmPassword('')
@@ -152,12 +141,11 @@ const SignUp = () => {
 
         const messFirstName = t('signUp.first_name_required');
         const messLastName = t('signUp.last_name_required');
-        const messUsername = t('signUp.user_name_required');
         const messEmail = t('signUp.email_required');
         const messPassword = t('signUp.password_required');
         const messConfirm = t('signUp.confirm_password_required');
         const messTermCheckBox = t('signUp.term_required');
-
+        const messPhone = t('signUp.phone_required');
         const schema = yup.object({
             firstName: yup
                 .string()
@@ -171,10 +159,10 @@ const SignUp = () => {
                 .string()
                 .email(t('signUp.email_invalid'))
                 .required(messEmail),
-            username: yup
+            phone: yup
                 .string()
-                .required(messUsername)
-                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$/, t('signUp.username_invalid')),
+                .required(messPhone)
+                .matches(/^[0-9]{10}$/, t('signUp.phone_invalid')),
             password: yup
                 .string()
                 .required(messPassword)
@@ -192,9 +180,9 @@ const SignUp = () => {
         }).required();
 
         try {
-            await schema.validate({ firstName, lastName, username, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
+            await schema.validate({ firstName, lastName, email, phone, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
             setLoading(true);
-            const result = await signUp({ firstName, lastName, username, email, password, captchaValue })
+            const result = await signUp({ firstName, lastName, email, phone, password, city: selectedCity, district: selectedDistrict, ward: selectedWard, grade: selectedClass, captchaValue })
             console.log('result')
             console.log(result)
             console.log('result.data:', result?.data)
@@ -218,7 +206,6 @@ const SignUp = () => {
                 // Clear previous error messages again
                 setErrorMessageFirstName('');
                 setErrorMessageLastName('');
-                setErrorMessageUsername('');
                 setErrorMessageEmail('');
                 setErrorMessagePassword('');
                 setErrorMessageConfirmPassword('');
@@ -235,9 +222,6 @@ const SignUp = () => {
                                     break;
                                 case 'lastName':
                                     setErrorMessageLastName(err.message);
-                                    break;
-                                case 'username':
-                                    setErrorMessageUsername(err.message);
                                     break;
                                 case 'email':
                                     setErrorMessageEmail(err.message);
@@ -269,9 +253,7 @@ const SignUp = () => {
                             if (typeof error === 'object' && error !== null && 'message' in error && 'code' in error) {
                                 console.log('error.code:', error.message);
                                 const message = String(error.message);
-                                if (message.includes('Username')) {
-                                    setErrorMessageUsername(message);
-                                } else if (message.includes('Email')) {
+                                if (message.includes('Email')) {
                                     setErrorMessageEmail(message);
                                 } else if (message.includes('Captcha')) {
                                     setErrorMessageCaptcha(message);
@@ -395,24 +377,6 @@ const SignUp = () => {
                                     <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
                                         <input
                                             id="email-address"
-                                            name="userName"
-                                            type="userName"
-                                            autoComplete="userName"
-                                            required
-                                            className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('signUp.user_name')}
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                        />
-                                        <AccountCircleOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
-                                    </div>
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageUsername}</div>
-
-                                </div>
-                                <div>
-                                    <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
-                                        <input
-                                            id="email-address"
                                             name="email"
                                             type="email"
                                             autoComplete="email"
@@ -436,7 +400,7 @@ const SignUp = () => {
                                             required
                                             className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
                                             placeholder={t('signUp.phone')}
-                                            value={email}
+                                            value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                         />
                                         <LocalPhoneOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
@@ -488,8 +452,8 @@ const SignUp = () => {
                                                     <Select
                                                         id="city"
                                                         className="tw-shadow-sm tw-border-sky-500 tw-rounded-2xl"
-                                                        options={cities.map(city => ({ value: city.Id, label: city.Name }))}
-                                                        value={cities.find(city => city.Id === selectedCity) ? { value: selectedCity, label: cities.find(city => city.Id === selectedCity)?.Name } : null}
+                                                        options={cities.map(city => ({ value: city.Name, label: city.Name }))}
+                                                        value={cities.find(city => city.Name === selectedCity) ? { value: selectedCity, label: selectedCity } : null}
                                                         onChange={(option) => setSelectedCity(option?.value ?? '')}
                                                         placeholder="Chọn thành phố"
                                                     />
@@ -499,11 +463,11 @@ const SignUp = () => {
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="district"
-                                                        value={districts.find(district => district.Id === selectedDistrict) ? { value: selectedDistrict, label: districts.find(district => district.Id === selectedDistrict)?.Name } : null}
+                                                        value={districts.find(district => district.Name === selectedDistrict) ? { value: selectedDistrict, label: selectedDistrict } : null}
                                                         onChange={(option) => setSelectedDistrict(option?.value ?? '')}
                                                         isDisabled={!selectedCity}
                                                         className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
-                                                        options={districts.map(district => ({ value: district.Id, label: district.Name }))}
+                                                        options={districts.map(district => ({ value: district.Name, label: district.Name }))}
                                                         placeholder="Chọn quận/huyện"
                                                     />
                                                 </div>
@@ -514,15 +478,14 @@ const SignUp = () => {
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="ward"
-                                                        value={wards.find(ward => ward.Id === selectedWard) ? { value: selectedWard, label: wards.find(ward => ward.Id === selectedWard)?.Name } : null}
-                                                        onChange={(option) => setSelectedWard(option?.value ?? '')}
+                                                        value={wards.find(ward => ward.Name === selectedWard) ? { value: selectedWard, label: selectedWard } : null}
+                                                        onChange={(option) => setSelectedWard(option?.label ?? '')}
                                                         isDisabled={!selectedDistrict}
                                                         className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
-                                                        options={wards.map(ward => ({ value: ward.Id, label: ward.Name }))}
+                                                        options={wards.map(ward => ({ value: ward.Name, label: ward.Name }))}
                                                         placeholder="Chọn phường/xã"
                                                     />
                                                 </div>
-
                                                 {/* Selector for Class */}
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select

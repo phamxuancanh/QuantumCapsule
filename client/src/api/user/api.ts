@@ -194,7 +194,6 @@ export const updateUser = async (id: string, payload: any): Promise<AxiosRespons
 export const changeAVT = async (id: string, payload: any): Promise<AxiosResponse<any>> => {
   return await requestWithJwt.put<any>(`/users/${id}/changeAVT`, payload);
 }
-
-function dispatch(arg0: any) {
-  throw new Error('Function not implemented.');
+export const changePassword = async (id: string, payload: any): Promise<AxiosResponse<any>> => {
+  return await requestWithJwt.put<any>(`/auths/${id}/changePassword`, payload);
 }
