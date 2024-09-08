@@ -3,39 +3,46 @@ import {
     useCurrentQuestion,
     useListAnswer,
     useListQuestion,
+    useOpenResult,
+    useResult,
     useTotalScore,
 } from "./context/context"
 import QuestionBox from "modules/Practice/components/question-box/QuestionBox"
 import { data } from "./data/questions"
-import { InitListAnswerFromListQuestion } from "helpers/Nam-helper/ConvertHelper"
+import { InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
 import { Button, Grid } from "@mui/material"
 import { IQuestion } from "api/question/question.interfaces"
+import ListQuestionButton from "./components/list-question-button/ListQuestionButton"
+import SubmitResultBox from "./components/submit-result-box/SubmitResultBox"
 
 const Practice: React.FC = () => {
     const { totalScore, setTotalScore } = useTotalScore()
     const { listQuestion, setListQuestion } = useListQuestion()
     const { listAnswer, setListAnswer } = useListAnswer()
     const { currentQuestion, setCurrentQuestion } = useCurrentQuestion()
+    const { result, setResult } = useResult()
+    const { openResult, setOpenResult } = useOpenResult()
     // const[]
     useEffect(() => {
         setListQuestion(data)
         setListAnswer(InitListAnswerFromListQuestion(data))
         setCurrentQuestion(data[0])
+        setResult(InitResult(listQuestion.length, new Date(), new Date()))
     }, [])
-    const handleClickNextQuestion = () => {
-        const index = listQuestion.findIndex(
-            (question: IQuestion) => question.id === currentQuestion.id,
-        )
-        if (index < listQuestion.length - 1) {
-            setCurrentQuestion(listQuestion[index + 1])
-        } else {
-            alert("Mày trả lời đúng: " + listAnswer.filter((answer) => answer.isCorrect).length + " câu")
-        }
-    }
+
     return (
-        <div>
-            <QuestionBox isOpen={true} onNextQuestionClick={handleClickNextQuestion} />
-        </div>
+        <Grid container spacing={2}>
+            <Grid item xs={9}>
+                <QuestionBox
+                    isOpen={openResult === false}
+                />
+                <SubmitResultBox isOpen={openResult} />
+            </Grid>
+            <Grid item xs={3}>
+                <ListQuestionButton />
+            </Grid>
+            
+        </Grid>
     )
 }
 

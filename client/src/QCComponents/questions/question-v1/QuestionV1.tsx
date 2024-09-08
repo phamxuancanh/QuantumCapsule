@@ -8,12 +8,15 @@ import {
     RadioGroup,
     Typography,
 } from "@mui/material"
+import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import React from "react"
 
 interface IProps {
     question: IQuestion
+    yourAnswer?: IAnswer
     onAnswer?: (answer: string) => void
+    mode?: "practice" | "submit" | "result"
 }
 
 const QuestionV1: React.FC<IProps> = (props) => {
@@ -35,6 +38,8 @@ const QuestionV1: React.FC<IProps> = (props) => {
                         control={<Radio />}
                         label={answer}
                         key={index}
+                        checked={props.yourAnswer?.yourAnswer === answer}
+                        disabled={props.mode === "result" || props.mode === "submit"}
                     />
                 )
             }
@@ -45,7 +50,7 @@ const QuestionV1: React.FC<IProps> = (props) => {
         event.target.value && onAnswer && onAnswer(event.target.value)
     }
     return (
-        <Card sx={{ p: 10 }}>
+        <Card sx={{ p: 5 }}>
             <Typography color={"#FF8A8A"} fontWeight={800}>
                 {question.title}
             </Typography>
