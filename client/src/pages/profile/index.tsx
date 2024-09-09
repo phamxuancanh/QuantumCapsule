@@ -32,7 +32,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import EditIcon from '@mui/icons-material/Edit'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { fetchLocations, City, District, Ward } from './locationData'
+import * as yup from 'yup'
 import ROUTES from 'routes/constant'
+// TODO : Add loading effect
 interface User {
   id: string
   firstName: string
@@ -89,6 +91,13 @@ function Profile() {
   const [oldPassword, setOldPassword] = useState<string>('')
   const [newPassword, setNewPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
+  const [errorMessageOldPassword, setErrorMessageOldPassword] = useState("")
+  const [errorMessageNewPassword, setErrorMessagePassword] = useState("")
+  const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState("")
+  const [erroMessageFirstName, setErrorMessageFirstName] = useState('')
+  const [errorMessageLastName, setErrorMessageLastName] = useState('')
+  const [errorMessageEmail, setErrorMessageEmail] = useState('')
+  const [errorMessagePhone, setErrorMessagePhone] = useState('')
   useEffect(() => {
     const storedUser = localStorage.getItem('persist:auth');
     if (storedUser) {
@@ -257,10 +266,38 @@ function Profile() {
   };
 
   const handleUpdatePersonalInfo = async () => {
-    const isValidFirstName = !!firstName;
-    const isValidLastName = !!lastName;
-    const isValidAge = !!dob;
-    const isValidEmail = !!email;
+    // Reset error messages
+    setErrorMessageFirstName('');
+    setErrorMessageLastName('');
+    setErrorMessageEmail('');
+    setErrorMessagePhone('');
+  
+    // Define error messages for validation
+    const messageFirstName = 'Họ không được để trống';
+    const messageLastName = 'Tên không được để trống';
+    const messageEmail = 'Email không được để trống';
+    const messagePhone = 'Số điện thoại không được để trống';
+  
+    // Define validation schema with yup
+    const schema = yup.object({
+      firstName: yup
+        .string()
+        .required(messageFirstName)
+        .matches(/^[A-Z][a-zA-Z]*$/, 'Họ không hợp lệ'),
+      lastName: yup
+        .string()
+        .required(messageLastName)
+        .matches(/^[A-Z][a-zA-Z]*$/, 'Tên không hợp lệ'),
+      email: yup
+        .string()
+        .email('Email không hợp lệ')
+        .required(messageEmail),
+      phone: yup
+        .string()
+        .required(messagePhone)
+        .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ'),
+    });
+  
     const payload = {
       firstName,
       lastName,
@@ -271,25 +308,48 @@ function Profile() {
       district: selectedDistrict,
       ward: selectedWard,
     };
-    if (userRedux?.id) {
-      try {
-        const result = await updateUser(userRedux?.id, payload);
+  
+    try {
+      // Validate the form before proceeding
+      await schema.validate(payload, { abortEarly: false });
+  
+      // If the user ID is available, proceed with the update
+      if (userRedux?.id) {
+        const result = await updateUser(userRedux.id, payload);
         console.log(result);
+  
         if (result) {
+          // Update Redux state if the update is successful
           dispatch(updateStateInfo({
             ...userRedux,
-            ...payload
+            ...payload,
           }));
           toast.success('Cập nhật thông tin cá nhân thành công!');
         } else {
           toast.error('Cập nhật thông tin cá nhân thất bại!');
         }
-      } catch (error) {
+      }
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        // Handle validation errors
+        error.inner.forEach((validationError) => {
+          if (validationError.path === 'firstName') {
+            setErrorMessageFirstName(validationError.message);
+          } else if (validationError.path === 'lastName') {
+            setErrorMessageLastName(validationError.message);
+          } else if (validationError.path === 'email') {
+            setErrorMessageEmail(validationError.message);
+          } else if (validationError.path === 'phone') {
+            setErrorMessagePhone(validationError.message);
+          }
+        });
+      } else {
+        // Handle general errors (e.g., API call errors)
         console.error(error);
         toast.error('Đã xảy ra lỗi khi cập nhật thông tin cá nhân!');
       }
     }
-  }
+  };
   const handleCancelUpdatePersonalInfo = () => {
     setFirstName(userRedux?.firstName ?? '');
     setLastName(userRedux?.lastName ?? '');
@@ -300,18 +360,50 @@ function Profile() {
     setSelectedDistrict(userRedux?.district ?? '');
     setSelectedWard(userRedux?.ward ?? '');
   }
+  
   const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error('Mật khẩu mới không trùng khớp');
-      return;
-    }
-    if (userRedux?.id) {
-      try {
+    setErrorMessageOldPassword('');
+    setErrorMessagePassword('');
+    setErrorMessageConfirmPassword('');
+  
+    const messageOldPassword = 'Mật khẩu cũ không được để trống';
+    const messageNewPassword = 'Mật khẩu mới không được để trống';
+    const messageConfirmPassword = 'Nhập lại mật khẩu mới không được để trống';
+  
+    const schema = yup.object({
+      oldPassword: yup
+        .string()
+        .required(messageOldPassword)
+        .matches(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+          'Mật khẩu không hợp lệ'
+        ),
+      newPassword: yup
+        .string()
+        .required(messageNewPassword)
+        .matches(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+          'Mật khẩu không hợp lệ'
+        ),
+      confirmPassword: yup
+        .string()
+        .required(messageConfirmPassword)
+        .oneOf([yup.ref('newPassword')], 'Mật khẩu mới phải trùng khớp'),
+    });
+  
+    try {
+      // Validate the form before proceeding
+      await schema.validate({ oldPassword, newPassword, confirmPassword }, { abortEarly: false });
+  
+      // Proceed only if validation is successful
+      if (userRedux?.id) {
         const result = await changePassword(userRedux.id, {
           oldPassword,
           newPassword
         });
+  
         console.log(result, 'result');
+  
         if (result.data.success) {
           toast.success('Đổi mật khẩu thành công!');
           setOldPassword('');
@@ -320,12 +412,30 @@ function Profile() {
         } else {
           toast.error(result.data.message || 'Đổi mật khẩu thất bại!');
         }
-      } catch (error) {
+      }
+    } catch (error) {
+      // Handle both validation and general errors in this single catch block
+      if (error instanceof yup.ValidationError) {
+        // Handle validation errors
+        error.inner.forEach((validationError) => {
+          if (validationError.path === 'oldPassword') {
+            setErrorMessageOldPassword(validationError.message);
+          } else if (validationError.path === 'newPassword') {
+            setErrorMessagePassword(validationError.message);
+          } else if (validationError.path === 'confirmPassword') {
+            setErrorMessageConfirmPassword(validationError.message);
+          }
+        });
+      } else {
+        // Handle general errors (e.g., API call errors)
         console.error(error);
         toast.error((error as Error)?.message || 'Đã xảy ra lỗi khi đổi mật khẩu!');
       }
     }
-  }
+  };
+  
+  
+  
   const handleCancelChangePassword = () => {
     setOldPassword('');
     setNewPassword('');
@@ -494,6 +604,8 @@ function Profile() {
                           />
                           <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                         </div>
+                        <div className="tw-text-red-500 tw-text-sm tw-p-2">{erroMessageFirstName}</div>
+
                       </div>
                       <div>
                         <div className='tw-font-bold tw-text-sm'>Tinh/thanh pho:</div>
@@ -550,6 +662,8 @@ function Profile() {
                           />
                           <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                         </div>
+                        <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageLastName}</div>
+
                       </div>
                       <div>
                         <div className='tw-font-bold tw-text-sm'>Email:</div>
@@ -566,6 +680,8 @@ function Profile() {
                           />
                           <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                         </div>
+                        <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
+
                       </div>
                       <div>
                         <div className='tw-font-bold tw-text-sm'>Ngày sinh:</div>
@@ -596,6 +712,8 @@ function Profile() {
                           />
                           <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                         </div>
+                        <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessagePhone}</div>
+
                       </div>
                     </div>
                   </div>
@@ -641,6 +759,7 @@ function Profile() {
                       />
                       <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                     </div>
+                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageOldPassword}</div>
                   </div>
                   <div className='tw-space-y-1'>
                     <div className='tw-font-bold'>Mat khau moi</div>
@@ -658,6 +777,8 @@ function Profile() {
                       />
                       <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                     </div>
+                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageNewPassword}</div>
+
                   </div>
                   <div className='tw-space-y-1'>
                     <div className='tw-font-bold'>Nhap lai mat khau moi</div>
@@ -676,6 +797,7 @@ function Profile() {
                       <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
 
                     </div>
+                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageConfirmPassword}</div>
                   </div>
                   <div className='tw-flex tw-space-x-8 tw-pr-8'>
                     <div className='tw-cursor-pointer tw-flex-1 tw-p-2 tw-rounded-3xl tw-border tw-border-green-500 tw-font-bold tw-bg-green-500 tw-flex tw-justify-center tw-items-center tw-text-white' onClick={handleChangePassword}>
