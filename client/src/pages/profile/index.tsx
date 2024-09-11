@@ -98,17 +98,20 @@ function Profile() {
   const [errorMessageLastName, setErrorMessageLastName] = useState('')
   const [errorMessageEmail, setErrorMessageEmail] = useState('')
   const [errorMessagePhone, setErrorMessagePhone] = useState('')
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem('persist:auth');
+  //   if (storedUser) {
+  //     const parsedData = JSON.parse(storedUser);
+  //     const user = parsedData?.currentUser;
+  //     if (user) {
+  //       dispatch(loginState(user));
+  //     } else {
+  //       dispatch(fetchUser());
+  //     }
+  //   }
+  // }, [dispatch]);
   useEffect(() => {
-    const storedUser = localStorage.getItem('persist:auth');
-    if (storedUser) {
-      const parsedData = JSON.parse(storedUser);
-      const user = parsedData?.currentUser;
-      if (user) {
-        dispatch(loginState(user));
-      } else {
-        dispatch(fetchUser());
-      }
-    }
+    dispatch(fetchUser());
   }, [dispatch]);
 
   useEffect(() => {

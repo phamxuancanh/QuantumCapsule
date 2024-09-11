@@ -67,6 +67,7 @@ const verifyAccessToken = (req, res, next) => {
 
   // Xác minh token bằng JWT và chỉ định thuật toán
   JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, { algorithms: ['HS256'] }, (err, payload) => {
+    console.log(token, 'token')
     if (err) {
       console.log(err, 'err')
       if (err.name === 'JsonWebTokenError') {
@@ -74,11 +75,7 @@ const verifyAccessToken = (req, res, next) => {
       }
       return res.status(401).json({ error: { message: err.message } })
     }
-
-    // Gán payload của token vào req để các middleware khác có thể sử dụng
     req.payload = payload
-
-    // Chuyển sang middleware tiếp theo
     setTimeout(() => {
       next()
     }, 100)
