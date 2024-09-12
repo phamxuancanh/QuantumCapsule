@@ -23,24 +23,24 @@ export const requestWithJwt = axios.create({
   withCredentials: true
 })
 
+
 const checkTokenValidity = (token: string) => {
   try {
-    const { exp } = jwtDecode<{ exp: number }>(token)
-    console.log(exp*1000 > Date.now(), 'exp')
-    return exp * 1000 > Date.now()
+    const decodedToken = jwtDecode<{ exp: number }>(token);
+    if (decodedToken.exp * 1000 < Date.now()) {
+      return false;
+    }
+
+    return true;
   } catch (error) {
+    console.error('Token is invalid:', error);
     return false
   }
-}
+};
+
+
 
 const handleTokenRefresh = async () => {
-  const tokens = getFromLocalStorage<any>('persist:auth');
-  if (tokens?.accessToken && checkTokenValidity(tokens.accessToken)) {
-    return tokens.accessToken
-  }
-  if (!tokens) {
-    return null
-  }
   try {
     const response = await refresh()
     const newAccessToken = response.data.accessToken
@@ -80,6 +80,7 @@ requestWithJwt.interceptors.response.use(
     const originalRequest: any = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      console.log('401 error')
       originalRequest._retry = true
 
       try {

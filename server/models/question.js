@@ -11,6 +11,9 @@ const Question = sequelize.define(
       unique: true,
       primaryKey: true
     },
+    lessonId: {
+      type: DataTypes.STRING
+    },
     questionType: {
       type: DataTypes.INTEGER
     },
@@ -26,19 +29,19 @@ const Question = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
-    answerA: {
+    A: {
       type: DataTypes.STRING
     },
-    answerB: {
+    B: {
       type: DataTypes.STRING
     },
-    answerC: {
+    C: {
       type: DataTypes.STRING
     },
-    answerD: {
+    D: {
       type: DataTypes.STRING
     },
-    answerE: {
+    E: {
       type: DataTypes.STRING
     },
     correctAnswer: {
@@ -47,8 +50,8 @@ const Question = sequelize.define(
     explainAnswer: {
       type: DataTypes.STRING
     },
-    score: {
-      type: DataTypes.FLOAT
+    status: {
+      type: DataTypes.INTEGER
     }
   },
   {

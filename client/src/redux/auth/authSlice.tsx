@@ -45,20 +45,20 @@ export const fetchUser = createAsyncThunk('auth/fetchUser', async () => {
     const decodedToken: DecodedToken = jwtDecode(currentUserObj.accessToken);
     console.log(decodedToken, 'decodedToken');
     userId = decodedToken.userId;
+    console.log(userId, 'userId');
   } catch (error) {
     throw new Error('Invalid token'); 
   }
-  const response: AxiosResponse<User> = await findUserById(userId);
-  console.log(response, 'response');
-  const persistAuth = localStorage.getItem('persist:auth');
 
-if (persistAuth) {
-  const authData = JSON.parse(persistAuth);
-  authData.currentUser = response.data;
-  console.log(authData, 'authData');
-console.log(currentUser)
-  localStorage.setItem('persist:auth', JSON.stringify(authData));
-}
+  const response: AxiosResponse<User> = await findUserById(userId);
+
+  const updatedAuthData = {
+    ...JSON.parse(currentUser),
+    currentUser: response.data,
+  };
+
+  localStorage.setItem('persist:auth', JSON.stringify(updatedAuthData));
+  
   return response.data;
 });
 
@@ -69,13 +69,11 @@ const authSlice = createSlice({
     loginState(state: AuthState, action: PayloadAction<User>) {
       console.log('loginSuccess', action.payload);
       state.user = action.payload;
-      // localStorage.setItem('persist:auth', JSON.stringify(action.payload));
     },
     updateStateInfo(state: AuthState, action: PayloadAction<User>) {
       const persistAuth = localStorage.getItem('persist:auth');
       if (persistAuth) {
         const authData = JSON.parse(persistAuth);
-        // Cập nhật chỉ thông tin người dùng mà không thay đổi token
         authData.currentUser = action.payload;
         localStorage.setItem('persist:auth', JSON.stringify(authData));
       }

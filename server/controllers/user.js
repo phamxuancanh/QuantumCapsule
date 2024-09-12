@@ -63,7 +63,20 @@ const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params
     const user = await models.User.findByPk(id, {
-      attributes: ['avatar', 'email', 'firstName', 'id', 'lastName', 'username', 'roleId']
+      attributes: [
+        'avatar',
+        'email',
+        'firstName',
+        'id',
+        'lastName',
+        'roleId',
+        'grade',
+        'phone',
+        'city',
+        'district',
+        'ward',
+        'birthOfDate'
+      ]
     })
 
     if (!user) {
@@ -78,14 +91,20 @@ const getUserById = async (req, res, next) => {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      username: user.username,
       email: user.email,
       avatar: user.avatar,
-      key: encryptedRole
+      key: encryptedRole,
+      grade: user.grade,
+      phone: user.phone,
+      city: user.city,
+      district: user.district,
+      ward: user.ward,
+      dob: user.birthOfDate ? user.birthOfDate.toISOString().split('T')[0] : ''
     }
 
     res.json(userResult)
   } catch (error) {
+    console.log('error', error)
     res.status(500).json({ message: 'not found' })
   }
 }
