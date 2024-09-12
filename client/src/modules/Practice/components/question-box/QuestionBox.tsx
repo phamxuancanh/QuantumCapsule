@@ -1,87 +1,83 @@
 import { Box, Button, Card } from "@mui/material"
-import { IAnswer, IQuestion } from "api/practice/question.interfaces"
-import { useCurrentQuestion, useListAnswer, useListQuestion } from "modules/Practice/context/context"
+import { IAnswer } from "api/answer/answer.interfaces"
+import { IQuestion } from "api/question/question.interfaces"
+import {
+    useCurrentQuestion,
+    useListAnswer,
+    useListQuestion,
+    useOpenResult,
+    useResult,
+} from "modules/Practice/context/context"
 import ExplainAnswerV1 from "QCComponents/explain-answer/explain-answer-v1/ExplainAnswerV1"
 import QuestionV1 from "QCComponents/questions/question-v1/QuestionV1"
+import QuestionV2 from "QCComponents/questions/question-v2/QuestionV2"
+import QuestionV3 from "QCComponents/questions/question-v3/QuestionV3"
+import SpeakerV1 from "QCComponents/speakers/speaker-v1/SpeakerV1"
 import React from "react"
 
 interface IProps {
-    question: IQuestion
+    isOpen?: boolean
 }
 
-const QuestionBox: React.FC<IProps> = ({ question }) => {
+const QuestionBox: React.FC<IProps> = (props) => {
     const { listAnswer, setListAnswer } = useListAnswer()
-    const {currentQuestion, setCurrentQuestion} = useCurrentQuestion()
-    const {listQuestion, setListQuestion} = useListQuestion()
-    const [openExplain, setOpenExplain] = React.useState(false)
-    const [yourAnswer, setYourAnswer] = React.useState("")
-    const handleAnswer = (answer: string) => {
-        setYourAnswer(answer)
-    }
-    const handleClickAnswer = () => {
-        const newListAnswer = listAnswer.map((item) => {
-            if (item.questionId === question.id) {
+    const { currentQuestion, setCurrentQuestion } = useCurrentQuestion()
+    const { listQuestion, setListQuestion } = useListQuestion()
+    const { result, setResult } = useResult()
+    const {openResult, setOpenResult} = useOpenResult()
+
+    const handleAnswer = (yourAnswer: string) => {
+        const newListAnswer = listAnswer.map((answer: IAnswer) => {
+            if (answer.questionId === currentQuestion.id) {
                 return {
-                    ...item,
+                    ...answer,
                     yourAnswer: yourAnswer,
-                    isCorrect: item.correctAnswer === yourAnswer,
+                    isCorrect: currentQuestion.correctAnswer === yourAnswer,
                 } as IAnswer
             }
-            return item
+            return answer
         })
         setListAnswer(newListAnswer)
-        setOpenExplain(true)
+        setResult({
+            ...result,
+            yourScore: newListAnswer.filter((answer) => answer.isCorrect).length,
+
+        })
     }
     const handleClickNextQuestion = () => {
-        setOpenExplain(false)
-        const index = listAnswer.findIndex(
-            (item) => item.questionId === question.id,
+        const index = listQuestion.findIndex(
+            (question: IQuestion) => question.id === currentQuestion.id,
         )
-        if (index < listAnswer.length - 1) {
-            setYourAnswer("")
+        if (index < listQuestion.length - 1) {
             setCurrentQuestion(listQuestion[index + 1])
+        } else {
+            setOpenResult(true)
         }
     }
     const renderQuestion = (question: IQuestion) => {
         if (question.questionType === 1) {
-            return <QuestionV1 question={question} onAnswer={handleAnswer} />
+            return <QuestionV1 question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer} />
+        }
+        if (question.questionType === 2) {
+            return <QuestionV2  question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer}/>
+        }
+        if (question.questionType === 3) {
+            return <QuestionV3  question={question}  yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer}/>
         }
         return <></>
     }
     return (
-        <Box>
-            {openExplain ? (
-                <Box>
-                    <ExplainAnswerV1
-                        question={question}
-                        answer={
-                            listAnswer.find(
-                                (item) => item.questionId === question.id,
-                            ) || {}
-                        }
-                    />
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        color="primary"
-                        onClick={handleClickNextQuestion}
-                    >
-                        câu tiếp theo
-                    </Button>
-                </Box>
-            ) : (
-                <Box>
-                    {renderQuestion(question)}
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        color="success"
-                        onClick={handleClickAnswer}
-                    >
-                        Trả lời
-                    </Button>
-                </Box>
-            )}
+        <Box display={props.isOpen ? "block" : "none"}>
+            <SpeakerV1 text={currentQuestion.content!} label="Đọc câu hỏi" autoSpeak />
+            {renderQuestion(currentQuestion)}
+            <Button
+                variant="contained"
+                fullWidth
+                color="success"
+                onClick={handleClickNextQuestion}
+            >
+                Câu tiếp theo
+            </Button>
         </Box>
     )
 }

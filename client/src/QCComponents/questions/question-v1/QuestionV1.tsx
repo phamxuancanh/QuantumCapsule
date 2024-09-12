@@ -8,12 +8,15 @@ import {
     RadioGroup,
     Typography,
 } from "@mui/material"
-import { IQuestion } from "api/practice/question.interfaces"
+import { IAnswer } from "api/answer/answer.interfaces"
+import { IQuestion } from "api/question/question.interfaces"
 import React from "react"
 
 interface IProps {
     question: IQuestion
+    yourAnswer?: IAnswer
     onAnswer?: (answer: string) => void
+    mode?: "practice" | "submit" | "result"
 }
 
 const QuestionV1: React.FC<IProps> = (props) => {
@@ -21,11 +24,11 @@ const QuestionV1: React.FC<IProps> = (props) => {
     const { question, onAnswer } = props
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
-            question.answer1,
-            question.answer2,
-            question.answer3,
-            question.answer4,
-            question.answer5,
+            question.A,
+            question.B,
+            question.C,
+            question.D,
+            question.E,
         ]
         return answers.map((answer, index) => {
             if (answer) {
@@ -35,6 +38,8 @@ const QuestionV1: React.FC<IProps> = (props) => {
                         control={<Radio />}
                         label={answer}
                         key={index}
+                        checked={props.yourAnswer?.yourAnswer === answer}
+                        disabled={props.mode === "result" || props.mode === "submit"}
                     />
                 )
             }
@@ -45,14 +50,14 @@ const QuestionV1: React.FC<IProps> = (props) => {
         event.target.value && onAnswer && onAnswer(event.target.value)
     }
     return (
-        <Card sx={{ p: 10 }}>
+        <Card sx={{ p: 5 }}>
             <Typography color={"#FF8A8A"} fontWeight={800}>
                 {question.title}
             </Typography>
             <Typography color={"#1E201E"} fontWeight={600}>
                 {question.content}
             </Typography>
-            <img src={question.imgContent} alt="question" />
+            <img src={question.contentImg} alt="question" />
             <FormControl>
                 <RadioGroup name="radio-buttons-group" onChange={(e)=>{handleChange(e)}}>
                     {renderAllAnswerNotNull(question)}
