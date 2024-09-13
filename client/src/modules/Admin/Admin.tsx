@@ -18,35 +18,35 @@ const Admin: React.FC = () => {
             </div>
             <div>
                 <h1>lesson</h1>
-                <ExcelReaderBtn sheetIndex={1} name='import chapter' onUpload={(listData : ILesson[])=>{
+                <ExcelReaderBtn sheetIndex={1} name='import lesson' onUpload={(listData : ILesson[])=>{
                     console.log(listData);
                     
                 }}/>
             </div>
             <div>
                 <h1>exam</h1>
-                <ExcelReaderBtn sheetIndex={1} name='import chapter' onUpload={(listData : IExam[])=>{
+                <ExcelReaderBtn sheetIndex={2} name='import exam' onUpload={(listData : IExam[])=>{
                     console.log(listData);
                     
                 }}/>
             </div>
             <div>
                 <h1>theory</h1>
-                <ExcelReaderBtn sheetIndex={1} name='import chapter' onUpload={(listData : ITheory[])=>{
+                <ExcelReaderBtn sheetIndex={3} name='import theory' onUpload={(listData : ITheory[])=>{
                     console.log(listData);
                     
                 }}/>
             </div>
             <div>
                 <h1>exam - question</h1>
-                <ExcelReaderBtn sheetIndex={1} name='import chapter' onUpload={(listData : IExamQuestion[])=>{
+                <ExcelReaderBtn sheetIndex={4} name='import exam - question' onUpload={(listData : IExamQuestion[])=>{
                     console.log(listData);
                     
                 }}/>
             </div>
             <div>
                 <h1>question</h1>
-                <ExcelReaderBtn sheetIndex={1} name='import chapter' onUpload={(listData : IQuestion[])=>{
+                <ExcelReaderBtn sheetIndex={5} name='import question' onUpload={(listData : IQuestion[])=>{
                     console.log(listData);
                     
                 }}/>
