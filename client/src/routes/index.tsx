@@ -49,6 +49,9 @@ const Profile = loadable(async () => await import('pages/profile'), {
 const SkillPractice = loadable(async () => await import('modules/Practice/PracticeProvider'), {
     fallback: <Loading />
 })
+const Admin = loadable(async () => await import('modules/Admin/Admin'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -141,6 +144,15 @@ const routes: RouteObject[] = [
         ),
         children: [
             { path: ROUTES.skill_practice, element: <SkillPractice /> }
+        ]
+    },
+    {
+        path: ROUTES.admin,
+        element: (
+            <LayoutDefault />
+        ),
+        children: [
+            { path: ROUTES.admin, element: <Admin /> }
         ]
     }
     
