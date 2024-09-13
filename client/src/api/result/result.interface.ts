@@ -5,9 +5,9 @@ export interface IResult {
     yourScore?: number
     timeStart?: Date
     timeEnd?: Date
-    subjectId?: string
-    chapterId?: string
-    lessonId?: string
+    // subjectId?: string
+    // chapterId?: string
+    // lessonId?: string
     examId?: string
     status?: boolean
 }

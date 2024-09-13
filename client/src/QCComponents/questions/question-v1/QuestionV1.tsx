@@ -24,21 +24,21 @@ const QuestionV1: React.FC<IProps> = (props) => {
     const { question, onAnswer } = props
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
-            question.A,
-            question.B,
-            question.C,
-            question.D,
-            question.E,
+            { value: "a", label: question.A },
+            { value: "b", label: question.B },
+            { value: "c", label: question.C },
+            { value: "d", label: question.D },
+            { value: "e", label: question.E },
         ]
         return answers.map((answer, index) => {
-            if (answer) {
+            if (answer.label) {
                 return (
                     <FormControlLabel
-                        value={answer}
+                        value={answer.value}
                         control={<Radio />}
-                        label={answer}
+                        label={answer.label}
                         key={index}
-                        checked={props.yourAnswer?.yourAnswer === answer}
+                        checked={props.yourAnswer?.yourAnswer === answer.value}
                         disabled={props.mode === "result" || props.mode === "submit"}
                     />
                 )
