@@ -36,7 +36,7 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
         }
 
         const reader = new FileReader();
-
+        
         reader.onload = (e) => {
             const arrayBuffer = e.target?.result;
             const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -70,11 +70,13 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
         };
         
         reader.readAsArrayBuffer(file as Blob);
+
+        event.target.value = '';
     };
 
 
     const handleClick = () => {
-        document.getElementById('contained-button-file')?.click();
+        document.getElementById(`contained-button-file-${props.name}-${props.sheetIndex}`)?.click();
     };
     return (
         <div>
@@ -82,7 +84,7 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
                 type="file"
                 accept=".xlsx, .xls"
                 onChange={(e) => { handleExcelFile(e) }}
-                id="contained-button-file"
+                id={`contained-button-file-${props.name}-${props.sheetIndex}`}
                 // multiple
                 className={classes.input}
             />
