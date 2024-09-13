@@ -1,14 +1,16 @@
 const { fakerEN: faker } = require('@faker-js/faker')
 const Subject = require('../models/subject')
 
-const sampleNames = ['Toan', 'Tieng viet']
+const sampleNames = ['Toán', 'Tiếng Việt']
 
 const generateSubject = async () => {
   const subjects = []
 
   for (let i = 0; i < sampleNames.length; i++) {
     const name = sampleNames[i]
+    const id = name === 'Toán' ? 'subject1' : name === 'Tiếng Việt' ? 'subject2' : faker.datatype.uuid()
     subjects.push({
+      id,
       name,
       createdAt: faker.date.past(),
       updatedAt: faker.date.recent()

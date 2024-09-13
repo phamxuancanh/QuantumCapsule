@@ -16,6 +16,7 @@ export interface IExcelReaderBtnProps {
     sx?: SxProps;
     name: string;
     variant?: 'text' | 'outlined' | 'contained';
+    sheetIndex?: number;
 }
 
 const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnProps) => {
@@ -35,11 +36,11 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
         }
 
         const reader = new FileReader();
-
+        
         reader.onload = (e) => {
             const arrayBuffer = e.target?.result;
             const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
+            const sheetName = workbook.SheetNames[props.sheetIndex? props.sheetIndex : 0];
             const worksheet = workbook.Sheets[sheetName];
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
@@ -54,7 +55,9 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
                 }
                 const obj: { [key: string]: any } = {};
                 keys?.forEach((key, index) => {
-                    obj[key] = row[index];
+                    if(key || key !== '') {
+                        obj[key] = row[index];
+                    }
                 });
                 return obj;
             })
@@ -67,11 +70,13 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
         };
         
         reader.readAsArrayBuffer(file as Blob);
+
+        event.target.value = '';
     };
 
 
     const handleClick = () => {
-        document.getElementById('contained-button-file')?.click();
+        document.getElementById(`contained-button-file-${props.name}-${props.sheetIndex}`)?.click();
     };
     return (
         <div>
@@ -79,7 +84,7 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
                 type="file"
                 accept=".xlsx, .xls"
                 onChange={(e) => { handleExcelFile(e) }}
-                id="contained-button-file"
+                id={`contained-button-file-${props.name}-${props.sheetIndex}`}
                 // multiple
                 className={classes.input}
             />

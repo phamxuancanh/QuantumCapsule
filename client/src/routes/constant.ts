@@ -12,5 +12,6 @@ const ROUTES = {
     reset_password: '/reset_password',
     profile: '/profile',
     skill_practice: '/skill_practice',
+    admin: '/admin',
 }
 export default ROUTES

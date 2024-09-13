@@ -1,6 +1,23 @@
 const { models } = require('../models')
 const { Op } = require('sequelize')
+// init chapters data
+const importChapters = async (req, res, next) => {
+  try {
+    const { chapters } = req.body
+    console.log('chapters', chapters)
+    if (!Array.isArray(chapters) || chapters.length === 0) {
+      return res.status(400).json({ message: 'Invalid data format or empty array' })
+    }
 
+    const newChapters = await models.Chapter.bulkCreate(chapters)
+
+    res.status(201).json({ message: 'Chapters added successfully', data: newChapters })
+  } catch (error) {
+    console.error('Error adding chapters:', error)
+    res.status(500).json({ message: 'Error adding chapters' })
+  }
+}
+// get all chapters
 const getAllChapter = async (req, res, next) => {
   try {
     const {
@@ -74,5 +91,6 @@ const getAllChapter = async (req, res, next) => {
 }
 
 module.exports = {
+  importChapters,
   getAllChapter
 }

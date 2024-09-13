@@ -15,8 +15,8 @@ export const data: IQuestion[] = [
         E: undefined,
         correctAnswer: "2",
         explainAnswer: "Kotaiete kudasai",
-        score: 1,
-        theoryId: "1",
+        // score: 1,
+        lessonId: "1",
     },
     {
         id: "2",
@@ -26,8 +26,8 @@ export const data: IQuestion[] = [
         contentImg: "https://s3.vio.edu.vn/image_1620704319139.png",
         correctAnswer: "hello",
         explainAnswer: "nothing to giai thich",
-        score: 2,
-        theoryId: "1",
+        // score: 2,
+        lessonId: "1",
     },
     {
         id: "3",
@@ -41,8 +41,8 @@ export const data: IQuestion[] = [
         D: "d",
         correctAnswer: "bcd",
         explainAnswer: "nothing to giai thich",
-        score: 3,
-        theoryId: "1",
+        // score: 3,
+        lessonId: "1",
     },
 
 ]

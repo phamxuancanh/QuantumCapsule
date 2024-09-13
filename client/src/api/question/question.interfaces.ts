@@ -11,9 +11,9 @@ export interface IQuestion {
     E?: string
     correctAnswer?: string
     explainAnswer?: string
-    score?: number
+    // score?: number
     status?: boolean
-    theoryId?: string
+    lessonId?: string
 }
 
 
