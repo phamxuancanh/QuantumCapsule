@@ -28,16 +28,19 @@ const QuestionV3: React.FC<IProps> = (props) => {
     const convertArrToSortedString = (arr: string[]) => {
         return arr.sort().join("")
     }
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         const { value } = event.target
         const currentIndex = checkedItems.indexOf(value)
         const newChecked = [...checkedItems]
 
-        if (currentIndex === -1) {
+        if(checked ) {
             newChecked.push(value)
-        } else {
+        }
+        else {
             newChecked.splice(currentIndex, 1)
         }
+        console.log(newChecked);
+        
         props.onAnswer && props.onAnswer(convertArrToSortedString(newChecked))
         setCheckedItems(newChecked)
     }
