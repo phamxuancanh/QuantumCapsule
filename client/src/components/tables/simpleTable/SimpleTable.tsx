@@ -24,6 +24,7 @@ import {
     GridToolbarDensitySelector,
     GridToolbarExport,
     GridToolbarQuickFilter,
+    GridRowParams,
 } from '@mui/x-data-grid';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { ACTIONS } from 'utils/enums';
@@ -34,6 +35,7 @@ interface EditToolbarProps {
         newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
     ) => void;
     initNewRow: any;
+    toolbarComponent?: React.ReactNode;
 }
 
 function EditToolbar(props: EditToolbarProps) {
@@ -52,6 +54,7 @@ function EditToolbar(props: EditToolbarProps) {
             <Button color="primary" startIcon={<AddIcon />} onClick={handleClick} variant='outlined'>
                 Add record
             </Button>
+            {props.toolbarComponent}
             <GridToolbarColumnsButton />
             <GridToolbarDensitySelector/>
             <GridToolbarExport/>
@@ -74,8 +77,9 @@ export interface ISimpleTableProps {
     columnVisibilityModel?: { [key: string]: boolean };
 
     processRowAdd?: (newRow: any) => void;
-    onRowClick?: (param: any) => void;
+    onRowClick?: (param: GridRowParams<any>) => void;
     onUpdateRow?: (data: any, action: ACTIONS) => void;
+    toolbarComponent?: React.ReactNode;
 }
 
 export default function SimpleTable(props: ISimpleTableProps) {
@@ -227,14 +231,14 @@ export default function SimpleTable(props: ISimpleTableProps) {
                     toolbar: EditToolbar as GridSlots['toolbar'],
                 }}
                 slotProps={{
-                    toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow },
+                    toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent },
                 }}
                 columnVisibilityModel={props.columnVisibilityModel}
                 initialState={{
                     pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } },
                 }}
                 pageSizeOptions={props.pageSizeOptions || [10, 20]}
-                onRowClick={props.onRowClick}
+                onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
                 // getRowId={(row) => {
                 //     return props.keys.map((key) => row[key]).join('');
                 // }}
