@@ -1,8 +1,8 @@
 const { models } = require('../models')
 
-const getAllSubject = async (req, res, next) => {
+const getListSubject = async (req, res, next) => {
   try {
-    const chapters = await models.Subject.findAll({
+    const subjects = await models.Subject.findAll({
       attributes: [
         'id',
         'name',
@@ -12,17 +12,17 @@ const getAllSubject = async (req, res, next) => {
       ]
     })
 
-    if (!chapters || chapters.length === 0) {
-      return res.status(404).json({ message: 'No chapters found' })
+    if (!subjects || subjects.length === 0) {
+      return res.json({ message: 'No subjects found', data: [] })
     }
 
-    res.json(chapters)
+    res.json({ data: subjects })
   } catch (error) {
-    console.error('Error fetching chapters:', error)
-    res.status(500).json({ message: 'Error fetching chapters' })
+    console.error('Error fetching subjects:', error)
+    res.status(500).json({ message: 'Error fetching subjects' })
   }
 }
 
 module.exports = {
-  getAllSubject
+  getListSubject
 }

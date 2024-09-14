@@ -39,7 +39,63 @@ const importExams = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding exams' })
   }
 }
+// get list exams by many conditions
+const getListExam = async (req, res, next) => {
+  try {
+    const {
+      page = '1',
+      size = '15',
+      search: nameCondition,
+      lessonId,
+      chapterId
+    } = req.query
+
+    const offset = (Number(page) - 1) * Number(size)
+
+    const searchConditions = {
+      where: {}
+    }
+
+    if (nameCondition) {
+      searchConditions.where.name = {
+        [Op.like]: `%${nameCondition}%`
+      }
+    }
+
+    if (lessonId) {
+      searchConditions.where.lessonId = lessonId
+    }
+
+    if (chapterId) {
+      searchConditions.where.chapterId = chapterId
+    }
+
+    const totalRecords = await models.Exam.count(searchConditions)
+    const exams = await models.Exam.findAll({
+      ...searchConditions,
+      limit: Number(size),
+      offset,
+      attributes: [
+        'id',
+        'name',
+        'order',
+        'lessonId',
+        'chapterId',
+        'name',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    res.json({ data: exams, totalRecords })
+  } catch (error) {
+    console.error('Error fetching exams:', error)
+    res.status(500).json({ message: 'Error fetching exams' })
+  }
+}
 
 module.exports = {
-  importExams
+  importExams,
+  getListExam
 }

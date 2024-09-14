@@ -37,7 +37,78 @@ const importQuestions = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding questions' })
   }
 }
+// get list questions by many conditions
+const getListQuestion = async (req, res, next) => {
+  try {
+    const {
+      page = '1',
+      size = '15',
+      search: contentCondition,
+      lessonId,
+      questionType,
+      examId
+    } = req.query
 
+    const offset = (Number(page) - 1) * Number(size)
+
+    const searchConditions = {
+      where: {},
+      include: []
+    }
+
+    if (contentCondition) {
+      searchConditions.where.content = {
+        [Op.like]: `%${contentCondition}%`
+      }
+    }
+
+    if (lessonId) {
+      searchConditions.where.lessonId = lessonId
+    }
+
+    if (questionType) {
+      searchConditions.where.questionType = questionType
+    }
+
+    if (examId) {
+      searchConditions.include.push({
+        model: models.Exam,
+        where: { id: examId },
+        through: { attributes: [] },
+        attributes: []
+      })
+    }
+
+    const totalRecords = await models.Question.count(searchConditions)
+    const questions = await models.Question.findAll({
+      ...searchConditions,
+      limit: Number(size),
+      offset,
+      attributes: [
+        'id',
+        'lessonId',
+        'questionType',
+        'title',
+        'content',
+        'contentImg',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'correctAnswer',
+        'explainAnswer',
+        'status'
+      ]
+    })
+
+    res.json({ data: questions, totalRecords })
+  } catch (error) {
+    console.error('Error getting questions:', error)
+    res.status(500).json({ message: 'Error getting questions' })
+  }
+}
 module.exports = {
-  importQuestions
+  importQuestions,
+  getListQuestion
 }

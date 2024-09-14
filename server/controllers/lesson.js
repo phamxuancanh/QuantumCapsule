@@ -30,11 +30,55 @@ const importLessons = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding lessons' })
   }
 }
+// get list lessons by many conditions
+const getListLesson = async (req, res, next) => {
+  try {
+    const {
+      page = '1',
+      size = '15',
+      search: nameCondition,
+      chapterId
+    } = req.query
 
-module.exports = {
-  importLessons
+    const offset = (Number(page) - 1) * Number(size)
+
+    const searchConditions = {
+      where: {}
+    }
+
+    if (nameCondition) {
+      searchConditions.where.name = {
+        [Op.like]: `%${nameCondition}%`
+      }
+    }
+
+    if (chapterId) {
+      searchConditions.where.chapterId = chapterId
+    }
+
+    const totalRecords = await models.Lesson.count(searchConditions)
+    const lessons = await models.Lesson.findAll({
+      ...searchConditions,
+      limit: Number(size),
+      offset,
+      attributes: [
+        'id',
+        'chapterId',
+        'name',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    res.json({ data: lessons, totalRecords })
+  } catch (error) {
+    console.error('Error fetching lessons:', error)
+    res.status(500).json({ message: 'Error fetching lessons' })
+  }
 }
-
 module.exports = {
-  importLessons
+  importLessons,
+  getListLesson
 }

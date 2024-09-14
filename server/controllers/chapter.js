@@ -17,16 +17,15 @@ const importChapters = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding chapters' })
   }
 }
-// get all chapters
-const getAllChapter = async (req, res, next) => {
+// get list chapters by many conditions
+const getListChapter = async (req, res, next) => {
   try {
     const {
       page = '1',
       size = '15',
       search: nameCondition,
       subjectId,
-      grade,
-      status
+      grade
     } = req.query
 
     const offset = (Number(page) - 1) * Number(size)
@@ -48,15 +47,7 @@ const getAllChapter = async (req, res, next) => {
     if (grade) {
       searchConditions.where.grade = grade
     }
-
-    if (status !== undefined) {
-      searchConditions.where.status = status === 'true'
-    }
-
-    // Fetch the total count of chapters with filtering conditions
     const totalRecords = await models.Chapter.count(searchConditions)
-
-    // Fetch the chapters with limit and offset
     const chapters = await models.Chapter.findAll({
       ...searchConditions,
       limit: Number(size),
@@ -74,10 +65,6 @@ const getAllChapter = async (req, res, next) => {
       ]
     })
 
-    if (!chapters || chapters.length === 0) {
-      return res.status(404).json({ message: 'No chapters found' })
-    }
-
     res.json({
       page: Number(page),
       size: Number(size),
@@ -92,5 +79,5 @@ const getAllChapter = async (req, res, next) => {
 
 module.exports = {
   importChapters,
-  getAllChapter
+  getListChapter
 }

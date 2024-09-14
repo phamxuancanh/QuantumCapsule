@@ -91,11 +91,11 @@ const Admin: React.FC = () => {
             </div>
             <div>
                 <h1>question</h1>
-                <ExcelReaderBtn sheetIndex={5} name='import question' onUpload={handleImportQuestion} />
+                <ExcelReaderBtn sheetIndex={6} name='import question' onUpload={handleImportQuestion} />
             </div>
             <div>
                 <h1>exam - question</h1>
-                <ExcelReaderBtn sheetIndex={4} name='import exam - question' onUpload={handleImportExamQuestion} />
+                <ExcelReaderBtn sheetIndex={5} name='import exam - question' onUpload={handleImportExamQuestion} />
             </div>
 
         </div>
