@@ -125,7 +125,8 @@ const routes: RouteObject[] = [
             // { path: ROUTES.dev, element: <Dev /> }
             // { path: ROUTES.forgot_password, element: <ForgotPassword />}
             { path: ROUTES.profile, element: <Profile /> },
-            { path: ROUTES.skill_list, element: <SkillList /> }
+            { path: ROUTES.skill_list, element: <SkillList /> },
+            { path: ROUTES.admin, element: <Admin /> }
         ]
     },
     {
@@ -145,17 +146,7 @@ const routes: RouteObject[] = [
         children: [
             { path: ROUTES.skill_practice, element: <SkillPractice /> }
         ]
-    },
-    {
-        path: ROUTES.admin,
-        element: (
-            <LayoutDefault />
-        ),
-        children: [
-            { path: ROUTES.admin, element: <Admin /> }
-        ]
     }
-    
 ]
 
 export default routes

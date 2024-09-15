@@ -11,7 +11,7 @@ const Exam = sequelize.define(
       unique: true,
       primaryKey: true
     },
-    theoryId: {
+    lessonId: {
       type: DataTypes.STRING,
       allowNull: true
     },

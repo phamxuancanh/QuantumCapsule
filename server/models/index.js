@@ -44,8 +44,8 @@ Question.belongsToMany(Exam, { through: ExamQuestion, foreignKey: 'questionId' }
 Chapter.hasMany(Exam, { foreignKey: 'chapterId' })
 Exam.belongsTo(Chapter, { foreignKey: 'chapterId' })
 
-Theory.hasMany(Exam, { foreignKey: 'theoryId' })
-Exam.belongsTo(Theory, { foreignKey: 'theoryId' })
+Lesson.hasMany(Exam, { foreignKey: 'lessonId' })
+Exam.belongsTo(Lesson, { foreignKey: 'lessonId' })
 
 Lesson.hasMany(Theory, { foreignKey: 'lessonId' })
 Theory.belongsTo(Chapter, { foreignKey: 'lessonId' })
@@ -97,6 +97,7 @@ module.exports = {
     Lesson,
     Exam,
     Question,
+    ExamQuestion,
     Answer,
     Scoresheet,
     Notification,

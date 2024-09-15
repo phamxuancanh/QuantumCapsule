@@ -22,7 +22,7 @@ const Theory = sequelize.define(
       type: DataTypes.STRING
     },
     summary: {
-      type: DataTypes.STRING
+      type: DataTypes.TEXT
     },
     url: {
       type: DataTypes.STRING

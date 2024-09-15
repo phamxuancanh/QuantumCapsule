@@ -12,7 +12,8 @@ const Question = sequelize.define(
       primaryKey: true
     },
     lessonId: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: true
     },
     questionType: {
       type: DataTypes.INTEGER
