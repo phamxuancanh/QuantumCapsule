@@ -5,12 +5,16 @@ import { IQuestion } from 'api/question/question.interfaces';
 import { ITheory } from 'api/theory/theory.interface';
 import ExcelReaderBtn from 'components/buttons/excel/ExcelReaderBtn';
 import React from 'react';
-import { importChapters } from 'api/chapter/api';
-import { importLessons } from 'api/lesson/api';
-import { importTheories } from 'api/theory/api';
-import { importExamQuestions, importExams } from 'api/exam/api';
-import { importQuestions } from 'api/question/api';
+import { importChapters } from 'api/chapter/chapter.api';
+import { importLessons } from 'api/lesson/lesson.api';
+import { importTheories } from 'api/theory/theory.api';
+import { importExamQuestions, importExams } from 'api/exam/exam.api';
+import { importQuestions } from 'api/question/question.api';
 import { toast } from 'react-toastify';
+import ExamManager from './ExamManager/ExamManagerProvider';
+import ComentManager from './ComentManager/CommentManagerProvider';
+import QuestionManager from './QuestionManager/QuestionManagerProvider';
+import TheoryManager from './TheoryManager/TheoryManagerProvider';
 const Admin: React.FC = () => {
     const handleImportChapter = async (listData: IChapter[]) => {
         try {
@@ -73,6 +77,7 @@ const Admin: React.FC = () => {
     };
     return (
         <div>
+            <TheoryManager />
             <div>
                 <h1>chapter</h1>
                 <ExcelReaderBtn sheetIndex={0} name='import chapter' onUpload={handleImportChapter} />

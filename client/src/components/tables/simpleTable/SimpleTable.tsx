@@ -80,6 +80,8 @@ export interface ISimpleTableProps {
     onRowClick?: (param: GridRowParams<any>) => void;
     onUpdateRow?: (data: any, action: ACTIONS) => void;
     toolbarComponent?: React.ReactNode;
+    loading?: boolean;
+    getRowId?: (row: any) => string;
 }
 
 export default function SimpleTable(props: ISimpleTableProps) {
@@ -217,10 +219,42 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 },
             }}
         >
+            {/* {
+                React.useMemo(() => {
+                    return <DataGrid
+                        apiRef={props.apiRef}
+                        rows={rows}
+                        columns={columns}
+                        loading={props.loading}
+                        editMode="row"
+                        rowModesModel={rowModesModel}
+                        onRowModesModelChange={handleRowModesModelChange}
+                        onRowEditStop={handleRowEditStop}
+                        processRowUpdate={processRowUpdate}
+                        slots={{
+                            // baseButton: EditToolbar as GridSlots['baseButton'],
+                            toolbar: EditToolbar as GridSlots['toolbar'],
+                        }}
+                        slotProps={{
+                            toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent },
+                        }}
+                        columnVisibilityModel={props.columnVisibilityModel}
+                        initialState={{
+                            pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } },
+                        }}
+                        pageSizeOptions={props.pageSizeOptions || [10, 20]}
+                        onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
+                        getRowId={props.getRowId}
+                        rowHeight={props.rowHeight || 60}
+                        checkboxSelection={props.checkboxSelection || true}
+                    />
+                }, [rows])
+            } */}
             <DataGrid
                 apiRef={props.apiRef}
                 rows={rows}
                 columns={columns}
+                loading={props.loading}
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
@@ -239,9 +273,7 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 }}
                 pageSizeOptions={props.pageSizeOptions || [10, 20]}
                 onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
-                // getRowId={(row) => {
-                //     return props.keys.map((key) => row[key]).join('');
-                // }}
+                getRowId={props.getRowId}
                 rowHeight={props.rowHeight || 60}
                 checkboxSelection={props.checkboxSelection || true}
             />

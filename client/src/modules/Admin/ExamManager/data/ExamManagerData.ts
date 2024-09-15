@@ -4,7 +4,7 @@ import { IQuestion } from "api/question/question.interfaces"
 
 export const  initTableData: IExam[] = [
     {
-        id: "1",
+        id: "ádasdas",
         name: "Exam 1",
         chapterId: "chapter001",
         lessonId: "1",
