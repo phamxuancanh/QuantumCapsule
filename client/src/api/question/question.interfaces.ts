@@ -16,4 +16,19 @@ export interface IQuestion {
     lessonId?: string
 }
 
+export interface ListQuesionParams {
+    page?: number
+    size?: number
+    search?: string
+    startDate?: Date
+    endDate?: Date
+}
+
+export interface DataListQuesion {
+    data: IQuestion[]
+    page: number
+    size: number
+    totalRecords: number
+}
+
 

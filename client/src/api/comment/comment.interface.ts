@@ -5,3 +5,18 @@ export interface IComment{
     status?: boolean
     content?: string
 }
+
+export interface ListCommentParams {
+    page?: number
+    size?: number
+    search?: string
+    startDate?: Date
+    endDate?: Date
+}
+
+export interface DataListComment {
+    data: IComment[]
+    page: number
+    size: number
+    totalRecords: number
+}

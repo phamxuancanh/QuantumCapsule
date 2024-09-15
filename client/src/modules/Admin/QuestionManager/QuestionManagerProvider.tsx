@@ -1,6 +1,6 @@
 import React from 'react';
 import Provider from './context/provider';
-import ExamManager from './QuestionManager';
+import QuestionManager from './QuestionManager';
 
 interface PracticeProviderProps {
     // Define the props for your component here
@@ -11,7 +11,7 @@ const PracticeProvider: React.FC<PracticeProviderProps> = () => {
 
     return (
         <Provider>
-            <ExamManager />
+            <QuestionManager />
         </Provider>
     );
 };

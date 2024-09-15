@@ -7,3 +7,18 @@ export interface IChapter {
     order?: number
     status?: boolean
 }
+
+export interface ListChapterParams {
+    page?: number
+    size?: number
+    search?: string
+    startDate?: Date
+    endDate?: Date
+}
+
+export interface DataListChapter{
+    data: IChapter[]
+    page: number
+    size: number
+    totalRecords: number
+}

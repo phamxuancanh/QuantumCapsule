@@ -13,3 +13,18 @@ export interface IExamQuestion {
     questionId?: string
     status?: boolean
 }
+
+export interface ListExamParams {
+    page?: number
+    size?: number
+    search?: string
+    startDate?: Date
+    endDate?: Date
+}
+
+export interface DataListExam {
+    data: IExam[]
+    page: number
+    size: number
+    totalRecords: number
+}

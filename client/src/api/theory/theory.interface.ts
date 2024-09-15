@@ -1,6 +1,6 @@
 export interface ITheory {
     id?: string
-    lessonId?: number
+    lessonId?: string
     name?: string
     description?: string
     summary?: string
@@ -8,4 +8,19 @@ export interface ITheory {
     type?: string
     order?: number
     status?: boolean
+}
+
+export interface ListTheoryParams {
+    page?: number
+    size?: number
+    search?: string
+    startDate?: Date
+    endDate?: Date
+}
+
+export interface DataListTheory {
+    data: ITheory[]
+    page: number
+    size: number
+    totalRecords: number
 }
