@@ -14,6 +14,12 @@ const Subject = sequelize.define(
     name: {
       type: DataTypes.STRING
     },
+    image_on: {
+      type: DataTypes.STRING
+    },
+    image_off: {
+      type: DataTypes.STRING
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true

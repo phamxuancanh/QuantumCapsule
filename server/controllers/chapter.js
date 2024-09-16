@@ -27,7 +27,7 @@ const getListChapter = async (req, res, next) => {
       subjectId,
       grade
     } = req.query
-
+    console.log('req.query', req.query)
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {
