@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from 'react-router-dom';
 import ROUTES from 'routes/constant';
-import { verifyEmail } from '../../api/user/api';
+import { verifyEmail } from '../../api/user/user.api';
 
 const EmailVerifyPage: React.FC = () => {
     const location = useLocation();

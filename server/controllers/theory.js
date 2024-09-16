@@ -87,7 +87,66 @@ const getListTheory = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching theories' })
   }
 }
+// add a new theory
+const addTheory = async (req, res, next) => {
+  try {
+    const theoryData = req.body
+
+    const { lessonId } = theoryData
+
+    // Check if the lesson exists
+    const lesson = await models.Lesson.findByPk(lessonId)
+
+    if (!lesson) {
+      return res.status(400).json({ message: 'Lesson not found' })
+    }
+
+    const newTheory = await models.Theory.create(theoryData)
+    res.status(201).json({ message: 'Theory added successfully', data: newTheory })
+  } catch (error) {
+    console.error('Error adding theory:', error)
+    res.status(500).json({ message: 'Error adding theory' })
+  }
+}
+// update a theory by id
+const updateTheory = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    const theory = await models.Theory.findByPk(id)
+    if (!theory) {
+      return res.status(404).json({ message: 'Theory not found' })
+    }
+
+    await theory.update(updateData)
+    res.json({ message: 'Theory updated successfully', data: theory })
+  } catch (error) {
+    console.error('Error updating theory:', error)
+    res.status(500).json({ message: 'Error updating theory' })
+  }
+}
+// delete a theory by id
+const deleteTheory = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const theory = await models.Theory.findByPk(id)
+    if (!theory) {
+      return res.status(404).json({ message: 'Theory not found' })
+    }
+
+    await theory.update({ status: 0 })
+    res.json({ message: 'Theory status updated to 0 successfully' })
+  } catch (error) {
+    console.error('Error updating theory status:', error)
+    res.status(500).json({ message: 'Error updating theory status' })
+  }
+}
 module.exports = {
   importTheories,
-  getListTheory
+  getListTheory,
+  addTheory,
+  updateTheory,
+  deleteTheory
 }

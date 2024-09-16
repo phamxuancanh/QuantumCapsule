@@ -74,7 +74,7 @@ export const facebookSignIn = async () => {
       console.log('Đăng nhập thành công:', data);
 
       const currentUser = {
-        accessToken: token,
+        accessToken: data.accessToken, // Sử dụng accessToken từ response
         currentUser: data.user,
       };
 
@@ -120,7 +120,7 @@ export const googleSignIn = async () => {
       console.log('Đăng nhập thành công:', data);
 
       const currentUser = {
-        accessToken: token,
+        accessToken: data.accessToken, // Sử dụng accessToken từ response
         currentUser: data.user,
       };
 
@@ -151,6 +151,7 @@ export const githubSignIn = async () => {
     const credential = GithubAuthProvider.credentialFromResult(result);
     const githubToken = credential?.accessToken;
     console.log("GitHub Token:", githubToken);
+
     const response = await fetch('http://localhost:8000/api/v1/auths/github', {
       method: 'POST',
       headers: {
@@ -159,13 +160,35 @@ export const githubSignIn = async () => {
       body: JSON.stringify({ githubToken }),
       credentials: 'include',
     });
+
     const data = await response.json();
     if (response.ok) {
       console.log('Đăng nhập GitHub thành công:', data);
+
+      // Lấy dữ liệu hiện tại từ localStorage
+      const persistAuthKey = 'persist:auth';
+      const persistAuthData = localStorage.getItem(persistAuthKey);
+
+      if (persistAuthData) {
+        // Parse dữ liệu JSON hiện tại
+        const parsedData = JSON.parse(persistAuthData);
+
+        // Cập nhật trường accessToken
+        parsedData.accessToken = data.accessToken;
+
+        // Lưu lại dữ liệu đã cập nhật vào localStorage
+        localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
+      } else {
+        // Nếu persist:auth chưa tồn tại, tạo mới với accessToken
+        const newData = { accessToken: data.accessToken };
+        localStorage.setItem(persistAuthKey, JSON.stringify(newData));
+      }
+
       const currentUser = {
-        accessToken: githubToken,
+        accessToken: data.accessToken, // Sử dụng accessToken từ response
         currentUser: data.user,
       };
+
       return currentUser;
     } else {
       console.error('Đăng nhập GitHub thất bại:', data);

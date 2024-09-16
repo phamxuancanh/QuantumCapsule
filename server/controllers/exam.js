@@ -94,8 +94,67 @@ const getListExam = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching exams' })
   }
 }
+// add a new exam
+const addExam = async (req, res, next) => {
+  try {
+    const examData = req.body
 
+    const { lessonId, chapterId } = examData
+
+    // Check if the lesson and chapter exist
+    const lesson = await models.Lesson.findByPk(lessonId)
+    const chapter = await models.Chapter.findByPk(chapterId)
+
+    if (!lesson || !chapter) {
+      return res.status(400).json({ message: 'Lesson or Chapter not found' })
+    }
+
+    const newExam = await models.Exam.create(examData)
+    res.status(201).json({ message: 'Exam added successfully', data: newExam })
+  } catch (error) {
+    console.error('Error adding exam:', error)
+    res.status(500).json({ message: 'Error adding exam' })
+  }
+}
+// update an exam by id
+const updateExam = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    const exam = await models.Exam.findByPk(id)
+    if (!exam) {
+      return res.status(404).json({ message: 'Exam not found' })
+    }
+
+    await exam.update(updateData)
+    res.json({ message: 'Exam updated successfully', data: exam })
+  } catch (error) {
+    console.error('Error updating exam:', error)
+    res.status(500).json({ message: 'Error updating exam' })
+  }
+}
+// delete an exam by id
+const deleteExam = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const exam = await models.Exam.findByPk(id)
+    if (!exam) {
+      return res.status(404).json({ message: 'Exam not found' })
+    }
+
+    await exam.update({ status: 0 })
+    res.json({ message: 'Exam status updated to 0 successfully' })
+  } catch (error) {
+    console.error('Error updating exam status:', error)
+    res.status(500).json({ message: 'Error updating exam status' })
+  }
+}
 module.exports = {
   importExams,
-  getListExam
+  getListExam,
+  addExam,
+  updateExam,
+  deleteExam
 }

@@ -5,4 +5,7 @@ const { verifyAccessToken } = require('../middlewares/jwtService')
 
 router.post('/importTheories', verifyAccessToken, theoryController.importTheories)
 router.get('/', verifyAccessToken, theoryController.getListTheory)
+router.post('/', verifyAccessToken, theoryController.addTheory)
+router.put('/:id', verifyAccessToken, theoryController.updateTheory)
+router.delete('/:id', verifyAccessToken, theoryController.deleteTheory)
 module.exports = router

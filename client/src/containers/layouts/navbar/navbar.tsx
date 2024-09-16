@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, FC, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'services/i18n'
+import CryptoJS from 'crypto-js'
 import ROUTES from 'routes/constant'
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
 import Notifications from '../../../components/dropdown/dropdown_notification'

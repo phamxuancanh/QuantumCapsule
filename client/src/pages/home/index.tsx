@@ -1,5 +1,5 @@
 import React from 'react';
-import { signOut } from '../../api/user/api';
+import { signOut } from '../../api/user/user.api';
 import { useNavigate } from 'react-router-dom';
 import ROUTES from 'routes/constant';
 

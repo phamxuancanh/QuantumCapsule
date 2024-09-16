@@ -56,15 +56,12 @@ const verifyAccessToken = (req, res, next) => {
   if (!authHeader) {
     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
   }
-
   // Tách chuỗi 'Bearer' và token
   const [scheme, token] = authHeader.split(' ')
-
   // Kiểm tra định dạng token có đúng là 'Bearer <token>' hay không
   if (scheme !== 'Bearer' || !token) {
     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
   }
-
   // Xác minh token bằng JWT và chỉ định thuật toán
   JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, { algorithms: ['HS256'] }, (err, payload) => {
     console.log(token, 'token')

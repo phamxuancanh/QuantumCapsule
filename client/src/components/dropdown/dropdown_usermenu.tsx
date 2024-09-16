@@ -26,7 +26,7 @@ import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import { useDispatch } from 'react-redux'
 import ChoiceModal from 'components/modals/choiceModal'
 import CryptoJS from 'crypto-js'
-import { signOut } from 'api/user/api'
+import { signOut } from 'api/user/user.api'
 import { toast } from 'react-toastify'
 import { logoutState } from '../../redux/auth/authSlice'
 interface DropdownProfileProps {
