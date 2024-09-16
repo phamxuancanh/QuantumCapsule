@@ -533,6 +533,7 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       existingUser = await models.User.create(userInfo)
     }
     const accessToken = await signAccessToken(existingUser.id)
+    console.log(accessToken, 'accessTokenGooogle')
     const refreshToken = await signRefreshToken(existingUser.id)
     console.log(refreshToken, 'refreshToken')
 

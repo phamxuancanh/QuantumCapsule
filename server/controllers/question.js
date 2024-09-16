@@ -108,7 +108,66 @@ const getListQuestion = async (req, res, next) => {
     res.status(500).json({ message: 'Error getting questions' })
   }
 }
+// add a new question
+const addQuestion = async (req, res, next) => {
+  try {
+    const questionData = req.body
+
+    const { lessonId } = questionData
+
+    // Check if the lesson exists
+    const lesson = await models.Lesson.findByPk(lessonId)
+
+    if (!lesson) {
+      return res.status(400).json({ message: 'Lesson not found' })
+    }
+
+    const newQuestion = await models.Question.create(questionData)
+    res.status(201).json({ message: 'Question added successfully', data: newQuestion })
+  } catch (error) {
+    console.error('Error adding question:', error)
+    res.status(500).json({ message: 'Error adding question' })
+  }
+}
+// update question by id
+const updateQuestion = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    const question = await models.Question.findByPk(id)
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' })
+    }
+
+    await question.update(updateData)
+    res.json({ message: 'Question updated successfully', data: question })
+  } catch (error) {
+    console.error('Error updating question:', error)
+    res.status(500).json({ message: 'Error updating question' })
+  }
+}
+// delete question by id
+const deleteQuestion = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const question = await models.Question.findByPk(id)
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' })
+    }
+
+    await question.update({ status: 0 })
+    res.json({ message: 'Question status updated to 0 successfully' })
+  } catch (error) {
+    console.error('Error updating question status:', error)
+    res.status(500).json({ message: 'Error updating question status' })
+  }
+}
 module.exports = {
   importQuestions,
-  getListQuestion
+  getListQuestion,
+  addQuestion,
+  updateQuestion,
+  deleteQuestion
 }

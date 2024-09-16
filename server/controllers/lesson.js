@@ -78,7 +78,66 @@ const getListLesson = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching lessons' })
   }
 }
+// add a new lesson
+const addLesson = async (req, res, next) => {
+  try {
+    const lessonData = req.body
+
+    const { chapterId } = lessonData
+
+    // Check if the chapter exists
+    const chapter = await models.Chapter.findByPk(chapterId)
+
+    if (!chapter) {
+      return res.status(400).json({ message: 'Chapter not found' })
+    }
+
+    const newLesson = await models.Lesson.create(lessonData)
+    res.status(201).json({ message: 'Lesson added successfully', data: newLesson })
+  } catch (error) {
+    console.error('Error adding lesson:', error)
+    res.status(500).json({ message: 'Error adding lesson' })
+  }
+}
+// update lesson by id
+const updateLesson = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    const lesson = await models.Lesson.findByPk(id)
+    if (!lesson) {
+      return res.status(404).json({ message: 'Lesson not found' })
+    }
+
+    await lesson.update(updateData)
+    res.json({ message: 'Lesson updated successfully', data: lesson })
+  } catch (error) {
+    console.error('Error updating lesson:', error)
+    res.status(500).json({ message: 'Error updating lesson' })
+  }
+}
+// delete lesson by id
+const deleteLesson = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const lesson = await models.Lesson.findByPk(id)
+    if (!lesson) {
+      return res.status(404).json({ message: 'Lesson not found' })
+    }
+
+    await lesson.update({ status: 0 })
+    res.json({ message: 'Lesson status updated to 0 successfully' })
+  } catch (error) {
+    console.error('Error updating lesson status:', error)
+    res.status(500).json({ message: 'Error updating lesson status' })
+  }
+}
 module.exports = {
   importLessons,
-  getListLesson
+  getListLesson,
+  addLesson,
+  updateLesson,
+  deleteLesson
 }

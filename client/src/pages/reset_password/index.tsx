@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import ROUTES from 'routes/constant'
 import { useTranslation } from "react-i18next";
-import { resetPassword } from "api/user/api";
+import { resetPassword } from "api/user/user.api";
 import { ClockLoader } from "react-spinners";
 import * as yup from 'yup'
 import { toast } from "react-toastify";

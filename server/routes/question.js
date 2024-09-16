@@ -5,4 +5,7 @@ const { verifyAccessToken } = require('../middlewares/jwtService')
 
 router.post('/importQuestions', verifyAccessToken, questionController.importQuestions)
 router.get('/', verifyAccessToken, questionController.getListQuestion)
+router.post('/', verifyAccessToken, questionController.addQuestion)
+router.put('/:id', verifyAccessToken, questionController.updateQuestion)
+router.delete('/:id', verifyAccessToken, questionController.deleteQuestion)
 module.exports = router

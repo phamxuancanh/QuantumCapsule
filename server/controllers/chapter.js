@@ -76,8 +76,57 @@ const getListChapter = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching chapters' })
   }
 }
+// add a new chapter
+const addChapter = async (req, res, next) => {
+  try {
+    const chapterData = req.body
 
+    const newChapter = await models.Chapter.create(chapterData)
+    res.status(201).json({ message: 'Chapter added successfully', data: newChapter })
+  } catch (error) {
+    console.error('Error adding chapter:', error)
+    res.status(500).json({ message: 'Error adding chapter' })
+  }
+}
+// update a chapter by id
+const updateChapter = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    const chapter = await models.Chapter.findByPk(id)
+    if (!chapter) {
+      return res.status(404).json({ message: 'Chapter not found' })
+    }
+
+    await chapter.update(updateData)
+    res.json({ message: 'Chapter updated successfully', data: chapter })
+  } catch (error) {
+    console.error('Error updating chapter:', error)
+    res.status(500).json({ message: 'Error updating chapter' })
+  }
+}
+// delete a chapter by id
+const deleteChapter = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const chapter = await models.Chapter.findByPk(id)
+    if (!chapter) {
+      return res.status(404).json({ message: 'Chapter not found' })
+    }
+
+    await chapter.update({ status: 0 })
+    res.json({ message: 'Chapter status updated to 0 successfully' })
+  } catch (error) {
+    console.error('Error updating chapter status:', error)
+    res.status(500).json({ message: 'Error updating chapter status' })
+  }
+}
 module.exports = {
   importChapters,
-  getListChapter
+  getListChapter,
+  addChapter,
+  updateChapter,
+  deleteChapter
 }

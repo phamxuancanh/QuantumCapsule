@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import axios, { AxiosError } from 'axios'
 import { getFromLocalStorage, setToLocalStorage, removeAllLocalStorage, reload } from 'utils/functions'
-import { refresh } from 'api/user/api'
+import { refresh } from 'api/user/user.api'
 import { jwtDecode } from 'jwt-decode'
 import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
@@ -39,13 +39,25 @@ const checkTokenValidity = (token: string) => {
 };
 
 
-
 const handleTokenRefresh = async () => {
   try {
-    const response = await refresh()
-    const newAccessToken = response.data.accessToken
-    setToLocalStorage('tokens', JSON.stringify(response.data))
-    return newAccessToken
+    console.log('Refreshing token');
+    const response = await refresh();
+    const newAccessToken = response.data.accessToken;
+    console.log('New access token:', newAccessToken);
+    const persistAuthKey = 'persist:auth';
+    const persistAuthData = localStorage.getItem(persistAuthKey);
+
+    if (persistAuthData) {
+      const parsedData = JSON.parse(persistAuthData);
+      parsedData.accessToken = newAccessToken;
+      localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
+    } else {
+      const newData = { accessToken: newAccessToken };
+      localStorage.setItem(persistAuthKey, JSON.stringify(newData));
+    }
+
+    return newAccessToken;
   } catch (error) {
     Swal.fire({
       title: 'Warning',
@@ -55,13 +67,37 @@ const handleTokenRefresh = async () => {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        removeAllLocalStorage()
-        reload()
+        removeAllLocalStorage();
+        reload();
       }
-    })
-    return null
+    });
+    return null;
   }
-}
+};
+// const handleTokenRefresh = async () => {
+//   try {
+//     console.log('Refreshing token')
+//     const response = await refresh()
+//     const newAccessToken = response.data.accessToken
+//     console.log('New access token:', newAccessToken)
+//     setToLocalStorage('persist:auth', JSON.stringify(response.data))
+//     return newAccessToken
+//   } catch (error) {
+//     Swal.fire({
+//       title: 'Warning',
+//       text: 'Your session has expired. Please log in again.',
+//       icon: 'warning',
+//       confirmButtonText: 'OK',
+//       allowOutsideClick: false
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         removeAllLocalStorage()
+//         reload()
+//       }
+//     })
+//     return null
+//   }
+// }
 
 
 requestWithJwt.interceptors.request.use(async (config) => {

@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from "react-router-dom"
 import { setToLocalStorage } from "utils/functions"
-import { signIn, googleSignIn, githubSignIn, facebookSignIn } from "api/user/api"
+import { signIn, googleSignIn, githubSignIn, facebookSignIn } from "api/user/user.api"
 import ROUTES from 'routes/constant'
 import * as yup from 'yup'
 import { useTranslation } from 'react-i18next'
@@ -55,6 +55,7 @@ const SignIn = () => {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
                 }
+                console.log(currentUser)
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser))
                 dispatch(loginState(currentUser.currentUser))
                 navigate(ROUTES.home)
