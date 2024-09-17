@@ -134,6 +134,7 @@ const deleteLesson = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating lesson status' })
   }
 }
+// get list lessons by chapterId
 const getLessonByChapterId = async (req, res, next) => {
   try {
     const { chapterId } = req.params
@@ -159,6 +160,7 @@ const getLessonByChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching lessons by chapterId' })
   }
 }
+// get list chapters and exams
 const getChaptersandExams = async (req, res, next) => {
   try {
     const {
@@ -223,6 +225,7 @@ const getChaptersandExams = async (req, res, next) => {
     res.status(500).json({ message: 'Error searching chapters and exams' })
   }
 }
+// get suggestions
 const getSuggestions = async (req, res, next) => {
   try {
     const { search } = req.query
@@ -237,22 +240,15 @@ const getSuggestions = async (req, res, next) => {
           [Op.like]: `%${search}%`
         }
       },
-      limit: 10, // Giới hạn số lượng kết quả gợi ý
+      limit: 10,
       attributes: ['id', 'name']
     }
-
-    // Tìm kiếm trong bảng Lesson
     const lessons = await models.Lesson.findAll(searchConditions)
-
-    // Tìm kiếm trong bảng Exam
     const exams = await models.Exam.findAll(searchConditions)
-
-    // Gộp kết quả từ Lesson và Exam
     const suggestions = [
       ...lessons.map((lesson) => ({ id: lesson.id, name: lesson.name, type: 'Lesson' })),
       ...exams.map((exam) => ({ id: exam.id, name: exam.name, type: 'Exam' }))
     ]
-
     res.json({ suggestions })
   } catch (error) {
     console.error('Error getting suggestions:', error)
