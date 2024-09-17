@@ -59,6 +59,7 @@ function DropdownProfile({ align }: DropdownProfileProps) {
   const userFirstName = currentUser?.currentUser.firstName
   const userEmail = currentUser?.currentUser.email
   const userRole = currentUser?.currentUser.key
+  const userAVT = currentUser?.currentUser.avatar
   let data: string | undefined
   if (userRole) {
     try {
@@ -191,7 +192,7 @@ function DropdownProfile({ align }: DropdownProfileProps) {
         onClick={() => setDropdownOpen(!dropdownOpen)}
         aria-expanded={dropdownOpen}
       >
-        <img className="tw-w-8 tw-h-8 tw-rounded-full" src={UserAvatar} width="32" height="32" alt="User" />
+        <img className="tw-w-8 tw-h-8 tw-rounded-full" src={userAVT} width="32" height="32" alt="User" />
         {/* <div className="flex items-center truncate">
                    <span className="truncate ml-2 text-sm font-medium group-hover:text-slate-800">Acme Inc.</span>
                    <svg className="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
@@ -216,7 +217,7 @@ function DropdownProfile({ align }: DropdownProfileProps) {
           onBlur={() => setDropdownOpen(false)}
         >
           <div className="tw-flex tw-items-center tw-py-1 tw-px-3">
-            <img className="tw-w-12 tw-h-12 tw-rounded-full tw--mt-2" src={UserAvatar} width="44" height="44" alt="User" />
+            <img className="tw-w-12 tw-h-12 tw-rounded-full tw--mt-2" src={userAVT} width="44" height="44" alt="User" />
             <div className="tw-pt-0.5 tw-pb-2 tw-px-3 tw-mb-1 tw-border-b tw-border-slate-200 tw-w-32">
               <p className='tw-font-bold tw-text-base tw-overflow-hidden tw-overflow-ellipsis tw-whitespace-nowrap'>
                 {`${userFirstName || ''} ${userLastName || ''}`}

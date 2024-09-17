@@ -9,7 +9,7 @@ import UserMenu from '../../../components/dropdown/dropdown_usermenu'
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux'
 import { getFromLocalStorage } from 'utils/functions'
-
+import SearchIcon from '@mui/icons-material/Search';
 const Navbar = () => {
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
@@ -26,11 +26,18 @@ const Navbar = () => {
       console.error('Decryption error:', error)
     }
   }
+  const [searchTerm, setSearchTerm] = useState('');
+  const handleSearch = (e: any) => {
+    setSearchTerm(e.target.value);
+  }
+  const handleSearchClick = () => {
+    alert('Tìm kiếm:');
+  };
   return (
     <header className='tw-sticky tw-top-0 tw-bg-white tw-border-b tw-border-slate-200 tw-z-30 tw-shadow-bottom tw-flex-col'>
       <div className='tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-flex tw-justify-center'>
-        <div className="tw-flex tw-h-16 tw--mb-px tw-space-x-4 tw-w-3/4">
-          <div className="tw-flex">
+        <div className="tw-flex tw-h-16 tw--mb-px tw-space-x-4 tw-w-3/4 tw-justify-center tw-px-2">
+          <div className="tw-flex tw-w-1/5">
             <a href="/" className="tw-flex-shrink-0 tw-flex tw-items-center">
               <p className="tw-font-bold">
                 <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-teal-600">VIO</span>
@@ -38,25 +45,36 @@ const Navbar = () => {
               </p>
             </a>
           </div>
-          <div className="tw-hidden lg:tw-flex lg:tw-items-center lg:tw-justify-center lg:tw-flex-1 lg:tw-space-x-2">
-            <a href="/" className={`tw-block tw-p-1 tw-font-bold ${pathname === '/' ? 'tw-text-slate-600 ' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-black'} tw-rounded px-2`}>
-              support@vio.edu.vn
-            </a>
-            <a href="/facebook" className={`tw-block tw-p-1 tw-font-bold ${pathname.includes('facebook') ? 'tw-text-slate-600 ' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-black'} tw-rounded px-2`}>
-              Facebook VioEdu
-            </a>
-            <a href="/canh" className={`tw-block tw-p-1 tw-font-bold ${pathname.includes('about') ? 'tw-text-slate-600' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname.includes('about') && 'hover:tw-text-black'} tw-rounded px-2`}>
-              0934060177
-            </a>
-            <a href="/nam" className={`tw-block tw-p-1 tw-font-bold ${pathname.includes('contact') ? 'tw-text-slate-600' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-black'} tw-rounded px-2`}>
-              033660652
-            </a>
-          </div>
 
-          <div className="tw-flex tw-items-center tw-space-x-3">
-            <div className='lg:tw-hidden'>
+          <div className='tw-w-3/5'>
+      <div
+        className='tw-w-full tw-transition-all tw-duration-300 tw-ease-in-out tw-h-2'
+      ></div>
+      <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-py-2">
+        <div className="tw-flex-grow tw-mx-4">
+          <div className="tw-relative">
+            <input
+              type="text"
+              placeholder="Tìm kiếm bài học, bài tập..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="tw-w-full tw-pl-10 tw-pr-4 tw-py-2 tw-rounded-full tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
+            />
+            <SearchIcon className="tw-absolute tw-left-3 tw-top-1/2 tw-transform -tw-translate-y-1/2 tw-text-gray-400" />
+          </div>
+        </div>
+        <button
+          onClick={handleSearchClick}
+          className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
+        >
+          Tìm
+        </button>
+      </div>
+    </div>
+          <div className="tw-flex tw-items-center tw-space-x-3 tw-w-1/5 tw-justify-end">
+            <div className=''>
               <a href="/cart">
-                <ShoppingCartOutlinedIcon className="tw-w-4 tw-h-4" sx={{ color: 'teal' }} />
+                <ShoppingCartOutlinedIcon className="tw-w-4 tw-h-4" sx={{ color: 'green' }} />
               </a>
             </div>
             <div className="tw-flex tw-items-center tw-space-x-3">

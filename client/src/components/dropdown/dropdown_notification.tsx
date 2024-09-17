@@ -51,7 +51,7 @@
            >
              <span className="tw-sr-only">Notifications</span>
              <div className="tw-absolute tw-top-0 tw-right-0 tw-w-2.5 tw-h-2.5 tw-bg-rose-500 tw-border-2 tw-border-white tw-rounded-full"></div>
-             <NotificationsNoneOutlinedIcon sx={{ color: 'teal' }} />
+             <NotificationsNoneOutlinedIcon sx={{ color: 'green' }} />
            </button>
    
          <Transition

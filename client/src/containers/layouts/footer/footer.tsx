@@ -35,8 +35,22 @@ const Footer = () => {
       </div>
 
       <div className="tw-text-center tw-mt-8 tw-border-t tw-border-white tw-pt-4 tw-pb-4 tw-mx-4 lg:tw-mx-28">
-        SORIMACHI VIET NAM &copy; 2024 All Rights Reserved.
+        QC VIET NAM &copy; 2024 All Rights Reserved.
       </div>
+                {/* <div className="tw-hidden lg:tw-flex lg:tw-items-center lg:tw-justify-center lg:tw-flex-1 lg:tw-space-x-2">
+            <a href="/" className={`tw-block tw-p-1 tw-font-bold ${pathname === '/' ? 'tw-text-slate-600 ' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-black'} tw-rounded px-2`}>
+              support@vio.edu.vn
+            </a>
+            <a href="/facebook" className={`tw-block tw-p-1 tw-font-bold ${pathname.includes('facebook') ? 'tw-text-slate-600 ' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-black'} tw-rounded px-2`}>
+              Facebook VioEdu
+            </a>
+            <a href="/canh" className={`tw-block tw-p-1 tw-font-bold ${pathname.includes('about') ? 'tw-text-slate-600' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname.includes('about') && 'hover:tw-text-black'} tw-rounded px-2`}>
+              0934060177
+            </a>
+            <a href="/nam" className={`tw-block tw-p-1 tw-font-bold ${pathname.includes('contact') ? 'tw-text-slate-600' : 'tw-text-gray-500'} hover:tw-text-black tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-black'} tw-rounded px-2`}>
+              033660652
+            </a>
+          </div> */}
     </div>
   )
 }
