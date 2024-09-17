@@ -12,8 +12,8 @@ export interface ListChapterParams {
     page?: number
     size?: number
     search?: string
-    startDate?: Date
-    endDate?: Date
+    subjectId?: string
+    grade?: number
 }
 
 export interface DataListChapter{

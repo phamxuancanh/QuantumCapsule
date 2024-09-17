@@ -6,6 +6,8 @@ const getListSubject = async (req, res, next) => {
       attributes: [
         'id',
         'name',
+        'image_on',
+        'image_off',
         'status',
         'createdAt',
         'updatedAt'

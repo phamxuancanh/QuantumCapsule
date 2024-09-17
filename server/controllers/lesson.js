@@ -134,10 +134,135 @@ const deleteLesson = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating lesson status' })
   }
 }
+// get list lessons by chapterId
+const getLessonByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const lessons = await models.Lesson.findAll({
+      where: {
+        chapterId
+      },
+      attributes: [
+        'id',
+        'chapterId',
+        'name',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    res.json({ data: lessons })
+  } catch (error) {
+    console.error('Error fetching lessons by chapterId:', error)
+    res.status(500).json({ message: 'Error fetching lessons by chapterId' })
+  }
+}
+// get list chapters and exams
+const getChaptersandExams = async (req, res, next) => {
+  try {
+    const {
+      page = '1',
+      size = '15',
+      search: nameCondition
+    } = req.query
+
+    const offset = (Number(page) - 1) * Number(size)
+    const limit = Number(size)
+
+    const searchConditions = {
+      where: {}
+    }
+
+    if (nameCondition) {
+      searchConditions.where.name = {
+        [Op.like]: `%${nameCondition}%`
+      }
+    }
+
+    const totalChapters = await models.Chapter.count(searchConditions)
+    const chapters = await models.Chapter.findAll({
+      ...searchConditions,
+      limit,
+      offset,
+      attributes: [
+        'id',
+        'name',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    const totalExams = await models.Exam.count(searchConditions)
+    const exams = await models.Exam.findAll({
+      ...searchConditions,
+      limit,
+      offset,
+      attributes: [
+        'id',
+        'name',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    // Trả về kết quả cả Chapter và Exam với thông tin phân trang
+    res.json({
+      data: { chapters, exams },
+      totalChapters,
+      totalExams,
+      currentPage: Number(page),
+      pageSize: limit
+    })
+  } catch (error) {
+    console.error('Error searching chapters and exams:', error)
+    res.status(500).json({ message: 'Error searching chapters and exams' })
+  }
+}
+// get suggestions
+const getSuggestions = async (req, res, next) => {
+  try {
+    const { search } = req.query
+
+    if (!search) {
+      return res.json({ suggestions: [] })
+    }
+
+    const searchConditions = {
+      where: {
+        name: {
+          [Op.like]: `%${search}%`
+        }
+      },
+      limit: 10,
+      attributes: ['id', 'name']
+    }
+    const lessons = await models.Lesson.findAll(searchConditions)
+    const exams = await models.Exam.findAll(searchConditions)
+    const suggestions = [
+      ...lessons.map((lesson) => ({ id: lesson.id, name: lesson.name, type: 'Lesson' })),
+      ...exams.map((exam) => ({ id: exam.id, name: exam.name, type: 'Exam' }))
+    ]
+    res.json({ suggestions })
+  } catch (error) {
+    console.error('Error getting suggestions:', error)
+    res.status(500).json({ message: 'Error getting suggestions' })
+  }
+}
+
 module.exports = {
   importLessons,
   getListLesson,
   addLesson,
   updateLesson,
-  deleteLesson
+  deleteLesson,
+  getLessonByChapterId,
+  getChaptersandExams,
+  getSuggestions
 }
