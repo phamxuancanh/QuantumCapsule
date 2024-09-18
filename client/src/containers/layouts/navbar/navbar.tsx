@@ -10,9 +10,13 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux'
 import { getFromLocalStorage } from 'utils/functions'
 import SearchIcon from '@mui/icons-material/Search';
+import { getLessonsandExams, getSuggestions } from 'api/lesson/lesson.api'
+import { debounce } from 'lodash'
+import { DataListLessonandExam } from 'api/lesson/lesson.interface'
 const Navbar = () => {
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const location = useLocation()
   const { pathname } = location
   const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'))
@@ -27,11 +31,47 @@ const Navbar = () => {
     }
   }
   const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState<{ id: string; name: string; type: string }[]>([])
+  const fetchSuggestions = debounce(async (value: string) => {
+    try {
+      const response = await getSuggestions(value);
+      console.log(response);
+      setSuggestions(response.data.suggestions);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  }, 300);
+
+  // const handleSearchClick = async () => {
+  //   const response = await getLessonsandExams({ params: { search: searchTerm } });
+  //   console.log(response.data);
+  //   setResults(response.data);
+  //   setSuggestions([]);
+  //   navigate(ROUTES.search_result, { state: { results } });
+  // };
+  const handleSearchClick = async () => {
+    const response = await getLessonsandExams({ params: { search: searchTerm } });
+    console.log(response.data);
+    setSuggestions([]);
+    // Encode the search term to make it URL-safe
+    const encodedSearchTerm = encodeURIComponent(searchTerm);
+    navigate(`${ROUTES.search_result}?name=${encodedSearchTerm}`);
+  };
   const handleSearch = (e: any) => {
-    setSearchTerm(e.target.value);
-  }
-  const handleSearchClick = () => {
-    alert('Tìm kiếm:');
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.length > 1) {
+      fetchSuggestions(value);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
+    }
   };
   return (
     <header className='tw-sticky tw-top-0 tw-bg-white tw-border-b tw-border-slate-200 tw-z-30 tw-shadow-bottom tw-flex-col'>
@@ -45,32 +85,85 @@ const Navbar = () => {
               </p>
             </a>
           </div>
-
           <div className='tw-w-3/5'>
-      <div
-        className='tw-w-full tw-transition-all tw-duration-300 tw-ease-in-out tw-h-2'
-      ></div>
-      <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-py-2">
-        <div className="tw-flex-grow tw-mx-4">
-          <div className="tw-relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm bài học, bài tập..."
-              value={searchTerm}
-              onChange={handleSearch}
-              className="tw-w-full tw-pl-10 tw-pr-4 tw-py-2 tw-rounded-full tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
-            />
-            <SearchIcon className="tw-absolute tw-left-3 tw-top-1/2 tw-transform -tw-translate-y-1/2 tw-text-gray-400" />
+            <div className='tw-w-full tw-transition-all tw-duration-300 tw-ease-in-out tw-h-2'></div>
+            <div className="tw-flex tw-items-center tw-justify-between tw-px-4 tw-py-2 tw-relative">
+              <div className="tw-flex-grow tw-mx-4">
+                <div className="tw-relative">
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm bài học, bài tập..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    onKeyDown={handleKeyPress}
+                    className="tw-w-full tw-pl-10 tw-pr-4 tw-py-2 tw-rounded-full tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
+                  />
+                  <SearchIcon className="tw-absolute tw-left-3 tw-top-1/2 tw-transform -tw-translate-y-1/2 tw-text-gray-400" />
+                </div>
+
+                {/* Gợi ý tìm kiếm */}
+                {suggestions.length > 0 && (
+                  <ul className="tw-absolute tw-bg-white tw-border tw-border-gray-300 tw-mt-1 tw-w-full tw-max-h-96 tw-overflow-y-auto tw-z-50 tw-shadow-2xl tw-rounded-b-lg">
+                    {suggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.id}
+                        className="tw-p-2 hover:tw-bg-gray-100 hover:tw-font-bold tw-cursor-pointer tw-flex tw-justify-between"
+                        onClick={() => setSearchTerm(suggestion.name)}
+                      >
+                        <div>{suggestion.name}</div>
+                        <div className="tw-text-sm">({suggestion.type})</div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Nút tìm */}
+              <button
+                onClick={handleSearchClick}
+                className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500 tw-flex-shrink-0"
+              >
+                Tìm
+              </button>
+            </div>
+
+            {/* <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-py-2">
+              <div className="tw-flex-grow tw-mx-4">
+                <div className="tw-relative">
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm bài học, bài tập..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    onKeyDown={handleKeyPress}
+                    className="tw-w-full tw-pl-10 tw-pr-4 tw-py-2 tw-rounded-full tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
+                  />
+                  <SearchIcon className="tw-absolute tw-left-3 tw-top-1/2 tw-transform -tw-translate-y-1/2 tw-text-gray-400" />
+                </div>
+                {suggestions.length > 0 && (
+                  <ul className="tw-relative tw-bg-white tw-border tw-border-gray-300 tw-mt-1 tw-w-full tw-max-h-96 tw-overflow-y-auto tw-z-50 tw-shadow-2xl tw-rounded-b-lg">
+                    {suggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.id}
+                        className="tw-p-2 hover:tw-bg-gray-100 hover:tw-font-bold tw-cursor-pointer tw-flex tw-justify-between"
+                        onClick={() => setSearchTerm(suggestion.name)}
+                      >
+                        <div>{suggestion.name}</div>
+                        <div className='tw-text-sm'>({suggestion.type})</div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <button
+                onClick={handleSearchClick}
+                className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
+              >
+                Tìm
+              </button>
+            </div> */}
           </div>
-        </div>
-        <button
-          onClick={handleSearchClick}
-          className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
-        >
-          Tìm
-        </button>
-      </div>
-    </div>
+
           <div className="tw-flex tw-items-center tw-space-x-3 tw-w-1/5 tw-justify-end">
             <div className=''>
               <a href="/cart">

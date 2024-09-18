@@ -1,3 +1,4 @@
+/* eslint-disable brace-style */
 const { models } = require('../models')
 const { Op } = require('sequelize')
 
@@ -136,6 +137,7 @@ const deleteLesson = async (req, res, next) => {
 }
 // get list lessons by chapterId
 const getLessonByChapterId = async (req, res, next) => {
+  console.log('getLessonByChapterId')
   try {
     const { chapterId } = req.params
 
@@ -160,20 +162,28 @@ const getLessonByChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching lessons by chapterId' })
   }
 }
-// get list chapters and exams
-const getChaptersandExams = async (req, res, next) => {
+
+// get lessons and exams
+const getLessonsandExams = async (req, res, next) => {
   try {
     const {
       page = '1',
-      size = '15',
-      search: nameCondition
+      size = '10',
+      search: nameCondition,
+      type,
+      subjectId,
+      grade
     } = req.query
 
     const offset = (Number(page) - 1) * Number(size)
     const limit = Number(size)
 
     const searchConditions = {
-      where: {}
+      where: {},
+      include: [{
+        model: models.Chapter,
+        where: {}
+      }]
     }
 
     if (nameCondition) {
@@ -182,49 +192,127 @@ const getChaptersandExams = async (req, res, next) => {
       }
     }
 
-    const totalChapters = await models.Chapter.count(searchConditions)
-    const chapters = await models.Chapter.findAll({
-      ...searchConditions,
-      limit,
-      offset,
-      attributes: [
-        'id',
-        'name',
-        'order',
-        'status',
-        'createdAt',
-        'updatedAt'
-      ]
-    })
+    if (subjectId) {
+      searchConditions.include[0].where.subjectId = subjectId
+    }
+    if (grade) {
+      searchConditions.include[0].where.grade = grade
+    }
 
+    if (type === 'lesson') {
+      const totalLessons = await models.Lesson.count(searchConditions)
+
+      const lessons = await models.Lesson.findAll({
+        ...searchConditions,
+        limit,
+        offset,
+        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+      })
+
+      const lessonsWithType = lessons.map(lesson => ({
+        ...lesson.dataValues,
+        type: 'Lesson'
+      }))
+
+      return res.json({
+        data: lessonsWithType,
+        totalLessons,
+        totalExams: 0,
+        totalRecords: totalLessons,
+        currentPage: Number(page),
+        size: limit
+      })
+    } else if (type === 'exam') {
+      const totalExams = await models.Exam.count(searchConditions)
+
+      const exams = await models.Exam.findAll({
+        ...searchConditions,
+        limit,
+        offset,
+        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+      })
+
+      const examsWithType = exams.map(exam => ({
+        ...exam.dataValues,
+        type: 'Exam'
+      }))
+
+      return res.json({
+        data: examsWithType,
+        totalLessons: 0,
+        totalExams,
+        totalRecords: totalExams,
+        currentPage: Number(page),
+        size: limit
+      })
+    }
+
+    const totalLessons = await models.Lesson.count(searchConditions)
     const totalExams = await models.Exam.count(searchConditions)
-    const exams = await models.Exam.findAll({
-      ...searchConditions,
-      limit,
-      offset,
-      attributes: [
-        'id',
-        'name',
-        'order',
-        'status',
-        'createdAt',
-        'updatedAt'
-      ]
-    })
+    const totalRecords = totalLessons + totalExams
 
-    // Trả về kết quả cả Chapter và Exam với thông tin phân trang
+    if (offset >= totalRecords) {
+      return res.json({
+        data: [],
+        totalLessons,
+        totalExams,
+        totalRecords,
+        currentPage: Number(page),
+        size: limit
+      })
+    }
+
+    let combinedResults = []
+
+    if (offset < totalLessons) {
+      const lessons = await models.Lesson.findAll({
+        ...searchConditions,
+        limit,
+        offset,
+        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+      })
+
+      const lessonsWithType = lessons.map(lesson => ({
+        ...lesson.dataValues,
+        type: 'Lesson'
+      }))
+
+      combinedResults = [...lessonsWithType]
+    }
+
+    if (combinedResults.length < limit) {
+      const remainingLimit = limit - combinedResults.length
+      const examOffset = Math.max(0, offset - totalLessons)
+
+      const exams = await models.Exam.findAll({
+        ...searchConditions,
+        limit: remainingLimit,
+        offset: examOffset,
+        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+      })
+
+      const examsWithType = exams.map(exam => ({
+        ...exam.dataValues,
+        type: 'Exam'
+      }))
+
+      combinedResults = [...combinedResults, ...examsWithType]
+    }
+
     res.json({
-      data: { chapters, exams },
-      totalChapters,
+      data: combinedResults,
+      totalLessons,
       totalExams,
+      totalRecords,
       currentPage: Number(page),
-      pageSize: limit
+      size: limit
     })
   } catch (error) {
-    console.error('Error searching chapters and exams:', error)
-    res.status(500).json({ message: 'Error searching chapters and exams' })
+    console.error('Error searching lessons and exams:', error)
+    res.status(500).json({ message: 'Error searching lessons and exams' })
   }
 }
+
 // get suggestions
 const getSuggestions = async (req, res, next) => {
   try {
@@ -263,6 +351,6 @@ module.exports = {
   updateLesson,
   deleteLesson,
   getLessonByChapterId,
-  getChaptersandExams,
+  getLessonsandExams,
   getSuggestions
 }

@@ -52,6 +52,9 @@ const SkillPractice = loadable(async () => await import('modules/Practice/Practi
 const Admin = loadable(async () => await import('modules/Admin/Admin'), {
     fallback: <Loading />
 })
+const SearchResultPage = loadable(async () => await import('pages/search'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -126,7 +129,8 @@ const routes: RouteObject[] = [
             // { path: ROUTES.forgot_password, element: <ForgotPassword />}
             { path: ROUTES.profile, element: <Profile /> },
             { path: ROUTES.skill_list, element: <SkillList /> },
-            { path: ROUTES.admin, element: <Admin /> }
+            { path: ROUTES.admin, element: <Admin /> },
+            { path: ROUTES.search_result, element: <SearchResultPage /> }
         ]
     },
     {

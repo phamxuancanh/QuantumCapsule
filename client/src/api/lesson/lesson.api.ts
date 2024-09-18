@@ -1,6 +1,6 @@
 import { requestWithJwt } from '../request'
 import { AxiosResponse } from 'axios'
-import { DataListChapterandExam, DataListLesson, ILesson, ListChapterandExamParams, ListLessonParams } from './lesson.interface';
+import { DataListLessonandExam, DataListLesson, ILesson, ListLessonandExamParams, ListLessonParams } from './lesson.interface';
 
 export const importLessons = async (lessons: any[]): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.post<any>('/lessons/importLessons', { lessons }, { withCredentials: true });
@@ -15,6 +15,9 @@ export const getLessonByChapterId = async (chapterId: string): Promise<AxiosResp
     console.log(chapterId);
     return await requestWithJwt.get<any>(`/lessons/chapter/${chapterId}`);
 }
-export const getChaptersandExams = async ({params}: {params?: ListChapterandExamParams}): Promise<AxiosResponse<DataListChapterandExam>> => {
-    return await requestWithJwt.get<DataListChapterandExam>('/getChaptersandExams', { params })
+export const getLessonsandExams = async ({params}: {params?: ListLessonandExamParams}): Promise<AxiosResponse<DataListLessonandExam>> => {
+    return await requestWithJwt.get<DataListLessonandExam>('/lessons/getLessonsandExams', { params })
 }
+export const getSuggestions = async (search: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>('/lessons/getSuggestions', { params: { search } });
+  }

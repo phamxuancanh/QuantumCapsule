@@ -13,10 +13,13 @@ export interface ListLessonParams {
     startDate?: Date
     endDate?: Date
 }
-export interface ListChapterandExamParams {
+export interface ListLessonandExamParams {
     page?: number
     size?: number
     search?: string
+    type? : string
+    subjectId? : string
+    grade? : number
 }
 export interface DataListLesson{
     data: ILesson[]
@@ -24,7 +27,7 @@ export interface DataListLesson{
     size: number
     totalRecords: number
 }
-export interface DataListChapterandExam{
+export interface DataListLessonandExam{
     data: any
     page: number
     size: number

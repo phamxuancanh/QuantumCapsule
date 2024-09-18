@@ -13,5 +13,6 @@ const ROUTES = {
     profile: '/profile',
     skill_practice: '/skill_practice',
     admin: '/admin',
+    search_result: '/search_result',
 }
 export default ROUTES
