@@ -55,6 +55,12 @@ const Admin = loadable(async () => await import('modules/Admin/Admin'), {
 const SearchResultPage = loadable(async () => await import('pages/search'), {
     fallback: <Loading />
 })
+const LessonDetail = loadable(async () => await import('pages/lessonDetail'), {
+    fallback: <Loading />
+})
+const ChapterDetail = loadable(async () => await import('pages/chapterDetail'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -130,7 +136,9 @@ const routes: RouteObject[] = [
             { path: ROUTES.profile, element: <Profile /> },
             { path: ROUTES.skill_list, element: <SkillList /> },
             { path: ROUTES.admin, element: <Admin /> },
-            { path: ROUTES.search_result, element: <SearchResultPage /> }
+            { path: ROUTES.search_result, element: <SearchResultPage /> },
+            { path: ROUTES.lessonDetail, element: <LessonDetail /> },
+            { path: ROUTES.chapterDetail, element: <ChapterDetail /> }
         ]
     },
     {

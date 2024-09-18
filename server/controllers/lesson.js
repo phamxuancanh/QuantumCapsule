@@ -135,6 +135,19 @@ const deleteLesson = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating lesson status' })
   }
 }
+const getLessonById = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const lesson = await models.Lesson.findByPk(id)
+    if (!lesson) {
+      return res.status(200).json({ message: 'Lesson not found' })
+    }
+    res.json(lesson)
+  } catch (error) {
+    console.error('Error fetching lesson by id:', error)
+    res.status(500).json({ message: 'Error fetching lesson by id' })
+  }
+}
 // get list lessons by chapterId
 const getLessonByChapterId = async (req, res, next) => {
   console.log('getLessonByChapterId')
@@ -350,6 +363,7 @@ module.exports = {
   addLesson,
   updateLesson,
   deleteLesson,
+  getLessonById,
   getLessonByChapterId,
   getLessonsandExams,
   getSuggestions
