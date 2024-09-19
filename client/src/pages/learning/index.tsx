@@ -27,9 +27,14 @@ const Learning = () => {
   };
 
   return (
-    <div className='tw-flex tw-items-center tw-justify-center tw-bg-slate-50'>
-      {theory ? theory.name : 'Loading...'}
-    </div>
+      <div className='tw-flex tw-flex-col tw-items-center tw-justify-center'>
+          <div className='tw-bg-blue-200 tw-w-full'>navigation</div>
+          <div className='tw-w-4/5 tw-flex tw-bg-red-200'>
+              <div className='tw-flex tw-flex-col tw-space-y-3'>
+                  <div className='tw-font-bold tw-text-2xl'>{theory?.name}</div>
+              </div>
+          </div>
+      </div>
   );
 };
 
