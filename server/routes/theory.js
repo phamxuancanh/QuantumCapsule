@@ -8,4 +8,5 @@ router.get('/', verifyAccessToken, theoryController.getListTheory)
 router.post('/', verifyAccessToken, theoryController.addTheory)
 router.put('/:id', verifyAccessToken, theoryController.updateTheory)
 router.delete('/:id', verifyAccessToken, theoryController.deleteTheory)
+router.get('/getTheoriesByLessonId/:lessonId', verifyAccessToken, theoryController.getTheoriesByLessonId)
 module.exports = router

@@ -40,11 +40,11 @@ app.use(cors({
   credentials: true
 }))
 app.use(cookieParser())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json({ limit: '100mb' }))
+app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }))
 app.use(morgan('combined'))
-app.use(express.json({ limit: '50mb' }))
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json({ limit: '100mb' }))
+app.use(express.urlencoded({ extended: true, limit: '100mb' }))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use('/', IndexRouter)
 

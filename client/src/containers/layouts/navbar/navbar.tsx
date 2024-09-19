@@ -41,14 +41,6 @@ const Navbar = () => {
       console.error('Error fetching suggestions:', error);
     }
   }, 300);
-
-  // const handleSearchClick = async () => {
-  //   const response = await getLessonsandExams({ params: { search: searchTerm } });
-  //   console.log(response.data);
-  //   setResults(response.data);
-  //   setSuggestions([]);
-  //   navigate(ROUTES.search_result, { state: { results } });
-  // };
   const handleSearchClick = async () => {
     const response = await getLessonsandExams({ params: { search: searchTerm } });
     console.log(response.data);

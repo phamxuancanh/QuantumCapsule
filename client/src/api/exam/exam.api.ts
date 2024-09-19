@@ -11,8 +11,9 @@ export const importExamQuestions = async (examQuestions: any[]): Promise<AxiosRe
     return await requestWithJwt.post<any>('/exam_questions/importExamQuestions', { examQuestions }, { withCredentials: true });
 }
 
-
-
 export const getListExam = async ({params}: {params?: ListExamParams}): Promise<AxiosResponse<DataListExam>> => {
     return await requestWithJwt.get<DataListExam>('/exams', { params })
+}
+export const getExamsByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/exams/getExamsByLessonId/${lessonId}`);
 }

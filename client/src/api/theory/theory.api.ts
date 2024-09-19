@@ -9,3 +9,6 @@ export const importTheories = async (theories: any[]): Promise<AxiosResponse<any
 export const getListTheory = async ({params}: {params?: ListTheoryParams}): Promise<AxiosResponse<DataListTheory>> => {
     return await requestWithJwt.get<DataListTheory>('/theories', { params })
 }
+export const getTheoriesByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/theories/getTheoriesByLessonId/${lessonId}`);
+}
