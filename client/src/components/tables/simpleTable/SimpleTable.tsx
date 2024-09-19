@@ -269,13 +269,13 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 }}
                 columnVisibilityModel={props.columnVisibilityModel}
                 initialState={{
-                    pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } },
+                    pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 0 } },
                 }}
                 pageSizeOptions={props.pageSizeOptions || [10, 20]}
                 onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
                 getRowId={props.getRowId}
                 rowHeight={props.rowHeight || 60}
-                checkboxSelection={props.checkboxSelection || true}
+                checkboxSelection={props.checkboxSelection}
             />
         </Box>
     );

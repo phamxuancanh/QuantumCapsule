@@ -1,4 +1,4 @@
-const { models } = require('../models')
+const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 
 const importQuestions = async (req, res, next) => {
@@ -164,10 +164,34 @@ const deleteQuestion = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating question status' })
   }
 }
+// get list questions by examId
+const getListQuestionByExamId = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const query = `
+      SELECT q.id, q.lessonId, q.questionType, q.title, q.content, q.contentImg, q.A, q.B, q.C, q.D, q.E, q.correctAnswer, q.explainAnswer, q.status
+      FROM Questions q
+      INNER JOIN Exam_Questions eq ON q.id = eq.questionId
+      WHERE eq.examId = :examId
+    `
+
+    // Thực hiện truy vấn
+    const listQuestions = await sequelize.query(query, {
+      replacements: { examId: id }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listQuestions })
+  } catch (error) {
+    console.error('Error getting questions by examId:', error)
+    res.status(500).json({ message: 'Error getting questions by examId' })
+  }
+}
+
 module.exports = {
   importQuestions,
   getListQuestion,
   addQuestion,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  getListQuestionByExamId
 }
