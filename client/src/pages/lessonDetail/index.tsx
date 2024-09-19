@@ -98,8 +98,17 @@ const LessonDetail = () => {
             navigate(`${ROUTES.chapterDetail}?${params.toString()}`);
         }
     };
+
     const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
-        alert(`${type === 'theory' ? 'Theory' : 'Exam'} ID: ${id}`);
+        if (type === 'theory') {
+            alert(`Theory ID: ${id}`);
+            navigate(`${ROUTES.learning}?theoryId=${id}`);
+        } else if (type === 'exam') {
+            // Xử lý khi type là 'exam'
+            // lam tiep di Nam
+            alert(`Exam ID: ${id}`);
+            // Thực hiện các hành động khác cho 'exam' tại đây
+        }
     };
     return (
         <div className='tw-flex tw-items-center tw-justify-center'>
