@@ -8,4 +8,5 @@ router.get('/', verifyAccessToken, chapterController.getListChapter)
 router.post('/', verifyAccessToken, chapterController.addChapter)
 router.put('/:id', verifyAccessToken, chapterController.updateChapter)
 router.delete('/:id', verifyAccessToken, chapterController.deleteChapter)
+router.get('/:id', verifyAccessToken, chapterController.getChapterById)
 module.exports = router

@@ -123,10 +123,25 @@ const deleteChapter = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating chapter status' })
   }
 }
+// get chapters by id
+const getChapterById = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const chapter = await models.Chapter.findByPk(id)
+    if (!chapter) {
+      return res.json({ data: null, message: 'Chapter not found' })
+    }
+    res.json({ chapter })
+  } catch (error) {
+    console.error('Error fetching chapter:', error)
+    res.status(500).json({ message: 'Error fetching chapter' })
+  }
+}
 module.exports = {
   importChapters,
   getListChapter,
   addChapter,
   updateChapter,
-  deleteChapter
+  deleteChapter,
+  getChapterById
 }

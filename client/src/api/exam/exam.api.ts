@@ -26,3 +26,6 @@ export const deleteExam = async (id: string): Promise<AxiosResponse<any>> => {
 export const getListExam = async ({params}: {params?: ListExamParams}): Promise<AxiosResponse<DataListExam>> => {
     return await requestWithJwt.get<DataListExam>('/exams', { params })
 }
+export const getExamsByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/exams/getExamsByLessonId/${lessonId}`);
+}
