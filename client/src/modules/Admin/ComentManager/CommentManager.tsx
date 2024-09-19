@@ -6,10 +6,13 @@ import { generateExamId } from "helpers/Nam-helper/GenerateUID"
 import { Box } from "@mui/material"
 import { ACTIONS } from "utils/enums"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
-import { getListComment } from "api/comment/coment.api"
+import { addComment, deleteComment, getListComment, updateComment } from "api/comment/coment.api"
 import { IComment } from "api/comment/comment.interface"
 import Loading from "containers/loadable-fallback/loading"
 import { ITheory } from "api/theory/theory.interface"
+import { toast } from "react-toastify"
+import { t } from "i18next"
+import { getListTheory } from "api/theory/theory.api"
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -34,17 +37,17 @@ const ExamManager: React.FC<IProps> = () => {
                         size: 30,
                     },
                 })
-
                 setDataTable(response.data.data as IComment[])
-                // const response2 = await getTheo({
-                //     params: {
-                //         page: 1,
-                //         search: "",
-                //         size: 30,
-                //     },
-                // })
 
-                // setDataTable(response.data.data as IComment[])
+                const response2 = await getListTheory({
+                    params: {
+                        page: 1,
+                        search: "",
+                        size: 100,
+                    },
+                })
+
+                setTheoryParams(response2.data.data as ITheory[])
             } catch (error) {
                 console.error("Error fetching data:", error)
             }
@@ -53,15 +56,33 @@ const ExamManager: React.FC<IProps> = () => {
         setLoading(false)
     }, [])
 
-    const handleUpdateRow = (data: any, action: ACTIONS) => {
+    const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data)
+            try {
+                const response = await addComment(data)
+                toast.success(response.data.message)
+            } catch (error : any) {
+                toast.error(error.message)
+            }
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data)
+            try {
+                const response = await updateComment(data.id, data)
+                toast.success(response.data.message)
+            } catch (error : any) {
+                toast.error(error.message)
+            }
         }
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data)
+            try {
+                const response = await deleteComment(data)
+                toast.success(response.data.message)
+            } catch (error : any) {
+                toast.error(error.message)
+            }
         }
     }
     return (
@@ -87,6 +108,7 @@ const ExamManager: React.FC<IProps> = () => {
                                     field: "content",
                                     headerName: "Content",
                                     width: 130,
+                                    editable: true
                                 },
                                 {
                                     field: "theoryId",
@@ -112,6 +134,7 @@ const ExamManager: React.FC<IProps> = () => {
                                     field: "order",
                                     headerName: "Order",
                                     width: 130,
+                                    editable: true,
                                 },
                                 {
                                     field: "status",

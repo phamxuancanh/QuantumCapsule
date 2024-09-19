@@ -8,10 +8,11 @@ import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
 import { IQuestion } from 'api/question/question.interfaces';
-import { getListQuesion, importQuestions } from 'api/question/question.api';
+import { addQuestion, deleteQuestion, getListQuesion, importQuestions, updateQuestion } from 'api/question/question.api';
 import { ILesson } from 'api/lesson/lesson.interface';
 import { getListLesson, importLessons } from 'api/lesson/lesson.api';
 import { toast } from 'react-toastify';
+import { addExam } from 'api/exam/exam.api';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -69,19 +70,29 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
             try {
-                await importQuestions([{...data}])
-                toast.success("Dữ liệu đã được lưu")
-            }catch (error) {
-                toast.error("Dữ liệu chưa được lưu: " + error)
+                const response = await addQuestion(data)
+                toast.success(response.data.message)
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
             }
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
-            
+            try {
+                const response = await updateQuestion(data.id, data)
+                toast.success(response.data.message)
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+            }
         }
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
-            
+            try {
+                const response = await deleteQuestion(data)
+                toast.success(response.data.message)
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+            }
         }
     }
     return (

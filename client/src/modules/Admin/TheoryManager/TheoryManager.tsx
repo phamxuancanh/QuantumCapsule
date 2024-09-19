@@ -11,7 +11,7 @@ import { ACTIONS } from "utils/enums"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
 import { ILesson } from "api/lesson/lesson.interface"
 import { ITheory } from "api/theory/theory.interface"
-import { getListTheory, importTheories } from "api/theory/theory.api"
+import { addTheory, deleteTheory, getListTheory, importTheories, updateTheory } from "api/theory/theory.api"
 import { getListLesson } from "api/lesson/lesson.api"
 import Loading from "containers/loadable-fallback/loading"
 import { toast } from "react-toastify"
@@ -70,17 +70,29 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data)
             try {
-                await importTheories([{ ...data }])
-                toast.success("lưu thành công")
-            } catch (error) {
-                console.error("data chưa được lưu: ", error)
+                const response = await addTheory(data)
+                toast.success(response.data.message)
+            } catch (error: any) {
+                console.error("data chưa được lưu: ", error.message)
             }
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data)
+            try {
+                const response = await updateTheory(data.id, data)
+                toast.success(response.data.message)
+            } catch (error: any) {
+                console.error("data chưa được lưu: ", error.message )
+            }
         }
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data)
+            try {
+                const response = await deleteTheory(data)
+                toast.success(response.data.message)
+            } catch (error: any) {
+                console.error("data chưa được lưu: ", error.message)
+            }
         }
     }
     return (

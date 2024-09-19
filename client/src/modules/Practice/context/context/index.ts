@@ -2,6 +2,14 @@ import { createContext, useContext } from "react"
 import { IProvider } from "../provider"
 
 const Context = createContext<IProvider | undefined>(undefined)
+
+export const useExamId = () => {
+    const context = useContext(Context)
+    if (!context) {
+        throw new Error("useExamId must be used within a Provider")
+    }
+    return context.examId
+}
 export const useTotalScore = () => {
     const context = useContext(Context)
     if (!context) {

@@ -10,6 +10,11 @@ interface IProps {
 }
 
 export interface IProvider {
+
+    examId: {
+        examId: string
+        setExamId: React.Dispatch<React.SetStateAction<string>>
+    }
     totalScore: {
         totalScore: number
         setTotalScore: React.Dispatch<React.SetStateAction<number>>
@@ -38,7 +43,7 @@ export interface IProvider {
 
 const Provider: React.FC<IProps> = ({ children }) => {
     // Đây là nơi bạn xác định giá trị mà bạn muốn chia sẻ
-
+    const [examId, setExamId] = React.useState<string>("exam00001")
     const [totalScore, setTotalScore] = React.useState<number>(0)
     const [listQuestion, setListQuestion] = React.useState<IQuestion[]>([])
     const [listAnswer, setListAnswer] = React.useState<IAnswer[]>([])
@@ -47,6 +52,10 @@ const Provider: React.FC<IProps> = ({ children }) => {
     const [openResult, setOpenResult] = React.useState<boolean>(false)
 
     const state: IProvider = {
+        examId: {
+            examId,
+            setExamId
+        },
         totalScore: {
             totalScore,
             setTotalScore,

@@ -7,7 +7,7 @@ import { ACTIONS } from "utils/enums"
 import ToolbarComponent from "./components/toolbar/ToolbarComponent"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
 import AddQuestionBox from "./components/add-questions/AddQuestionBox"
-import { getListExam, importExamQuestions, importExams } from "api/exam/exam.api"
+import { addExam, deleteExam, getListExam, importExamQuestions, importExams, updateExam } from "api/exam/exam.api"
 import { IExam, ListExamParams } from "api/exam/exam.interface"
 import Loading from "containers/loadable-fallback/loading"
 import loadable from "@loadable/component"
@@ -37,7 +37,7 @@ const ExamManager: React.FC<IProps> = () => {
                     params: {
                         page: 1,
                         search: "",
-                        size: 30,
+                        size: 200,
                     },
                 })
 
@@ -72,26 +72,34 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data)
             try{
-                await importExams([{...data}])
-            }catch(e){
-                toast.error("Error: " + e)
+                await addExam(data)
+                toast.success("Exam added successfully")
+            }catch(e: any){
+                toast.error("Error: " + e.message )
             }
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data)
             try{
-                await importExams([{...data}])
-            }catch(e){
-                toast.error("Error: " + e)
+                const resUpdate = await updateExam(data.id, data)
+                toast.success(resUpdate.data.message)
+            }catch(e: any){
+                toast.error("Error: " + e.message)
             }
         }
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data)
+            try{
+                const resDelete = await deleteExam(data)
+                toast.success(resDelete.data.message)
+            }catch(e: any){
+                toast.error("Error: " + e.message)
+            }
         }
     }
     return (
         <Box>
-            <Box p={5}>
+            <Box p={1}>
                 {!dataTable?.length ? <Loading /> :
                     <SimpleTable
                         initData={dataTable as unknown as IExam[]}

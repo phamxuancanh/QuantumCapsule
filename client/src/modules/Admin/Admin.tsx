@@ -15,6 +15,8 @@ import ExamManager from './ExamManager/ExamManagerProvider';
 import ComentManager from './ComentManager/CommentManagerProvider';
 import QuestionManager from './QuestionManager/QuestionManagerProvider';
 import TheoryManager from './TheoryManager/TheoryManagerProvider';
+import TabMenu from 'components/menus/tabMenu/TabMenu';
+import { Box } from '@mui/material';
 const Admin: React.FC = () => {
     const handleImportChapter = async (listData: IChapter[]) => {
         try {
@@ -77,7 +79,17 @@ const Admin: React.FC = () => {
     };
     return (
         <div>
-            <TheoryManager />
+            <Box p={2}>
+                <TabMenu 
+                    listItems={[
+                        {index: 0, label: 'Exam', item: <ExamManager />},
+                        {index: 1, label: 'Question', item: <QuestionManager />},
+                        {index: 2, label: 'Comment', item: <ComentManager />},
+                        {index: 3, label: 'Theory', item: <TheoryManager />}
+                    ]}
+                    defaultIndex={0}
+                />
+            </Box>
             <div>
                 <h1>chapter</h1>
                 <ExcelReaderBtn sheetIndex={0} name='import chapter' onUpload={handleImportChapter} />
