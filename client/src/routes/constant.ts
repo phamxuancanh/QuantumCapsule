@@ -16,5 +16,6 @@ const ROUTES = {
     search_result: '/search_result',
     lessonDetail: '/lessonDetail',
     chapterDetail: '/chapterDetail',
+    learning: '/learning',
 }
 export default ROUTES

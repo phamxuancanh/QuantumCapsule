@@ -55,11 +55,11 @@ const LessonDetail = () => {
     }
     useEffect(() => {
         if (lesson && lesson.id) {
-          fetchTheories();
-          fetchExams();
-          fetchChapter();
+            fetchTheories();
+            fetchExams();
+            fetchChapter();
         }
-      }, [lesson?.id]);
+    }, [lesson?.id]);
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const lessonId = queryParams.get('lessonId');
@@ -82,29 +82,32 @@ const LessonDetail = () => {
     }, [lesson]);
     const handleTitleClick = () => {
         if (chapter) {
-          const params = new URLSearchParams({
-            subject: chapter.subjectId || '',
-            grade: chapter.grade?.toString() || ''
-          });
-          navigate(`${ROUTES.home}?${params.toString()}`);
+            const params = new URLSearchParams({
+                subject: chapter.subjectId || '',
+                grade: chapter.grade?.toString() || ''
+            });
+            navigate(`${ROUTES.home}?${params.toString()}`);
         }
-      };
-    
-      const handleTopicClick = () => {
+    };
+
+    const handleTopicClick = () => {
         if (lesson) {
-          const params = new URLSearchParams({
-            chapter: lesson.chapterId || '',
-          });
-          navigate(`${ROUTES.chapterDetail}?${params.toString()}`);
+            const params = new URLSearchParams({
+                chapter: lesson.chapterId || '',
+            });
+            navigate(`${ROUTES.chapterDetail}?${params.toString()}`);
         }
-      };
+    };
+    const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
+        alert(`${type === 'theory' ? 'Theory' : 'Exam'} ID: ${id}`);
+    };
     return (
         <div className='tw-flex tw-items-center tw-justify-center'>
             {lesson ? (
                 <div className='tw-w-4/5 tw-space-y-2'>
                     <div className='tw-flex tw-items-center'>
                         <div onClick={handleTitleClick} className='tw-font-bold tw-text-xl tw-inline-flex tw-items-center tw-cursor-pointer tw-text-gray-500 hover:tw-text-green-500'>
-                        {getSubjectName(chapter?.subjectId || '')} {chapter?.grade} - Chân trời sáng tạo
+                            {getSubjectName(chapter?.subjectId || '')} {chapter?.grade} - Chân trời sáng tạo
                         </div>
                         <NavigateNextIcon className='tw-ml-2' />
                         <div onClick={handleTopicClick} className='tw-font-bold tw-text-xl tw-inline-flex tw-items-center tw-cursor-pointer tw-text-gray-500 hover:tw-text-green-500'>
@@ -116,25 +119,42 @@ const LessonDetail = () => {
                         <div className='tw-w-1/2 tw-p-4 tw-space-y-3'>
                             <h1 className='tw-text-xl tw-font-bold'>Lý thuyết</h1>
                             <ul className='tw-space-y-1'>
-                                {theories?.map((theory, index) => (
-                                    <li key={index} className='tw-flex tw-items-center tw-text-blue-500 tw-cursor-pointer hover:tw-underline'>
-                                        <PlayCircleOutlineIcon className='tw-mr-2' />
-                                        {theory.name}
-                                    </li>
-                                ))}
+                                {theories && theories.length > 0 ? (
+                                    theories.map((theory, index) => (
+                                        <li
+                                            key={index}
+                                            className='tw-flex tw-items-center tw-text-blue-500 tw-cursor-pointer hover:tw-underline'
+                                            onClick={() => theory.id && handleTheoryExamClick('theory', theory.id)}
+                                        >
+                                            <PlayCircleOutlineIcon className='tw-mr-2' />
+                                            {theory.name}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className='tw-text-gray-500'>Không có bài lý thuyết</li>
+                                )}
                             </ul>
                         </div>
                         <div className='tw-w-1/2 tw-p-4 tw-space-y-3'>
                             <h1 className='tw-text-xl tw-font-bold'>Luyện tập</h1>
                             <ul className='tw-space-y-1'>
-                                {exams?.map((exam, index) => (
-                                    <li key={index} className='tw-flex tw-items-center tw-text-blue-500 tw-cursor-pointer hover:tw-underline'>
-                                        <CheckCircleOutlineIcon className='tw-mr-2' />
-                                        {exam.name}
-                                    </li>
-                                ))}
+                                {exams && exams.length > 0 ? (
+                                    exams.map((exam, index) => (
+                                        <li
+                                            key={index}
+                                            className='tw-flex tw-items-center tw-text-blue-500 tw-cursor-pointer hover:tw-underline'
+                                            onClick={() => exam.id && handleTheoryExamClick('exam', exam.id)}
+                                        >
+                                            <CheckCircleOutlineIcon className='tw-mr-2' />
+                                            {exam.name}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className='tw-text-gray-500'>Không có bài luyện tập</li>
+                                )}
                             </ul>
                         </div>
+
                     </div>
                 </div>
             ) : (
