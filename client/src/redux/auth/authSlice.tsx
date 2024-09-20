@@ -3,7 +3,6 @@ import { RootState } from '../store'
 import { findUserById } from '../../api/user/user.api'
 import { AxiosResponse } from 'axios'
 import { jwtDecode } from 'jwt-decode'
-import { setToLocalStorage } from 'utils/functions';
 
 interface User {
   id: string;

@@ -72,8 +72,8 @@ const Navbar = () => {
           <div className="tw-flex tw-w-1/5">
             <a href="/" className="tw-flex-shrink-0 tw-flex tw-items-center">
               <p className="tw-font-bold">
-                <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-teal-600">VIO</span>
-                <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-amber-800">EDU</span>
+                <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-teal-600">Quantum</span>
+                <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-amber-800">Capsule</span>
               </p>
             </a>
           </div>

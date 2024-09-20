@@ -1,15 +1,27 @@
 const express = require('express')
 const morgan = require('morgan')
+const http = require('http')
+const socketIo = require('socket.io')
+const session = require('express-session')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const { sequelize } = require('./models')
 const seedDatabase = require('./seeds/index')
 const IndexRouter = require('./routes/index')
 const bodyParser = require('body-parser')
-const app = express()
-// const passport = require('./middlewares/passport-setup')
-const session = require('express-session')
 const cors = require('cors')
+
+const app = express()
+const server = http.createServer(app)
+const io = socketIo(server, {
+  cors: {
+    origin: 'http://localhost:3000', // Cho phép yêu cầu từ nguồn này
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }
+})
+
 app.set('trust proxy', true)
 
 app.use(session({
@@ -17,8 +29,6 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }))
-// app.use(passport.initialize())
-// app.use(passport.session())
 
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', `http://localhost:${process.env.CLIENT_PORT}`)
@@ -33,12 +43,14 @@ app.use(function (req, res, next) {
   }
   next()
 })
+
 app.use(cors({
   origin: `http://localhost:${process.env.CLIENT_PORT}`,
   methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
   allowedHeaders: 'X-Requested-With,Content-Type,Authorization',
   credentials: true
 }))
+
 app.use(cookieParser())
 app.use(bodyParser.json({ limit: '100mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }))
@@ -48,14 +60,21 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use('/', IndexRouter)
 
+io.on('connection', (socket) => {
+  console.log('A user connected')
+  socket.on('disconnect', () => {
+    console.log('User disconnected')
+  })
+})
+
 async function startServer () {
   try {
-    await sequelize.sync({ logging: console.log })
+    await sequelize.sync()
     console.log('Database synchronized successfully')
     await seedDatabase()
     console.log('Data seeded successfully')
 
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log('Server is running on port', process.env.PORT)
     })
   } catch (error) {
@@ -64,3 +83,5 @@ async function startServer () {
 }
 
 startServer()
+
+module.exports = { app, io }

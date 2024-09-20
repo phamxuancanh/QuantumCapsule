@@ -164,7 +164,7 @@ const getTheoryById = async (req, res, next) => {
     if (!theory) {
       return res.json({ data: null, message: 'Theory not found' })
     }
-
+    console.log('theory', theory)
     res.json({ theory })
   } catch (error) {
     console.error('Error fetching theory:', error)

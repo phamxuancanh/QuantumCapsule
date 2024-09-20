@@ -62,8 +62,8 @@ Scoresheet.belongsTo(User, { foreignKey: 'userId' })
 Comment.belongsTo(Theory, { foreignKey: 'theoryId' })
 Comment.belongsTo(User, { foreignKey: 'userId' })
 
-Theory.belongsToMany(User, { through: Comment, foreignKey: 'theoryId' })
-User.belongsToMany(Theory, { through: Comment, foreignKey: 'userId' })
+Theory.hasMany(Comment, { foreignKey: 'theoryId' })
+User.hasMany(Comment, { foreignKey: 'userId' })
 
 NotificationRecipient.belongsTo(User, { foreignKey: 'userId' })
 NotificationRecipient.belongsTo(Notification, { foreignKey: 'notificationId' })

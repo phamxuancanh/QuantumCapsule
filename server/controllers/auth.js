@@ -512,9 +512,12 @@ const signInOrRegisterWithGoogle = async (req, res) => {
     }
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const email = decodedToken.email
+    const fullName = decodedToken.name || ''
+    const nameParts = fullName.split(' ')
+
     const userInfo = {
-      firstName: decodedToken.name.split(' ')[0] || '',
-      lastName: decodedToken.name.split(' ')[1] || '',
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
       email,
       avatar: decodedToken.picture,
       roleId: 3,

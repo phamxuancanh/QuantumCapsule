@@ -13,13 +13,11 @@ const Comment = sequelize.define(
     },
     theoryId: {
       type: DataTypes.STRING,
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
     userId: {
       type: DataTypes.STRING,
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
     isView: {
       type: DataTypes.BOOLEAN
@@ -33,14 +31,9 @@ const Comment = sequelize.define(
     }
   },
   {
-    tableName: 'comment',
-    indexes: [
-      {
-        unique: true,
-        fields: ['theoryId', 'userId']
-      }
-    ],
+    tableName: 'comments',
     timestamps: true
   }
 )
+
 module.exports = Comment
