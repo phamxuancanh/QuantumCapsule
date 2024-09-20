@@ -143,6 +143,34 @@ const deleteTheory = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating theory status' })
   }
 }
+// get a theory by id
+const getTheoryById = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const theory = await models.Theory.findByPk(id, {
+      attributes: [
+        'id',
+        'lessonId',
+        'name',
+        'summary',
+        'url',
+        'type',
+        'order',
+        'status'
+      ]
+    })
+
+    if (!theory) {
+      return res.json({ data: null, message: 'Theory not found' })
+    }
+
+    res.json({ theory })
+  } catch (error) {
+    console.error('Error fetching theory:', error)
+    res.status(500).json({ message: 'Error fetching theory' })
+  }
+}
 // get theories by lesson id
 const getTheoriesByLessonId = async (req, res, next) => {
   try {
@@ -177,5 +205,6 @@ module.exports = {
   addTheory,
   updateTheory,
   deleteTheory,
+  getTheoryById,
   getTheoriesByLessonId
 }
