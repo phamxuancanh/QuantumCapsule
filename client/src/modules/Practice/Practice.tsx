@@ -17,9 +17,11 @@ import ListQuestionButton from "./components/list-question-button/ListQuestionBu
 import SubmitResultBox from "./components/submit-result-box/SubmitResultBox"
 import { getListQuesionByExamId } from "api/question/question.api"
 import { toast } from "react-toastify"
+import { getFromLocalStorage } from "utils/functions"
 
 const Practice: React.FC = () => {
-    const EXAM_ID = "exam00001"
+    // const EXAM_ID = "exam00001"
+    const curentUser = getFromLocalStorage<any>('persist:auth')
     const { totalScore, setTotalScore } = useTotalScore()
     const { listQuestion, setListQuestion } = useListQuestion()
     const { listAnswer, setListAnswer } = useListAnswer()
@@ -31,15 +33,18 @@ const Practice: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setExamId(EXAM_ID)
+                const params = new URLSearchParams(window.location.search)
+                const EXAM_ID = params.get('examId') || "exam00001"
                 const response = await getListQuesionByExamId(EXAM_ID)
+                
                 const resListQuestion = response.data.data
-                console.log(resListQuestion);
-
+                const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
+                
+                setExamId(EXAM_ID)
                 setListQuestion(resListQuestion)
-                setListAnswer(InitListAnswerFromListQuestion(resListQuestion))
+                setListAnswer(InitListAnswerFromListQuestion(resListQuestion, initResult.id))
                 setCurrentQuestion(resListQuestion[0])
-                setResult(InitResult(resListQuestion.length, new Date(), new Date()))
+                setResult(initResult)
             }catch (error) {
                 toast.error("Error when fetch data")
             }
