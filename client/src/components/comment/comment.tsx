@@ -38,11 +38,11 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
   return (
     <div className='tw-flex tw-flex-col tw-justify-center tw-mb-4 tw-space-y-3'>
       <div className='tw-flex tw-items-center'>
-        <img className='tw-rounded-full tw-w-10 tw-h-10 tw-border-2 tw-border-green-500' src={comment.User.avatar} />
+        <img className='tw-rounded-full tw-w-10 tw-h-10 tw-border-2 tw-border-green-500' src={comment.User?.avatar} />
         <div className='tw-flex tw-font-bold tw-ml-2 tw-items-center'>
-          <div>{comment.User.lastName}</div>
+          <div>{comment.User?.lastName}</div>
           <div>&nbsp;</div>
-          <div>{comment.User.firstName}</div>
+          <div>{comment.User?.firstName}</div>
           <div>&nbsp;</div>
           <div>&nbsp;</div>
           <div className='tw-text-gray-400 tw-text-sm tw-font-normal'>

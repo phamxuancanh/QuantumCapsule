@@ -1,7 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const http = require('http')
-const socketIo = require('socket.io')
+const socket = require('./socket') // Import socket module
 const session = require('express-session')
 const path = require('path')
 const cookieParser = require('cookie-parser')
@@ -13,14 +13,6 @@ const cors = require('cors')
 
 const app = express()
 const server = http.createServer(app)
-const io = socketIo(server, {
-  cors: {
-    origin: 'http://localhost:3000', // Cho phép yêu cầu từ nguồn này
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }
-})
 
 app.set('trust proxy', true)
 
@@ -60,12 +52,8 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use('/', IndexRouter)
 
-io.on('connection', (socket) => {
-  console.log('A user connected')
-  socket.on('disconnect', () => {
-    console.log('User disconnected')
-  })
-})
+// Initialize Socket.IO
+socket.init(server)
 
 async function startServer () {
   try {
@@ -84,4 +72,4 @@ async function startServer () {
 
 startServer()
 
-module.exports = { app, io }
+module.exports = { app }

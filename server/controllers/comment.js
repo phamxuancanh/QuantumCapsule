@@ -1,5 +1,6 @@
 const { models } = require('../models')
-const { io } = require('../server')
+const socket = require('../socket') // Import socket module
+
 const getAllCommentsByTheoryId = async (req, res, next) => {
   try {
     const { theoryId } = req.params
@@ -114,20 +115,22 @@ const getListActiveCommentByTheoryId = async (req, res, next) => {
 const addComment = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
-    console.log(req.user)
     const { theoryId, content } = req.body
 
     if (!theoryId || !loginedUserId || !content) {
       return res.status(400).json({ message: 'Missing required fields' })
     }
+
     const user = await models.User.findByPk(loginedUserId)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
+
     const theory = await models.Theory.findByPk(theoryId)
     if (!theory) {
       return res.status(404).json({ message: 'Theory not found' })
     }
+
     const newComment = await models.Comment.create({
       theoryId,
       userId: loginedUserId,
@@ -137,6 +140,7 @@ const addComment = async (req, res, next) => {
     })
 
     // Phát sự kiện qua Socket.IO
+    const io = socket.getIO()
     io.emit('newComment', newComment)
 
     res.status(201).json({ data: newComment })
@@ -145,6 +149,7 @@ const addComment = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding comment' })
   }
 }
+
 module.exports = {
   getAllCommentsByTheoryId,
   getListActiveCommentByTheoryId,
