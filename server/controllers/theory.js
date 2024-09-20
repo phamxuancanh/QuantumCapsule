@@ -143,10 +143,39 @@ const deleteTheory = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating theory status' })
   }
 }
+// get theories by lesson id
+const getTheoriesByLessonId = async (req, res, next) => {
+  try {
+    const { lessonId } = req.params
+
+    const theories = await models.Theory.findAll({
+      where: {
+        lessonId,
+        status: 1
+      },
+      attributes: [
+        'id',
+        'lessonId',
+        'name',
+        'summary',
+        'url',
+        'type',
+        'order',
+        'status'
+      ]
+    })
+
+    res.json({ theories })
+  } catch (error) {
+    console.error('Error fetching theories:', error)
+    res.status(500).json({ message: 'Error fetching theories' })
+  }
+}
 module.exports = {
   importTheories,
   getListTheory,
   addTheory,
   updateTheory,
-  deleteTheory
+  deleteTheory,
+  getTheoriesByLessonId
 }

@@ -224,6 +224,10 @@ const Home = () => {
         }
     };
     const allChaptersExpanded = expandedChapters.length === chaptersData?.data.length;
+
+    const handleLessonClick = (lesson: ILesson) => {
+        navigate(`/lessonDetail?lessonId=${lesson.id}`, { state: { lesson } });
+      };
     return (
         <div className='tw-flex tw-items-center tw-justify-center tw-bg-slate-50'>
             <div className='tw-w-4/5 tw-mt-16 tw-space-y-16'>
@@ -372,7 +376,7 @@ const Home = () => {
                                                             className='tw-flex tw-justify-between tw-items-center tw-bg-gray-200 tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5'
                                                             onClick={() => toggleChapterExpansion(chapter.id ?? '')}
                                                         >
-                                                            <li className='tw-font-bold tw-flex tw-items-center'>
+                                                            <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
                                                                 {expandedChapters.includes(chapter.id ?? '') ? (
                                                                     <RemoveIcon className='tw-mr-2 tw-text-red-500' />
                                                                 ) : (
@@ -387,7 +391,11 @@ const Home = () => {
                                                                 {lessonsData
                                                                     .filter(lesson => lesson.chapterId === chapter.id)
                                                                     .map((lesson, idx) => (
-                                                                        <li key={lesson.id} className='tw-flex tw-items-center tw-p-2 tw-border-b tw-text-gray-500'>
+                                                                        <li
+                                                                            key={lesson.id}
+                                                                            className='tw-flex tw-items-center tw-p-2 tw-py-1 tw-border-b tw-text-gray-500 tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'
+                                                                            onClick={() => handleLessonClick(lesson)}
+                                                                        >
                                                                             <PlayLessonIcon className='tw-mr-2' />
                                                                             <span>{idx + 1}. {lesson.name}</span>
                                                                         </li>
