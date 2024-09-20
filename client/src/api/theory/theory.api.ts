@@ -20,7 +20,7 @@ export const updateTheory = async (id: string, theory: ITheory): Promise<AxiosRe
 
 export const deleteTheory = async (id: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.delete<any>(`/theories/${id}`, { withCredentials: true });
-
+}
 export const getTheoriesByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/theories/getTheoriesByLessonId/${lessonId}`);
 }
