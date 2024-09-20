@@ -10,6 +10,8 @@ const theoryRoutes = require('./theory')
 const examRoutes = require('./exam')
 const questionRoutes = require('./question')
 const examQuestionRoutes = require('./exam_question')
+const answerRoutes = require('./answer')
+const resultRoutes = require('./result')
 const { API_PREFIX } = require('../utils')
 // const { rateLimitAndTimeout, services } = require('../middlewares/gateway')
 // const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware')
@@ -24,6 +26,9 @@ router.use(`${API_PREFIX}/theories`, theoryRoutes)
 router.use(`${API_PREFIX}/exams`, examRoutes)
 router.use(`${API_PREFIX}/questions`, questionRoutes)
 router.use(`${API_PREFIX}/exam_questions`, examQuestionRoutes)
+router.use(`${API_PREFIX}/answers`, answerRoutes)
+router.use(`${API_PREFIX}/results`, resultRoutes)
+
 // router.use(`${API_PREFIX}/grids`, )
 // services.forEach(({ route, target }) => {
 //   const proxyOptions = {

@@ -1,6 +1,7 @@
 import { IAnswer } from "api/answer/answer.interfaces";
 import { IQuestion } from "api/question/question.interfaces";
 import { IResult } from "api/result/result.interface";
+import { generateAnswerUID, generateResultUID } from "./GenerateUID";
 
 
 const randomOrderAnswer = (): string =>{
@@ -12,11 +13,12 @@ const randomOrderAnswer = (): string =>{
 
 export const  InitAnswerFromQuestion = (question: IQuestion, resultId?: string): IAnswer => {
     return {
+        id: generateAnswerUID(),
         questionId: question.id,
         resultId: resultId,
         yourAnswer: '',
         isCorrect: false,
-        orderAnswer: randomOrderAnswer(),
+        // orderAnswer: randomOrderAnswer(),
         status: true,
     }
 }
@@ -24,11 +26,17 @@ export const  InitListAnswerFromListQuestion = (questions: IQuestion[], resultId
     return questions.map((question) => InitAnswerFromQuestion(question, resultId));
 }
 
-export const InitResult = (totalScore: number, timeStart: Date, timeEnd: Date): IResult => {
+export const InitResult = (totalScore: number, examId: string, userId: string): IResult => {
     return {
+        id: generateResultUID(),
         yourScore: 0,
         totalScore: totalScore,
-        timeStart: timeStart,
-        timeEnd: timeEnd,
+        timeStart: new Date(),
+        timeEnd: new Date(),
+        status: true,
+        examId: examId,
+        userId: userId,
     }
 }
+
+
