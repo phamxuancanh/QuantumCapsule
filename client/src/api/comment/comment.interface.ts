@@ -4,6 +4,10 @@ export interface IComment{
     userId?: string
     status?: boolean
     content?: string
+    createdAt?: Date
+    updatedAt?: Date
+    isView?: boolean
+    User?: any
 }
 
 export interface ListCommentParams {

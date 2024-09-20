@@ -49,6 +49,35 @@ const signAccessToken = async (userId) => {
 //     }, 100)
 //   })
 // }
+// const verifyAccessToken = (req, res, next) => {
+//   const authHeader = req.headers.authorization
+
+//   // Kiểm tra xem header authorization có tồn tại hay không
+//   if (!authHeader) {
+//     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
+//   }
+//   // Tách chuỗi 'Bearer' và token
+//   const [scheme, token] = authHeader.split(' ')
+//   // Kiểm tra định dạng token có đúng là 'Bearer <token>' hay không
+//   if (scheme !== 'Bearer' || !token) {
+//     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
+//   }
+//   // Xác minh token bằng JWT và chỉ định thuật toán
+//   JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, { algorithms: ['HS256'] }, (err, payload) => {
+//     console.log(token, 'token')
+//     if (err) {
+//       console.log(err, 'err')
+//       if (err.name === 'JsonWebTokenError') {
+//         return res.status(401).json({ error: { message: 'Unauthorized 2' } })
+//       }
+//       return res.status(401).json({ error: { message: err.message } })
+//     }
+//     req.payload = payload
+//     setTimeout(() => {
+//       next()
+//     }, 100)
+//   })
+// }
 const verifyAccessToken = (req, res, next) => {
   const authHeader = req.headers.authorization
 
@@ -56,12 +85,15 @@ const verifyAccessToken = (req, res, next) => {
   if (!authHeader) {
     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
   }
+
   // Tách chuỗi 'Bearer' và token
   const [scheme, token] = authHeader.split(' ')
+
   // Kiểm tra định dạng token có đúng là 'Bearer <token>' hay không
   if (scheme !== 'Bearer' || !token) {
     return res.status(401).json({ error: { message: 'Unauthorized 1' } })
   }
+
   // Xác minh token bằng JWT và chỉ định thuật toán
   JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, { algorithms: ['HS256'] }, (err, payload) => {
     console.log(token, 'token')
@@ -72,7 +104,17 @@ const verifyAccessToken = (req, res, next) => {
       }
       return res.status(401).json({ error: { message: err.message } })
     }
+
+    // Lấy userId từ payload
+    const { userId } = payload
+    if (!userId) {
+      return res.status(401).json({ error: { message: 'Unauthorized 3' } })
+    }
+
+    // Gắn userId vào request object
+    req.userId = userId
     req.payload = payload
+
     setTimeout(() => {
       next()
     }, 100)

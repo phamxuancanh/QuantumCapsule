@@ -7,7 +7,9 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'),
+  ],
   variants: {
     extend: {
       translate: ['responsive', 'group-hover', 'hover', 'focus'],
