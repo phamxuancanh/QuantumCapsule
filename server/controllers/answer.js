@@ -3,7 +3,6 @@ const { models } = require('../models')
 const insertListAnswer = async (req, res, next) => {
   try {
     const { listAnswer } = req.body
-    console.log('--------->', listAnswer)
     if (!Array.isArray(listAnswer) || listAnswer.length === 0) {
       return res
         .status(400)

@@ -68,7 +68,8 @@ const getListActiveCommentByTheoryId = async (req, res, next) => {
           model: models.User,
           attributes: ['id', 'firstName', 'lastName', 'avatar']
         }
-      ]
+      ],
+      order: [['createdAt', 'DESC']]
     })
 
     if (!comments || comments.length === 0) {
@@ -81,37 +82,6 @@ const getListActiveCommentByTheoryId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching comments' })
   }
 }
-// const addComment = async (req, res, next) => {
-//   try {
-//     const loginedUserId = req.userId
-//     console.log(req.user)
-//     const { theoryId, content } = req.body
-
-//     if (!theoryId || !loginedUserId || !content) {
-//       return res.status(400).json({ message: 'Missing required fields' })
-//     }
-//     const user = await models.User.findByPk(loginedUserId)
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' })
-//     }
-//     const theory = await models.Theory.findByPk(theoryId)
-//     if (!theory) {
-//       return res.status(404).json({ message: 'Theory not found' })
-//     }
-//     const newComment = await models.Comment.create({
-//       theoryId,
-//       userId: loginedUserId,
-//       content,
-//       isView: true,
-//       status: true
-//     })
-
-//     res.status(201).json({ data: newComment })
-//   } catch (error) {
-//     console.error('Error adding comment:', error)
-//     res.status(500).json({ message: 'Error adding comment' })
-//   }
-// }
 const addComment = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
@@ -139,16 +109,73 @@ const addComment = async (req, res, next) => {
       status: true
     })
 
+    // Lấy thông tin người dùng để trả về trong phản hồi
+    const commentWithUser = await models.Comment.findByPk(newComment.id, {
+      attributes: [
+        'id',
+        'content',
+        'userId',
+        'theoryId',
+        'isView',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ],
+      include: [
+        {
+          model: models.User,
+          attributes: ['id', 'firstName', 'lastName', 'avatar']
+        }
+      ]
+    })
+
     // Phát sự kiện qua Socket.IO
     const io = socket.getIO()
-    io.emit('newComment', newComment)
+    io.emit('newComment', commentWithUser)
 
-    res.status(201).json({ data: newComment })
+    res.status(201).json({ data: commentWithUser })
   } catch (error) {
     console.error('Error adding comment:', error)
     res.status(500).json({ message: 'Error adding comment' })
   }
 }
+// const addComment = async (req, res, next) => {
+//   try {
+//     const loginedUserId = req.userId
+//     const { theoryId, content } = req.body
+
+//     if (!theoryId || !loginedUserId || !content) {
+//       return res.status(400).json({ message: 'Missing required fields' })
+//     }
+
+//     const user = await models.User.findByPk(loginedUserId)
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' })
+//     }
+
+//     const theory = await models.Theory.findByPk(theoryId)
+//     if (!theory) {
+//       return res.status(404).json({ message: 'Theory not found' })
+//     }
+
+//     const newComment = await models.Comment.create({
+//       theoryId,
+//       userId: loginedUserId,
+//       content,
+//       isView: true,
+//       status: true
+//     })
+
+//     // Phát sự kiện qua Socket.IO
+//     const io = socket.getIO()
+//     io.emit('newComment', newComment)
+
+//     res.status(201).json({ data: newComment })
+//   } catch (error) {
+//     console.error('Error adding comment:', error)
+//     res.status(500).json({ message: 'Error adding comment' })
+//   }
+// }
 
 module.exports = {
   getAllCommentsByTheoryId,

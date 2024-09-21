@@ -14,6 +14,7 @@ import loginImage from 'assets/bb.jpg'
 import { ClockLoader, PacmanLoader } from "react-spinners"
 import { loginState } from '../../redux/auth/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import socket from 'services/socket/socket'
 const theme = createTheme();
 const SignIn = () => {
     const dispatch = useDispatch()
@@ -40,6 +41,9 @@ const SignIn = () => {
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser))
                 dispatch(loginState(currentUser.currentUser))
                 navigate(ROUTES.home)
+                socket.on('connection', () => {
+                    console.log('User Connect')
+                  })
                 toast.success(t('signIn.success'))
             }
         } catch (error) {
@@ -59,6 +63,9 @@ const SignIn = () => {
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser))
                 dispatch(loginState(currentUser.currentUser))
                 navigate(ROUTES.home)
+                socket.on('connection', () => {
+                    console.log('User Connect')
+                  })
                 toast.success(t('signIn.success'))
             }
         } catch (error) {
@@ -76,6 +83,9 @@ const SignIn = () => {
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser))
                 dispatch(loginState(currentUser.currentUser))
                 navigate(ROUTES.home)
+                socket.on('connection', () => {
+                    console.log('User Connect')
+                  })
                 toast.success(t('signIn.success'))
             }
         } catch (error) {
