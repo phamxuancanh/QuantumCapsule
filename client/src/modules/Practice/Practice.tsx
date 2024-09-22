@@ -30,6 +30,7 @@ const Practice: React.FC = () => {
     const { openResult, setOpenResult } = useOpenResult()
     const {examId, setExamId} = useExamId()
     // const[]
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -53,18 +54,21 @@ const Practice: React.FC = () => {
     }, [])
 
     return (
-        <Grid container spacing={2}>
-            <Grid item xs={9}>
-                <QuestionBox
-                    isOpen={openResult === false}
-                />
-                <SubmitResultBox isOpen={openResult} />
-            </Grid>
-            <Grid item xs={3}>
-                <ListQuestionButton />
-            </Grid>
+        <div>Practice
+            {examId}
+        </div>
+        // <Grid container spacing={2}>
+        //     <Grid item xs={9}>
+        //         <QuestionBox
+        //             isOpen={openResult === false}
+        //         />
+        //         <SubmitResultBox isOpen={openResult} />
+        //     </Grid>
+        //     <Grid item xs={3}>
+        //         <ListQuestionButton />
+        //     </Grid>
             
-        </Grid>
+        // </Grid>
     )
 }
 

@@ -101,11 +101,11 @@ const LessonDetail = () => {
 
     const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
-            alert(`Theory ID: ${id}`);
             navigate(`${ROUTES.learning}?theoryId=${id}`);
         } else if (type === 'exam') {
             // Xử lý khi type là 'exam'
             // lam tiep di Nam
+            navigate(`${ROUTES.skill_practice}?examId=${id}`);
             alert(`Exam ID: ${id}`);
             // Thực hiện các hành động khác cho 'exam' tại đây
         }
