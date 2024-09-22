@@ -1,7 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const http = require('http')
-const socket = require('./socket') // Import socket module
+const socket = require('./socket')
 const session = require('express-session')
 const path = require('path')
 const cookieParser = require('cookie-parser')
@@ -10,7 +10,7 @@ const seedDatabase = require('./seeds/index')
 const IndexRouter = require('./routes/index')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-
+const socketEvents = require('./socketEvent')
 const app = express()
 const server = http.createServer(app)
 
@@ -30,6 +30,7 @@ app.use(function (req, res, next) {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200)
   }
@@ -51,10 +52,8 @@ app.use(express.json({ limit: '100mb' }))
 app.use(express.urlencoded({ extended: true, limit: '100mb' }))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use('/', IndexRouter)
-
-// Initialize Socket.IO
 socket.init(server)
-
+socketEvents()
 async function startServer () {
   try {
     await sequelize.sync()

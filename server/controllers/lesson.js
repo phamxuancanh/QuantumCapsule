@@ -10,7 +10,6 @@ const importLessons = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid data format or empty array' })
     }
     const chapterIds = lessons.map(lesson => lesson.chapterId)
-    console.log('chapterIds', chapterIds)
     const existingChapters = await models.Chapter.findAll({
       where: {
         id: {
@@ -18,7 +17,6 @@ const importLessons = async (req, res, next) => {
         }
       }
     })
-    console.log('existingChapters', existingChapters)
     const existingChapterIds = new Set(existingChapters.map(chapter => chapter.id))
     const allChapterIdsExist = chapterIds.every(chapterId => existingChapterIds.has(chapterId))
     if (!allChapterIdsExist) {
@@ -150,7 +148,6 @@ const getLessonById = async (req, res, next) => {
 }
 // get list lessons by chapterId
 const getLessonByChapterId = async (req, res, next) => {
-  console.log('getLessonByChapterId')
   try {
     const { chapterId } = req.params
 

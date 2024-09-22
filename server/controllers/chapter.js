@@ -4,7 +4,6 @@ const { Op } = require('sequelize')
 const importChapters = async (req, res, next) => {
   try {
     const { chapters } = req.body
-    console.log('chapters', chapters)
     if (!Array.isArray(chapters) || chapters.length === 0) {
       return res.status(400).json({ message: 'Invalid data format or empty array' })
     }
@@ -27,7 +26,6 @@ const getListChapter = async (req, res, next) => {
       subjectId,
       grade
     } = req.query
-    console.log('req.query', req.query)
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {

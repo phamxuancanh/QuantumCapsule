@@ -9,7 +9,6 @@ const importTheories = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid data format or empty array' })
     }
     const lessonIds = theories.map(theory => theory.lessonId)
-    console.log('lessonIds', lessonIds)
     const existingLessons = await models.Lesson.findAll({
       where: {
         id: {
@@ -17,7 +16,6 @@ const importTheories = async (req, res, next) => {
         }
       }
     })
-    console.log('existingLessons', existingLessons)
     const existingLessonIds = new Set(existingLessons.map(lesson => lesson.id))
     const allLessonIdsExist = lessonIds.every(lessonId => existingLessonIds.has(lessonId))
     if (!allLessonIdsExist) {
@@ -164,7 +162,6 @@ const getTheoryById = async (req, res, next) => {
     if (!theory) {
       return res.json({ data: null, message: 'Theory not found' })
     }
-    console.log('theory', theory)
     res.json({ theory })
   } catch (error) {
     console.error('Error fetching theory:', error)

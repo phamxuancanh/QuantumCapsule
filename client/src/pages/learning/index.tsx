@@ -15,21 +15,23 @@ import { Editor } from "react-draft-wysiwyg"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import { convertToRaw, EditorState } from "draft-js"
 import { fetchUser, selectUser } from '../../redux/auth/authSlice'
+import { selectComments, postComment, fetchComments, setComments } from '../../redux/comment/commentSlice'
+import { addComment } from 'api/comment/coment.api'
 import draftToHtml from "draftjs-to-html"
-import { IComment } from 'api/comment/comment.interface'
-import { addComment, getListActiveCommentByTheoryId } from 'api/comment/coment.api'
 import { useTranslation } from 'react-i18next'
 import CommentItem from 'components/comment/comment'
-import io from 'socket.io-client'
-
-const socket = io('http://localhost:8000');
-socket.on('connect', () => {
-  console.log('Connected to server');
-});
-
-// socket.on('disconnect', () => {
-//   console.log('Disconnected from server');
-// });
+import socket from 'services/socket/socket'
+interface Comment {
+  id?: string;
+  theoryId?: string;
+  userId?: string;
+  status?: boolean;
+  content?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isView?: boolean;
+  User?: any;
+}
 declare global {
   interface Window {
     YT: any
@@ -52,16 +54,17 @@ const Learning = () => {
   const [isOpenedComment, setIsOpenedComment] = useState(false)
   const [theory, setTheory] = useState<ITheory | null>(null);
   const location = useLocation();
-  const [comments, setComments] = useState<IComment[]>([]);
-  
+  const comments = useSelector(selectComments);
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const theoryId = queryParams.get('theoryId');
-
+    
     if (theoryId) {
-      fetchTheory(theoryId)
+      fetchTheory(theoryId);
+      dispatch(fetchComments(theoryId) as any);
     }
-  }, [location])
+
+  }, [location, dispatch]);
 
   const fetchTheory = async (id: string) => {
     try {
@@ -79,98 +82,46 @@ const Learning = () => {
       allowFullscreen: true
     }
   }
-  // const fetchComments = async () => {
-  //   try {
-  //     if (theory?.id) {
-  //       const theoryId = theory.id;
-        
-  //       const response = await getListActiveCommentByTheoryId(theoryId);
-  //       console.log('Response:', response.data.comments);
-  //       setComments(response.data.comments);
-  //       console.log('Comments:', comments);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching comments');
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchComments();
-  // }, [theory])
-  // const handleOpenComment = () => {
-  //   setIsOpenedComment(true);
-  // }
-  // const handleCloseComment = () => {
-  //   setIsOpenedComment(false);
-  // }
-  // const handleComment = async () => {
-  //   console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())))
-  //   try {
-  //     const response = await addComment({
-  //       content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
-  //       theoryId: theory?.id
-  //     });
-  //   }
-  //   catch (error) {
-  //     console.error('Error adding comment:', error);
-  //   }
-  // }
-  const fetchComments = async () => {
-    try {
-      if (theory?.id) {
-        const theoryId = theory.id;
-        const response = await getListActiveCommentByTheoryId(theoryId);
-        setComments(response.data.comments || []); // Cập nhật bình luận từ API
-        console.log('Comments:', response.data.comments);
-      }
-    } catch (error) {
-      console.error('Error fetching comments', error);
-    }
-  };
 
-  // Lắng nghe sự kiện Socket.IO cho bình luận mới
-  useEffect(() => {
-    // Kết nối socket và lắng nghe sự kiện 'newComment'
-    socket.on('newComment', (newComment) => {
-      console.log('Received new comment via Socket.IO:', newComment);
-      if (newComment.theoryId === theory?.id) {
-        setComments((prevComments) => [...prevComments, newComment]);
-      }
-    });
-
-    // Gọi fetchComments khi `theory` thay đổi
-    fetchComments();
-
-    // Hủy đăng ký sự kiện khi component bị unmount
-    return () => {
-      socket.off('newComment');
-    };
-  }, [theory]);
-
-  // Mở phần bình luận
   const handleOpenComment = () => {
     setIsOpenedComment(true);
   };
 
-  // Đóng phần bình luận
   const handleCloseComment = () => {
     setIsOpenedComment(false);
   };
 
-  // Xử lý khi người dùng gửi bình luận
+  useEffect(() => {
+    const handleNewComment = (newComment: Comment) => {
+      console.log('Received new comment via Socket.IO:', newComment);
+            dispatch(postComment(newComment));
+    };
+  
+    socket.on('newComment', handleNewComment);
+  
+    return () => {
+      socket.off('newComment', handleNewComment);
+    };
+  }, [dispatch]);
   const handleComment = async () => {
     const commentContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-    
+  
     console.log('Comment content:', commentContent);
     try {
       if (theory?.id && commentContent.trim()) {
+        // Gọi action Redux để thêm bình luận
         const response = await addComment({
           content: commentContent,
-          theoryId: theory.id
+          theoryId: theory.id,
         });
-        
-        // Sau khi bình luận được gửi thành công, thêm nó vào danh sách bình luận
-        fetchComments();
-        // Reset lại trạng thái editor
+        // dispatch(postComment(response.data.data));
+  
+        console.log('Comment response:', response.data);
+  
+        // Phát sự kiện qua Socket.IO
+        socket.emit('newComment', response.data); // Gửi bình luận mới cho tất cả người dùng
+  
+        // Reset editor state
         setEditorState(EditorState.createEmpty());
       } else {
         console.error('Missing theoryId or comment content');
@@ -179,6 +130,8 @@ const Learning = () => {
       console.error('Error adding comment:', error);
     }
   };
+  
+  
   return (
     <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-4'>
       <div className='tw-bg-blue-200 tw-w-full'>navigation</div>
@@ -265,7 +218,7 @@ const Learning = () => {
             {isOpenedComment ? (
               <div className='tw-space-y-4'>
                 <Editor
-                  defaultEditorState={editorState}
+                  editorState={editorState} 
                   onEditorStateChange={setEditorState}
                   wrapperClassName="wrapper-class tw-cursor-text"
                   editorClassName="editor-class"

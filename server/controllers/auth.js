@@ -24,9 +24,6 @@ const transporter = nodemailer.createTransport({
 const signIn = async (req, res, next) => {
   try {
     const { email, password, rememberChecked } = req.body.data
-    console.log(req.body.data)
-    console.log(req.body)
-    console.log(email)
     if (!email || !password) {
       return res.status(400).json({
         code: 400,
