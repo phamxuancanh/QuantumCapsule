@@ -94,9 +94,9 @@ const Navbar = () => {
                 </div>
 
                 {/* Gợi ý tìm kiếm */}
-                {suggestions.length > 0 && (
+                {suggestions?.length > 0 && (
                   <ul className="tw-absolute tw-bg-white tw-border tw-border-gray-300 tw-mt-1 tw-w-full tw-max-h-96 tw-overflow-y-auto tw-z-50 tw-shadow-2xl tw-rounded-b-lg">
-                    {suggestions.map((suggestion) => (
+                    {suggestions?.map((suggestion) => (
                       <li
                         key={suggestion.id}
                         className="tw-p-2 hover:tw-bg-gray-100 hover:tw-font-bold tw-cursor-pointer tw-flex tw-justify-between"

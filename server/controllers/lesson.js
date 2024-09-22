@@ -326,8 +326,10 @@ const getLessonsandExams = async (req, res, next) => {
 // get suggestions
 const getSuggestions = async (req, res, next) => {
   try {
+    console.log('RUNNING getSuggestions')
     const { search } = req.query
-
+    console.log('req.query:', req.query)
+    console.log('search:', search)
     if (!search) {
       return res.json({ suggestions: [] })
     }
