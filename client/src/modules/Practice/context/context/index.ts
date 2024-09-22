@@ -52,5 +52,12 @@ export const useOpenResult = () => {
     }
     return context.openResult
 }
+export const useIsSumited = () => {
+    const context = useContext(Context)
+    if (!context) {
+        throw new Error("useIsSumited must be used within a Provider")
+    }
+    return context.isSumited
+}
 
 export default Context

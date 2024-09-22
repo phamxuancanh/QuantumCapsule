@@ -1,4 +1,5 @@
 import {
+    Box,
     Card,
     Checkbox,
     colors,
@@ -45,6 +46,14 @@ const QuestionV3: React.FC<IProps> = (props) => {
         setCheckedItems(newChecked)
     }
 
+    function renderColor(answer: string) {
+        if(props.mode === "result" && props.yourAnswer?.isCorrect) {
+            if(props.question.correctAnswer?.includes(answer)) {
+                return "#4caf50"
+            }
+        }
+        return "#000"
+    }
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
             question.A,
@@ -68,7 +77,11 @@ const QuestionV3: React.FC<IProps> = (props) => {
                                 disabled={props.mode === "result" || props.mode === "submit"}
                             />
                         }
-                        label={answer}
+                        label={ 
+                            <Typography style={{color: renderColor(answer)}}>
+                                {answer}
+                            </Typography>
+                        }
                     />
                 )
             }
@@ -86,6 +99,17 @@ const QuestionV3: React.FC<IProps> = (props) => {
             </Typography>
             <img src={props.question.contentImg} alt="question" />
             <FormGroup>{renderAllAnswerNotNull(props.question)}</FormGroup>
+            {props.mode === "result" && (
+                <Box>
+                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontWeight={600}>
+                        {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
+                    </Typography>
+                    <Typography color={"#1E201E"} fontWeight={600}>
+                        {props.question.explainAnswer}
+                    </Typography>
+
+                </Box>
+            )}
         </Card>
     )
 }

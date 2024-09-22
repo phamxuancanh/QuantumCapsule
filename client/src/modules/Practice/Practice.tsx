@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import {
     useCurrentQuestion,
     useExamId,
+    useIsSumited,
     useListAnswer,
     useListQuestion,
     useOpenResult,
@@ -18,6 +19,7 @@ import SubmitResultBox from "./components/submit-result-box/SubmitResultBox"
 import { getListQuesionByExamId } from "api/question/question.api"
 import { toast } from "react-toastify"
 import { getFromLocalStorage } from "utils/functions"
+import ResultBox from "./components/result-box/ResultBox"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -28,6 +30,7 @@ const Practice: React.FC = () => {
     const { currentQuestion, setCurrentQuestion } = useCurrentQuestion()
     const { result, setResult } = useResult()
     const { openResult, setOpenResult } = useOpenResult()
+    const {isSumited, setIsSumited} = useIsSumited()
     const {examId, setExamId} = useExamId()
     // const[]
     
@@ -54,21 +57,21 @@ const Practice: React.FC = () => {
     }, [])
 
     return (
-        <div>Practice
-            {examId}
-        </div>
-        // <Grid container spacing={2}>
-        //     <Grid item xs={9}>
-        //         <QuestionBox
-        //             isOpen={openResult === false}
-        //         />
-        //         <SubmitResultBox isOpen={openResult} />
-        //     </Grid>
-        //     <Grid item xs={3}>
-        //         <ListQuestionButton />
-        //     </Grid>
-            
-        // </Grid>
+        // <div>Practice
+        //     {examId}
+        // </div>
+        <Grid container spacing={2}>
+            <Grid item xs={9}>
+                <QuestionBox
+                    isOpen={openResult === false && isSumited === false}
+                />
+                <SubmitResultBox isOpen={openResult === true && isSumited === false} />
+                <ResultBox isOpen={isSumited === true}/>
+            </Grid>
+            <Grid item xs={3}>
+                <ListQuestionButton isOpen={isSumited === false}/>
+            </Grid>
+        </Grid>
     )
 }
 
