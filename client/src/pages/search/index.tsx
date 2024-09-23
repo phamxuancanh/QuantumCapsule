@@ -7,6 +7,7 @@ import { styled } from '@mui/system'
 import { Pagination } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { getListSubject } from 'api/subject/subject.api';
+import ROUTES from 'routes/constant';
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
@@ -189,7 +190,20 @@ function SearchResultPage() {
     queryParams.set('page', value.toString());
     navigate(`?${queryParams.toString()}`);
   };
-
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+  const handleTheoryExamClick = (type: 'theory' | 'exam' | 'lesson', id: string) => {
+    console.log(type, id);
+    if (type === 'lesson') {
+        navigate(`${ROUTES.lessonDetail}?lessonId=${id}`);
+    } else if (type === 'exam') {
+        // Xử lý khi type là 'exam'
+        // lam tiep di Nam
+        navigate(`${ROUTES.skill_practice}?examId=${id}`);
+        alert(`Exam ID: ${id}`);
+    }
+};
   return (
     <div className="tw-mt-4 tw-flex tw-items-center tw-flex-col">
       <div className='tw-w-4/5 tw-p-2'>
@@ -198,11 +212,11 @@ function SearchResultPage() {
           <div className="tw-w-1/3">
             <label className="tw-block tw-mb-1">Chọn môn học:</label>
             <Select
-  options={subjects}
-  value={subjects.find(option => option.value === selectedSubject)}
-  onChange={handleSubjectChange}
-  placeholder="Tất cả môn học"
-/>
+              options={subjects}
+              value={subjects.find(option => option.value === selectedSubject)}
+              onChange={handleSubjectChange}
+              placeholder="Tất cả môn học"
+            />
           </div>
 
           <div className="tw-w-1/3">
@@ -228,16 +242,25 @@ function SearchResultPage() {
       </div>
       <div className='tw-w-4/5 tw-p-2'>
         <h2 className="tw-text-lg tw-font-bold">Kết quả tìm kiếm:</h2>
-
-        {results?.data?.length > 0 ? (
-          results?.data?.map((result: any) => (
-            <div key={result.id} className="tw-py-2 tw-border-b">
-              {result.name} ({result.type})
-            </div>
-          ))
-        ) : (
-          <p>Không có kết quả nào.</p>
-        )}
+        <div className='tw-flex tw-flex-col tw-space-y-3'>
+          {results?.data?.length > 0 ? (
+            results?.data?.map((result: any) => (
+              <div>
+                <div key={result.id} className="tw-py-2 tw-border-b tw-rounded-md tw-cursor-pointer tw-bg-slate-200 tw-p-2" onClick={() => handleTheoryExamClick(result?.type, result?.id)}>
+                <div className="tw-flex tw-space-x-2">
+                    <div>{result.Chapter?.Subject?.name}</div>
+                    <div>{result.Chapter?.grade}</div>
+                  </div>
+                  <div className='tw-font-bold'>
+                    {result.name} ({capitalizeFirstLetter(result.type)}) 
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Không có kết quả nào.</p>
+          )}
+        </div>
       </div>
       <div className='tw-flex tw-justify-center tw-mt-10 md:tw-mt-5 lg:tw-mt-3'>
         <CustomPagination

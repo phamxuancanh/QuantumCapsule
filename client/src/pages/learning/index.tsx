@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getTheoryById } from 'api/theory/theory.api'
 import { ITheory } from 'api/theory/theory.interface'
 import YouTube from 'react-youtube'
@@ -21,6 +21,8 @@ import draftToHtml from "draftjs-to-html"
 import { useTranslation } from 'react-i18next'
 import CommentItem from 'components/comment/comment'
 import socket from 'services/socket/socket'
+import ROUTES from 'routes/constant'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 interface Comment {
   id?: string;
   theoryId?: string;
@@ -38,6 +40,7 @@ declare global {
   }
 }
 const Learning = () => {
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const dispatch = useDispatch<AppDispatch>()
   const userRedux = useSelector(selectUser)
@@ -58,7 +61,7 @@ const Learning = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const theoryId = queryParams.get('theoryId');
-    
+
     if (theoryId) {
       fetchTheory(theoryId);
       dispatch(fetchComments(theoryId) as any);
@@ -69,7 +72,7 @@ const Learning = () => {
   const fetchTheory = async (id: string) => {
     try {
       const response = await getTheoryById(id);
-      setTheory(response.data.theory);
+      setTheory(response.data.data);
     } catch (error) {
       console.error('Error fetching theory:', error);
     }
@@ -94,18 +97,18 @@ const Learning = () => {
   useEffect(() => {
     const handleNewComment = (newComment: Comment) => {
       console.log('Received new comment via Socket.IO:', newComment);
-            dispatch(postComment(newComment));
+      dispatch(postComment(newComment));
     };
-  
+
     socket.on('newComment', handleNewComment);
-  
+
     return () => {
       socket.off('newComment', handleNewComment);
     };
   }, [dispatch]);
   const handleComment = async () => {
     const commentContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-  
+
     console.log('Comment content:', commentContent);
     try {
       if (theory?.id && commentContent.trim()) {
@@ -115,12 +118,12 @@ const Learning = () => {
           theoryId: theory.id,
         });
         // dispatch(postComment(response.data.data));
-  
+
         console.log('Comment response:', response.data);
-  
+
         // Phát sự kiện qua Socket.IO
         socket.emit('newComment', response.data); // Gửi bình luận mới cho tất cả người dùng
-  
+
         // Reset editor state
         setEditorState(EditorState.createEmpty());
       } else {
@@ -130,11 +133,29 @@ const Learning = () => {
       console.error('Error adding comment:', error);
     }
   };
-  
-  
+  const handleLessonClick = (id: string) => {
+    navigate(`${ROUTES.lessonDetail}?lessonId=${id}`);
+  };
+
   return (
     <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-4'>
-      <div className='tw-bg-blue-200 tw-w-full'>navigation</div>
+
+      <div className=' tw-w-full tw-flex tw-justify-center'>
+        <div className='tw-w-4/5 tw-space-x-4 tw-flex tw-items-center tw-pt-4'>
+        <div className="tw-flex">
+          <a href="/" className="tw-flex-shrink-0 tw-flex tw-items-center">
+            <p className="tw-font-bold">
+              <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-teal-600">Quantum</span>
+              <span className="sm:tw-text-sm md:tw-text-base lg:tw-text-xl xl:tw-text-xl tw-text-amber-800">Capsule</span>
+            </p>
+          </a>
+        </div>
+        <NavigateNextIcon />
+        <div className='tw-font-bold tw-text-xl tw-text-blue-500 tw-cursor-pointer hover:tw-underline' onClick={() => theory?.lessonId && handleLessonClick(theory.lessonId)}>
+          {theory?.lessonName}
+        </div>
+        </div>
+      </div>
       <div className='tw-w-4/5 tw-flex tw-flex-col tw-mt-10 tw-space-y-8'>
         <div className='tw-flex tw-flex-col tw-space-y-3'>
           <div className='tw-font-bold tw-text-2xl'>{theory?.name}</div>
@@ -190,10 +211,10 @@ const Learning = () => {
             <TabPanel className="tw-flex tw-flex-col tw-justify-between tw-h-full">
               <div className='tw-p-4 tw-space-y-3' >
                 <div>
-                Bạn phải xem đến hết Video thì mới được lưu thời gian xem.
+                  Bạn phải xem đến hết Video thì mới được lưu thời gian xem.
                 </div>
                 <div>
-                Để đảm bảo tốc độ truyền video, QuantumCapsule lưu trữ video trên youtube. Do vậy phụ huynh tạm thời không chặn youtube để con có thể xem được bài giảng.
+                  Để đảm bảo tốc độ truyền video, QuantumCapsule lưu trữ video trên youtube. Do vậy phụ huynh tạm thời không chặn youtube để con có thể xem được bài giảng.
                 </div>
               </div>
             </TabPanel>
@@ -218,7 +239,7 @@ const Learning = () => {
             {isOpenedComment ? (
               <div className='tw-space-y-4'>
                 <Editor
-                  editorState={editorState} 
+                  editorState={editorState}
                   onEditorStateChange={setEditorState}
                   wrapperClassName="wrapper-class tw-cursor-text"
                   editorClassName="editor-class"

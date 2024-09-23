@@ -61,7 +61,7 @@ const Practice: React.FC = () => {
         //     <Grid item xs={9}>
         //         <QuestionBox
         //             isOpen={openResult === false}
-        //         />
+        //         /> 
         //         <SubmitResultBox isOpen={openResult} />
         //     </Grid>
         //     <Grid item xs={3}>

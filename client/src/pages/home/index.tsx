@@ -270,7 +270,20 @@ const Home = () => {
                     <div className='tw-flex-col tw-w-3/4 tw-border tw-space-y-5'>
                         <div className='tw-w-full tw-border tw-rounded-2xl tw-bg-white'>
                             <div className='tw-flex tw-justify-between tw-border-b tw-border-dashed tw-p-5 tw-mx-4 tw-space-x-10'>
-                                <img className='tw-w-64 tw-h-40' src='https://cdn.discordapp.com/attachments/1284566452833222777/1285285340516585636/img_2024-07-23_669f35c4a55b3.png?ex=66e9b6c0&is=66e86540&hm=2af64b9973a379433bc32aa1693170f209ba32110ebc933671ce17c0935102f6&'></img>
+
+                                <img
+                                    className='tw-w-64 tw-h-40'
+                                    src={
+                                        selectedSubject === 'subject1' && selectedGrade === 1
+                                            ? 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/toan1.jpg'
+                                            : selectedSubject === 'subject1' && selectedGrade === 2
+                                                ? 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/toan2.jpg'
+                                                : selectedSubject !== 'subject1' && selectedGrade === 1
+                                                    ? 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/tiengviet1.jpg'
+                                                    : 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/tiengviet2.jpg'
+                                    }
+                                />
+                                { }
                                 <div className='tw-space-y-3'>
                                     <div>
                                         <div className='tw-flex tw-space-x-3 tw-w-full'>
