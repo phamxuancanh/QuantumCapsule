@@ -165,7 +165,14 @@
             "last_change": "Last change",
             "old_password": "Old password",
             "new_password": "New password",
-            "confirm_password": "Confirm password"
+            "confirm_password": "Confirm password",
+            "uploadImage": "Upload image",
+            "selectAnImage": "Select an image",
+            "editIMG": "Edit image",
+            "zoom": "Zoom",
+            "rotate": "Rotate",
+            "skip": "Skip",
+            "save": "Save"
         },
         "search": {
             "search_filter": "Search filter",
