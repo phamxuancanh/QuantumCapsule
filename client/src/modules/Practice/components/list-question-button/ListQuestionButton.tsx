@@ -7,7 +7,7 @@ import {
 import React from "react"
 
 interface IProps {
-    // Define the props for the component here
+    isOpen: boolean
 }
 
 const ListQuestionButton: React.FC<IProps> = (props) => {
@@ -15,7 +15,7 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
     const { currentQuestion, setCurrentQuestion } = useCurrentQuestion()
     const { openResult, setOpenResult } = useOpenResult()
     return (
-        <Box >
+        <Box display={props.isOpen ? "block" : "none"}>
             <Box sx={{maxHeight: "350px", overflowY: "scroll", background: "#ECDFCC", borderRadius: "5px"}}>
                 <Grid container spacing={2} p={2}>
                     {listQuestion.map((question) => (

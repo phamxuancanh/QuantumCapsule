@@ -1,4 +1,5 @@
 import {
+    Box,
     Card,
     colors,
     FormControl,
@@ -49,6 +50,20 @@ const QuestionV2: React.FC<IProps> = (props) => {
                     disabled={props.mode === "result" || props.mode === "submit"}
                 />
             </FormControl>
+            {props.mode === "result" && (
+                <Box>
+                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontWeight={600}>
+                        {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
+                    </Typography>
+                    <Typography color={"#4caf50"} fontWeight={600}>
+                        Đáp án đúng là: {props.question.correctAnswer}
+                    </Typography>
+                    <Typography color={"#1E201E"} fontWeight={600}>
+                        {props.question.explainAnswer}
+                    </Typography>
+
+                </Box>
+            )}
         </Card>
     )
 }

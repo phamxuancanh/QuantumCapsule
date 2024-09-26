@@ -64,6 +64,9 @@ const ChapterDetail = loadable(async () => await import('pages/chapterDetail'), 
 const Learning = loadable(async () => await import('pages/learning'), {
     fallback: <Loading />
 })
+const ResultHistory = loadable(async () => await import('pages/result_history'), {
+    fallback: <Loading />
+})
 /**
  * Use <AuthRoute /> to protect authenticate pages
  */
@@ -142,7 +145,8 @@ const routes: RouteObject[] = [
             { path: ROUTES.search_result, element: <SearchResultPage /> },
             { path: ROUTES.lessonDetail, element: <LessonDetail /> },
             { path: ROUTES.chapterDetail, element: <ChapterDetail /> },
-            { path: ROUTES.learning, element: <Learning /> }
+            { path: ROUTES.learning, element: <Learning /> },
+            { path: ROUTES.result_history, element: <ResultHistory /> }
         ]
     },
     {

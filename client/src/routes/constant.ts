@@ -17,5 +17,6 @@ const ROUTES = {
     lessonDetail: '/lessonDetail',
     chapterDetail: '/chapterDetail',
     learning: '/learning',
+    result_history: '/result_history',
 }
 export default ROUTES
