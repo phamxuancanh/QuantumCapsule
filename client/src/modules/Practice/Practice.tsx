@@ -43,10 +43,12 @@ const Practice: React.FC = () => {
                 
                 const resListQuestion = response.data.data
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
+                const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
+                console.log(initListAnswer);
                 
                 setExamId(EXAM_ID)
                 setListQuestion(resListQuestion)
-                setListAnswer(InitListAnswerFromListQuestion(resListQuestion, initResult.id))
+                setListAnswer(initListAnswer)
                 setCurrentQuestion(resListQuestion[0])
                 setResult(initResult)
             }catch (error) {

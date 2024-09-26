@@ -31,7 +31,6 @@ router.use(`${API_PREFIX}/comments`, commentRoutes)
 router.use(`${API_PREFIX}/answers`, answerRoutes)
 router.use(`${API_PREFIX}/results`, resultRoutes)
 
-
 // router.use(`${API_PREFIX}/grids`, )
 // services.forEach(({ route, target }) => {
 //   const proxyOptions = {
