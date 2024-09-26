@@ -307,8 +307,8 @@ const SignUp = () => {
                                     </option>
                                 ))}
                             </select>
-                            <div className="tw-w-full tw-text-center tw-font-bold tw-text-neutral-800">Hay chon loai tai khoan phu hop voi ban</div>
-                            <div className="tw-flex tw-w-full">
+                            {/* <div className="tw-w-full tw-text-center tw-font-bold tw-text-neutral-800">Hay chon loai tai khoan phu hop voi ban</div> */}
+                            {/* <div className="tw-flex tw-w-full">
                                 <div className="tw-flex tw-w-full tw-justify-between tw-space-x-20">
                                     <div
                                         className={`tw-w-1/3 tw-rounded-lg tw-border-2 tw-border-slate-800 tw-p-5 tw-flex tw-flex-col tw-items-center tw-justify-center tw-cursor-pointer ${typeAccount === 'student' ? 'tw-bg-green-200 tw-border-green-500 tw-text-green-500' : ''
@@ -335,7 +335,7 @@ const SignUp = () => {
                                         <div className="tw-font-bold">Nha truong</div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="tw-space-y-7">
                                 <div className="sm:tw-flex sm:tw-space-x-5 sm:tw-space-y-0 tw-space-y-10">
                                     <div className="sm:tw-w-1/2">

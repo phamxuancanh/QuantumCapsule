@@ -34,7 +34,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { fetchLocations, City, District, Ward } from './locationData'
 import * as yup from 'yup'
 import ROUTES from 'routes/constant'
-// TODO : Add loading effect
 interface User {
   id: string
   firstName: string
@@ -98,18 +97,7 @@ function Profile() {
   const [errorMessageLastName, setErrorMessageLastName] = useState('')
   const [errorMessageEmail, setErrorMessageEmail] = useState('')
   const [errorMessagePhone, setErrorMessagePhone] = useState('')
-  // useEffect(() => {
-  //   const storedUser = localStorage.getItem('persist:auth');
-  //   if (storedUser) {
-  //     const parsedData = JSON.parse(storedUser);
-  //     const user = parsedData?.currentUser;
-  //     if (user) {
-  //       dispatch(loginState(user));
-  //     } else {
-  //       dispatch(fetchUser());
-  //     }
-  //   }
-  // }, [dispatch]);
+
   useEffect(() => {
     dispatch(fetchUser());
   }, [dispatch]);
@@ -467,40 +455,37 @@ function Profile() {
               <img className="tw-w-full tw-h-full tw-object-cover tw-cursor-pointer" src={userRedux?.avatar} alt="User upload" />
             </div>
             <div className="tw-text-center">{userRedux?.firstName} {userRedux?.lastName}</div>
-            <div className='tw-text-slate-600'>Khoi {userRedux?.grade}</div>
-            <div className='tw-bg-orange-200 tw-text-orange-500 tw-p-2 tw-cursor-pointer tw-font-bold tw-rounded-lg' onClick={handleOpenChangeAVTModal}>Cap nhat avatar</div>
+            <div className='tw-text-slate-600'>{t('profile.grade')} {userRedux?.grade}</div>
+            <div className='tw-bg-green-200 tw-text-green-500 tw-p-2 tw-cursor-pointer tw-font-bold tw-rounded-lg' onClick={handleOpenChangeAVTModal}>{t('profile.updateAVT')}</div>
           </div>
           <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-2'>
-            <div className='tw-font-bold tw-text-lg'>Cai dat tai khoan</div>
-            <div className='tw-text-slate-600 tw-text-sm tw-pl-2'>Thong tin ca nhan, cai dat bao mat, quan ly thong bao, v.v</div>
+            <div className='tw-font-bold tw-text-lg'>{t('profile.personal_info')}</div>
+            <div className='tw-text-slate-600 tw-text-sm tw-pl-2'>{t('profile.description')}</div>
 
             {/* Mục sidebar */}
             <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1' onClick={() => handleSectionSelect(1)}>
               <AccountCircleIcon className='tw-mr-2' />
-              Thong tin ca nhan
+              {t('profile.personal_info')}
             </div>
             <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(2)}>
               <LockIcon className='tw-mr-2' />
-              Mat khau va bao mat
+              {t('profile.password_security')}
             </div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1' onClick={() => handleSectionSelect(3)}>
+            {/* <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1' onClick={() => handleSectionSelect(3)}>
               <SchoolIcon className='tw-mr-2' />
               Khoa hoc cua ban
-            </div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(4)}>
-              Tao tai khoan cho con
-            </div>
-            <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(5)}>
+            </div> */}
+            {/* <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(5)}>
               <LinkIcon className='tw-mr-2' />
               Lien ket tai khoan
             </div>
             <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleSectionSelect(6)}>
               <QrCodeIcon className='tw-mr-2' />
               Nhap ma kich hoat
-            </div>
+            </div> */}
             <div className='hover:tw-bg-slate-100 tw-rounded-lg hover:tw-font-bold tw-text-sm tw-w-11/12 tw-cursor-pointer tw-pl-2 tw-py-1 tw-flex tw-items-center' onClick={() => handleLogout()}>
               <LogoutIcon className='tw-mr-2' />
-              Dang xuat
+              {t('profile.logout')}
             </div>
           </div>
         </div>
@@ -511,73 +496,73 @@ function Profile() {
               <div className='tw-w-full tw-space-y-4'>
                 <div className='tw-mx-5'>
                   <div className='tw-flex'>
-                    <div className='tw-flex-1 tw-font-bold tw-text-green-500 tw-text-xl'>Thông tin cá nhân</div>
+                    <div className='tw-flex-1 tw-font-bold tw-text-green-500 tw-text-xl'>{t('profile.personal_info')}</div>
                     <div className='tw-flex-1 tw-flex tw-justify-end'>
                       <div
                         className='tw-border tw-rounded-3xl tw-px-8 tw-py-2 tw-flex tw-items-center tw-cursor-pointer'
                         onClick={handleEditPersonalInfo}
                       >
                         <EditIcon className='tw-mr-2' />
-                        Cập nhật
+                        {t('profile.update')}
                       </div>
                     </div>
                   </div>
                   <div className="tw-grid tw-grid-cols-2 tw-gap-4">
                     <div className="tw-p-4 tw-space-y-2">
                       <div>
-                        <div className='tw-text-gray-500 tw-text-sm'>Họ:</div>
+                        <div className='tw-text-gray-500 tw-text-sm'>{t('profile.first_name')}:</div>
                         <div className='tw-font-bold text-text-sm'>{userRedux?.firstName}</div>
                       </div>
                       <div>
-                        <div className='tw-text-gray-500 tw-text-sm'>Tên:</div>
+                        <div className='tw-text-gray-500 tw-text-sm'>{t('profile.last_name')}:</div>
                         <div className='tw-font-bold text-text-sm'>{userRedux?.lastName}</div>
                       </div>
-                      <div>
+                      {/* <div>
                         <div className='tw-text-gray-500 tw-text-sm'>Loại tài khoản:</div>
                         <div className='tw-font-bold text-text-sm'>Pxc</div>
-                      </div>
+                      </div> */}
                       <div>
-                        <div className='tw-text-gray-500 tw-text-sm'>Khối:</div>
+                        <div className='tw-text-gray-500 tw-text-sm'>{t('profile.grade')}:</div>
                         <div className='tw-font-bold text-text-sm'>{userRedux?.grade}</div>
                       </div>
                     </div>
                     <div className="tw-p-4 tw-space-y-2">
                       <div>
-                        <div className='tw-text-gray-500 tw-text-sm'>Ngày sinh:</div>
+                        <div className='tw-text-gray-500 tw-text-sm'>{t('profile.birthday')}:</div>
                         <div className='tw-font-bold text-text-sm'>
                           {userRedux?.dob ?? 'Chưa cập nhật'}
                         </div>
                       </div>
                       <div>
-                        <div className='tw-text-gray-500 tw-text-sm'>Điện thoại:</div>
+                        <div className='tw-text-gray-500 tw-text-sm'>{t('profile.phone')}:</div>
                         <div className='tw-font-bold text-text-sm'>
                           {userRedux?.phone ?? 'Chưa cập nhật'}
                         </div>
                       </div>
                       <div>
-                        <div className='tw-text-gray-500 tw-text-sm'>Email:</div>
+                        <div className='tw-text-gray-500 tw-text-sm'>{t('profile.email')}:</div>
                         <div className='tw-font-bold text-text-sm'>{userRedux?.email}</div>
                       </div>
                     </div>
                   </div>
                   <div className='tw-space-y-4 -tw-mt-2'>
                     <div className='tw-px-4'>
-                      <div className='tw-text-gray-500 tw-text-sm'>Phường/xã:</div>
+                      <div className='tw-text-gray-500 tw-text-sm'>{t('profile.ward_commune')}:</div>
                       <div className='tw-font-bold text-text-sm'>{userRedux?.ward}</div>
                     </div>
                     <div className='tw-px-4'>
-                      <div className='tw-text-gray-500 tw-text-sm'>Quận/huyện:</div>
+                      <div className='tw-text-gray-500 tw-text-sm'>{t('profile.district')}:</div>
                       <div className='tw-font-bold text-text-sm'>{userRedux?.district}</div>
                     </div>
                     <div className='tw-px-4'>
-                      <div className='tw-text-gray-500 tw-text-sm'>Tỉnh/thành phố:</div>
+                      <div className='tw-text-gray-500 tw-text-sm'>{t('profile.city_province')}:</div>
                       <div className='tw-font-bold text-text-sm'>{userRedux?.city}</div>
                     </div>
                   </div>
                 </div>
                 <div className='tw-bg-blue-200 tw-mx-5 tw-p-2 tw-rounded-lg'>
-                  <div className='tw-font-bold'>Lưu ý:</div>
-                  <div>Hệ thống sẽ tự động nâng lớp cho học sinh vào năm học mới.</div>
+                  <div className='tw-font-bold'>{t('profile.note')}:</div>
+                  <div>{t('profile.note_content')}</div>
                 </div>
               </div>
             ) : (
@@ -585,14 +570,14 @@ function Profile() {
                 <div className='tw-mx-5 tw-space-y-3'>
                   <div className='tw-flex'>
                     <div className='tw-font-bold tw-text-green-500 tw-text-base tw-cursor-pointer' onClick={handleEditPersonalInfo}>
-                      <ArrowBackIcon className='tw-mr-2' />Quay lại
+                      <ArrowBackIcon className='tw-mr-2' />{t('profile.back')}
                     </div>
                   </div>
-                  <div className='tw-flex tw-justify-center tw-font-bold tw-text-2xl'>Cap nhat thong tin ca nhan</div>
+                  <div className='tw-flex tw-justify-center tw-font-bold tw-text-2xl'>{t('profile.update_info_title')}</div>
                   <div className="tw-grid tw-grid-cols-2 tw-gap-4">
                     <div className="tw-p-4 tw-space-y-2">
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Họ:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.first_name')}:</div>
                         <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                           <input
                             id="firstname"
@@ -611,18 +596,18 @@ function Profile() {
 
                       </div>
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Tinh/thanh pho:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.city_province')}:</div>
                         <Select
                           id="city"
                           className="tw-shadow-sm tw-border-sky-500 tw-rounded-2xl"
                           options={cities.map(city => ({ value: city.Name, label: city.Name }))}
                           value={cities.find(city => city.Name === selectedCity) ? { value: selectedCity, label: selectedCity } : null}
                           onChange={(option) => setSelectedCity(option?.value ?? '')}
-                          placeholder="Chọn thành phố"
+                          placeholder={`${t('profile.select')} ${t('profile.city_province')}`}
                         />
                       </div>
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Quan/huyen:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.district')}:</div>
                         <Select
                           id="district"
                           className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
@@ -630,11 +615,11 @@ function Profile() {
                           onChange={(option) => setSelectedDistrict(option?.value ?? '')}
                           isDisabled={!selectedCity}
                           options={districts.map(district => ({ value: district.Name, label: district.Name }))}
-                          placeholder="Chọn quận/huyện"
+                          placeholder={`${t('profile.select')} ${t('profile.district')}`}
                         />
                       </div>
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Phuong/xa:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.ward_commune')}:</div>
                         <Select
                           id="ward"
                           value={wards.find(ward => ward.Name === selectedWard) ? { value: selectedWard, label: selectedWard } : null}
@@ -642,7 +627,7 @@ function Profile() {
                           isDisabled={!selectedDistrict}
                           className="tw-shadow-sm disabled:tw-bg-gray-100 tw-border-sky-500 tw-rounded-2xl"
                           options={wards.map(ward => ({ value: ward.Name, label: ward.Name }))}
-                          placeholder="Chọn phường/xã"
+                          placeholder={`${t('profile.select')} ${t('profile.ward_commune')}`}
                         />
                       </div>
 
@@ -650,7 +635,7 @@ function Profile() {
                     </div>
                     <div className="tw-p-4 tw-space-y-2">
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Tên:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.last_name')}:</div>
                         <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                           <input
                             id="lastname"
@@ -669,7 +654,7 @@ function Profile() {
 
                       </div>
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Email:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.email')}:</div>
                         <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                           <input
                             id="email"
@@ -687,7 +672,7 @@ function Profile() {
 
                       </div>
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Ngày sinh:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.birthday')}:</div>
                         <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                           <input
                             id="dob"
@@ -701,7 +686,7 @@ function Profile() {
                         </div>
                       </div>
                       <div>
-                        <div className='tw-font-bold tw-text-sm'>Điện thoại:</div>
+                        <div className='tw-font-bold tw-text-sm'>{t('profile.phone')}:</div>
                         <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                           <input
                             id="phone"
@@ -709,7 +694,7 @@ function Profile() {
                             type="text"
                             required
                             className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                            placeholder='Điện thoại'
+                            placeholder={t('profile.ward_commune')}
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                           />
@@ -717,19 +702,19 @@ function Profile() {
                         </div>
                         <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessagePhone}</div>
 
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="tw-grid tw-grid-cols-2 tw-gap-8">
-                    <div className='tw-flex tw-justify-end tw-items-center'>
-                      <div className='tw-bg-green-500 tw-border-green-500 tw-text-white tw-font-bold tw-px-3 tw-py-2 tw-rounded-3xl tw-cursor-pointer' onClick={handleUpdatePersonalInfo}>
-                        Cap nhat thong tin
+                    <div className="tw-grid tw-grid-cols-2 tw-gap-8">
+                      <div className='tw-flex tw-justify-end tw-items-center'>
+                        <div className='tw-bg-green-500 tw-border-green-500 tw-text-white tw-font-bold tw-px-3 tw-py-2 tw-rounded-3xl tw-cursor-pointer' onClick={handleUpdatePersonalInfo}>
+                          {t('profile.update_info')}
+                        </div>
                       </div>
-                    </div>
-                    <div className='tw-flex tw-justify-start tw-items-center tw-cursor-pointer'>
-                      <div className='tw-bg-white tw-border-gray-500 tw-border tw-rounded-3xl tw-px-3 tw-py-2' onClick={handleCancelUpdatePersonalInfo}>
-                        Huy bo
-                      </div>
+                      <div className='tw-flex tw-justify-start tw-items-center tw-cursor-pointer'>
+                        <div className='tw-bg-white tw-border-gray-500 tw-border tw-rounded-3xl tw-px-3 tw-py-2' onClick={handleCancelUpdatePersonalInfo}>
+                          {t('profile.cancel')}
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -741,13 +726,13 @@ function Profile() {
           {selectedSection === 2 &&
             <div className='tw-w-full'>
               <div className='tw-ml-5'>
-                <div className='tw-font-bold tw-text-green-500 tw-text-xl'>Mat khau va bao mat</div>
-                <div className='tw-text-slate-500 tw-text-sm'>Quan ly mat khau</div>
-                <div className='tw-font-bold tw-pl-5 tw-text-lg'>Doi mat khau</div>
-                <div className='tw-text-slate-500 tw-text-sm tw-pl-5'>Lan doi gan nhat: 26 ngay truoc</div>
+                <div className='tw-font-bold tw-text-green-500 tw-text-xl'>{t('profile.password_security')}</div>
+                <div className='tw-text-slate-500 tw-text-sm'>{t('profile.password_management')}</div>
+                <div className='tw-font-bold tw-pl-5 tw-text-lg'>{t('profile.change_password')}</div>
+                <div className='tw-text-slate-500 tw-text-sm tw-pl-5'>{t('profile.last_change')}:</div>
                 <div className='tw-pl-5 tw-py-3 tw-space-y-3 tw-w-3/5'>
                   <div className='tw-space-y-1'>
-                    <div className='tw-font-bold'>Mat khau cu</div>
+                    <div className='tw-font-bold'>{t('profile.old_password')}:</div>
                     <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                       <input
                         id="oldpass"
@@ -756,7 +741,7 @@ function Profile() {
                         autoComplete="current-password"
                         required
                         className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                        placeholder={t('signIn.password')}
+                        placeholder={t('profile.old_password')}
                         value={oldPassword}
                         onChange={(e) => setOldPassword(e.target.value)}
                       />
@@ -765,7 +750,7 @@ function Profile() {
                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageOldPassword}</div>
                   </div>
                   <div className='tw-space-y-1'>
-                    <div className='tw-font-bold'>Mat khau moi</div>
+                    <div className='tw-font-bold'>{t('profile.new_password')}:</div>
                     <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                       <input
                         id="password"
@@ -774,7 +759,7 @@ function Profile() {
                         autoComplete="current-password"
                         required
                         className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                        placeholder={t('signIn.password')}
+                        placeholder={t('profile.new_password')}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                       />
@@ -784,7 +769,7 @@ function Profile() {
 
                   </div>
                   <div className='tw-space-y-1'>
-                    <div className='tw-font-bold'>Nhap lai mat khau moi</div>
+                    <div className='tw-font-bold'>{t('profile.confirm_password')}:</div>
                     <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">
                       <input
                         id="password"
@@ -793,7 +778,7 @@ function Profile() {
                         autoComplete="current-password"
                         required
                         className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                        placeholder={t('signIn.password')}
+                        placeholder={t('profile.confirm_password')}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
@@ -804,10 +789,10 @@ function Profile() {
                   </div>
                   <div className='tw-flex tw-space-x-8 tw-pr-8'>
                     <div className='tw-cursor-pointer tw-flex-1 tw-p-2 tw-rounded-3xl tw-border tw-border-green-500 tw-font-bold tw-bg-green-500 tw-flex tw-justify-center tw-items-center tw-text-white' onClick={handleChangePassword}>
-                      Doi mat khau
+                    {t('profile.change_password')}
                     </div>
                     <div className='tw-cursor-pointer tw-flex-1 tw-p-2 tw-rounded-3xl tw-border tw-border-gray-500 tw-bg-white tw-flex tw-justify-center tw-items-center' onClick={handleCancelChangePassword}>
-                      Huy bo
+                    {t('profile.cancel')}
                     </div>
                   </div>
                 </div>

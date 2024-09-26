@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('./init')
 
-const Scoresheet = sequelize.define(
-  'Scoresheet',
+const Result = sequelize.define(
+  'Result',
   {
     id: {
       type: DataTypes.STRING,
@@ -37,9 +37,9 @@ const Scoresheet = sequelize.define(
     }
   },
   {
-    tableName: 'scoresheets',
+    tableName: 'results',
     timestamps: true
   }
 )
 
-module.exports = Scoresheet
+module.exports = Result

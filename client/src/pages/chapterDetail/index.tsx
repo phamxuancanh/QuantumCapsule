@@ -13,6 +13,7 @@ import { IExam } from 'api/exam/exam.interface';
 import { ITheory } from 'api/theory/theory.interface';
 import { getExamsByLessonId } from 'api/exam/exam.api';
 import { getTheoriesByLessonId } from 'api/theory/theory.api';
+import { useTranslation } from 'react-i18next'
 
 const ChapterDetail = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const ChapterDetail = () => {
       navigate(`${ROUTES.home}?${params.toString()}`);
     }
   };
-
+  const { t } = useTranslation();
   const [chapter, setChapter] = useState<IChapter | null>(null);
   const [lessons, setLessons] = useState<ILesson[]>([]);
   const [expandedLessons, setExpandedLessons] = useState<string[]>([]);
@@ -119,18 +120,14 @@ const ChapterDetail = () => {
     if (type === 'theory') {
         navigate(`${ROUTES.learning}?theoryId=${id}`);
     } else if (type === 'exam') {
-        // Xử lý khi type là 'exam'
-        // lam tiep di Nam
         navigate(`${ROUTES.skill_practice}?examId=${id}`);
-        alert(`Exam ID: ${id}`);
-        // Thực hiện các hành động khác cho 'exam' tại đây
     }
 };
 
   return (
-    <div className='tw-flex tw-items-center tw-justify-center'>
+    <div className='tw-flex tw-min-h-screen tw-justify-center'>
       {chapter ? (
-        <div className='tw-w-4/5 tw-space-y-2'>
+        <div className='tw-mt-20 tw-w-4/5 tw-space-y-2'>
           <div className='tw-flex tw-items-center'>
             <div
               onClick={handleTitleClick}
@@ -158,7 +155,7 @@ const ChapterDetail = () => {
 
                     <div className='tw-flex tw-flex-col tw-w-1/2 tw-space-y-3'>
                       <div className='tw-flex'>
-                        <span className='tw-font-semibold'>Lý thuyết</span>
+                        <span className='tw-font-semibold'>{t('chapterDetail.theory')}</span>
                       </div>
                       <ul className='tw-space-y-1'>
                         {lesson.id && theories[lesson.id]?.length > 0 ? (
@@ -168,7 +165,7 @@ const ChapterDetail = () => {
                             </li>
                           ))
                         ) : (
-                          <li>Không có bài lý thuyết.</li>
+                          <li>{t('chapterDetail.not_have_theory')}</li>
                         )}
                       </ul>
                     </div>
@@ -176,7 +173,7 @@ const ChapterDetail = () => {
                     <div className='tw-flex tw-flex-col tw-w-1/2 tw-space-y-3'>
                       <div className='tw-flex'>
 
-                        <span className='tw-font-semibold'>Luyện tập</span>
+                        <span className='tw-font-semibold'>{t('chapterDetail.practice')}</span>
                       </div>
                       <ul className='tw-space-y-1'>
                         {lesson.id && exams[lesson.id]?.length > 0 ? (
@@ -186,7 +183,7 @@ const ChapterDetail = () => {
                             </li>
                           ))
                         ) : (
-                          <li>Không có bài luyện tập.</li>
+                          <li>{t('chapterDetail.not_have_practice')}</li>
                         )}
                       </ul>
                     </div>

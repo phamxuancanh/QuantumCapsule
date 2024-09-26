@@ -16,6 +16,8 @@ import { getLessonByChapterId } from 'api/lesson/lesson.api';
 import { ILesson } from 'api/lesson/lesson.interface';
 import { ClockLoader } from 'react-spinners'
 import PlayLessonIcon from '@mui/icons-material/PlayLesson';
+import { useTranslation } from 'react-i18next'
+
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -81,19 +83,21 @@ const Home = () => {
         }
     })
     const [grades] = useState([
-        { Id: 1, Name: 'Khối 1' },
-        { Id: 2, Name: 'Khối 2' },
-        { Id: 3, Name: 'Khối 3' },
-        { Id: 4, Name: 'Khối 4' },
-        { Id: 5, Name: 'Khối 5' },
-        { Id: 6, Name: 'Khối 6' },
-        { Id: 7, Name: 'Khối 7' },
-        { Id: 8, Name: 'Khối 8' },
-        { Id: 9, Name: 'Khối 9' },
-        { Id: 10, Name: 'Khối 10' },
-        { Id: 11, Name: 'Khối 11' },
-        { Id: 12, Name: 'Khối 12' }
+        { Id: 1, Name: '1' },
+        { Id: 2, Name: '2' },
+        { Id: 3, Name: '3' },
+        { Id: 4, Name: '4' },
+        { Id: 5, Name: '5' },
+        { Id: 6, Name: '6' },
+        { Id: 7, Name: '7' },
+        { Id: 8, Name: '8' },
+        { Id: 9, Name: '9' },
+        { Id: 10, Name: '10' },
+        { Id: 11, Name: '11' },
+        { Id: 12, Name: '12' }
     ])
+    const { t, i18n } = useTranslation();
+    const currentLanguage = i18n.language;
     const query = useQuery();
     const initialPage = parseInt(query.get('page') || '1', 10);
     const initialSubject = query.get('subject') || 'subject1';
@@ -223,11 +227,16 @@ const Home = () => {
             setExpandedChapters(chaptersData?.data.map(chapter => chapter.id ?? '') ?? []);
         }
     };
+
     const allChaptersExpanded = expandedChapters.length === chaptersData?.data.length;
 
     const handleLessonClick = (lesson: ILesson) => {
         navigate(`/lessonDetail?lessonId=${lesson.id}`, { state: { lesson } });
-      };
+    };
+    const capitalizeFirstLetter = (string: string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
     return (
         <div className='tw-flex tw-items-center tw-justify-center tw-bg-slate-50'>
             <div className='tw-w-4/5 tw-mt-16 tw-space-y-16'>
@@ -242,26 +251,29 @@ const Home = () => {
                                 src={selectedSubject === subject.id ? subject.image_on : subject.image_off}
                                 alt={subject.name}
                             />
-                            <div className='tw-font-bold tw-text-lg'>{subject.name}</div>
+                            {/* <div className='tw-font-bold tw-text-lg'>{subject.name}</div> */}
+                            <div className='tw-font-bold tw-text-lg'>
+                                {subject.name === 'Toán' ? t('homepage.math') : t('homepage.literature')}
+                            </div>
                         </div>
                     ))}
                 </div>
 
                 <div className='tw-flex tw-justify-between'>
-                    <div className='tw-text-4xl tw-font-bold'>Nội dung khóa học</div>
+                    <div className='tw-text-4xl tw-font-bold'>{(t('homepage.course_content'))}</div>
                 </div>
                 <div className='tw-flex tw-w-full tw-space-x-16'>
                     <div className='tw-w-1/4 tw-border tw-rounded-2xl tw-bg-white tw-h-fit'>
-                        <div className='tw-bg-green-400 tw-font-bold tw-text-lg tw-text-center tw-rounded-t-2xl tw-p-3'>Lớp</div>
+                        <div className='tw-bg-green-400 tw-font-bold tw-text-lg tw-text-center tw-rounded-t-2xl tw-p-3'>{t('homepage.grade')}</div>
                         <div className='tw-border tw-rounded-md tw-p-1 tw-m-2'>
                             <div className='tw-flex tw-flex-col tw-space-y-2'>
                                 {grades.map((cls) => (
                                     <button
                                         key={cls.Id}
-                                        className={`tw-p-2 tw-rounded-md tw-bg-blue-200 hover:tw-bg-blue-300 tw-text-left ${selectedGrade === cls.Id ? 'tw-bg-blue-400' : ''}`}
+                                        className={`tw-flex tw-justify-center tw-p-2 tw-rounded-md tw-bg-blue-200 hover:tw-bg-blue-300 tw-text-left ${selectedGrade === cls.Id ? 'tw-bg-blue-400' : ''}`}
                                         onClick={() => handleGradeClick(cls.Id)}
                                     >
-                                        {cls.Name}
+                                       {t('homepage.grade')} {cls.Name}
                                     </button>
                                 ))}
                             </div>
@@ -289,17 +301,17 @@ const Home = () => {
                                         <div className='tw-flex tw-space-x-3 tw-w-full'>
                                             <img src={icon_category} alt="icon_category" />
                                             <div className='tw-text-2xl tw-font-bold'>
-                                                {selectedSubject === 'subject1' && selectedGrade === 1 && 'Toán 1: Chân trời sáng tạo'}
-                                                {selectedSubject === 'subject1' && selectedGrade === 2 && 'Toán 2: Chân trời sáng tạo'}
-                                                {selectedSubject !== 'subject1' && selectedGrade === 1 && 'Tiếng Việt 1 - Chân trời sáng tạo'}
-                                                {selectedSubject !== 'subject1' && selectedGrade === 2 && 'Tiếng Việt 2 - Chân trời sáng tạo'}
+                                                {selectedSubject === 'subject1' && selectedGrade === 1 && t('homepage.math1_title')}
+                                                {selectedSubject === 'subject1' && selectedGrade === 2 && t('homepage.math2_title')}
+                                                {selectedSubject !== 'subject1' && selectedGrade === 1 && t('homepage.literature1_title')}
+                                                {selectedSubject !== 'subject1' && selectedGrade === 2 && t('homepage.literature2_title')}
                                             </div>
                                         </div>
                                         <div>
-                                            {selectedSubject === 'subject1' && selectedGrade === 1 && 'Khóa học Toán lớp 1 Chân Trời Sáng Tạo giúp học sinh nắm vững các khái niệm toán học cơ bản như số học, phép cộng, phép trừ, và hình học đơn giản. Với phương pháp giảng dạy sáng tạo và thực tế, khóa học không chỉ phát triển tư duy logic và kỹ năng giải quyết vấn đề mà còn khơi dậy niềm yêu thích toán học, chuẩn bị vững chắc cho các bậc học tiếp theo.'}
-                                            {selectedSubject === 'subject1' && selectedGrade === 2 && 'Khóa học Toán lớp 2 Chân trời sáng tạo cung cấp đầy đủ nội dung và giải bài tập SGK, giúp học sinh làm bài hiệu quả. Khóa học bao gồm các bài tập toán lớp 2 chi tiết và hướng dẫn dễ hiểu, giúp học sinh nắm vững kiến thức và giải quyết bài tập từ cả tập 1 và tập 2.'}
-                                            {selectedSubject !== 'subject1' && selectedGrade === 1 && 'Khóa học Tiếng Việt lớp 1 Chân trời sáng tạo cung cấp bài giảng chi tiết, đầy đủ và bám sát chương trình SGK. Khóa học giúp học sinh nắm vững các kỹ năng cơ bản như đọc, viết, phát âm, và luyện chữ, phát triển khả năng ngôn ngữ từ sớm. Nội dung đa dạng, dễ hiểu giúp học sinh lớp 1 tiếp thu nhanh, tạo nền tảng vững chắc cho các lớp học tiếp theo và tự tin sử dụng tiếng Việt trong cuộc sống hàng ngày.'}
-                                            {selectedSubject !== 'subject1' && selectedGrade === 2 && 'Khóa học tiếng Việt lớp 2 Chân Trời Sáng Tạo giúp trẻ phát triển toàn diện kỹ năng ngôn ngữ. Với chương trình học phong phú, các em sẽ nắm vững ngữ pháp, từ vựng và cải thiện kỹ năng đọc, viết. Qua các bài học tương tác, thực hành sáng tạo, trẻ em không chỉ học mà còn phát triển tư duy logic, khơi dậy đam mê học tập và chuẩn bị cho các bậc học cao hơn.'}
+                                            {selectedSubject === 'subject1' && selectedGrade === 1 && t('homepage.math1_description')}
+                                            {selectedSubject === 'subject1' && selectedGrade === 2 && t('homepage.math2_description')}
+                                            {selectedSubject !== 'subject1' && selectedGrade === 1 && t('homepage.literature1_description')}
+                                            {selectedSubject !== 'subject1' && selectedGrade === 2 && t('homepage.literature2_description')}
                                         </div>
                                     </div>
                                     <ProgressBar
@@ -310,55 +322,68 @@ const Home = () => {
                                     />
                                     <div className="tw-flex tw-items-center">
                                         <BarChartIcon className="tw-mr-2" />
-                                        <span>Hoàn thành: 0/224 bài học (đạt 0%)</span>
+                                        <span>{t('homepage.completed')}: 0/{lessonsData.length} {t('homepage.lesson')} ({t('homepage.archived')} 0%)</span>
                                     </div>
                                     <button className='tw-cursor-pointer tw-bg-red-200 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
                                         <ArrowCircleRightOutlinedIcon className='tw-mr-2' />
-                                        Tiếp tục học bài
+                                        {t('homepage.continue_learning')}
                                     </button>
                                 </div>
                             </div>
                             <div className='tw-flex tw-justify-between tw-p-5'>
                                 <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
-                                    <div className='tw-font-bold tw-text-2xl'>0/2</div>
-                                    <div>Chu diem</div>
+                                    <div className='tw-font-bold tw-text-2xl'>0/{lessonsData.length}</div>
+                                    <div>{capitalizeFirstLetter(t('homepage.lesson'))}</div>
                                 </div>
                                 <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
-                                    <div className='tw-font-bold tw-text-2xl'>0/2</div>
-                                    <div>Bai kiem tra</div>
+                                    <div className='tw-font-bold tw-text-2xl'>0/0</div>
+                                    <div>{capitalizeFirstLetter(t('homepage.exam'))}</div>
                                 </div>
                                 <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                    <div>Chua thuc hanh</div>
+                                    <div>{t('homepage.not_yet_practice')}</div>
                                 </div>
                                 <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-sky-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                    <div>Dang thuc hanh</div>
+                                    <div>{t('homepage.in_progress')}</div>
                                 </div>
                                 <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-green-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                    <div>Da hoan thanh</div>
+                                    <div>{t('homepage.completed')}</div>
                                 </div>
                                 <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                     <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                    <div>Chu diem con yeu</div>
+                                    <div>{t('homepage.need_improvement')}</div>
                                 </div>
                             </div>
                         </div>
-                        <div className='tw-font-bold tw-text-2xl tw-px-5'>Nội dung</div>
+                        <div className='tw-font-bold tw-text-2xl tw-px-5'>{t('homepage.content')}</div>
                         <div className='tw-flex tw-justify-between tw-px-5'>
                             <div className='tw-flex tw-items-center tw-space-x-2'>
-                                <div><span className='tw-font-bold'>11</span> chương</div>
+                                {/* <div><span className='tw-font-bold'>{chaptersData?.data?.length}</span> {t('homepage.chapter')}</div> */}
+                                <div>
+                                    <span className='tw-font-bold'>{chaptersData?.data?.length} </span>
+                                    {t('homepage.chapter')}
+                                    {(currentLanguage !== 'vi' && (chaptersData?.data?.length ?? 0) >= 2) ? 's' : ''}
+                                </div>
                                 <div>•</div>
-                                <div><span className='tw-font-bold'>138</span> bài học</div>
+                                <div>
+                                    <span className='tw-font-bold'>{lessonsData.length} </span>
+                                    {t('homepage.lesson')}
+                                    {(currentLanguage !== 'vi' && lessonsData.length >= 2) ? 's' : ''}
+                                </div>
                                 <div>•</div>
-                                <div><span className='tw-font-bold'>3</span> bài kiểm tra</div>
+                                <div>
+                                    <span className='tw-font-bold'>{lessonsData.length} </span>
+                                    {t('homepage.exam')}
+                                    {(currentLanguage !== 'vi' && lessonsData.length >= 2) ? 's' : ''}
+                                </div>
                             </div>
                             <div
                                 className='tw-font-bold tw-text-green-500 tw-cursor-pointer'
                                 onClick={toggleAllChapterExpansion}
                             >
-                                {allChaptersExpanded ? 'Thu gon tat ca' : 'Mo rong tat ca'}
+                                {allChaptersExpanded ? t('homepage.colapse_all') : t('homepage.expand_all')}
                             </div>
                         </div>
                         <div className='tw-bg-white tw-border tw-rounded-2xl'>
@@ -397,7 +422,10 @@ const Home = () => {
                                                                 )}
                                                                 {index + 1}. {chapter.name}
                                                             </li>
-                                                            <div>{lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} bài học</div>
+                                                            <div>
+                                                                {lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} {t('homepage.lesson')}
+                                                                {(currentLanguage === 'en' && lessonsData.filter(lesson => lesson.chapterId === chapter.id).length >= 2) ? 's' : ''}
+                                                            </div>
                                                         </div>
                                                         {expandedChapters.includes(chapter.id ?? '') && (
                                                             <ul className='tw-ml-8 tw-space-y-1'>

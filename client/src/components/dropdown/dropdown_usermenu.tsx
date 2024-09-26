@@ -101,20 +101,6 @@ function DropdownProfile({ align }: DropdownProfileProps) {
     return () => document.removeEventListener('keydown', keyHandler)
   })
 
-  //  const handleLogout = useCallback(async () => {
-  //    try {
-  //      dispatch(startLogout())
-  //      const response = await logout()
-  //      if (response) {
-  //        removeLocalStorage('tokens')
-  //        removeAllLocalStorage()
-  //        navigate(ROUTES.dev)
-  //      }
-  //      dispatch(finishLogout())
-  //    } catch (error) {
-  //      console.error(error)
-  //    }
-  //  }, [dispatch, navigate])
   const handleOpenLogOutModal = useCallback(() => {
     setChoiceModalOpen(true)
   }, [])
@@ -127,17 +113,34 @@ function DropdownProfile({ align }: DropdownProfileProps) {
     ]
   }, [])
 
-  //  const handleChange = useCallback(
-  //    async (e: { target: { value: React.SetStateAction<string> | undefined } }) => {
-  //      try {
-  //        await i18n.changeLanguage(e.target.value)
-  //        setSelectedLanguage(e.target.value)
-  //      } catch (error) {
-  //        console.log(error)
-  //      }
-  //    },
-  //    [i18n]
-  //  )
+//   const handleChange = useCallback(
+//     async (e: React.ChangeEvent<HTMLSelectElement>) => {
+//         try {
+//             await i18n.changeLanguage(e.target.value)
+//             setSelectedLanguage(e.target.value)
+//         } catch (error) {
+//             console.log(error)
+//         }
+//     },
+//     [i18n]
+// )
+const handleChange = useCallback(
+  async (e: any) => {
+    try {
+      const newLanguage = e.target.value
+      await i18n.changeLanguage(newLanguage)
+      setSelectedLanguage(newLanguage)
+      localStorage.setItem('selectedLanguage', newLanguage)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  [i18n]
+)
+useEffect(() => {
+  i18n.changeLanguage(selectedLanguage)
+}, [selectedLanguage, i18n])
+
   const activateLink = useCallback((isLastItem?: boolean) => {
     return ({ isActive }: { isActive: boolean }) => ({
       marginRight: (isLastItem ?? false) ? 0 : 20,
@@ -196,7 +199,7 @@ function DropdownProfile({ align }: DropdownProfileProps) {
       </button>
 
       <Transition
-        className={`tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-44 tw-bg-white tw-border tw-border-slate-200 tw-py-1.5 tw-rounded tw-shadow-lg tw-overflow-hidden tw-mt-1 ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
+        className={`tw-w-56 tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-44 tw-bg-white tw-border tw-border-slate-200 tw-py-1.5 tw-rounded tw-shadow-lg tw-overflow-hidden tw-mt-1 ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
         show={dropdownOpen}
         enter="tw-transition tw-ease-out tw-duration-200 tw-transform"
         enterStart="tw-opacity-0 -tw-translate-y-2"
@@ -220,13 +223,14 @@ function DropdownProfile({ align }: DropdownProfileProps) {
             </div>
           </div>
           <div className='tw-px-2 tw-py-1'>
-            <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700  tw-border tw-border-gray-300 focus:tw-border-indigo-500 focus:tw-outline-none tw-shadow">
+            <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700 tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
               {languageOptions.map((option, index) => (
                 <option key={index} value={option.value} className='tw-font-bold tw-py-2'>
                   {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
                 </option>
               ))}
             </select>
+
           </div>
           <ul>
             <li>
@@ -266,16 +270,6 @@ function DropdownProfile({ align }: DropdownProfileProps) {
             <li>
               <Link
                 className="tw-font-medium tw-text-sm tw-text-gray-500 hover:tw-text-teal-600 tw-flex tw-items-center tw-py-1 tw-px-6"
-                to="/blog"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                <NewspaperIcon className="tw-mr-2" />
-                {t('dropdown.blog')}
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="tw-font-medium tw-text-sm tw-text-gray-500 hover:tw-text-teal-600 tw-flex tw-items-center tw-py-1 tw-px-6"
                 to="/settings"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
@@ -302,7 +296,7 @@ function DropdownProfile({ align }: DropdownProfileProps) {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
                   <AdminPanelSettingsIcon className="tw-mr-2" />
-                  {t('dropdown.gottoadmin')}
+                  {t('dropdown.gotoadmin')}
                 </Link>
               </li>
             )}
