@@ -25,7 +25,6 @@ const QuestionBox: React.FC<IProps> = (props) => {
     const { listQuestion, setListQuestion } = useListQuestion()
     const { result, setResult } = useResult()
     const {openResult, setOpenResult} = useOpenResult()
-
     const handleAnswer = (yourAnswer: string) => {
         const newListAnswer = listAnswer.map((answer: IAnswer) => {
             if (answer.questionId === currentQuestion.id) {
@@ -55,20 +54,20 @@ const QuestionBox: React.FC<IProps> = (props) => {
         }
     }
     const renderQuestion = (question: IQuestion) => {
-        if (question.questionType === 1) {
+        if (question?.questionType === 1) {
             return <QuestionV1 question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer} />
         }
-        if (question.questionType === 2) {
+        if (question?.questionType === 2) {
             return <QuestionV2  question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer}/>
         }
-        if (question.questionType === 3) {
+        if (question?.questionType === 3) {
             return <QuestionV3  question={question}  yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer}/>
         }
         return <></>
     }
     return (
         <Box display={props.isOpen ? "block" : "none"}>
-            <SpeakerV1 text={currentQuestion.content!} label="Đọc câu hỏi" autoSpeak />
+            <SpeakerV1 text={currentQuestion?.content!} label="Đọc câu hỏi" autoSpeak />
             {renderQuestion(currentQuestion)}
             <Button
                 variant="contained"

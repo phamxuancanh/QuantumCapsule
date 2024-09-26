@@ -165,7 +165,14 @@
             "last_change": "Lần thay đổi mật khẩu cuối cùng",
             "old_password": "Mật khẩu cũ",
             "new_password": "Mật khẩu mới",
-            "confirm_password": "Xác nhận mật khẩu"
+            "confirm_password": "Xác nhận mật khẩu",
+            "uploadImage": "Tải ảnh lên",
+            "selectAnImage": "Chọn ảnh",
+            "editIMG": "Chỉnh sửa",
+            "zoom": "Phóng to",
+            "rotate": "Xoay",
+            "skip": "Bỏ qua",
+            "save": "Lưu"
         },
         "search": {
             "search_filter": "Bộ lọc tìm kiếm",

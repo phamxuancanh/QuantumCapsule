@@ -819,7 +819,7 @@ function Profile() {
             <div className='tw-rounded-full tw-bg-sky-700 tw-w-32 tw-h-32 tw-flex tw-items-center tw-justify-center tw-cursor-pointer'>
               <AddPhotoAlternateIcon className='tw-text-slate-300 tw-cursor-pointer' fontSize='large' />
             </div>
-            <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>Upload Image</div>
+            <div className='tw-font-bold hover:tw-text-gray-700 tw-cursor-pointer'>{t('profile.uploadImage')}</div>
           </div>
           <input
             type='file'
@@ -831,7 +831,7 @@ function Profile() {
         </div>
       </AVTChangeModal>
       <ZoomModal
-        title={t('profile.zoom')}
+        title={t('profile.editIMG')}
         modalOpen={zoomModalAVTOpen}
         setModalOpen={setZoomModalAVTOpen}
       >
@@ -848,7 +848,7 @@ function Profile() {
             rotate={rotate}
           />
           <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
-            Zoom
+            {t('profile.zoom')}
           </label>
           <input
             type="range"
@@ -869,8 +869,9 @@ function Profile() {
             value={zoom}
             onChange={handleInputZoomChange}
           />
+          <div></div>
           <label className="tw-col-span-2 tw-text-sm tw-font-semibold tw-text-dark-2">
-            Rotate
+            {t('profile.rotate')}
           </label>
           <input
             type="range"
@@ -893,10 +894,10 @@ function Profile() {
           />
         </>
         <div className='tw-flex tw-justify-between tw-m-3 tw-font-bold'>
-          <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Skip</div>
+          <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>{t('profile.skip')}</div>
           <div className='tw-flex tw-space-x-4'>
-            <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>Cancel</div>
-            <div className='tw-cursor-pointer hover:tw-text-gray-700 tw-bg-teal-300 hover:tw-bg-teal-500 tw-rounded-md tw-px-3 tw-py-1' onClick={handleSaveAVT}>Save</div>
+            <div className='tw-cursor-pointer hover:tw-text-gray-700 hover:tw-underline tw-py-1' onClick={() => setZoomModalAVTOpen(false)}>{t('profile.cancel')}</div>
+            <div className='tw-cursor-pointer hover:tw-text-gray-700 tw-bg-teal-300 hover:tw-bg-teal-500 tw-rounded-md tw-px-3 tw-py-1' onClick={handleSaveAVT}>{t('profile.save')}</div>
           </div>
         </div>
       </ZoomModal>
