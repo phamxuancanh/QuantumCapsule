@@ -2,6 +2,7 @@ import { Box, Button } from "@mui/material"
 import { insertListAnswer } from "api/answer/answer.api"
 import { insertResult } from "api/result/result.api"
 import {
+    useIsSumited,
     useListAnswer,
     useListQuestion,
     useResult,
@@ -19,11 +20,14 @@ interface IProps {
 const SubmitResultBox: React.FC<IProps> = (props) => {
     const { listAnswer } = useListAnswer()
     const { listQuestion } = useListQuestion()
+    const {setIsSumited} = useIsSumited()
     const {result} = useResult()
     const handleSubmit = async () => {
         try {
             const res2 = await insertResult(result)        
             const res1 = await insertListAnswer(listAnswer)
+            toast.success("Nộp bài thành công")
+            setIsSumited(true)
         } catch (error: any) {
             toast.error(error.message)
             toast.error(error.message)
@@ -31,7 +35,7 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     }
     const renderYourAnswer = () => {
         return (
-            <Box>
+            <Box >
                 {listQuestion.map((question, index) => {
                     if (question.questionType === 1) {
                         return (

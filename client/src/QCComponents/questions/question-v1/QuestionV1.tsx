@@ -1,4 +1,5 @@
 import {
+    Box,
     Card,
     colors,
     FormControl,
@@ -11,6 +12,7 @@ import {
 import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import React from "react"
+import { render } from "react-dom"
 
 interface IProps {
     question: IQuestion
@@ -22,6 +24,26 @@ interface IProps {
 const QuestionV1: React.FC<IProps> = (props) => {
     // Implement your component logic here
     const { question, onAnswer } = props
+
+    function renderColor(answer: { value: string; label: string | undefined}) {
+        if(props.mode === "result" && props.yourAnswer?.isCorrect) {
+            if (props.yourAnswer?.yourAnswer === answer.value) {
+                return "#4caf50"
+            }
+            return "#000"
+        }
+        if(props.mode === "result" && !props.yourAnswer?.isCorrect) {
+            if (props.yourAnswer?.yourAnswer === answer.value) {
+                return "#f44336"
+            }
+            if (props.question?.correctAnswer === answer.value) {
+                return "#4caf50"
+            }
+            return "#000"
+        }
+        return "#000"
+    }
+
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
             { value: "a", label: question.A },
@@ -36,10 +58,16 @@ const QuestionV1: React.FC<IProps> = (props) => {
                     <FormControlLabel
                         value={answer.value}
                         control={<Radio />}
-                        label={answer.label}
+                        label={ 
+                            <Typography style={{color: renderColor(answer)}}>
+                                {answer.label}
+                            </Typography>
+                        }
                         key={index}
                         checked={props.yourAnswer?.yourAnswer === answer.value}
                         disabled={props.mode === "result" || props.mode === "submit"}
+                        sx={{ color: renderColor(answer) }}
+                        color={renderColor(answer)}
                     />
                 )
             }
@@ -63,6 +91,17 @@ const QuestionV1: React.FC<IProps> = (props) => {
                     {renderAllAnswerNotNull(question)}
                 </RadioGroup>
             </FormControl>
+            {props.mode === "result" && (
+                <Box>
+                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontWeight={600}>
+                        {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
+                    </Typography>
+                    <Typography color={"#1E201E"} fontWeight={600}>
+                        {question.explainAnswer}
+                    </Typography>
+
+                </Box>
+            )}
         </Card>
     )
 }

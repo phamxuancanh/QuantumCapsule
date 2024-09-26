@@ -2,6 +2,7 @@ import { IAnswer } from "api/answer/answer.interfaces";
 import { IQuestion } from "api/question/question.interfaces";
 import { IResult } from "api/result/result.interface";
 import { generateAnswerUID, generateResultUID } from "./GenerateUID";
+import { getFromLocalStorage } from "utils/functions";
 
 
 const randomOrderAnswer = (): string =>{
@@ -39,4 +40,8 @@ export const InitResult = (totalScore: number, examId: string, userId: string): 
     }
 }
 
+export const getUserIDLogin = () => {
+    const curentUser = getFromLocalStorage<any>('persist:auth')
+    return curentUser.currentUser.id
+}
 

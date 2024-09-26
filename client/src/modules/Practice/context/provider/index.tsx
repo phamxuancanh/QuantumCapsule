@@ -39,6 +39,10 @@ export interface IProvider {
         openResult: boolean
         setOpenResult: React.Dispatch<React.SetStateAction<boolean>>
     }
+    isSumited: {
+        isSumited: boolean
+        setIsSumited: React.Dispatch<React.SetStateAction<boolean>>
+    }
 }
 
 const Provider: React.FC<IProps> = ({ children }) => {
@@ -50,6 +54,7 @@ const Provider: React.FC<IProps> = ({ children }) => {
     const [currentQuestion, setCurrentQuestion] = React.useState<IQuestion>({})
     const [result, setResult] = React.useState<IResult>({})
     const [openResult, setOpenResult] = React.useState<boolean>(false)
+    const [isSumited, setIsSumited] = React.useState<boolean>(false)
 
     const state: IProvider = {
         examId: {
@@ -79,6 +84,10 @@ const Provider: React.FC<IProps> = ({ children }) => {
         openResult: {
             openResult,
             setOpenResult
+        },
+        isSumited: {
+            isSumited,
+            setIsSumited
         }
     }
     return <Context.Provider value={state}>{children}</Context.Provider>
