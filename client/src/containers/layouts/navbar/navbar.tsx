@@ -31,7 +31,7 @@ const Navbar = () => {
     }
   }
   const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState<{ id: string; name: string; type: string }[]>([])
+  const [suggestions, setSuggestions] = useState<{ id: string; name: string; type: string, Chapter: any }[]>([])
   const fetchSuggestions = debounce(async (value: string) => {
     try {
       const response = await getSuggestions(value);
@@ -45,7 +45,6 @@ const Navbar = () => {
     const response = await getLessonsandExams({ params: { search: searchTerm } });
     console.log(response.data);
     setSuggestions([]);
-    // Encode the search term to make it URL-safe
     const encodedSearchTerm = encodeURIComponent(searchTerm);
     navigate(`${ROUTES.search_result}?name=${encodedSearchTerm}`);
   };
@@ -84,7 +83,7 @@ const Navbar = () => {
                 <div className="tw-relative">
                   <input
                     type="text"
-                    placeholder="Tìm kiếm bài học, bài tập..."
+                    placeholder={t('navbar.search_placeholder')}
                     value={searchTerm}
                     onChange={handleSearch}
                     onKeyDown={handleKeyPress}
@@ -104,6 +103,7 @@ const Navbar = () => {
                       >
                         <div>{suggestion.name}</div>
                         <div className="tw-text-sm">({suggestion.type})</div>
+                        {/* <div>{suggestion?.Chapter?.grade}</div> */}
                       </li>
                     ))}
                   </ul>
@@ -115,45 +115,9 @@ const Navbar = () => {
                 onClick={handleSearchClick}
                 className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500 tw-flex-shrink-0"
               >
-                Tìm
+                {t('navbar.search')}
               </button>
             </div>
-
-            {/* <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-py-2">
-              <div className="tw-flex-grow tw-mx-4">
-                <div className="tw-relative">
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm bài học, bài tập..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    onKeyDown={handleKeyPress}
-                    className="tw-w-full tw-pl-10 tw-pr-4 tw-py-2 tw-rounded-full tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
-                  />
-                  <SearchIcon className="tw-absolute tw-left-3 tw-top-1/2 tw-transform -tw-translate-y-1/2 tw-text-gray-400" />
-                </div>
-                {suggestions.length > 0 && (
-                  <ul className="tw-relative tw-bg-white tw-border tw-border-gray-300 tw-mt-1 tw-w-full tw-max-h-96 tw-overflow-y-auto tw-z-50 tw-shadow-2xl tw-rounded-b-lg">
-                    {suggestions.map((suggestion) => (
-                      <li
-                        key={suggestion.id}
-                        className="tw-p-2 hover:tw-bg-gray-100 hover:tw-font-bold tw-cursor-pointer tw-flex tw-justify-between"
-                        onClick={() => setSearchTerm(suggestion.name)}
-                      >
-                        <div>{suggestion.name}</div>
-                        <div className='tw-text-sm'>({suggestion.type})</div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <button
-                onClick={handleSearchClick}
-                className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500"
-              >
-                Tìm
-              </button>
-            </div> */}
           </div>
 
           <div className="tw-flex tw-items-center tw-space-x-3 tw-w-1/5 tw-justify-end">
@@ -171,36 +135,26 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      {/* CHUA DANG NHAP HOAC PHU HUYNH*/}
+      {/* HOC SINH */}
       <div className='tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-flex tw-justify-center tw-bg-green-400'>
         <div className="tw-flex tw-items-center tw-justify-between tw-h-16 tw--mb-px tw-w-3/5">
-          <div className="tw-hidden lg:tw-flex lg:tw-items-center lg:tw-justify-center lg:tw-flex-1 lg:tw-space-x-2">
+          <div className="tw-flex tw-items-center tw-justify-center tw-flex-1 tw-space-x-2">
             <Link to="/skill_list" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/skill_list' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Vao hoc
+              {t('navbar.learning')}
             </Link>
-            <Link to="/gift-exchange" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('gift-exchange') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('about') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Doi qua
+            <Link to="/recommendations" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/recommendations' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
+            {t('navbar.journal')}
             </Link>
-            <Link to="/analysis-intro" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('analysis-intro') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Danh gia
-            </Link>
-            <Link to="/arena" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('arena') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Dau truong
-            </Link>
-            <Link to="/package" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('package') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Mua khoa hoc
+            <Link to="/dashboard-report" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/dashboard-report' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
+            {t('navbar.evaluation')}
             </Link>
             <Link to="/news" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('news') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Tin tuc
-            </Link>
-            <Link to="/gianhangvio" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('gianhangvio') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Gian hang Vio
+            {t('navbar.news')}
             </Link>
           </div>
         </div>
       </div>
-      {/* HOC SINH */}
-      <div className='tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-flex tw-justify-center tw-bg-green-400'>
+      {/* <div className='tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-flex tw-justify-center tw-bg-green-400'>
         <div className="tw-flex tw-items-center tw-justify-between tw-h-16 tw--mb-px tw-w-3/5">
           <div className="tw-hidden lg:tw-flex lg:tw-items-center lg:tw-justify-center lg:tw-flex-1 lg:tw-space-x-2">
             <Link to="/skill_list" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/skill_list' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
@@ -212,30 +166,12 @@ const Navbar = () => {
             <Link to="/dashboard-report" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/dashboard-report' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
               Danh gia
             </Link>
-            <Link to="/list-award" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/list-award' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Thanh tich
-            </Link>
-            <Link to="/gift-exchange" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('gift-exchange') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('about') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Doi qua
-            </Link>
-            <Link to="/arena-mass-battle/game" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('/arena-mass-battle/game') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Dau truong
-            </Link>
-            <Link to="/arena" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/arena' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Thach dau
-            </Link>
-            <Link to="/package" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('package') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Mua khoa hoc
-            </Link>
             <Link to="/news" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('news') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
               Tin tuc
             </Link>
-            <Link to="/gianhangvio" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('gianhangvio') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
-              Gian hang Vio
-            </Link>
           </div>
         </div>
-      </div>
+      </div> */}
     </header>
   )
 }

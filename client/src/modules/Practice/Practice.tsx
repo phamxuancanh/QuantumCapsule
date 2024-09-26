@@ -59,9 +59,6 @@ const Practice: React.FC = () => {
     }, [])
 
     return (
-        // <div>Practice
-        //     {examId}
-        // </div>
         <Grid container spacing={2}>
             <Grid item xs={9}>
                 <QuestionBox

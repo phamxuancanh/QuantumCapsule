@@ -174,6 +174,154 @@ const getLessonByChapterId = async (req, res, next) => {
 }
 
 // get lessons and exams
+// const getLessonsandExams = async (req, res, next) => {
+//   try {
+//     const {
+//       page = '1',
+//       size = '10',
+//       search: nameCondition,
+//       type,
+//       subjectId,
+//       grade
+//     } = req.query
+
+//     const offset = (Number(page) - 1) * Number(size)
+//     const limit = Number(size)
+
+//     const searchConditions = {
+//       where: {},
+//       include: [{
+//         model: models.Chapter,
+//         where: {}
+//       }]
+//     }
+
+//     if (nameCondition) {
+//       searchConditions.where.name = {
+//         [Op.like]: `%${nameCondition}%`
+//       }
+//     }
+
+//     if (subjectId) {
+//       searchConditions.include[0].where.subjectId = subjectId
+//     }
+//     if (grade) {
+//       searchConditions.include[0].where.grade = grade
+//     }
+
+//     if (type === 'lesson') {
+//       const totalLessons = await models.Lesson.count(searchConditions)
+
+//       const lessons = await models.Lesson.findAll({
+//         ...searchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const lessonsWithType = lessons.map(lesson => ({
+//         ...lesson.dataValues,
+//         type: 'Lesson'
+//       }))
+
+//       return res.json({
+//         data: lessonsWithType,
+//         totalLessons,
+//         totalExams: 0,
+//         totalRecords: totalLessons,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     } else if (type === 'exam') {
+//       const totalExams = await models.Exam.count(searchConditions)
+
+//       const exams = await models.Exam.findAll({
+//         ...searchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const examsWithType = exams.map(exam => ({
+//         ...exam.dataValues,
+//         type: 'Exam'
+//       }))
+
+//       return res.json({
+//         data: examsWithType,
+//         totalLessons: 0,
+//         totalExams,
+//         totalRecords: totalExams,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     }
+
+//     const totalLessons = await models.Lesson.count(searchConditions)
+//     const totalExams = await models.Exam.count(searchConditions)
+//     const totalRecords = totalLessons + totalExams
+
+//     if (offset >= totalRecords) {
+//       return res.json({
+//         data: [],
+//         totalLessons,
+//         totalExams,
+//         totalRecords,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     }
+
+//     let combinedResults = []
+
+//     if (offset < totalLessons) {
+//       const lessons = await models.Lesson.findAll({
+//         ...searchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const lessonsWithType = lessons.map(lesson => ({
+//         ...lesson.dataValues,
+//         type: 'Lesson'
+//       }))
+
+//       combinedResults = [...lessonsWithType]
+//     }
+
+//     if (combinedResults.length < limit) {
+//       const remainingLimit = limit - combinedResults.length
+//       const examOffset = Math.max(0, offset - totalLessons)
+
+//       const exams = await models.Exam.findAll({
+//         ...searchConditions,
+//         limit: remainingLimit,
+//         offset: examOffset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const examsWithType = exams.map(exam => ({
+//         ...exam.dataValues,
+//         type: 'Exam'
+//       }))
+
+//       combinedResults = [...combinedResults, ...examsWithType]
+//     }
+
+//     res.json({
+//       data: combinedResults,
+//       totalLessons,
+//       totalExams,
+//       totalRecords,
+//       currentPage: Number(page),
+//       size: limit
+//     })
+//   } catch (error) {
+//     console.error('Error searching lessons and exams:', error)
+//     res.status(500).json({ message: 'Error searching lessons and exams' })
+//   }
+// }
 const getLessonsandExams = async (req, res, next) => {
   try {
     const {
@@ -192,7 +340,11 @@ const getLessonsandExams = async (req, res, next) => {
       where: {},
       include: [{
         model: models.Chapter,
-        where: {}
+        where: {},
+        include: [{
+          model: models.Subject,
+          attributes: ['id', 'name']
+        }]
       }]
     }
 
@@ -209,6 +361,18 @@ const getLessonsandExams = async (req, res, next) => {
       searchConditions.include[0].where.grade = grade
     }
 
+    const mapResultsWithSubject = (results, type) => {
+      return results.map(result => {
+        const { id, name } = result.Chapter.Subject
+        return {
+          ...result.dataValues,
+          subjectId: id,
+          subjectName: name,
+          type // Thêm type vào kết quả
+        }
+      })
+    }
+
     if (type === 'lesson') {
       const totalLessons = await models.Lesson.count(searchConditions)
 
@@ -219,10 +383,7 @@ const getLessonsandExams = async (req, res, next) => {
         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
-      const lessonsWithType = lessons.map(lesson => ({
-        ...lesson.dataValues,
-        type: 'Lesson'
-      }))
+      const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
 
       return res.json({
         data: lessonsWithType,
@@ -242,10 +403,7 @@ const getLessonsandExams = async (req, res, next) => {
         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
-      const examsWithType = exams.map(exam => ({
-        ...exam.dataValues,
-        type: 'Exam'
-      }))
+      const examsWithType = mapResultsWithSubject(exams, 'Exam')
 
       return res.json({
         data: examsWithType,
@@ -282,10 +440,7 @@ const getLessonsandExams = async (req, res, next) => {
         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
-      const lessonsWithType = lessons.map(lesson => ({
-        ...lesson.dataValues,
-        type: 'Lesson'
-      }))
+      const lessonsWithType = mapResultsWithSubject(lessons, 'lesson')
 
       combinedResults = [...lessonsWithType]
     }
@@ -301,10 +456,7 @@ const getLessonsandExams = async (req, res, next) => {
         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
-      const examsWithType = exams.map(exam => ({
-        ...exam.dataValues,
-        type: 'Exam'
-      }))
+      const examsWithType = mapResultsWithSubject(exams, 'exam')
 
       combinedResults = [...combinedResults, ...examsWithType]
     }
@@ -322,7 +474,6 @@ const getLessonsandExams = async (req, res, next) => {
     res.status(500).json({ message: 'Error searching lessons and exams' })
   }
 }
-
 // get suggestions
 const getSuggestions = async (req, res, next) => {
   try {

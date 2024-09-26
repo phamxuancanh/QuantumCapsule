@@ -11,13 +11,16 @@ const Answer = sequelize.define(
       unique: true,
       primaryKey: true
     },
+    yourAnswer: {
+      type: DataTypes.STRING
+    },
     questionType: {
       type: DataTypes.INTEGER
     },
     isCorrect: {
       type: DataTypes.BOOLEAN
     },
-    scoresheetId: {
+    resultId: {
       type: DataTypes.STRING
     },
     questionId: {

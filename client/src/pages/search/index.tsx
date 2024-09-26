@@ -7,6 +7,8 @@ import { styled } from '@mui/system'
 import { Pagination } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { getListSubject } from 'api/subject/subject.api';
+import ROUTES from 'routes/constant';
+import { useTranslation } from 'react-i18next'
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
@@ -71,6 +73,7 @@ function SearchResultPage() {
       justifyContent: 'center'
     }
   })
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const query = useQuery();
   const initialPage = parseInt(query.get('page') || '1', 10);
@@ -136,18 +139,17 @@ function SearchResultPage() {
   ];
 
   const classOptions = [
-    { value: 1, label: 'Khối 1' },
-    { value: 2, label: 'Khối 2' },
-    { value: 3, label: 'Khối 3' },
-    { value: 4, label: 'Khối 4' },
-    { value: 5, label: 'Khối 5' },
-    { value: 6, label: 'Khối 6' },
-    { value: 7, label: 'Khối 7' },
-    { value: 8, label: 'Khối 8' },
-    { value: 9, label: 'Khối 9' },
-    { value: 10, label: 'Khối 10' },
-    { value: 11, label: 'Khối 11' },
-    { value: 12, label: 'Khối 12' }
+    { value: 1, label: '1' },
+    { value: 2, label: '2' },
+    { value: 3, label: '3' },
+    { value: 4, label: '4' },
+    { value: 5, label: '5' },
+    { value: 6, label: '6' },
+    { value: 7, label: '7' },
+    { value: 8, label: '8' },
+    { value: 9, label: '9' },
+    { value: 10, label: '11' },
+    { value: 12, label: '12' }
   ];
 
   useEffect(() => {
@@ -189,55 +191,102 @@ function SearchResultPage() {
     queryParams.set('page', value.toString());
     navigate(`?${queryParams.toString()}`);
   };
-
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+  const handleLessonExamClick = (type: 'theory' | 'exam' | 'lesson', id: string) => {
+    console.log(type, id);
+    if (type === 'lesson') {
+      navigate(`${ROUTES.lessonDetail}?lessonId=${id}`);
+    } else if (type === 'exam') {
+      // Xử lý khi type là 'exam'
+      // lam tiep di Nam
+      navigate(`${ROUTES.skill_practice}?examId=${id}`);
+      alert(`Exam ID: ${id}`);
+    }
+  };
+  const formatOptionLabelSubject = ({ label }: { label: string }) => {
+      switch (label) {
+          case 'Toán':
+              return t('search.math');
+          case 'Tiếng Việt':
+              return t('search.literature');
+          default:
+              return label;
+      }
+  };
+  const formatOptionLabelType = ({ label }: { label: string }) => {
+    switch (label) {
+        case 'Exam':
+            return t('search.exam');
+        case 'Lesson':
+            return t('search.lesson');
+        default:
+            return label;
+    }
+};
+  const formatOptionLabelGrade = ({ label }: { label: string }) => `${t('search.grade')} ${label}`;
+  
   return (
-    <div className="tw-mt-4 tw-flex tw-items-center tw-flex-col">
+    <div className="tw-mt-4 tw-flex tw-items-center tw-flex-col tw-min-h-screen">
       <div className='tw-w-4/5 tw-p-2'>
-        <h2 className="tw-text-lg tw-font-bold">Bộ lọc tìm kiếm</h2>
+        <h2 className="tw-text-lg tw-font-bold">{t('search.search_filter')}</h2>
         <div className="tw-flex tw-space-x-4 tw-mb-4">
           <div className="tw-w-1/3">
-            <label className="tw-block tw-mb-1">Chọn môn học:</label>
+            <label className="tw-block tw-mb-1">{t('search.choose_subject')}:</label>
             <Select
-  options={subjects}
-  value={subjects.find(option => option.value === selectedSubject)}
-  onChange={handleSubjectChange}
-  placeholder="Tất cả môn học"
-/>
-          </div>
-
-          <div className="tw-w-1/3">
-            <label className="tw-block tw-mb-1">Chọn loại học liệu:</label>
-            <Select
-              options={typeOptions as any}
-              value={typeOptions.find(option => option.value === selectedType)}
-              onChange={handleTypeChange}
-              placeholder="Tất cả loại"
+              options={subjects}
+              value={subjects.find(option => option.value === selectedSubject)}
+              onChange={handleSubjectChange}
+              placeholder={t('search.allSubject')}
+              formatOptionLabel={formatOptionLabelSubject}
             />
           </div>
 
           <div className="tw-w-1/3">
-            <label className="tw-block tw-mb-1">Chọn lớp:</label>
+            <label className="tw-block tw-mb-1">{t('search.choose_learning_materials')}:</label>
+            <Select
+              options={typeOptions as any}
+              value={typeOptions.find(option => option.value === selectedType)}
+              onChange={handleTypeChange}
+              placeholder={t('search.allLearningMaterials')}
+              formatOptionLabel={formatOptionLabelType}
+            />
+          </div>
+
+          <div className="tw-w-1/3">
+            <label className="tw-block tw-mb-1">{t('search.choose_grade')}:</label>
             <Select
               options={classOptions as any}
               value={classOptions.find(option => option.value === Number(selectedGrade))}
               onChange={handleClassChange}
-              placeholder="Tất cả lớp"
+              placeholder={t('search.allGrade')}
+              formatOptionLabel={formatOptionLabelGrade}
             />
           </div>
         </div>
       </div>
       <div className='tw-w-4/5 tw-p-2'>
-        <h2 className="tw-text-lg tw-font-bold">Kết quả tìm kiếm:</h2>
-
-        {results?.data?.length > 0 ? (
-          results?.data?.map((result: any) => (
-            <div key={result.id} className="tw-py-2 tw-border-b">
-              {result.name} ({result.type})
-            </div>
-          ))
-        ) : (
-          <p>Không có kết quả nào.</p>
-        )}
+        <h2 className="tw-text-lg tw-font-bold">{t('search.search_result')}:</h2>
+        <div className='tw-flex tw-flex-col tw-space-y-3'>
+          {results?.data?.length > 0 ? (
+            results?.data?.map((result: any) => (
+              <div>
+                <div key={result.id} className="tw-py-2 tw-border-b tw-rounded-md tw-cursor-pointer tw-bg-slate-200 tw-p-2" onClick={() => handleLessonExamClick(result?.type, result?.id)}>
+                <div className="tw-flex tw-space-x-2">
+                    <div>{result.Chapter?.Subject?.name}</div>
+                    <div>{result.Chapter?.grade}</div>
+                  </div>
+                  <div className='tw-font-bold'>
+                    {result.name} ({capitalizeFirstLetter(result.type)}) 
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Không có kết quả nào.</p>
+          )}
+        </div>
       </div>
       <div className='tw-flex tw-justify-center tw-mt-10 md:tw-mt-5 lg:tw-mt-3'>
         <CustomPagination

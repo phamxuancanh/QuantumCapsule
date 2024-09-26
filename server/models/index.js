@@ -11,7 +11,7 @@ const Theory = require('./theory')
 const Exam = require('./exam')
 const Question = require('./question')
 const Answer = require('./answer')
-const Scoresheet = require('./scoresheet')
+const Result = require('./result')
 const Comment = require('./comment')
 const Notification = require('./notification')
 const NotificationRecipient = require('./notification_recipient')
@@ -53,11 +53,11 @@ Theory.belongsTo(Chapter, { foreignKey: 'lessonId' })
 Question.hasMany(Answer, { foreignKey: 'questionId' })
 Answer.belongsTo(Question, { foreignKey: 'questionId' })
 
-Scoresheet.hasMany(Answer, { foreignKey: 'scoresheetId' })
-Answer.belongsTo(Scoresheet, { foreignKey: 'scoresheetId' })
+Result.hasMany(Answer, { foreignKey: 'resultId' })
+Answer.belongsTo(Result, { foreignKey: 'resultId' })
 
-User.hasMany(Scoresheet, { foreignKey: 'userId' })
-Scoresheet.belongsTo(User, { foreignKey: 'userId' })
+User.hasMany(Result, { foreignKey: 'userId' })
+Result.belongsTo(User, { foreignKey: 'userId' })
 
 Comment.belongsTo(Theory, { foreignKey: 'theoryId' })
 Comment.belongsTo(User, { foreignKey: 'userId' })
@@ -99,7 +99,7 @@ module.exports = {
     Question,
     ExamQuestion,
     Answer,
-    Scoresheet,
+    Result,
     Notification,
     NotificationRecipient,
     Comment,

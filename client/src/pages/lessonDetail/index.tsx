@@ -12,7 +12,10 @@ import { IChapter } from 'api/chapter/chapter.interface';
 import { getChapterById } from 'api/chapter/chapter.api';
 import { useNavigate } from 'react-router-dom';
 import ROUTES from 'routes/constant';
+import { useTranslation } from 'react-i18next'
+
 const LessonDetail = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
     const [lesson, setLesson] = useState(location.state?.lesson || null);
@@ -103,17 +106,13 @@ const LessonDetail = () => {
         if (type === 'theory') {
             navigate(`${ROUTES.learning}?theoryId=${id}`);
         } else if (type === 'exam') {
-            // Xử lý khi type là 'exam'
-            // lam tiep di Nam
             navigate(`${ROUTES.skill_practice}?examId=${id}`);
-            alert(`Exam ID: ${id}`);
-            // Thực hiện các hành động khác cho 'exam' tại đây
         }
     };
     return (
-        <div className='tw-flex tw-items-center tw-justify-center'>
+        <div className='tw-flex tw-justify-center tw-min-h-screen'>
             {lesson ? (
-                <div className='tw-w-4/5 tw-space-y-2'>
+                <div className='tw-mt-32 tw-w-4/5 tw-space-y-2'>
                     <div className='tw-flex tw-items-center'>
                         <div onClick={handleTitleClick} className='tw-font-bold tw-text-xl tw-inline-flex tw-items-center tw-cursor-pointer tw-text-gray-500 hover:tw-text-green-500'>
                             {getSubjectName(chapter?.subjectId || '')} {chapter?.grade} - Chân trời sáng tạo
@@ -126,7 +125,7 @@ const LessonDetail = () => {
                     <div className='tw-font-bold tw-text-3xl'>{lesson.name}</div>
                     <div className='tw-flex tw-shadow-2xl tw-border tw-rounded-lg'>
                         <div className='tw-w-1/2 tw-p-4 tw-space-y-3'>
-                            <h1 className='tw-text-xl tw-font-bold'>Lý thuyết</h1>
+                            <h1 className='tw-text-xl tw-font-bold'>{t('lessonDetail.theory')}</h1>
                             <ul className='tw-space-y-1'>
                                 {theories && theories.length > 0 ? (
                                     theories.map((theory, index) => (
@@ -140,12 +139,12 @@ const LessonDetail = () => {
                                         </li>
                                     ))
                                 ) : (
-                                    <li className='tw-text-gray-500'>Không có bài lý thuyết</li>
+                                    <li className='tw-text-gray-500'>{t('lessonDetail.not_have_theory')}</li>
                                 )}
                             </ul>
                         </div>
                         <div className='tw-w-1/2 tw-p-4 tw-space-y-3'>
-                            <h1 className='tw-text-xl tw-font-bold'>Luyện tập</h1>
+                            <h1 className='tw-text-xl tw-font-bold'>{t('lessonDetail.practice')}</h1>
                             <ul className='tw-space-y-1'>
                                 {exams && exams.length > 0 ? (
                                     exams.map((exam, index) => (
@@ -159,7 +158,7 @@ const LessonDetail = () => {
                                         </li>
                                     ))
                                 ) : (
-                                    <li className='tw-text-gray-500'>Không có bài luyện tập</li>
+                                    <li className='tw-text-gray-500'>{t('lessonDetail.not_have_practice')}</li>
                                 )}
                             </ul>
                         </div>

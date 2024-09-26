@@ -1,4 +1,3 @@
-// socket.js
 let io
 
 function init (server) {

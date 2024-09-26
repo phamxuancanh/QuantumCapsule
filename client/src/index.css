@@ -26,3 +26,47 @@
     background-color: #e5e7eb;
     /* Màu nền của thanh cuộn */
 }
+.plyr__video-embed {
+    width: 80%;
+    aspect-ratio: 16 / 9;
+  }
+  
+  .plyr__video-embed iframe {
+    pointer-events: none;
+    unicode-bidi: isolate;
+  }
+  
+  .plyr__video-embed iframe {
+      top: 0%;
+      height: 200%;
+  }
+  .plyr {
+    &--paused {
+      @extend .plyr--stopped;
+    }
+  
+    &__poster {
+      background-size: cover;
+      z-index: 2;
+    }
+  }
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  
+  .plyr__video-embed iframe {
+    position: relative;
+  }
+  
+  .video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .plyr__video-embed iframe::before {
+    display: none !important;
+  }
+  .plyr iframe[id^=youtube] {   top: -50%;   height: 200%; }
+   

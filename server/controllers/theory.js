@@ -142,10 +142,37 @@ const deleteTheory = async (req, res, next) => {
   }
 }
 // get a theory by id
+// const getTheoryById = async (req, res, next) => {
+//   try {
+//     const { id } = req.params
+
+//     const theory = await models.Theory.findByPk(id, {
+//       attributes: [
+//         'id',
+//         'lessonId',
+//         'name',
+//         'summary',
+//         'url',
+//         'type',
+//         'order',
+//         'status'
+//       ]
+//     })
+
+//     if (!theory) {
+//       return res.json({ data: null, message: 'Theory not found' })
+//     }
+//     res.json({ theory })
+//   } catch (error) {
+//     console.error('Error fetching theory:', error)
+//     res.status(500).json({ message: 'Error fetching theory' })
+//   }
+// }
 const getTheoryById = async (req, res, next) => {
   try {
     const { id } = req.params
-
+    console.log('id', id)
+    // Tìm kiếm thông tin của Theory
     const theory = await models.Theory.findByPk(id, {
       attributes: [
         'id',
@@ -162,7 +189,17 @@ const getTheoryById = async (req, res, next) => {
     if (!theory) {
       return res.json({ data: null, message: 'Theory not found' })
     }
-    res.json({ theory })
+
+    const lesson = await models.Lesson.findByPk(theory.lessonId, {
+      attributes: ['name']
+    })
+
+    const data = {
+      ...theory.dataValues,
+      lessonName: lesson ? lesson.name : null
+    }
+
+    res.json({ data })
   } catch (error) {
     console.error('Error fetching theory:', error)
     res.status(500).json({ message: 'Error fetching theory' })

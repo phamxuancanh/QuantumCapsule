@@ -1,5 +1,5 @@
 const { models } = require('../models')
-
+// get list subject
 const getListSubject = async (req, res, next) => {
   try {
     const subjects = await models.Subject.findAll({
@@ -24,7 +24,32 @@ const getListSubject = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching subjects' })
   }
 }
+const getSubjectById = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const subject = await models.Subject.findByPk(id, {
+      attributes: [
+        'id',
+        'name',
+        'image_on',
+        'image_off',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
 
+    if (!subject) {
+      return res.status(404).json({ message: 'Subject not found' })
+    }
+
+    res.json({ data: subject })
+  } catch (error) {
+    console.error('Error fetching subject:', error)
+    res.status(500).json({ message: 'Error fetching subject' })
+  }
+}
 module.exports = {
-  getListSubject
+  getListSubject,
+  getSubjectById
 }

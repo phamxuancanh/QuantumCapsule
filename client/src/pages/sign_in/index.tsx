@@ -14,6 +14,7 @@ import loginImage from 'assets/bb.jpg'
 import { ClockLoader, PacmanLoader } from "react-spinners"
 import { loginState } from '../../redux/auth/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import CryptoJS from 'crypto-js'
 import socket from 'services/socket/socket'
 const theme = createTheme();
 const SignIn = () => {
@@ -31,67 +32,123 @@ const SignIn = () => {
     const [loading, setLoading] = useState(false)
     const handleFacebookSignIn = async () => {
         try {
-            const result = await facebookSignIn()
-            console.log(result)
+            const result = await facebookSignIn();
             if (result) {
                 const currentUser = {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
+                };
+                console.log(currentUser.currentUser.key);
+                let data: string | undefined;
+                const userRole = currentUser?.currentUser.key;
+                if (userRole) {
+                    try {
+                        const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication');
+                        data = giaiMa.toString(CryptoJS.enc.Utf8);
+                    } catch (error) {
+                        console.error('Decryption error:', error);
+                    }
                 }
-                setToLocalStorage('persist:auth', JSON.stringify(currentUser))
-                dispatch(loginState(currentUser.currentUser))
-                navigate(ROUTES.home)
+
+                console.log(currentUser);
+                setToLocalStorage('persist:auth', JSON.stringify(currentUser));
+                dispatch(loginState(currentUser.currentUser));
+
+                if (data === 'R1' || data === 'R2') {
+                    navigate(ROUTES.admin);
+                } else {
+                    navigate(ROUTES.home);
+                }
+
                 socket.on('connection', () => {
-                    console.log('User Connect')
-                  })
-                toast.success(t('signIn.success'))
+                    console.log('User Connect');
+                });
+                toast.success(t('signIn.success'));
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
     const handleGoogleSignIn = async () => {
         try {
-            const result = await googleSignIn()
-            console.log(result)
+            const result = await googleSignIn();
+            console.log(result);
             if (result) {
                 const currentUser = {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
+                };
+                console.log(currentUser.currentUser.key);
+                let data: string | undefined;
+                const userRole = currentUser?.currentUser.key;
+                if (userRole) {
+                    try {
+                        const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication');
+                        data = giaiMa.toString(CryptoJS.enc.Utf8);
+                    } catch (error) {
+                        console.error('Decryption error:', error);
+                    }
                 }
-                console.log(currentUser)
-                setToLocalStorage('persist:auth', JSON.stringify(currentUser))
-                dispatch(loginState(currentUser.currentUser))
-                navigate(ROUTES.home)
+
+                console.log(currentUser);
+                setToLocalStorage('persist:auth', JSON.stringify(currentUser));
+                dispatch(loginState(currentUser.currentUser));
+
+                if (data === 'R1' || data === 'R2') {
+                    navigate(ROUTES.admin);
+                } else {
+                    navigate(ROUTES.home);
+                }
+
                 socket.on('connection', () => {
-                    console.log('User Connect')
-                  })
-                toast.success(t('signIn.success'))
+                    console.log('User Connect');
+                });
+                toast.success(t('signIn.success'));
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
     const handleGithubSignIn = async () => {
         try {
-            const result = await githubSignIn()
+            const result = await githubSignIn();
             if (result) {
                 const currentUser = {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
+                };
+                console.log(currentUser.currentUser.key);
+                let data: string | undefined;
+                const userRole = currentUser?.currentUser.key;
+                if (userRole) {
+                    try {
+                        const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication');
+                        data = giaiMa.toString(CryptoJS.enc.Utf8);
+                    } catch (error) {
+                        console.error('Decryption error:', error);
+                    }
                 }
-                setToLocalStorage('persist:auth', JSON.stringify(currentUser))
-                dispatch(loginState(currentUser.currentUser))
-                navigate(ROUTES.home)
+
+                console.log(currentUser);
+                setToLocalStorage('persist:auth', JSON.stringify(currentUser));
+                dispatch(loginState(currentUser.currentUser));
+
+                // Kiểm tra giá trị của data và chuyển hướng nếu cần thiết
+                if (data === 'R1' || data === 'R2') {
+                    navigate(ROUTES.admin);
+                } else {
+                    navigate(ROUTES.home);
+                }
+
                 socket.on('connection', () => {
-                    console.log('User Connect')
-                  })
-                toast.success(t('signIn.success'))
+                    console.log('User Connect');
+                });
+                toast.success(t('signIn.success'));
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
     const handleRememberCheckboxChange = (event: any) => {
         setRememberChecked(event.target.checked);
     };
@@ -230,18 +287,19 @@ const SignIn = () => {
             </div>
             <div className="tw-flex lg:tw-relative lg:tw-w-3/5 tw-w-full tw-items-center tw-justify-between">
                 <img src={loginImage} alt="loginImg" className="tw-absolute tw-h-full tw-w-full lg:tw-hidden tw-hidden sm:tw-block" />
-                {/* <div className="tw-flex tw-z-20  tw-items-center tw-justify-center lg:tw-h-full sm:tw-h-screen tw-h-full lg:tw-w-full tw-w-full"> */}
                 <div className="tw-flex tw-z-20 tw-items-center tw-justify-center lg:tw-h-full sm:tw-h-screen tw-min-h-screen lg:tw-w-full tw-w-full">
+                    <div className="tw-fixed tw-top-0 tw-right-0 tw-m-4">
+                        <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700 tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
+                            {languageOptions.map((option, index) => (
+                                <option key={index} value={option.value} className='tw-font-bold tw-py-2'>
+                                    {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <div className="tw-w-4/5 lg:tw-w-3/5 tw-bg-gray-200 tw-bg-opacity-25 tw-rounded-3xl tw-p-5">
                         <div className="tw-text-teal-500 tw-font-bold tw-text-2xl tw-text-center">{t('signIn.title')}</div>
                         <form className="tw-mt-8 tw-space-y-6" action="#" method="POST" onSubmit={handleLogin}>
-                            <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700  tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
-                                {languageOptions.map((option, index) => (
-                                    <option key={index} value={option.value} className='tw-font-bold tw-py-2'>
-                                        {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
-                                    </option>
-                                ))}
-                            </select>
                             <div className="tw-space-y-7">
                                 <div>
                                     <div className="tw-relative tw-border-2 tw-border-teal-300 tw-rounded-2xl">

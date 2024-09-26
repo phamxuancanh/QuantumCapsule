@@ -8,6 +8,7 @@ export interface ITheory {
     type?: string
     order?: number
     status?: boolean
+    lessonName?: string
 }
 
 export interface ListTheoryParams {

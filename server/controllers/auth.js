@@ -325,59 +325,6 @@ const sendOTP = async (req, res, next) => {
     next(error)
   }
 }
-// const sendOTP = async (req, res, next) => {
-//   try {
-//     const { email, captchaValue, type } = req.body.data
-//     console.log(req.body.data, 'req.body.data')
-//     if (!email || !captchaValue) {
-//       return res.status(400).json({ message: 'Missing email or captcha token.' })
-//     }
-//     const captchaVerifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-//       params: {
-//         secret: process.env.SECRET_KEY_CAPTCHA,
-//         response: captchaValue
-//       }
-//     })
-
-//     if (!captchaVerifyResponse.data.success) {
-//       return res.status(400).json({ message: 'Invalid CAPTCHA. Please try again.' })
-//     }
-
-//     const user = await models.User.findOne({ where: { email } })
-//     if (!user) {
-//       return res.status(400).json({ message: 'User not found.' })
-//     }
-//     const otp = Math.floor(100000 + Math.random() * 900000)
-//     const otpExpire = new Date()
-//     otpExpire.setMinutes(otpExpire.getMinutes() + 5)
-
-//     await models.User.update({ otp, otpExpire }, { where: { email } })
-
-//     const mailOptions = {
-//       from: 'canhmail292@gmail.com',
-//       to: email,
-//       subject: 'Email Verification Code',
-//       html: `Dear ${user.firstName},<br>
-//         Thank you for using our service.<br><br>
-//         Please confirm your e-mail address by entering the code below into the verification form.<br><br>
-//         <strong>Your OTP is ${otp}. It will expire in 5 minutes.</strong><br><br>
-//         * This is an automated e-mail. Please do not respond to this address.<br>
-//         * Please disregard this message if you receive it and did not request to change your password.`
-//     }
-
-//     transporter.sendMail(mailOptions, function (error, info) {
-//       if (error) {
-//         console.log(error)
-//         return res.status(500).json({ message: 'Failed to send OTP.' })
-//       } else {
-//         console.log('Email sent: ' + info.response)
-//         return res.status(200).json({ success: true, message: 'OTP sent successfully.', otpExpire })
-//       }
-//     })
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 const verifyOTP = async (req, res, next) => {
   try {
     const { email, otp } = req.body.data
@@ -455,7 +402,6 @@ const signInOrRegisterWithFacebook = async (req, res) => {
       lastName: nameParts.slice(1).join(' ') || '',
       email,
       avatar: decodedToken.picture,
-      roleId: 3,
       type: 'facebook',
       emailVerified: true
     }
@@ -468,6 +414,7 @@ const signInOrRegisterWithFacebook = async (req, res) => {
       }
       await existingUser.update(userInfo)
     } else {
+      userInfo.roleId = 3
       existingUser = await models.User.create(userInfo)
     }
     const accessToken = await signAccessToken(existingUser.id)
@@ -500,7 +447,6 @@ const signInOrRegisterWithFacebook = async (req, res) => {
     return res.status(500).json({ message: 'Lỗi khi đăng ký với Facebook' })
   }
 }
-
 const signInOrRegisterWithGoogle = async (req, res) => {
   try {
     const { idToken } = req.body
@@ -517,10 +463,10 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       lastName: nameParts.slice(1).join(' ') || '',
       email,
       avatar: decodedToken.picture,
-      roleId: 3,
       type: 'google',
       emailVerified: true
     }
+
     let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
     if (existingUser) {
       if (existingUser.type !== 'google') {
@@ -530,10 +476,12 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       }
       await existingUser.update(userInfo)
     } else {
+      userInfo.roleId = 3
       existingUser = await models.User.create(userInfo)
     }
+
     const accessToken = await signAccessToken(existingUser.id)
-    console.log(accessToken, 'accessTokenGooogle')
+    console.log(accessToken, 'accessTokenGoogle')
     const refreshToken = await signRefreshToken(existingUser.id)
     console.log(refreshToken, 'refreshToken')
 
@@ -542,6 +490,7 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       sameSite: 'Strict',
       maxAge: 30 * 24 * 60 * 60 * 1000
     })
+
     const expire = new Date()
     expire.setDate(expire.getDate() + 5)
     await models.User.update({ expire }, { where: { id: existingUser.id } })
@@ -560,6 +509,7 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       key: encryptedRole,
       emailVerified: true
     }
+
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
     console.error('Lỗi khi đăng ký với Google:', error)
@@ -582,10 +532,9 @@ const signInOrRegisterWithGitHub = async (req, res) => {
     const primaryEmail = emailData.find((email) => email.primary).email
     const userInfo = {
       firstName: (userData.name && userData.name.split(' ')[0]) || '',
-      lastName: (userData.name && userData.name.split(' ')[1]) || '',
+      lastName: (userData.name && userData.name.split(' ').slice(1).join(' ')) || '',
       email: primaryEmail,
       avatar: userData.avatar_url,
-      roleId: 3,
       type: 'github'
     }
     let existingUser = await models.User.findOne({ where: { email: userInfo.email } })
@@ -597,6 +546,7 @@ const signInOrRegisterWithGitHub = async (req, res) => {
       }
       await existingUser.update(userInfo)
     } else {
+      userInfo.roleId = 3
       existingUser = await models.User.create(userInfo)
     }
     const accessToken = await signAccessToken(existingUser.id)

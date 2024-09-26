@@ -80,39 +80,43 @@ const Admin: React.FC = () => {
     return (
         <div>
             <Box p={2}>
-                <TabMenu 
+                <TabMenu
                     listItems={[
-                        {index: 0, label: 'Exam', item: <ExamManager />},
-                        {index: 1, label: 'Question', item: <QuestionManager />},
-                        {index: 2, label: 'Comment', item: <ComentManager />},
-                        {index: 3, label: 'Theory', item: <TheoryManager />}
+                        { index: 0, label: 'Exam', item: <ExamManager /> },
+                        { index: 1, label: 'Question', item: <QuestionManager /> },
+                        { index: 2, label: 'Comment', item: <ComentManager /> },
+                        { index: 3, label: 'Theory', item: <TheoryManager /> }
                     ]}
                     defaultIndex={0}
                 />
             </Box>
-            <div>
-                <h1>chapter</h1>
-                <ExcelReaderBtn sheetIndex={0} name='import chapter' onUpload={handleImportChapter} />
-            </div>
-            <div>
-                <h1>lesson</h1>
-                <ExcelReaderBtn sheetIndex={1} name='import lesson' onUpload={handleImportLesson} />
-            </div>
-            <div>
-                <h1>exam</h1>
-                <ExcelReaderBtn sheetIndex={2} name='import exam' onUpload={handleImportExam} />
-            </div>
-            <div>
-                <h1>theory</h1>
-                <ExcelReaderBtn sheetIndex={3} name='import theory' onUpload={handleImportTheory} />
-            </div>
-            <div>
-                <h1>question</h1>
-                <ExcelReaderBtn sheetIndex={6} name='import question' onUpload={handleImportQuestion} />
-            </div>
-            <div>
-                <h1>exam - question</h1>
-                <ExcelReaderBtn sheetIndex={5} name='import exam - question' onUpload={handleImportExamQuestion} />
+            <div className='tw-flex tw-justify-center'>
+                <div className='tw-w-11/12'>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Chapter</h1>
+                        <ExcelReaderBtn sheetIndex={0} name='import chapter' onUpload={handleImportChapter} />
+                    </div>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Lesson</h1>
+                        <ExcelReaderBtn sheetIndex={1} name='import lesson' onUpload={handleImportLesson} />
+                    </div>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Exam</h1>
+                        <ExcelReaderBtn sheetIndex={2} name='import exam' onUpload={handleImportExam} />
+                    </div>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Theory</h1>
+                        <ExcelReaderBtn sheetIndex={3} name='import theory' onUpload={handleImportTheory} />
+                    </div>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Question</h1>
+                        <ExcelReaderBtn sheetIndex={6} name='import question' onUpload={handleImportQuestion} />
+                    </div>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Exam - Question</h1>
+                        <ExcelReaderBtn sheetIndex={5} name='import exam - question' onUpload={handleImportExamQuestion} />
+                    </div>
+                </div>
             </div>
 
         </div>

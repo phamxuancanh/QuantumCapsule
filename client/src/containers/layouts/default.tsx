@@ -1,13 +1,15 @@
 import Footer from './footer/footer'
 import Navbar from './navbar/navbar'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import React from 'react'
 
 const Default = () => {
+  const location = useLocation();
+
   return (
     <>
-      <Navbar />
-        <Outlet />
+      {location.pathname !== '/learning' && <Navbar />}
+      <Outlet />
       <Footer />
     </>
   )

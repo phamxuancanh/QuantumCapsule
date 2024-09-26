@@ -14,7 +14,7 @@ const changeAVT = async (req, res, next) => {
     const { id } = req.params
     const image = req.file ? req.file.originalname.split('.') : []
     const fileType = image[image.length - 1]
-    const filePath = `${id}_${Date.now().toString()}.${fileType}`
+    const filePath = `AVT_${id}_${Date.now().toString()}.${fileType}`
     const user = await models.User.findByPk(id)
     if (!user) {
       return res.status(404).json({ message: 'not found' })
