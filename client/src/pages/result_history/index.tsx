@@ -41,6 +41,7 @@ const ResultHistory: React.FC = () => {
     }, []);
 
     return (
+        <div className='tw-min-h-screen'>
         <Box p={3}>
             <Grid container spacing={2}>
                 <Grid item xs={3}>
@@ -62,6 +63,7 @@ const ResultHistory: React.FC = () => {
                 </Grid>
             </Grid>
         </Box>
+        </div>
     );
 };
 

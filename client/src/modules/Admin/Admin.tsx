@@ -114,7 +114,7 @@ const Admin: React.FC = () => {
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Exam - Question</h1>
-                        <ExcelReaderBtn sheetIndex={5} name='import exam - question' onUpload={handleImportExamQuestion} />
+                        <ExcelReaderBtn sheetIndex={4} name='import exam - question' onUpload={handleImportExamQuestion} />
                     </div>
                 </div>
             </div>
