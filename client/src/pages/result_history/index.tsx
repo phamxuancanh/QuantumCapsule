@@ -44,12 +44,42 @@ const ResultHistory: React.FC = () => {
         <div className='tw-min-h-screen'>
         <Box p={3}>
             <Grid container spacing={2}>
-                <Grid item xs={3}>
-                    {listResult.map((result, index) => {
-                        return <Button key={result.id} onClick={()=>{handleClick(result)}}>
-                            {result.examId} - {result.yourScore}/{result.totalScore}
-                        </Button>
-                    })}
+            <Grid item xs={3}>
+                <Typography variant="h3" style={{ textAlign: 'center', marginBottom: '20px', color: '#4caf50' }}>
+                    Lịch sử
+                </Typography>
+                {listResult.map((result, index) => {
+                    return (
+                    <Button
+                        key={result.id}
+                        onClick={() => handleClick(result)}
+                        variant="outlined"
+                        style={{
+                            marginBottom: '10px',
+                            padding: '10px',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            borderRadius: '10px',
+                            color: '#4caf50',
+                            borderColor: '#4caf50',
+                            transition: 'all 0.3s ease-in-out',
+                          }}
+                          onMouseEnter={(e) => {
+                            const button = e.currentTarget as HTMLElement;
+                            button.style.backgroundColor = '#4caf50';
+                            button.style.color = 'white';
+                          }}
+                          onMouseLeave={(e) => {
+                            const button = e.currentTarget as HTMLElement;
+                            button.style.backgroundColor = 'white';
+                            button.style.color = '#4caf50';
+                          }}
+                    >
+                        <span>{result.examId}</span>
+                        <span>{result.yourScore}/{result.totalScore}</span>
+                    </Button>
+                    );
+                })}
                 </Grid>
                 <Grid item xs={9}>
                     <Box p={2}>
