@@ -324,7 +324,7 @@ const Home = () => {
                                         <BarChartIcon className="tw-mr-2" />
                                         <span>{t('homepage.completed')}: 0/{lessonsData.length} {t('homepage.lesson')} ({t('homepage.archived')} 0%)</span>
                                     </div>
-                                    <button className='tw-cursor-pointer tw-bg-red-200 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
+                                    <button className='tw-cursor-pointer tw-bg-green-200 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
                                         <ArrowCircleRightOutlinedIcon className='tw-mr-2' />
                                         {t('homepage.continue_learning')}
                                     </button>
