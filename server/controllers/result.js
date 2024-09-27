@@ -9,7 +9,7 @@ const insertResult = async (req, res, next) => {
         .json({ message: 'Invalid data format or empty data' })
     }
 
-    const resData = await models.Scoresheet.create(result)
+    const resData = await models.Result.create(result)
 
     res
       .status(201)
@@ -25,7 +25,7 @@ const getListResultByUserId = async (req, res, next) => {
     if (!userId) {
       return res.status(400).json({ message: 'Invalid data format or empty data' })
     }
-    const listResult = await models.Scoresheet.findAll({
+    const listResult = await models.Result.findAll({
       where: {
         userId
       }
@@ -44,21 +44,21 @@ const getResultDetail = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid data format' })
     }
 
-    const result = await models.Scoresheet.findOne({
+    const result = await models.Result.findOne({
       where: {
         id: resultId
       }
     })
     const listAnswer = await models.Answer.findAll({
       where: {
-        scoresheetId: resultId
+        resultId
       }
     })
     const listQuestion = await models.Question.findAll({
       where: {
         id: {
           [Sequelize.Op.in]: Sequelize.literal(
-            `(SELECT questionId FROM answers WHERE scoresheetId= '${resultId}')`
+            `(SELECT questionId FROM answers WHERE resultId= '${resultId}')`
           )
         }
       }

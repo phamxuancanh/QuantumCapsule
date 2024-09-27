@@ -9,10 +9,7 @@ const insertListAnswer = async (req, res, next) => {
         .json({ message: 'Invalid data format or empty array' })
     }
 
-    const newList = await models.Answer.bulkCreate(listAnswer.map(answer => ({
-      ...answer,
-      scoresheetId: answer.resultId
-    })))
+    const newList = await models.Answer.bulkCreate(listAnswer)
 
     res
       .status(201)

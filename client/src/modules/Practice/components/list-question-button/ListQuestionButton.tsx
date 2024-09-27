@@ -16,7 +16,7 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
     const { openResult, setOpenResult } = useOpenResult()
     return (
         <Box display={props.isOpen ? "block" : "none"}>
-            <Box sx={{maxHeight: "350px", overflowY: "scroll", background: "#ECDFCC", borderRadius: "5px"}}>
+            <Box sx={{maxHeight: "350px", overflowY: "scroll", borderRadius: "5px"}}>
                 <Grid container spacing={2} p={2}>
                     {listQuestion.map((question) => (
                         <Grid item xs={12} md={4} xl={3} key={question.id}>

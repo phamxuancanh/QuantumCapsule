@@ -25,7 +25,8 @@ const QuestionV2: React.FC<IProps> = (props) => {
     const handleChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-        event.target.value &&
+            console.log(props.yourAnswer);
+            
             props.onAnswer &&
             props.onAnswer(event.target.value)
     }
@@ -46,7 +47,8 @@ const QuestionV2: React.FC<IProps> = (props) => {
                     }}
                     focused
                     color="success"
-                    defaultValue={props.yourAnswer?.yourAnswer}
+                    value={props.yourAnswer?.yourAnswer}
+                    // defaultValue={props.yourAnswer?.yourAnswer}
                     disabled={props.mode === "result" || props.mode === "submit"}
                 />
             </FormControl>

@@ -36,6 +36,8 @@ const QuestionBox: React.FC<IProps> = (props) => {
             }
             return answer
         })
+        console.log(newListAnswer);
+        
         setListAnswer(newListAnswer)
         setResult({
             ...result,
