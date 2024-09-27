@@ -142,7 +142,7 @@ const Navbar = () => {
             <Link to="/skill_list" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/skill_list' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
               {t('navbar.learning')}
             </Link>
-            <Link to="/recommendations" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/recommendations' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
+            <Link to="/result_history" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/result_history' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
             {t('navbar.journal')}
             </Link>
             <Link to="/dashboard-report" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/dashboard-report' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
