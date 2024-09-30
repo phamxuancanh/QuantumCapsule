@@ -110,22 +110,11 @@ function DropdownProfile({ align }: DropdownProfileProps) {
     ]
   }, [])
 
-//   const handleChange = useCallback(
-//     async (e: React.ChangeEvent<HTMLSelectElement>) => {
-//         try {
-//             await i18n.changeLanguage(e.target.value)
-//             setSelectedLanguage(e.target.value)
-//         } catch (error) {
-//             console.log(error)
-//         }
-//     },
-//     [i18n]
-// )
 useEffect(() => {
-  const savedLanguage = localStorage.getItem('selectedLanguage');
+  const savedLanguage = localStorage.getItem('selectedLanguage')
   if (savedLanguage) {
-      setSelectedLanguage(savedLanguage);
-      i18n.changeLanguage(savedLanguage);
+      setSelectedLanguage(savedLanguage)
+      i18n.changeLanguage(savedLanguage)
   }
 }, [i18n]);
 

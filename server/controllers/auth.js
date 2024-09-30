@@ -106,8 +106,6 @@ const signIn = async (req, res, next) => {
 const signUp = async (req, res, next) => {
   try {
     const { firstName, lastName, email, phone, password, city, district, ward, grade, captchaValue } = req.body.data
-
-    // Kiểm tra captcha
     const captchaVerificationUrl = 'https://www.google.com/recaptcha/api/siteverify'
     const captchaResponse = await axios.post(captchaVerificationUrl, null, {
       params: {
@@ -438,6 +436,7 @@ const signInOrRegisterWithFacebook = async (req, res) => {
       lastName: existingUser.lastName,
       email: existingUser.email,
       avatar: existingUser.avatar,
+      grade: existingUser.grade,
       key: encryptedRole,
       emailVerified: true
     }
@@ -506,6 +505,7 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       lastName: existingUser.lastName,
       email: existingUser.email,
       avatar: existingUser.avatar,
+      grade: existingUser.grade,
       key: encryptedRole,
       emailVerified: true
     }
@@ -571,6 +571,7 @@ const signInOrRegisterWithGitHub = async (req, res) => {
       firstName: existingUser.firstName,
       lastName: existingUser.lastName,
       email: existingUser.email,
+      grade: existingUser.grade,
       avatar: existingUser.avatar,
       key: encryptedRole
     }

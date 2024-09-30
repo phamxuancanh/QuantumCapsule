@@ -9,7 +9,8 @@
   import { getFromLocalStorage } from 'utils/functions';
   import { useMemo } from 'react';
   import { jwtDecode } from 'jwt-decode';
-  
+  import CryptoJS from 'crypto-js'
+
   interface IAuthRouteProps {
     children: JSX.Element;
     allowedRoles?: string[];
@@ -42,6 +43,45 @@
       }
     }, [accessToken, allowedRoles]);
   
+    // const publicRoutes = [
+    //   ROUTES.sign_in,
+    //   ROUTES.sign_up,
+    //   ROUTES.forgot_password,
+    //   ROUTES.reset_password,
+    //   ROUTES.email_verify,
+    //   ROUTES.email_verify_send,
+    //   ROUTES.email_verify_success,
+    //   ROUTES.grade_choose
+    // ];
+    // const adminRoutes = [
+    //   ROUTES.admin
+    // ];
+  
+    // if (isAuthenticated && location.pathname === ROUTES.sign_in) {
+    //   return <Navigate to={ROUTES.home} />;
+    // }
+  
+    // if (!isAuthenticated && !publicRoutes.includes(location.pathname)) {
+    //   return <Navigate to={ROUTES.sign_in} />;
+    // }
+    // if (isAuthenticated) {
+    //   const userRoleEncrypted = tokens.currentUser?.key;
+    //   console.log('User role encrypted:', userRoleEncrypted);
+    //   let userRole: string | undefined;
+  
+    //   if (userRoleEncrypted) {
+    //     try {
+    //       const decrypted = CryptoJS.AES.decrypt(userRoleEncrypted, 'Access_Token_Secret_#$%_ExpressJS_Authentication');
+    //       userRole = decrypted.toString(CryptoJS.enc.Utf8);
+    //     } catch (error) {
+    //       console.error('Decryption error:', error);
+    //     }
+    //   }
+    //   console.log('User role:', userRole);
+    //   if (userRole !== 'R1' && userRole !== 'R2' && !tokens.currentUser?.grade && location.pathname !== ROUTES.grade_choose) {
+    //     return <Navigate to={ROUTES.grade_choose} />;
+    //   }
+    // }
     const publicRoutes = [
       ROUTES.sign_in,
       ROUTES.sign_up,
@@ -50,16 +90,44 @@
       ROUTES.email_verify,
       ROUTES.email_verify_send,
       ROUTES.email_verify_success,
+      ROUTES.grade_choose,
     ];
-  
-    if (isAuthenticated && location.pathname === ROUTES.sign_in) {
-      return <Navigate to={ROUTES.home} />;
-    }
   
     if (!isAuthenticated && !publicRoutes.includes(location.pathname)) {
       return <Navigate to={ROUTES.sign_in} />;
     }
   
+    if (isAuthenticated) {
+      const userRoleEncrypted = tokens.currentUser?.key;
+      console.log('User role encrypted:', userRoleEncrypted);
+      let userRole: string | undefined;
+  
+      if (userRoleEncrypted) {
+        try {
+          const decrypted = CryptoJS.AES.decrypt(
+            userRoleEncrypted,
+            'Access_Token_Secret_#$%_ExpressJS_Authentication'
+          );
+          userRole = decrypted.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+          console.error('Decryption error:', error);
+        }
+      }
+  
+      console.log('User role:', userRole);
+  
+      if ((userRole === 'R1' || userRole === 'R2') && location.pathname !== ROUTES.admin) {
+        return <Navigate to={ROUTES.admin} />
+      }
+  
+      if (userRole !== 'R1' && userRole !== 'R2' && location.pathname === ROUTES.admin) {
+        return <Navigate to={ROUTES.home} />
+      }
+  
+      if (userRole !== 'R1' && userRole !== 'R2' && !tokens.currentUser?.grade && location.pathname !== ROUTES.grade_choose) {
+        return <Navigate to={ROUTES.grade_choose} />
+      }
+    }
     return <>{children}</>;
   };
   

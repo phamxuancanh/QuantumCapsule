@@ -67,9 +67,10 @@ const Learning = loadable(async () => await import('pages/learning'), {
 const ResultHistory = loadable(async () => await import('pages/result_history'), {
     fallback: <Loading />
 })
-/**
- * Use <AuthRoute /> to protect authenticate pages
- */
+const GradeChoosePage = loadable(async () => await import('pages/grade_choose'), {
+    fallback: <Loading />
+})
+
 const routes: RouteObject[] = [
     {
         path: ROUTES.sign_in,
@@ -84,6 +85,14 @@ const routes: RouteObject[] = [
         element: (
             <AuthRoute>
                 <SignUp />
+            </AuthRoute>
+        )
+    },
+    {
+        path: ROUTES.grade_choose,
+        element: (
+            <AuthRoute>
+                <GradeChoosePage />
             </AuthRoute>
         )
     },
@@ -137,8 +146,6 @@ const routes: RouteObject[] = [
         children: [
             { index: true, element: <Home /> },
             { path: ROUTES.notfound, element: <NotFound /> },
-            // { path: ROUTES.dev, element: <Dev /> }
-            // { path: ROUTES.forgot_password, element: <ForgotPassword />}
             { path: ROUTES.profile, element: <Profile /> },
             { path: ROUTES.skill_list, element: <SkillList /> },
             { path: ROUTES.admin, element: <Admin /> },
