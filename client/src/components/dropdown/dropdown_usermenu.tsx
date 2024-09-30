@@ -327,7 +327,7 @@ const handleChange = useCallback(
         </div>
         {/* Modal footer */}
         <div className="tw-flex tw-flex-wrap tw-justify-end tw-space-x-2">
-          <div className='tw-space-x-2 tw-flex'>
+          <div className='tw-space-x-2 tw-flex tw-w-1/3'>
             <button className="tw-flex-1 tw-border tw-rounded-lg tw-btn-sm tw-border-slate-300 hover:tw-border-slate-400 tw-text-slate-600 tw-p-2 tw-font-bold tw-text-sm" onClick={(e) => { e.stopPropagation(); setChoiceModalOpen(false) }}>{t('homepage.decline')}</button>
             <button className="tw-flex-1 tw-border tw-rounded-lg tw-btn-sm tw-bg-indigo-500 hover:tw-bg-indigo-600 tw-text-white tw-p-2 tw-font-bold tw-text-sm" onClick={handleLogout}>{t('homepage.continue')}</button>
           </div>

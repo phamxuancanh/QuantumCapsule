@@ -112,7 +112,11 @@
             "not_yet_practice": "Chưa hoàn thành",
             "in_progress": "Đang thực hành",
             "completed": "Đã hoàn thành",
-            "need_improvement": "Còn yếu"
+            "need_improvement": "Còn yếu",
+            "decline": "Hủy",
+            "continue": "Tiếp tục",
+            "logout": "Đăng xuất",
+            "logout_confirm": "Bạn có chắc chắn muốn đăng xuất không?"
         },
         "navbar": {
             "learning": "Vào học",
