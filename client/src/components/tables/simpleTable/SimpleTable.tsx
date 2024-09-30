@@ -262,20 +262,24 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 processRowUpdate={processRowUpdate}
                 slots={{
                     // baseButton: EditToolbar as GridSlots['baseButton'],
-                    toolbar: EditToolbar as GridSlots['toolbar'],
+                    toolbar: EditToolbar as GridSlots['toolbar']
                 }}
                 slotProps={{
+                    pagination: {
+                        labelRowsPerPage: "Số dòng mỗi trang",
+                    },
                     toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent },
                 }}
                 columnVisibilityModel={props.columnVisibilityModel}
                 initialState={{
-                    pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 0 } },
+                    pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 0,}},
                 }}
                 pageSizeOptions={props.pageSizeOptions || [10, 20]}
                 onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
                 getRowId={props.getRowId}
                 rowHeight={props.rowHeight || 60}
                 checkboxSelection={props.checkboxSelection}
+                
             />
         </Box>
     );
