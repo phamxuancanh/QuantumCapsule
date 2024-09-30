@@ -106,13 +106,13 @@ const ExamManager: React.FC<IProps> = () => {
                                 // { field: 'id', headerName: 'ID', width: 70 },
                                 {
                                     field: "content",
-                                    headerName: "Content",
+                                    headerName: "Nội dung",
                                     width: 130,
                                     editable: true
                                 },
                                 {
                                     field: "theoryId",
-                                    headerName: "Theory ID",
+                                    headerName: "Bài lý thuyết",
                                     width: 130,
                                     valueOptions: theoryParams.map(
                                         (item) => {
@@ -127,18 +127,18 @@ const ExamManager: React.FC<IProps> = () => {
                                 },
                                 {
                                     field: "userId",
-                                    headerName: "User ID",
+                                    headerName: "Mã học sinh",
                                     width: 130,
                                 },
                                 {
                                     field: "order",
-                                    headerName: "Order",
+                                    headerName: "Thứ tự",
                                     width: 130,
                                     editable: true,
                                 },
                                 {
                                     field: "status",
-                                    headerName: "Status",
+                                    headerName: "Trạng thái",
                                     width: 130,
                                 },
                             ] as GridColDef[]

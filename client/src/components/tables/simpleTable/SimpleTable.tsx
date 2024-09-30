@@ -52,14 +52,14 @@ function EditToolbar(props: EditToolbarProps) {
     return (
         <GridToolbarContainer>
             <Button color="primary" startIcon={<AddIcon />} onClick={handleClick} variant='outlined'>
-                Add record
+                Thêm mới
             </Button>
             {props.toolbarComponent}
-            <GridToolbarColumnsButton />
-            <GridToolbarDensitySelector/>
-            <GridToolbarExport/>
+            {/* <GridToolbarColumnsButton /> */}
+            {/* <GridToolbarDensitySelector/> */}
+            {/* <GridToolbarExport/> */}
             <Box sx={{ flexGrow: 1 }} />
-            <GridToolbarQuickFilter />
+            <GridToolbarQuickFilter placeholder='Tìm kiếm'/>
         </GridToolbarContainer>
     );
 }
@@ -160,7 +160,7 @@ export default function SimpleTable(props: ISimpleTableProps) {
         {
             field: 'actions',
             type: 'actions',
-            headerName: 'Actions',
+            headerName: '',
             headerClassName: 'table-header',
             width: 100,
             cellClassName: 'actions',
