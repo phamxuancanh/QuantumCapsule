@@ -32,5 +32,6 @@ function checkFileType (file, callback) {
 router.get('/:id', verifyAccessToken, userController.getUserById)
 router.put('/:id', verifyAccessToken, userController.editUserById)
 router.put('/:id/changeAVT', verifyAccessToken, upload.single('avatar'), userController.changeAVT)
+router.put('/:id/assignClassToUser', verifyAccessToken, userController.assignClassToUser)
 
 module.exports = router
