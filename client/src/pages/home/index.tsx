@@ -238,7 +238,7 @@ const Home = () => {
     };
 
     return (
-        <div className='tw-flex tw-items-center tw-justify-center tw-bg-slate-50'>
+        <div className='tw-text-lg tw-flex tw-items-center tw-justify-center tw-bg-slate-50'>
             <div className='tw-w-4/5 tw-mt-16 tw-space-y-16'>
                 <div className='tw-flex tw-space-x-10'>
                     {subjects?.map((subject) => (

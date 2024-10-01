@@ -228,7 +228,7 @@ function SearchResultPage() {
   const formatOptionLabelGrade = ({ label }: { label: string }) => `${t('search.grade')} ${label}`;
   
   return (
-    <div className="tw-mt-4 tw-flex tw-items-center tw-flex-col tw-min-h-screen">
+    <div className="tw-text-lg tw-mt-4 tw-flex tw-items-center tw-flex-col tw-min-h-screen">
       <div className='tw-w-4/5 tw-p-2'>
         <h2 className="tw-text-lg tw-font-bold">{t('search.search_filter')}</h2>
         <div className="tw-flex tw-space-x-4 tw-mb-4">

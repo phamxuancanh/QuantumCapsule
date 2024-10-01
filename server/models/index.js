@@ -19,7 +19,8 @@ const Conversation = require('./conversation')
 const UserConversations = require('./user_conversation')
 const Message = require('./message')
 const ExamQuestion = require('./exam_question')
-
+const Progress = require('./progress')
+const Enrollment = require('./enrollment')
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
 
@@ -65,6 +66,18 @@ Comment.belongsTo(User, { foreignKey: 'userId' })
 Theory.hasMany(Comment, { foreignKey: 'theoryId' })
 User.hasMany(Comment, { foreignKey: 'userId' })
 
+Progress.belongsTo(User, { foreignKey: 'userId' })
+Progress.belongsTo(Theory, { foreignKey: 'theoryId' })
+
+User.belongsToMany(Theory, { through: Progress, foreignKey: 'userId' })
+Theory.belongsToMany(User, { through: Progress, foreignKey: 'theoryId' })
+
+Enrollment.belongsTo(User, { foreignKey: 'userId' })
+Enrollment.belongsTo(Lesson, { foreignKey: 'lessonId' })
+
+User.belongsToMany(Lesson, { through: Enrollment, foreignKey: 'userId' })
+Lesson.belongsToMany(User, { through: Enrollment, foreignKey: 'lessonId' })
+
 NotificationRecipient.belongsTo(User, { foreignKey: 'userId' })
 NotificationRecipient.belongsTo(Notification, { foreignKey: 'notificationId' })
 
@@ -95,6 +108,8 @@ module.exports = {
     Keyword,
     TheoryKeyword,
     Lesson,
+    Progress,
+    Enrollment,
     Exam,
     Question,
     ExamQuestion,

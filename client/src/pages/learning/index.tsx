@@ -240,7 +240,7 @@ const Learning = () => {
     }
   }
   return (
-    <div className='tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-4'>
+    <div className='tw-text-lg tw-flex tw-flex-col tw-items-center tw-justify-center tw-space-y-4'>
 
       <div className=' tw-w-full tw-flex tw-justify-center'>
         <div className='tw-w-4/5 tw-space-x-4 tw-flex tw-items-center tw-pt-4'>

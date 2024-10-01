@@ -50,7 +50,7 @@ const GradeChoosePage = () => {
     };
 
         return (
-            <div className="tw-bg-teal-700 tw-min-h-screen tw-flex tw-items-center tw-justify-center">
+            <div className="tw-text-lg tw-bg-teal-700 tw-min-h-screen tw-flex tw-items-center tw-justify-center">
                 <div className="tw-bg-white tw-p-8 tw-rounded-lg tw-shadow-lg tw-text-center tw-max-w-md tw-w-full">
                     <h1 className="tw-text-2xl tw-font-bold tw-mb-4">Chọn lớp của bạn</h1>
                     <p className="tw-mb-6 tw-text-gray-600">Vui lòng chọn lớp học của bạn từ danh sách dưới đây để tiếp tục.</p>

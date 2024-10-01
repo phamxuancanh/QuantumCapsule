@@ -65,7 +65,7 @@ const Navbar = () => {
     }
   };
   return (
-    <header className='tw-sticky tw-top-0 tw-bg-white tw-border-b tw-border-slate-200 tw-z-30 tw-shadow-bottom tw-flex-col'>
+    <header className='tw-text-lg tw-sticky tw-top-0 tw-bg-white tw-border-b tw-border-slate-200 tw-z-30 tw-shadow-bottom tw-flex-col'>
       <div className='tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-flex tw-justify-center'>
         <div className="tw-flex tw-h-16 tw--mb-px tw-space-x-4 tw-w-3/4 tw-justify-center tw-px-2">
           <div className="tw-flex tw-w-1/5">
