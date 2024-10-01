@@ -48,6 +48,10 @@ const User = sequelize.define(
     birthOfDate: {
       type: DataTypes.DATE
     },
+    starPoint: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: true

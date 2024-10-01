@@ -446,7 +446,7 @@ function Profile() {
     }
   }, [dispatch, navigate])
   return (
-    <div className="tw-flex tw-justify-center">
+    <div className="tw-text-lg tw-flex tw-justify-center">
       <div className='tw-w-10/12 tw-flex tw-space-x-4 tw-mt-5'>
         {/* <div className="tw-w-3/12 tw-p-4 tw-border tw-border-gray-300 tw-rounded-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-white tw-space-y-2"> */}
         <div className="tw-w-3/12 tw-p-4 tw-border tw-border-gray-300 tw-border-b-4 tw-border-b-green-500 tw-rounded-md tw-rounded-b-md tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-white tw-space-y-2 tw-shadow-2xl">
