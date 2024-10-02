@@ -556,47 +556,6 @@ const Home = () => {
                                     </ul>
                                 </div>
                             )}
-                            {/* {selectedChapterId && (
-                                <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
-                                    <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
-                                    <ul className='tw-space-y-2'>
-                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapterId).map((lesson) => (
-                                            <li
-                                                key={lesson.id}
-                                                className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer'
-                                                onClick={() => handleLessonClick(lesson.id)}
-                                            >
-                                                {lesson.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {selectedLessonId && (
-                                <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
-                                    <h2 className='tw-font-bold tw-text-xl'>Theory and Exams</h2>
-                                    <div className='tw-mb-4'>
-                                        <h3 className='tw-font-bold tw-text-lg'>Theory</h3>
-                                        <ul className='tw-space-y-2'>
-                                            {theories[selectedLessonId]?.map((theory) => (
-                                                <li key={theory.id} className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow'>
-                                                    {theory.name}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h3 className='tw-font-bold tw-text-lg'>Exams</h3>
-                                        <ul className='tw-space-y-2'>
-                                            {exams[selectedLessonId]?.map((exam) => (
-                                                <li key={exam.id} className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow'>
-                                                    {exam.name}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )} */}
                         </div>
                     </div>
                 </div>
