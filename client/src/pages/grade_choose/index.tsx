@@ -44,7 +44,7 @@ const GradeChoosePage = () => {
             } else {
                 alert('Vui lòng chọn lớp của bạn');
             }
-        } else {
+        } else { 
             alert('Vui lòng chọn lớp của bạn');
         }
     };
