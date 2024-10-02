@@ -228,22 +228,27 @@ const Home = () => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
     const [selectedChapterId, setSelectedChapterId] = useState(null);
+    const [expandedLessons, setExpandedLessons] = useState<{ [key: string]: boolean }>({});
 
 
     const [theories, setTheories] = useState<{ [key: string]: ITheory[] }>({});
     const [exams, setExams] = useState<{ [key: string]: IExam[] }>({});
-    const [selectedLessonId, setSelectedLessonId] = useState(null);
 
     const handleChapterClick = (chapterId: any) => {
         setSelectedChapterId(chapterId);
-        setSelectedLessonId(null); // Reset selected lesson when a new chapter is selected
     };
 
     const handleLessonClick = async (lessonId: any) => {
-        setSelectedLessonId(lessonId);
-        await fetchTheoriesAndExams(lessonId);
+        setExpandedLessons((prevState) => ({
+            ...prevState,
+            [lessonId]: !prevState[lessonId as string],
+        }));
+
+        if (!expandedLessons[lessonId]) {
+            await fetchTheoriesAndExams(lessonId);
+        }
     };
-    
+
     const fetchTheoriesAndExams = async (lessonId: string) => {
         try {
             const [theoriesResponse, examsResponse] = await Promise.all([
@@ -522,6 +527,46 @@ const Home = () => {
                                                 onClick={() => handleLessonClick(lesson.id)}
                                             >
                                                 {lesson.name}
+                                                {lesson.id !== undefined && expandedLessons[lesson.id] && (
+                                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
+                                                        <div className='tw-mb-4'>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Theory</h3>
+                                                            <ul className='tw-space-y-2'>
+                                                                {theories[lesson.id]?.map((theory) => (
+                                                                    <li key={theory.id} className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow'>
+                                                                        {theory.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Exams</h3>
+                                                            <ul className='tw-space-y-2'>
+                                                                {exams[lesson.id]?.map((exam) => (
+                                                                    <li key={exam.id} className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow'>
+                                                                        {exam.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            {/* {selectedChapterId && (
+                                <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
+                                    <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
+                                    <ul className='tw-space-y-2'>
+                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapterId).map((lesson) => (
+                                            <li
+                                                key={lesson.id}
+                                                className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer'
+                                                onClick={() => handleLessonClick(lesson.id)}
+                                            >
+                                                {lesson.name}
                                             </li>
                                         ))}
                                     </ul>
@@ -551,7 +596,7 @@ const Home = () => {
                                         </ul>
                                     </div>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
