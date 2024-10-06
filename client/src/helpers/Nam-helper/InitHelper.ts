@@ -37,11 +37,26 @@ export const InitResult = (totalScore: number, examId: string, userId: string): 
         status: true,
         examId: examId,
         userId: userId,
+        star: 0,
     }
 }
 
 export const getUserIDLogin = () => {
     const curentUser = getFromLocalStorage<any>('persist:auth')
     return curentUser.currentUser.id
+}
+
+export const caculateStar = (result : IResult): number => {
+    const percent = result.yourScore! / result.totalScore! * 100
+    if (percent >= 90) {
+        return 3
+    }
+    if (percent >= 50) {
+        return 2
+    }
+    if (percent >= 10) {
+        return 1
+    }   
+    return 0
 }
 
