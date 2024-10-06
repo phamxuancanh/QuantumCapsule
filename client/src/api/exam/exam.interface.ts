@@ -5,6 +5,7 @@ export interface IExam {
     lessonId?: string
     chapterId?: string
     status?: boolean
+    star?: number
 }
 
 export interface IExamQuestion {

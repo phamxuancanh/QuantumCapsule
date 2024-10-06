@@ -13,6 +13,7 @@ export interface IResult {
     // lessonId?: string
     examId?: string
     status?: boolean
+    star?: number
 }
 
 export interface IResultDetail {

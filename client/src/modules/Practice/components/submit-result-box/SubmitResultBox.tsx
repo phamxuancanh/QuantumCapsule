@@ -1,6 +1,8 @@
 import { Box, Button } from "@mui/material"
 import { insertListAnswer } from "api/answer/answer.api"
 import { insertResult } from "api/result/result.api"
+import { IResult } from "api/result/result.interface"
+import { caculateStar } from "helpers/Nam-helper/InitHelper"
 import {
     useIsSumited,
     useListAnswer,
@@ -24,7 +26,10 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     const {result} = useResult()
     const handleSubmit = async () => {
         try {
-            const res2 = await insertResult(result)        
+            const res2 = await insertResult({
+                ...result,
+                star: caculateStar(result),
+            } as IResult)        
             const res1 = await insertListAnswer(listAnswer)
             toast.success("Nộp bài thành công")
             setIsSumited(true)

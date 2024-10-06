@@ -118,13 +118,13 @@ const ExamManager: React.FC<IProps> = () => {
                             [
                                 {
                                     field: "name",
-                                    headerName: "Name",
+                                    headerName: "Tên bài tập",
                                     width: 130,
                                     editable: true,
                                 },
                                 {
                                     field: "chapterId",
-                                    headerName: "Chapter ID",
+                                    headerName: "Chương",
                                     width: 130,
                                     valueOptions: chapterParams.map(
                                         (chapter) => {
@@ -139,7 +139,7 @@ const ExamManager: React.FC<IProps> = () => {
                                 },
                                 {
                                     field: "lessonId",
-                                    headerName: "Lesson ID",
+                                    headerName: "Bài học",
                                     width: 130,
                                     valueOptions: lessonParams.map(
                                         (lesson) => {
@@ -154,14 +154,14 @@ const ExamManager: React.FC<IProps> = () => {
                                 },
                                 {
                                     field: "order",
-                                    headerName: "Order",
+                                    headerName: "Sắp xếp",
                                     width: 130,
                                     editable: true,
                                     type: "number",
                                 },
                                 {
                                     field: "status",
-                                    headerName: "Status",
+                                    headerName: "Trạng thái",
                                     width: 130,
                                 },
                             ] as GridColDef[]

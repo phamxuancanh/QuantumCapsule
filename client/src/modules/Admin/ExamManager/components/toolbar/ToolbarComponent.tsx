@@ -20,7 +20,7 @@ const ToolbarComponent: React.FC<IProps> = () => {
     }
     return (
         <Button onClick={e => handleClick(e)}>
-            Add questions
+            Thêm câu hỏi vào bài tập
         </Button>
     );
 };

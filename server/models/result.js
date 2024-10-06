@@ -34,6 +34,11 @@ const Result = sequelize.define(
     examId: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    star: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: false
     }
   },
   {

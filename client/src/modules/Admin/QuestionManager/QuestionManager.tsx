@@ -120,18 +120,18 @@ const ExamManager: React.FC<IProps> = () => {
                     }as IQuestion}
                     columns={[
                         // { field: 'id', headerName: 'ID', width: 70 },
-                        { field: 'questionType', headerName: 'questionType', width: 130, editable: true, type: "number" },
-                        { field: 'title', headerName: 'title', width: 130, editable: true },
-                        { field: 'content', headerName: 'content', width: 130, editable: true },
-                        { field: 'contentImg', headerName: 'contentImg', width: 130, editable: true },
+                        { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
+                        { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
+                        { field: 'content', headerName: 'Nội dung', width: 130, editable: true },
+                        { field: 'contentImg', headerName: 'Ảnh', width: 130, editable: true },
                         { field: 'A', headerName: 'A', width: 130, editable: true },
                         { field: 'B', headerName: 'B', width: 130, editable: true },
                         { field: 'C', headerName: 'C', width: 130, editable: true },
                         { field: 'D', headerName: 'D', width: 130, editable: true },
                         { field: 'E', headerName: 'E', width: 130, editable: true },
-                        { field: 'correctAnswer', headerName: 'correctAnswer', width: 130, editable: true },
-                        { field: 'explainAnswer', headerName: 'explainAnswer', width: 130, editable: true },
-                        { field: 'lessonId', headerName: 'Lesson ID', width: 130, 
+                        { field: 'correctAnswer', headerName: 'Đáp án đúng', width: 130, editable: true },
+                        { field: 'explainAnswer', headerName: 'Giải thích đáp án', width: 130, editable: true },
+                        { field: 'lessonId', headerName: 'Bài học', width: 130, 
                             valueOptions: lessonParams.map((item) => {
                                 return {
                                     value: item.id,
@@ -141,7 +141,7 @@ const ExamManager: React.FC<IProps> = () => {
                             editable: true,
                             type: 'singleSelect',
                         },
-                        { field: 'status', headerName: 'Status', width: 130 }
+                        { field: 'status', headerName: 'Trạng thái', width: 130 }
                     ] as GridColDef[]}
                     onRowClick={(row) => {
                         setDataSelected(row.row)

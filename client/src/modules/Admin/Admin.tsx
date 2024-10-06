@@ -82,10 +82,10 @@ const Admin: React.FC = () => {
             <Box p={2}>
                 <TabMenu
                     listItems={[
-                        { index: 0, label: 'Exam', item: <ExamManager /> },
-                        { index: 1, label: 'Question', item: <QuestionManager /> },
-                        { index: 2, label: 'Comment', item: <ComentManager /> },
-                        { index: 3, label: 'Theory', item: <TheoryManager /> }
+                        { index: 0, label: 'Quản lý bài kiểm tra', item: <ExamManager /> },
+                        { index: 1, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
+                        { index: 2, label: 'Quản lý bình luận', item: <ComentManager /> },
+                        { index: 3, label: 'Quản lý lý thuyết', item: <TheoryManager /> }
                     ]}
                     defaultIndex={0}
                 />
@@ -93,28 +93,28 @@ const Admin: React.FC = () => {
             <div className='tw-flex tw-justify-center'>
                 <div className='tw-w-11/12'>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Chapter</h1>
-                        <ExcelReaderBtn sheetIndex={0} name='import chapter' onUpload={handleImportChapter} />
+                        <h1 className='tw-font-bold'>Chương</h1>
+                        <ExcelReaderBtn sheetIndex={0} name='Nhập dữ liệu chương' onUpload={handleImportChapter} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Lesson</h1>
-                        <ExcelReaderBtn sheetIndex={1} name='import lesson' onUpload={handleImportLesson} />
+                        <h1 className='tw-font-bold'>Bài học</h1>
+                        <ExcelReaderBtn sheetIndex={1} name='Nhập dữ liệu bài học' onUpload={handleImportLesson} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Exam</h1>
-                        <ExcelReaderBtn sheetIndex={2} name='import exam' onUpload={handleImportExam} />
+                        <h1 className='tw-font-bold'>Bài tập</h1>
+                        <ExcelReaderBtn sheetIndex={2} name='Nhập dữ liệu bài tập' onUpload={handleImportExam} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Theory</h1>
-                        <ExcelReaderBtn sheetIndex={3} name='import theory' onUpload={handleImportTheory} />
+                        <h1 className='tw-font-bold'>Lý thuyết</h1>
+                        <ExcelReaderBtn sheetIndex={3} name='Nhập dữ liệu lý thuyết' onUpload={handleImportTheory} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Question</h1>
-                        <ExcelReaderBtn sheetIndex={6} name='import question' onUpload={handleImportQuestion} />
+                        <h1 className='tw-font-bold'>Câu hỏi</h1>
+                        <ExcelReaderBtn sheetIndex={6} name='Nhập dữ liệu Câu hỏi' onUpload={handleImportQuestion} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Exam - Question</h1>
-                        <ExcelReaderBtn sheetIndex={4} name='import exam - question' onUpload={handleImportExamQuestion} />
+                        <h1 className='tw-font-bold'>Bài tập - Câu hỏi</h1>
+                        <ExcelReaderBtn sheetIndex={4} name='Nhập dữ liệu bài tập - câu hỏi' onUpload={handleImportExamQuestion} />
                     </div>
                 </div>
             </div>
