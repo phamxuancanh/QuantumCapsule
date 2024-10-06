@@ -110,7 +110,7 @@ const LessonDetail = () => {
         }
     };
     return (
-        <div className='tw-flex tw-justify-center tw-min-h-screen'>
+        <div className='tw-flex tw-justify-center tw-min-h-screen tw-text-lg'>
             {lesson ? (
                 <div className='tw-mt-32 tw-w-4/5 tw-space-y-2'>
                     <div className='tw-flex tw-items-center'>

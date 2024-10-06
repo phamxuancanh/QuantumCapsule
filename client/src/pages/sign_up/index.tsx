@@ -272,7 +272,7 @@ const SignUp = () => {
 
 
     return (
-        <div className="tw-flex tw-bg-gray-200">
+        <div className="tw-text-lg tw-flex tw-bg-gray-200">
             {loading && (
                 <div className="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-opacity-50">
                     <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">

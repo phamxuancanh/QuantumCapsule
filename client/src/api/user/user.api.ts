@@ -220,3 +220,6 @@ export const changeAVT = async (id: string, payload: any): Promise<AxiosResponse
 export const changePassword = async (id: string, payload: any): Promise<AxiosResponse<any>> => {
   return await requestWithJwt.put<any>(`/auths/${id}/changePassword`, payload);
 }
+export const assignClassToUser = async (id: string, payload: any): Promise<AxiosResponse<any>> => {
+  return await requestWithJwt.put<any>(`/users/${id}/assignClassToUser`, payload);
+}

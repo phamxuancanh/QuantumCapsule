@@ -40,6 +40,7 @@ const changeAVT = async (req, res, next) => {
     res.status(500).json({ message: 'not found' })
   }
 }
+
 const editUserById = async (req, res, next) => {
   try {
     const { id } = req.params
@@ -108,8 +109,29 @@ const getUserById = async (req, res, next) => {
     res.status(500).json({ message: 'not found' })
   }
 }
+const assignClassToUser = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const { grade } = req.body
+    console.log('check grade', grade)
+    console.log('check id', id)
+    if (isNaN(grade)) {
+      return res.status(400).json({ message: 'Grade must be a number' })
+    }
+    const user = await models.User.findByPk(id)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    const updatedUser = await user.update({ grade })
+    res.json(updatedUser)
+  } catch (error) {
+    console.log('Error assigning class to user:', error)
+    res.status(500).json({ message: 'Internal server error' })
+  }
+}
 module.exports = {
   changeAVT,
   getUserById,
-  editUserById
+  editUserById,
+  assignClassToUser
 }

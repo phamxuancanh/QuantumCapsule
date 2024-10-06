@@ -30,6 +30,7 @@ const SignIn = () => {
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
     const [loading, setLoading] = useState(false)
+
     const handleFacebookSignIn = async () => {
         try {
             const result = await facebookSignIn();
@@ -38,7 +39,7 @@ const SignIn = () => {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
                 };
-                console.log(currentUser.currentUser.key);
+    
                 let data: string | undefined;
                 const userRole = currentUser?.currentUser.key;
                 if (userRole) {
@@ -49,17 +50,23 @@ const SignIn = () => {
                         console.error('Decryption error:', error);
                     }
                 }
-
+    
+                if (data !== 'R1' && data !== 'R2' && currentUser.currentUser.grade === null) {
+                    // alert('User grade is null');
+                    navigate(ROUTES.grade_choose);
+                    return;
+                }
+    
                 console.log(currentUser);
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser));
                 dispatch(loginState(currentUser.currentUser));
-
+    
                 if (data === 'R1' || data === 'R2') {
                     navigate(ROUTES.admin);
                 } else {
                     navigate(ROUTES.home);
                 }
-
+    
                 socket.on('connection', () => {
                     console.log('User Connect');
                 });
@@ -72,13 +79,12 @@ const SignIn = () => {
     const handleGoogleSignIn = async () => {
         try {
             const result = await googleSignIn();
-            console.log(result);
             if (result) {
                 const currentUser = {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
                 };
-                console.log(currentUser.currentUser.key);
+    
                 let data: string | undefined;
                 const userRole = currentUser?.currentUser.key;
                 if (userRole) {
@@ -89,17 +95,22 @@ const SignIn = () => {
                         console.error('Decryption error:', error);
                     }
                 }
-
-                console.log(currentUser);
+    
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser));
+    
+                if (data !== 'R1' && data !== 'R2' && currentUser.currentUser.grade === null) {
+                    navigate(ROUTES.grade_choose);
+                    return;
+                }
+    
                 dispatch(loginState(currentUser.currentUser));
-
+    
                 if (data === 'R1' || data === 'R2') {
                     navigate(ROUTES.admin);
                 } else {
                     navigate(ROUTES.home);
                 }
-
+    
                 socket.on('connection', () => {
                     console.log('User Connect');
                 });
@@ -109,6 +120,52 @@ const SignIn = () => {
             console.log(error);
         }
     };
+    // const handleGoogleSignIn = async () => {
+    //     try {
+    //         const result = await googleSignIn();
+    //         if (result) {
+    //             const currentUser = {
+    //                 accessToken: result.accessToken,
+    //                 currentUser: result.currentUser
+    //             };
+    
+    //             let data: string | undefined;
+    //             const userRole = currentUser?.currentUser.key;
+    //             if (userRole) {
+    //                 try {
+    //                     const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication');
+    //                     data = giaiMa.toString(CryptoJS.enc.Utf8);
+    //                 } catch (error) {
+    //                     console.error('Decryption error:', error);
+    //                 }
+    //             }
+    
+    //             if (data !== 'R1' && data !== 'R2' && currentUser.currentUser.grade === null) {
+    //                 // alert('User grade is null');
+    //                 navigate(ROUTES.grade_choose);
+    //                 return;
+    //             }
+    
+    //             console.log(currentUser);
+    //             setToLocalStorage('persist:auth', JSON.stringify(currentUser));
+    //             dispatch(loginState(currentUser.currentUser));
+    
+    //             if (data === 'R1' || data === 'R2') {
+    //                 navigate(ROUTES.admin);
+    //             } else {
+    //                 navigate(ROUTES.home);
+    //             }
+    
+    //             socket.on('connection', () => {
+    //                 console.log('User Connect');
+    //             });
+    //             toast.success(t('signIn.success'));
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
+    
     const handleGithubSignIn = async () => {
         try {
             const result = await githubSignIn();
@@ -117,7 +174,7 @@ const SignIn = () => {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
                 };
-                console.log(currentUser.currentUser.key);
+    
                 let data: string | undefined;
                 const userRole = currentUser?.currentUser.key;
                 if (userRole) {
@@ -128,18 +185,22 @@ const SignIn = () => {
                         console.error('Decryption error:', error);
                     }
                 }
-
+                if (data !== 'R1' && data !== 'R2' && currentUser.currentUser.grade === null) {
+                    // alert('User grade is null');
+                    navigate(ROUTES.grade_choose);
+                    return;
+                }
+    
                 console.log(currentUser);
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser));
                 dispatch(loginState(currentUser.currentUser));
-
-                // Kiểm tra giá trị của data và chuyển hướng nếu cần thiết
+    
                 if (data === 'R1' || data === 'R2') {
                     navigate(ROUTES.admin);
                 } else {
                     navigate(ROUTES.home);
                 }
-
+    
                 socket.on('connection', () => {
                     console.log('User Connect');
                 });
@@ -262,7 +323,7 @@ const SignIn = () => {
         }
     }
     return (
-        <div className="tw-flex tw-bg-gray-200">
+        <div className="tw-text-lg tw-flex tw-bg-gray-200">
             {loading && (
                 <div className="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-opacity-50">
                     <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">
@@ -275,7 +336,6 @@ const SignIn = () => {
                                 borderColor: 'blue'
                             }}
                             loading
-                            // margin={10}
                             speedMultiplier={3}
                             size={40}
                         />

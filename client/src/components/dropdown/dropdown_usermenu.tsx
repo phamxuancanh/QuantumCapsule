@@ -91,7 +91,6 @@ function DropdownProfile({ align }: DropdownProfileProps) {
       console.error(error)
     }
   }, [dispatch, navigate])
-  // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }: { keyCode: number }) => {
       if (!dropdownOpen || keyCode !== 27) return
@@ -107,39 +106,48 @@ function DropdownProfile({ align }: DropdownProfileProps) {
   const languageOptions = useMemo(() => {
     return [
       { label: 'EN', value: 'en', flag: getUnicodeFlagIcon('GB') },
-      { label: 'FR', value: 'fr', flag: getUnicodeFlagIcon('FR') },
-      { label: 'JP', value: 'jp', flag: getUnicodeFlagIcon('JP') },
       { label: 'VN', value: 'vi', flag: getUnicodeFlagIcon('VN') }
     ]
   }, [])
 
-//   const handleChange = useCallback(
-//     async (e: React.ChangeEvent<HTMLSelectElement>) => {
-//         try {
-//             await i18n.changeLanguage(e.target.value)
-//             setSelectedLanguage(e.target.value)
-//         } catch (error) {
-//             console.log(error)
-//         }
-//     },
-//     [i18n]
-// )
+useEffect(() => {
+  const savedLanguage = localStorage.getItem('selectedLanguage')
+  if (savedLanguage) {
+      setSelectedLanguage(savedLanguage)
+      i18n.changeLanguage(savedLanguage)
+  }
+}, [i18n]);
+
 const handleChange = useCallback(
   async (e: any) => {
-    try {
-      const newLanguage = e.target.value
-      await i18n.changeLanguage(newLanguage)
-      setSelectedLanguage(newLanguage)
-      localStorage.setItem('selectedLanguage', newLanguage)
-    } catch (error) {
-      console.log(error)
-    }
+      try {
+          const newLanguage = e.target.value;
+          await i18n.changeLanguage(newLanguage);
+          setSelectedLanguage(newLanguage);
+          localStorage.setItem('selectedLanguage', newLanguage);
+      } catch (error) {
+          console.log(error);
+      }
   },
   [i18n]
-)
-useEffect(() => {
-  i18n.changeLanguage(selectedLanguage)
-}, [selectedLanguage, i18n])
+);
+
+// const handleChange = useCallback(
+//   async (e: any) => {
+//     try {
+//       const newLanguage = e.target.value
+//       await i18n.changeLanguage(newLanguage)
+//       setSelectedLanguage(newLanguage)
+//       localStorage.setItem('selectedLanguage', newLanguage)
+//     } catch (error) {
+//       console.log(error)
+//     }
+//   },
+//   [i18n]
+// )
+// useEffect(() => {
+//   i18n.changeLanguage(selectedLanguage)
+// }, [selectedLanguage, i18n])
 
   const activateLink = useCallback((isLastItem?: boolean) => {
     return ({ isActive }: { isActive: boolean }) => ({
@@ -223,7 +231,11 @@ useEffect(() => {
             </div>
           </div>
           <div className='tw-px-2 tw-py-1'>
-            <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700 tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
+            <select
+              className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700 tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow"
+              value={selectedLanguage}
+              onChange={handleChange}
+            >
               {languageOptions.map((option, index) => (
                 <option key={index} value={option.value} className='tw-font-bold tw-py-2'>
                   {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
@@ -315,7 +327,7 @@ useEffect(() => {
         </div>
         {/* Modal footer */}
         <div className="tw-flex tw-flex-wrap tw-justify-end tw-space-x-2">
-          <div className='tw-space-x-2 tw-flex'>
+          <div className='tw-space-x-2 tw-flex tw-w-1/3'>
             <button className="tw-flex-1 tw-border tw-rounded-lg tw-btn-sm tw-border-slate-300 hover:tw-border-slate-400 tw-text-slate-600 tw-p-2 tw-font-bold tw-text-sm" onClick={(e) => { e.stopPropagation(); setChoiceModalOpen(false) }}>{t('homepage.decline')}</button>
             <button className="tw-flex-1 tw-border tw-rounded-lg tw-btn-sm tw-bg-indigo-500 hover:tw-bg-indigo-600 tw-text-white tw-p-2 tw-font-bold tw-text-sm" onClick={handleLogout}>{t('homepage.continue')}</button>
           </div>

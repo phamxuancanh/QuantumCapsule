@@ -4,6 +4,7 @@ const ROUTES = {
     notfound: '*',
     sign_in: '/sign_in',
     sign_up: '/sign_up',
+    grade_choose: '/grade_choose',
     dev: '/dev',
     forgot_password: '/forgot_password',
     email_verify: '/verify/email',

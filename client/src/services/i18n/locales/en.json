@@ -112,7 +112,11 @@
             "not_yet_practice": "Not yet practice",
             "in_progress": "In progress",
             "completed": "Completed",
-            "need_improvement": "Need improvement"
+            "need_improvement": "Need improvement",
+            "decline": "Decline",
+            "continue": "Continue",
+            "logout": "Logout",
+            "logout_confirm": "Are you sure you want to log out?"
         },
         "navbar": {
             "learning": "Learning",
