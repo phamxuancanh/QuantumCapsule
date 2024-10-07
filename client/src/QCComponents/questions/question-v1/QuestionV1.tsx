@@ -79,7 +79,7 @@ const QuestionV1: React.FC<IProps> = (props) => {
     }
     return (
         <Card sx={{ p: 5 }}>
-            <Typography color={"#FF8A8A"} fontWeight={800}>
+            <Typography color={"#257180"} fontWeight={800}>
                 {question.title}
             </Typography>
             <Typography color={"#1E201E"} fontWeight={600}>

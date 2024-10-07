@@ -32,7 +32,7 @@ const QuestionV2: React.FC<IProps> = (props) => {
     }
     return (
         <Card sx={{ p: 5 }}>
-            <Typography color={"#FF8A8A"} fontWeight={800}>
+            <Typography color={"#257180"} fontWeight={800}>
                 {props.question.title}
             </Typography>
             <Typography color={"#1E201E"} fontWeight={600}>
@@ -50,6 +50,11 @@ const QuestionV2: React.FC<IProps> = (props) => {
                     value={props.yourAnswer?.yourAnswer}
                     // defaultValue={props.yourAnswer?.yourAnswer}
                     disabled={props.mode === "result" || props.mode === "submit"}
+                    sx={{
+                        "& .Mui-disabled": {
+                            WebkitTextFillColor: "#000 !important", // Thay đổi màu chữ khi disabled
+                        }
+                    }}
                 />
             </FormControl>
             {props.mode === "result" && (
