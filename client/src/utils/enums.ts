@@ -66,3 +66,11 @@ export enum IconName {
     face_smile = 'SentimentSatisfiedOutlined',
     face_bored = 'SentimentDissatisfiedOutlined',
 }
+
+export enum DATA_TYPE {
+    STRING = 'string',
+    NUMBER = 'number',
+    DATE = 'date',
+    DATETIME = 'datetime',
+    BOOLEAN = 'boolean',
+}

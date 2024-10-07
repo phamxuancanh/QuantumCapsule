@@ -1,30 +1,21 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Rating, Typography } from '@mui/material';
 import { IAnswer } from 'api/answer/answer.interfaces';
 import { IQuestion } from 'api/question/question.interfaces';
 import { getListResultByUserId, getResultDetailByResultId } from 'api/result/result.api';
 import { IResult, IResultDetail } from 'api/result/result.interface';
+import { time } from 'console';
+import { formatDisplayData } from 'helpers/Nam-helper/FormatData';
 import { getUserIDLogin } from 'helpers/Nam-helper/InitHelper';
+import QCDateFilter, { IDateFilter } from 'QCComponents/QCDateFilter/QCDateFilter';
 import ListResults from 'QCComponents/results/ListResults';
 import React from 'react';
 import { toast } from 'react-toastify';
+import { DATA_TYPE } from 'utils/enums';
 
 const ResultHistory: React.FC = () => {
     const [listResult, setListResult] = React.useState<IResult[]>([]);
-    const [resultDetail, setResultDetail] = React.useState<IResultDetail>(
-        {
-            result: {
-                examId: "",
-                totalScore: 0,
-                yourScore: 0,
-                status: false,
-                timeEnd: new Date(),
-                timeStart: new Date(),
-                userId: "",
-            },
-            listQuestion: [],
-            listAnswer: [],
-        }
-    );
+    const [resultDetail, setResultDetail] = React.useState<IResultDetail>();
+    const [filter, setFilter] = React.useState<IDateFilter>();
     const handleClick = async (result : IResult) => {
         const resultDetail = await getResultDetailByResultId(result.id!);
         setResultDetail(resultDetail.data.data);
@@ -44,50 +35,82 @@ const ResultHistory: React.FC = () => {
         <div className='tw-min-h-screen'>
         <Box p={3}>
             <Grid container spacing={2}>
-            <Grid item xs={3}>
-                <Typography variant="h3" style={{ textAlign: 'center', marginBottom: '20px', color: '#4caf50' }}>
-                    Lịch sử
-                </Typography>
-                {listResult.map((result, index) => {
-                    return (
-                    <Button
-                        key={result.id}
-                        onClick={() => handleClick(result)}
-                        variant="outlined"
-                        style={{
-                            marginBottom: '10px',
-                            padding: '10px',
-                            justifyContent: 'space-between',
-                            width: '100%',
-                            borderRadius: '10px',
-                            color: '#4caf50',
-                            borderColor: '#4caf50',
-                            transition: 'all 0.3s ease-in-out',
-                          }}
-                          onMouseEnter={(e) => {
-                            const button = e.currentTarget as HTMLElement;
-                            button.style.backgroundColor = '#4caf50';
-                            button.style.color = 'white';
-                          }}
-                          onMouseLeave={(e) => {
-                            const button = e.currentTarget as HTMLElement;
-                            button.style.backgroundColor = 'white';
-                            button.style.color = '#4caf50';
-                          }}
-                    >
-                        <span>{result.examId}</span>
-                        <span>{result.yourScore}/{result.totalScore}</span>
-                    </Button>
-                    );
-                })}
+                <Grid item xs={12}>
+                    <QCDateFilter 
+                        onChange={(filter) => {
+                            console.log(filter);
+                        }}
+                    />
                 </Grid>
-                <Grid item xs={9}>
+                <Grid item md={4} xs={12}>
+                    <Typography variant="h3" style={{ textAlign: 'center', marginBottom: '20px', color: '#4caf50' }}>
+                        Lịch sử làm bài
+                    </Typography>
+                    {listResult.map((result, index) => {
+                        return (
+                        <Button
+                            key={result.id}
+                            onClick={() => handleClick(result)}
+                            variant="outlined"
+                            style={{
+                                marginBottom: '10px',
+                                padding: '10px',
+                                width: '100%',
+                                borderRadius: '10px',
+                                color: '#4caf50',
+                                borderColor: '#4caf50',
+                                transition: 'all 0.3s ease-in-out',
+                            }}
+                            onMouseEnter={(e) => {
+                                const button = e.currentTarget as HTMLElement;
+                                button.style.backgroundColor = '#4caf50';
+                                button.style.color = 'white';
+                            }}
+                            onMouseLeave={(e) => {
+                                const button = e.currentTarget as HTMLElement;
+                                button.style.backgroundColor = 'white';
+                                button.style.color = '#4caf50';
+                            }}
+                        >
+                            <Grid container spacing={1} sx={{
+                                width: '100%',
+                            }}>
+                                <Grid item xs={9}>
+                                    <Box>
+                                        <Typography textAlign={"left"}>{result.examName}</Typography>
+                                    </Box>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                    }}>
+                                        <Typography color={"#08C2FF"}>{formatDisplayData(result.timeStart, DATA_TYPE.DATE)}</Typography>
+                                        <Rating name="customized-10" defaultValue={result.star} max={3} readOnly/>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        flexDirection: "column",
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}>
+                                        <Typography color={result.chapterName ? "#FD8B51" : "#10375C"} variant='caption'>
+                                            {result.chapterName ? result.chapterName : result.lessonName}
+                                        </Typography>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Button>
+                        );
+                    })}
+                </Grid>
+                <Grid item md={8} xs={12}>
                     <Box p={2}>
                         <Typography variant="h3" color="#4caf50">Kết quả: {resultDetail?.result.yourScore} / {resultDetail?.result.totalScore}</Typography>
                         <ListResults 
-                            result={resultDetail?.result}
-                            listQuestion={resultDetail?.listQuestion}
-                            listAnswer={resultDetail?.listAnswer}
+                            result={resultDetail?.result ?? {}}
+                            listQuestion={resultDetail?.listQuestion ?? []}
+                            listAnswer={resultDetail?.listAnswer ?? []}
                         />
                     </Box>
                 </Grid>

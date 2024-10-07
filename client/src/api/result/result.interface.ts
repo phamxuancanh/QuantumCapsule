@@ -14,6 +14,9 @@ export interface IResult {
     examId?: string
     status?: boolean
     star?: number
+    examName?: string // for display
+    chapterName?: string // for display
+    lessonName?: string // for display
 }
 
 export interface IResultDetail {

@@ -1,4 +1,5 @@
-const { models } = require('../models')
+const { queries } = require('../helpers/QueryHelper')
+const { models, sequelize } = require('../models')
 const { Sequelize } = require('sequelize')
 const insertResult = async (req, res, next) => {
   try {
@@ -10,6 +11,20 @@ const insertResult = async (req, res, next) => {
     }
 
     const resData = await models.Result.create(result)
+    const query = queries.getStarPointOfUser
+    // Thực hiện truy vấn
+    const resultQuery = await sequelize.query(query, {
+      type: sequelize.QueryTypes.SELECT
+    })
+    const starPoint = resultQuery[0].starPoint ?? 0
+    await models.User.update(
+      { starPoint },
+      {
+        where: {
+          id: result.userId
+        }
+      }
+    )
 
     res
       .status(201)
@@ -25,12 +40,12 @@ const getListResultByUserId = async (req, res, next) => {
     if (!userId) {
       return res.status(400).json({ message: 'Invalid data format or empty data' })
     }
-    const listResult = await models.Result.findAll({
-      where: {
-        userId
-      }
+    const query = queries.getListResultAndExamNameByUserId
+    const resultQuery = await sequelize.query(query, {
+      replacements: { userId },
+      type: sequelize.QueryTypes.SELECT
     })
-    res.status(200).json({ message: 'success', data: listResult })
+    res.status(200).json({ message: 'success', data: resultQuery })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
