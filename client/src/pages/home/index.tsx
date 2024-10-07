@@ -25,6 +25,7 @@ import { IExam } from 'api/exam/exam.interface';
 import { ITheory } from 'api/theory/theory.interface';
 import Select, { ActionMeta, SingleValue } from 'react-select';
 import ROUTES from 'routes/constant';
+import { findProgressByGradeAndSubject } from 'api/progress/progress.api';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -118,7 +119,7 @@ const Home = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedClass, setSelectedClass] = useState<{ value: number; label: string } | null>(null);
-
+    const [numberTheoryDone, setNumberTheoryDone] = useState<number>(0);
     const classes = [
         { value: 1, label: 'Lớp 1' },
         { value: 2, label: 'Lớp 2' },
@@ -148,7 +149,6 @@ const Home = () => {
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject()
-            console.log('Danh sách môn học:', response.data.data);
             setSubjects(response.data.data);
         } catch (error) {
             console.error('Lỗi khi lấy danh sách môn học:', error);
@@ -168,7 +168,6 @@ const Home = () => {
         try {
             const res = await getListChapter({ params });
             setChaptersData(res.data);
-            console.log('Chapters:', res.data);
             if (res.data.data.length > 0) {
                 if (res.data.data[0].id) {
                     setSelectedChapterId(res.data.data[0].id);
@@ -192,7 +191,6 @@ const Home = () => {
     const fetchLessonByChapterId = async (chapterId: string) => {
         try {
             const response = await getLessonByChapterId(chapterId);
-            console.log('Danh sách bài học:', response.data);
             return response.data;
         } catch (error) {
             console.error('Lỗi khi lấy danh sách bài học:', error);
@@ -212,9 +210,7 @@ const Home = () => {
                     if (Array.isArray(lessons.data)) {
                         allLessons.push(...lessons.data);
                     }
-                    console.log(`Danh sách bài học cho chapter ${chapter.id}:`, lessons);
                 }
-                console.log('Tất cả bài học trước khi cập nhật state:', allLessons);
                 setLessonsData(allLessons);
             }
             setLessonLoading(false);
@@ -306,6 +302,18 @@ const Home = () => {
             navigate(`${ROUTES.skill_practice}?examId=${id}`);
         }
     };
+    useEffect(() => {
+        const fetchProgress = async () => {
+            console.log('Selected class:', selectedClass);
+            console.log('Selected subject:', selectedSubject);
+            const progress = selectedClass?.value !== undefined
+                ? await findProgressByGradeAndSubject(selectedClass.value, selectedSubject)
+                : await findProgressByGradeAndSubject(userRedux?.grade ?? 1, selectedSubject);
+            console.log('Progress1:', progress);
+            setNumberTheoryDone(progress?.data.data.length ?? 0);
+        };
+        fetchProgress();
+    }, [location.search]);
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
             <div className='tw-w-4/5 tw-py-5'>
@@ -464,11 +472,13 @@ const Home = () => {
                                                     bgColor='orange'
                                                     className='tw-w-2/3'
                                                     maxCompleted={100}
-                                                    completed={70}
+                                                    completed={numberTheoryDone / lessonsData.length * 100}
                                                 />
                                                 <div className="tw-flex tw-items-center">
                                                     <BarChartIcon className="tw-mr-2" />
-                                                    <span>{t('homepage.completed')}: 0/{lessonsData.length} {t('homepage.lesson')} ({t('homepage.archived')} 0%)</span>
+                                                    <span>
+                                                        {t('homepage.completed')}: {numberTheoryDone}/{lessonsData.length} {t('homepage.lesson')} ({t('homepage.archived')} {lessonsData.length > 0 ? (numberTheoryDone / lessonsData.length * 100).toFixed(2) : '0.00'}%)
+                                                    </span>
                                                 </div>
                                                 <button className='tw-cursor-pointer tw-bg-green-200 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
                                                     <ArrowCircleRightOutlinedIcon className='tw-mr-2' />
@@ -478,7 +488,7 @@ const Home = () => {
                                         </div>
                                         <div className='tw-flex tw-justify-between tw-p-5'>
                                             <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
-                                                <div className='tw-font-bold tw-text-2xl'>0/{lessonsData.length}</div>
+                                                <div className='tw-font-bold tw-text-2xl'>{numberTheoryDone}/{lessonsData.length}</div>
                                                 <div>{capitalizeFirstLetter(t('homepage.lesson'))}</div>
                                             </div>
                                             <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>

@@ -21,7 +21,7 @@ const getListChapter = async (req, res, next) => {
   try {
     const {
       page = '1',
-      size = '15',
+      size = '20',
       search: nameCondition,
       subjectId,
       grade
