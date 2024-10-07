@@ -49,7 +49,7 @@ Lesson.hasMany(Exam, { foreignKey: 'lessonId' })
 Exam.belongsTo(Lesson, { foreignKey: 'lessonId' })
 
 Lesson.hasMany(Theory, { foreignKey: 'lessonId' })
-Theory.belongsTo(Chapter, { foreignKey: 'lessonId' })
+Theory.belongsTo(Lesson, { foreignKey: 'lessonId' })
 
 Question.hasMany(Answer, { foreignKey: 'questionId' })
 Answer.belongsTo(Question, { foreignKey: 'questionId' })
