@@ -3,6 +3,7 @@ const queries = {
     FROM (
         SELECT MAX(r.star) AS max_star
         FROM results r
+        where userId = :userId
         GROUP BY r.userId, r.examId
     ) AS subquery `,
   getListResultAndExamNameByUserId: `SELECT r.*, e.name AS examName, c.name as chapterName, l.name as lessonName
