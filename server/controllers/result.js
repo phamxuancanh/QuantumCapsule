@@ -14,6 +14,7 @@ const insertResult = async (req, res, next) => {
     const query = queries.getStarPointOfUser
     // Thực hiện truy vấn
     const resultQuery = await sequelize.query(query, {
+      replacements: { userId: result.userId },
       type: sequelize.QueryTypes.SELECT
     })
     const starPoint = resultQuery[0].starPoint ?? 0
