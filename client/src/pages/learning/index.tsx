@@ -26,6 +26,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 // import Plyr, { PlyrInstance, usePlyr } from 'plyr-react'
 import Plyr, { APITypes } from 'plyr-react';
 import { toast } from 'react-toastify'
+import { addProgress } from 'api/progress/progress.api'
 interface Comment {
   id?: string;
   theoryId?: string;
@@ -186,15 +187,29 @@ const Learning = () => {
 
     fetchVideoSrc();
   }, [theory]);
+
   useEffect(() => {
-    const handleTimeUpdate = (event: any) => {
+    const handleTimeUpdate = async (event: any) => {
       const newCurrentTime = event.detail.plyr.currentTime;
       console.log('Current Time:', newCurrentTime);
       setCurrentTime(newCurrentTime);
       if (newCurrentTime > playerRef.current.plyr.duration / 2) {
-        toast.success('Bạn đã học xong video này');
-        console.log('End video');
         playerRef.current.plyr.off('timeupdate', handleTimeUpdate);
+        try {
+          if (theory?.id) {
+            const addProgressResponse = await addProgress(theory.id);
+            console.log('Add progress response:', addProgressResponse);
+            if (addProgressResponse.status === 201) {
+              toast.success('Bạn đã học xong video này');
+            } else {
+              console.error('Failed to add progress, status:', addProgressResponse.status);
+            }
+          } else {
+            console.error('Theory ID is missing');
+          }
+        } catch (error) {
+          console.error('Error adding progress:', error);
+        }
       }
     };
   
@@ -214,7 +229,8 @@ const Learning = () => {
         playerRef.current.plyr.off('timeupdate', handleTimeUpdate);
       }
     };
-  }, [playerRef]);
+  }, [playerRef, theory]);
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -263,11 +279,6 @@ const Learning = () => {
           <div className='tw-font-bold tw-text-2xl'>{theory?.name}</div>
         </div>
         <div className="tw-rounded-2xl tw-overflow-hidden 2xl:tw-h-[700px] xl:tw-h-[620px] md:tw-h-[600px] sm:tw-h-[500px] tw-h-[300px]">
-          {/* <YouTube
-            videoId={theory?.url}
-            opts={{ ...opts, width: '100%', height: '100%' }}
-            className="tw-top-0 tw-left-0 tw-w-full tw-h-full"
-          /> */}
           {videoSrc &&
             <Plyr
               ref={playerRef}

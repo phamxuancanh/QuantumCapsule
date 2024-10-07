@@ -6,7 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
 import { getListSubject } from 'api/subject/subject.api';
 import { ISubject } from 'api/subject/subject.interface';
-import { DataListChapter, IChapter, ListChapterParams } from 'api/chapter/chapter.interface';
+import { DataListChapter, ListChapterParams } from 'api/chapter/chapter.interface';
 import { getListChapter } from 'api/chapter/chapter.api';
 import { styled } from '@mui/system'
 import { Pagination } from '@mui/material'
@@ -15,7 +15,6 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import { getLessonByChapterId } from 'api/lesson/lesson.api';
 import { ILesson } from 'api/lesson/lesson.interface';
 import { ClockLoader } from 'react-spinners'
-import PlayLessonIcon from '@mui/icons-material/PlayLesson';
 import { useTranslation } from 'react-i18next'
 import { AppDispatch } from 'redux/store';
 import { fetchUser, selectUser } from '../../redux/auth/authSlice'
@@ -24,7 +23,8 @@ import { getTheoriesByLessonId } from 'api/theory/theory.api';
 import { getExamsByLessonId } from 'api/exam/exam.api';
 import { IExam } from 'api/exam/exam.interface';
 import { ITheory } from 'api/theory/theory.interface';
-
+import Select, { ActionMeta, SingleValue } from 'react-select';
+import ROUTES from 'routes/constant';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -117,6 +117,34 @@ const Home = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const [selectedClass, setSelectedClass] = useState<{ value: number; label: string } | null>(null);
+
+    const classes = [
+        { value: 1, label: 'Lớp 1' },
+        { value: 2, label: 'Lớp 2' },
+        { value: 3, label: 'Lớp 3' },
+    ];
+    const handleClassChange = (newValue: SingleValue<{ value: number; label: string }>, actionMeta: ActionMeta<{ value: number; label: string }>) => {
+        if (newValue) {
+            setSelectedClass(newValue);
+            const queryParams = new URLSearchParams(location.search);
+            queryParams.set('grade', newValue.value.toString());
+            queryParams.set('page', '1');
+            navigate(`?${queryParams.toString()}`);
+        }
+    };
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const currentPage = parseInt(queryParams.get('page') || '1', 10);
+        const currentGrade = parseInt(queryParams.get('grade') || '1', 10);
+        const currentSubject = queryParams.get('subject') || 'subject1';
+        setPage(currentPage);
+        setSelectedSubject(currentSubject);
+        setSelectedClass({ value: currentGrade, label: `Lớp ${currentGrade}` });
+        if (currentSubject && currentGrade) {
+            fetchChapters({ page: currentPage, subjectId: currentSubject, grade: currentGrade });
+        }
+    }, [location.search]);
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject()
@@ -136,28 +164,20 @@ const Home = () => {
         queryParams.set('page', '1');
         navigate(`?${queryParams.toString()}`);
     }
-
     const fetchChapters = async (params?: ListChapterParams) => {
         try {
             const res = await getListChapter({ params });
             setChaptersData(res.data);
             console.log('Chapters:', res.data);
+            if (res.data.data.length > 0) {
+                if (res.data.data[0].id) {
+                    setSelectedChapterId(res.data.data[0].id);
+                }
+            }
         } catch (error) {
             console.log(error);
         }
-    }
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const currentPage = parseInt(queryParams.get('page') || '1', 10);
-        const currentGrade = userRedux?.grade || 1;
-        const currentSubject = queryParams.get('subject') || 'subject1';
-        setPage(currentPage);
-        setSelectedSubject(currentSubject);
-        if (currentSubject && currentGrade) {
-            fetchChapters({ page: currentPage, subjectId: currentSubject, grade: currentGrade });
-        }
-    }, [location.search]);
-
+    };
     const totalPage = useMemo(() => {
         const size = (chaptersData != null) ? chaptersData.size : 5;
         const totalRecord = (chaptersData != null) ? chaptersData.totalRecords : 5;
@@ -202,32 +222,42 @@ const Home = () => {
         fetchAllLessons();
     }, [chaptersData]);
 
-    useEffect(() => {
-        console.log('Lessons data sau khi update:', lessonsData);
-    }, [lessonsData]);
+    const handleExpandAll = async () => {
+        const newExpandedLessons = lessonsData.reduce((acc: { [key: string]: boolean }, lesson) => {
+            if (lesson.id !== undefined) {
+                acc[lesson.id] = true;
+            }
+            return acc;
+        }, {});
 
-    const toggleChapterExpansion = (chapterId: string) => {
-        console.log('Toggle chapter expansion:', chapterId);
-        if (expandedChapters.includes(chapterId)) {
-            setExpandedChapters(expandedChapters.filter(id => id !== chapterId));
-        } else {
-            setExpandedChapters([...expandedChapters, chapterId]);
-        }
-    };
-    const toggleAllChapterExpansion = () => {
-        if (expandedChapters.length === chaptersData?.data.length) {
-            setExpandedChapters([]);
-        } else {
-            setExpandedChapters(chaptersData?.data.map(chapter => chapter.id ?? '') ?? []);
-        }
+        setExpandedLessons(newExpandedLessons);
+        await Promise.all(
+            lessonsData.map(async (lesson) => {
+                if (lesson.id !== undefined) {
+                    await fetchTheoriesAndExams(lesson.id);
+                }
+            })
+        );
     };
 
-    const allChaptersExpanded = expandedChapters.length === chaptersData?.data.length;
+    const handleCollapseAll = () => {
+        setExpandedLessons({});
+    };
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpandCollapse = async () => {
+        if (isExpanded) {
+            handleCollapseAll();
+        } else {
+            await handleExpandAll();
+        }
+        setIsExpanded(!isExpanded);
+    };
 
     const capitalizeFirstLetter = (string: string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
-    const [selectedChapterId, setSelectedChapterId] = useState(null);
+    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
     const [expandedLessons, setExpandedLessons] = useState<{ [key: string]: boolean }>({});
 
 
@@ -269,10 +299,17 @@ const Home = () => {
             console.error('Error fetching theories and exams:', error);
         }
     };
+    const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
+        if (type === 'theory') {
+            navigate(`${ROUTES.learning}?theoryId=${id}`);
+        } else if (type === 'exam') {
+            navigate(`${ROUTES.skill_practice}?examId=${id}`);
+        }
+    };
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
-            <div className='tw-w-4/5'>
-                <div className='tw-bg-red-200'>
+            <div className='tw-w-4/5 tw-py-5'>
+                <div className='tw-bg-transparent'>
                     <div className='tw-flex tw-space-x-10'>
                         {subjects?.map((subject) => (
                             <div
@@ -284,7 +321,6 @@ const Home = () => {
                                     src={selectedSubject === subject.id ? subject.image_on : subject.image_off}
                                     alt={subject.name}
                                 />
-                                {/* <div className='tw-font-bold tw-text-lg'>{subject.name}</div> */}
                                 <div className='tw-font-bold tw-text-lg'>
                                     {subject.name === 'Toán' ? t('homepage.math') : t('homepage.literature')}
                                 </div>
@@ -317,59 +353,7 @@ const Home = () => {
                                     </div>
                                 </div>
                             </div>
-                            {/* <div className='tw-bg-white tw-border tw-rounded-2xl'>
-                                <div className='tw-p-2'>
-                                    {lessonLoading ? (
-                                        <div className='tw-p-5'>
-                                            <ClockLoader
-                                                className='tw-flex tw-justify-center tw-items-center tw-w-full tw-mt-20'
-                                                color='#5EEAD4'
-                                                cssOverride={{
-                                                    display: 'block',
-                                                    margin: '0 auto',
-                                                    borderColor: 'blue'
-                                                }}
-                                                loading
-                                                speedMultiplier={3}
-                                                size={40}
-                                            />
-                                        </div>
-                                    ) : (
-                                        chaptersData?.data.length ?? 0 > 0 ? (
-                                            <div>
-                                                <ul className='tw-space2-y-2'>
-                                                    {chaptersData?.data.map((chapter, index) => (
-                                                        <div key={chapter.id}>
-                                                            <div
-                                                                className='tw-flex tw-justify-between tw-items-center tw-bg-gray-200 tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5'
-                                                            >
-                                                                <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
-                                                                    {index + 1}. {chapter.name}
-                                                                </li>
-                                                                <div>
-                                                                    {lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} {t('homepage.lesson')}
-                                                                    {(currentLanguage === 'en' && lessonsData.filter(lesson => lesson.chapterId === chapter.id).length >= 2) ? 's' : ''}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </ul>
-                                                <div className='tw-flex tw-justify-center tw-mt-10 md:tw-mt-5 lg:tw-mt-3'>
-                                                    <CustomPagination
-                                                        count={totalPage}
-                                                        page={page}
-                                                        onChange={(_, page) => handleChangeChapterPagination(page)}
-                                                        boundaryCount={1}
-                                                        siblingCount={1}
-                                                    />
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className='tw-font-bold tw-text-2xl tw-text-center tw-p-5'>There are currently no lessons</div>
-                                        )
-                                    )}
-                                </div>
-                            </div> */}
+
                             <div className='tw-bg-white tw-border tw-rounded-2xl'>
                                 <div className='tw-p-2'>
                                     {lessonLoading ? (
@@ -428,13 +412,20 @@ const Home = () => {
                         </div>
                     </div>
 
-                    <div className='tw-bg-red-500 tw-w-3/5'>
+                    <div className='tw-bg-transparent tw-w-3/5'>
                         <div>
                             <div className='tw-flex tw-justify-between'>
-                                <div className='tw-text-4xl tw-font-bold'>{(t('homepage.course_content'))}</div>
+                                {/* <div className='tw-text-4xl tw-font-bold'>{t('homepage.course_content')}</div> */}
+                                <Select
+                                    value={selectedClass}
+                                    onChange={handleClassChange}
+                                    options={classes}
+                                    placeholder="Select Class"
+                                    className="tw-w-1/3"
+                                />
                             </div>
-                            <div className='tw-flex tw-w-full tw-space-x-16'>
-                                <div className='tw-flex-col tw-w-full tw-border tw-space-y-5'>
+                            <div className='tw-flex tw-w-full tw-space-x-16 tw-py-5'>
+                                <div className='tw-flex-col tw-w-full tw-space-y-5'>
                                     <div className='tw-w-full tw-border tw-rounded-2xl tw-bg-white'>
                                         <div className='tw-flex tw-justify-between tw-border-b tw-border-dashed tw-p-5 tw-mx-4 tw-space-x-10'>
 
@@ -519,31 +510,51 @@ const Home = () => {
                             {selectedChapterId && (
                                 <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
                                     <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
+                                    <div className='tw-flex tw-justify-end tw-mb-4'>
+                                        <button
+                                            className='tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded-md'
+                                            onClick={toggleExpandCollapse}
+                                        >
+                                            {isExpanded ? 'Thu gọn tất cả' : 'Mở rộng tất cả'}
+                                        </button>
+                                    </div>
                                     <ul className='tw-space-y-2'>
                                         {lessonsData.filter(lesson => lesson.chapterId === selectedChapterId).map((lesson) => (
-                                            <li
-                                                key={lesson.id}
-                                                className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer'
-                                                onClick={() => handleLessonClick(lesson.id)}
-                                            >
-                                                {lesson.name}
+                                            <React.Fragment key={lesson.id}>
+                                                <li
+                                                    className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
+                                                    onClick={() => handleLessonClick(lesson.id)}
+                                                >
+                                                    <span className='tw-font-bold tw-text-lg'>{lesson.name}</span>
+                                                    {lesson.id !== undefined && (
+                                                        expandedLessons[lesson.id] ? <RemoveIcon /> : <AddIcon />
+                                                    )}
+                                                </li>
                                                 {lesson.id !== undefined && expandedLessons[lesson.id] && (
-                                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
-                                                        <div className='tw-mb-4'>
+                                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg tw-flex'>
+                                                        <div className='tw-flex-1'>
                                                             <h3 className='tw-font-bold tw-text-lg'>Theory</h3>
                                                             <ul className='tw-space-y-2'>
                                                                 {theories[lesson.id]?.map((theory) => (
-                                                                    <li key={theory.id} className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow'>
+                                                                    <li
+                                                                        key={theory.id}
+                                                                        className='tw-p-1 tw-text-blue-500 hover:tw-underline tw-cursor-pointer'
+                                                                        onClick={() => handleTheoryExamClick('theory', theory.id ?? '')}
+                                                                    >
                                                                         {theory.name}
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                         </div>
-                                                        <div>
+                                                        <div className='tw-flex-1'>
                                                             <h3 className='tw-font-bold tw-text-lg'>Exams</h3>
                                                             <ul className='tw-space-y-2'>
                                                                 {exams[lesson.id]?.map((exam) => (
-                                                                    <li key={exam.id} className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow'>
+                                                                    <li
+                                                                        key={exam.id}
+                                                                        className='tw-p-1 tw-text-blue-500 hover:tw-underline tw-cursor-pointer'
+                                                                        onClick={() => handleTheoryExamClick('exam', exam.id ?? '')}
+                                                                    >
                                                                         {exam.name}
                                                                     </li>
                                                                 ))}
@@ -551,7 +562,7 @@ const Home = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                            </li>
+                                            </React.Fragment>
                                         ))}
                                     </ul>
                                 </div>
