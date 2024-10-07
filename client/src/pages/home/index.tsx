@@ -461,12 +461,12 @@ const Home = () => {
                                                             {selectedSubject !== 'subject1' && userRedux?.grade === 2 && t('homepage.literature2_title')}
                                                         </div>
                                                     </div>
-                                                    <div>
+                                                    {/* <div>
                                                         {selectedSubject === 'subject1' && userRedux?.grade === 1 && t('homepage.math1_description')}
                                                         {selectedSubject === 'subject1' && userRedux?.grade === 2 && t('homepage.math2_description')}
                                                         {selectedSubject !== 'subject1' && userRedux?.grade === 1 && t('homepage.literature1_description')}
                                                         {selectedSubject !== 'subject1' && userRedux?.grade === 2 && t('homepage.literature2_description')}
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                                 <ProgressBar
                                                     bgColor='orange'
