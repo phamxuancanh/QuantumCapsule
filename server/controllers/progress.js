@@ -71,6 +71,7 @@ const addProgress = async (req, res, next) => {
 // }
 const findProgressByGradeAndSubject = async (req, res, next) => {
   try {
+    const loginedUserId = req.userId
     const { grade, subjectId } = req.query
     console.log('grade:', grade)
     console.log('subjectId:', subjectId)
@@ -84,11 +85,14 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
     }
 
     const progressList = await models.Progress.findAll({
+      where: {
+        userId: loginedUserId // Thêm điều kiện where để chỉ lấy progress của user đã đăng nhập
+      },
       include: [
         {
           model: models.Theory,
           required: true,
-          attributes: ['id'], // Only include the 'id' field of Theory
+          attributes: ['id'], // Chỉ bao gồm trường 'id' của Theory
           include: [
             {
               model: models.Lesson,
@@ -109,7 +113,6 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
       ]
     })
 
-    // Map the results to only include the theory IDs
     const theoryIds = progressList.map(progress => progress.Theory.id)
 
     return res.status(200).json({
@@ -121,6 +124,7 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
     return res.status(500).json({ message: 'An error occurred while retrieving progress', error: error.message })
   }
 }
+
 module.exports = {
   addProgress,
   findProgressByGradeAndSubject
