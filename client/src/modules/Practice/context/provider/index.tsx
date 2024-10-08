@@ -4,6 +4,7 @@ import Context from "../context"
 import { IQuestion } from "api/question/question.interfaces"
 import { IAnswer } from "api/answer/answer.interfaces"
 import { IResult } from "api/result/result.interface"
+import { defaultAction, IAction } from "utils/interfaces"
 
 interface IProps {
     children: React.ReactNode
@@ -42,6 +43,10 @@ export interface IProvider {
     isSumited: {
         isSumited: boolean
         setIsSumited: React.Dispatch<React.SetStateAction<boolean>>
+    },
+    actStarModal: {
+        actStarModal: IAction
+        setActStarModal: React.Dispatch<React.SetStateAction<IAction>>
     }
 }
 
@@ -55,6 +60,7 @@ const Provider: React.FC<IProps> = ({ children }) => {
     const [result, setResult] = React.useState<IResult>({})
     const [openResult, setOpenResult] = React.useState<boolean>(false)
     const [isSumited, setIsSumited] = React.useState<boolean>(false)
+    const [actStarModal, setActStarModal] = React.useState<IAction>(defaultAction)
 
     const state: IProvider = {
         examId: {
@@ -88,6 +94,10 @@ const Provider: React.FC<IProps> = ({ children }) => {
         isSumited: {
             isSumited,
             setIsSumited
+        },
+        actStarModal: {
+            actStarModal,
+            setActStarModal
         }
     }
     return <Context.Provider value={state}>{children}</Context.Provider>

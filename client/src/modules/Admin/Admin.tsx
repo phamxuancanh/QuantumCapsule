@@ -16,7 +16,8 @@ import ComentManager from './ComentManager/CommentManagerProvider';
 import QuestionManager from './QuestionManager/QuestionManagerProvider';
 import TheoryManager from './TheoryManager/TheoryManagerProvider';
 import TabMenu from 'components/menus/tabMenu/TabMenu';
-import { Box } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 const Admin: React.FC = () => {
     const handleImportChapter = async (listData: IChapter[]) => {
         try {
@@ -77,6 +78,15 @@ const Admin: React.FC = () => {
             toast.error(`Error importing exam questions: ${(error as Error).message || error}`);
         }
     };
+    const handleDownloadTemplate = () => {
+        const url = 'https://example.com/template.xlsx'; 
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'template.xlsx'); 
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
     return (
         <div>
             <Box p={2}>
@@ -92,6 +102,13 @@ const Admin: React.FC = () => {
             </Box>
             <div className='tw-flex tw-justify-center'>
                 <div className='tw-w-11/12'>
+                    <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
+                        <h1 className='tw-font-bold'>Tải về file mẫu</h1>
+                        <IconButton onClick={handleDownloadTemplate}>
+                            <FileDownloadIcon />
+                            <Typography>File excel mẫu</Typography>
+                        </IconButton>
+                    </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Chương</h1>
                         <ExcelReaderBtn sheetIndex={0} name='Nhập dữ liệu chương' onUpload={handleImportChapter} />

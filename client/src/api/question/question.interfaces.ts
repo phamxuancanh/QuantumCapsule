@@ -14,6 +14,7 @@ export interface IQuestion {
     // score?: number
     status?: boolean
     lessonId?: string
+    examQuestionId?: string // for display
 }
 
 export interface ListQuesionParams {

@@ -59,5 +59,12 @@ export const useIsSumited = () => {
     }
     return context.isSumited
 }
+export const useActStarModal = () => {
+    const context = useContext(Context)
+    if (!context) {
+        throw new Error("useActStarModal must be used within a Provider")
+    }
+    return context.actStarModal
+}
 
 export default Context

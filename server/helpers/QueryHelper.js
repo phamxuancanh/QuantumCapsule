@@ -12,6 +12,13 @@ const queries = {
     left join chapters c on e.chapterId = c.id
     left join lessons l on e.lessonId = l.id
     WHERE r.userId = :userId
-    order by r.timeStart desc;`
+    and r.timeStart between :from and :to
+    order by r.timeStart desc;`,
+  getListQuestionByExamId: `
+    select q.*, eq.id as examQuestionId
+    from questions q
+    join exam_questions eq on q.id = eq.questionId
+    where examId = :examId
+  `
 }
 module.exports = { queries }

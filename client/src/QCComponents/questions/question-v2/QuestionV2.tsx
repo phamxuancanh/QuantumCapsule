@@ -13,6 +13,7 @@ import {
 import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import React from "react"
+import RenderContentImg from "../render-content-img/RenderContentImg"
 
 interface IProps {
     question: IQuestion
@@ -38,7 +39,7 @@ const QuestionV2: React.FC<IProps> = (props) => {
             <Typography color={"#1E201E"} fontWeight={600}>
                 {props.question.content}
             </Typography>
-            <img src={props.question.contentImg} alt="question" />
+            <RenderContentImg imageContent={props.question.contentImg!}/>
             <FormControl>
                 <FormLabel component="legend">Trả lời ở đây</FormLabel>
                 <TextField

@@ -13,6 +13,7 @@ import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import React from "react"
 import { render } from "react-dom"
+import RenderContentImg from "../render-content-img/RenderContentImg"
 
 interface IProps {
     question: IQuestion
@@ -85,7 +86,8 @@ const QuestionV1: React.FC<IProps> = (props) => {
             <Typography color={"#1E201E"} fontWeight={600}>
                 {question.content}
             </Typography>
-            <img src={question.contentImg} alt="question" />
+            <RenderContentImg imageContent={question.contentImg!}/>
+            {/* <img src={question.contentImg} alt="question" /> */}
             <FormControl>
                 <RadioGroup name="radio-buttons-group" onChange={(e)=>{handleChange(e)}}>
                     {renderAllAnswerNotNull(question)}

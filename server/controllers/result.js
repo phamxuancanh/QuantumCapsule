@@ -38,12 +38,13 @@ const insertResult = async (req, res, next) => {
 const getListResultByUserId = async (req, res, next) => {
   try {
     const { userId } = req.params
+    const { from, to } = req.query
     if (!userId) {
       return res.status(400).json({ message: 'Invalid data format or empty data' })
     }
     const query = queries.getListResultAndExamNameByUserId
     const resultQuery = await sequelize.query(query, {
-      replacements: { userId },
+      replacements: { userId, from, to },
       type: sequelize.QueryTypes.SELECT
     })
     res.status(200).json({ message: 'success', data: resultQuery })
