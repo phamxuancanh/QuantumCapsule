@@ -6,6 +6,7 @@ interface ICustomModalProps {
     open: boolean;
     children: React.ReactNode;
     setOpenModal: (open: boolean) => void;
+    width?: string;
 }
 
 const CustomModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
@@ -17,7 +18,8 @@ const CustomModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: isSmallScreen ? '90%' : isMediumScreen ? '80%' : '75%',
+        width: props.width,
+        // width: props.width ?? isSmallScreen ? '90%' : isMediumScreen ? '80%' : '75%',
         maxWidth: '90%',
         bgcolor: 'background.paper',
         border: '2px solid #000',

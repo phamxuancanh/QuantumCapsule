@@ -1,3 +1,4 @@
+const { queries } = require('../helpers/QueryHelper')
 const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 
@@ -168,12 +169,7 @@ const deleteQuestion = async (req, res, next) => {
 const getListQuestionByExamId = async (req, res, next) => {
   try {
     const { id } = req.params
-    const query = `
-      SELECT q.id, q.lessonId, q.questionType, q.title, q.content, q.contentImg, q.A, q.B, q.C, q.D, q.E, q.correctAnswer, q.explainAnswer, q.status
-      FROM Questions q
-      INNER JOIN Exam_Questions eq ON q.id = eq.questionId
-      WHERE eq.examId = :examId
-    `
+    const query = queries.getListQuestionByExamId
 
     // Thực hiện truy vấn
     const listQuestions = await sequelize.query(query, {

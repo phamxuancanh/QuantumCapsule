@@ -28,19 +28,15 @@ export interface IDateFilterProps {
 const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
     const [filter, setFilter] = React.useState<IDateFilter>({
         mode: DateFilterMode.DATE,
-        from: undefined,
-        to: undefined,
+        from: new Date(new Date().setHours(0, 0, 0, 0)), // Đầu ngày hôm nay (00:00:00)
+        to: new Date(new Date().setHours(23, 59, 59, 999)),
         month: undefined,
         year: undefined
     });
     const flat = React.useRef(false);
     useEffect(() => {
-        if (flat.current) {
-            props.onChange && props.onChange(filter);
-            return;
-        }
-        flat.current = true;
-    }, [filter, props]);
+        props.onChange && props.onChange(filter);
+    }, [filter.from, filter.to]);
 
     const handleChangeMode = (mode: DateFilterMode)=>{
         if(mode === DateFilterMode.DATE){

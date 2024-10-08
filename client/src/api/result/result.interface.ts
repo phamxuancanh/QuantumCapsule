@@ -29,3 +29,8 @@ export interface IDTOResponse <T> {
     message: string
     data: T
 }
+
+export interface IGetResultByUserIdFilterParams {
+    from: Date,
+    to: Date
+}

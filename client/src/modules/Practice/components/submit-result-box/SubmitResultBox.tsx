@@ -4,6 +4,7 @@ import { insertResult } from "api/result/result.api"
 import { IResult } from "api/result/result.interface"
 import { caculateStar } from "helpers/Nam-helper/InitHelper"
 import {
+    useActStarModal,
     useIsSumited,
     useListAnswer,
     useListQuestion,
@@ -14,6 +15,7 @@ import QuestionV2 from "QCComponents/questions/question-v2/QuestionV2"
 import QuestionV3 from "QCComponents/questions/question-v3/QuestionV3"
 import React from "react"
 import { toast } from "react-toastify"
+import { ACTIONS } from "utils/enums"
 
 interface IProps {
     isOpen: boolean
@@ -24,6 +26,7 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     const { listQuestion } = useListQuestion()
     const {setIsSumited} = useIsSumited()
     const {result} = useResult()
+    const {setActStarModal}  = useActStarModal()
     const handleSubmit = async () => {
         try {
             const res2 = await insertResult({
@@ -33,6 +36,7 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
             const res1 = await insertListAnswer(listAnswer)
             toast.success("Nộp bài thành công")
             setIsSumited(true)
+            setActStarModal({open: true, payload: caculateStar(result), type: ACTIONS.VIEW})
         } catch (error: any) {
             toast.error(error.message)
             toast.error(error.message)
