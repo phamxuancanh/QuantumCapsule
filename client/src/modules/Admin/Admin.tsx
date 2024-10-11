@@ -93,10 +93,10 @@ const Admin: React.FC = () => {
             <Box p={2}>
                 <TabMenu
                     listItems={[
-                        { index: 0, label: 'Quản lý bài kiểm tra', item: <ExamManager /> },
+                        { index: 0, label: 'Quản lý bài bài tập', item: <ExamManager /> },
                         { index: 1, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
-                        { index: 2, label: 'Quản lý bình luận', item: <ComentManager /> },
-                        { index: 3, label: 'Quản lý lý thuyết', item: <TheoryManager /> },
+                        { index: 2, label: 'Quản lý bài học', item: <ComentManager /> },
+                        { index: 3, label: 'Quản lý bài giảng (lý thuyết)', item: <TheoryManager /> },
                         { index: 4, label: 'Quản lý bài kiểm tra và câu hỏi', item: <ExamQuestionManager /> }
                     ]}
                     defaultIndex={0}
