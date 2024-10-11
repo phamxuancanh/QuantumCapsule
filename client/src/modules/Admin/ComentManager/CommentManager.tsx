@@ -106,29 +106,9 @@ const ExamManager: React.FC<IProps> = () => {
                                 // { field: 'id', headerName: 'ID', width: 70 },
                                 {
                                     field: "content",
-                                    headerName: "Nội dung",
+                                    headerName: "Tên",
                                     width: 130,
                                     editable: true
-                                },
-                                {
-                                    field: "theoryId",
-                                    headerName: "Bài lý thuyết",
-                                    width: 130,
-                                    valueOptions: theoryParams.map(
-                                        (item) => {
-                                            return {
-                                                value: item.id,
-                                                label: item.name,
-                                            }
-                                        },
-                                    ),
-                                    editable: true,
-                                    type: "singleSelect",
-                                },
-                                {
-                                    field: "userId",
-                                    headerName: "Mã học sinh",
-                                    width: 130,
                                 },
                                 {
                                     field: "order",
