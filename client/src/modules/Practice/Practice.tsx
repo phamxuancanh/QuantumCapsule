@@ -72,7 +72,7 @@ const Practice: React.FC = () => {
                     <ResultBox isOpen={isSumited === true}/>
                 </Grid>
                 <Grid item xs={3}>
-                    <TimeCountdown initialSeconds={60 * 60* 20} // 20 minutes 
+                    <TimeCountdown initialSeconds={60 *20} // 20 minutes 
                         onCountdownEnd={() => {
                             toast.error("Hết giờ rồi !!!")
                         }}
