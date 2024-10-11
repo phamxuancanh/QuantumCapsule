@@ -6,7 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
 import { getListSubject } from 'api/subject/subject.api';
 import { ISubject } from 'api/subject/subject.interface';
-import { DataListChapter, ListChapterParams } from 'api/chapter/chapter.interface';
+import { DataListChapter, IChapter, ListChapterParams } from 'api/chapter/chapter.interface';
 import { getListChapter } from 'api/chapter/chapter.api';
 import { styled } from '@mui/system'
 import { Pagination } from '@mui/material'
@@ -26,6 +26,7 @@ import { ITheory } from 'api/theory/theory.interface';
 import Select, { ActionMeta, SingleValue } from 'react-select';
 import ROUTES from 'routes/constant';
 import { findProgressByGradeAndSubject } from 'api/progress/progress.api';
+import { set } from 'lodash';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -100,6 +101,9 @@ const Home = () => {
     useEffect(() => {
         dispatch(fetchUser());
     }, [dispatch]);
+    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null)
+    const [selectedChapter, setSelectedChapter] = useState<IChapter | null>(null)
+    const [selectedChapterGrade, setSelectedChapterGrade] = useState<number | null>(null)
     console.log('User from redux:', userRedux?.grade);
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language;
@@ -174,6 +178,9 @@ const Home = () => {
             if (res.data.data.length > 0) {
                 if (res.data.data[0].id) {
                     setSelectedChapterId(res.data.data[0].id);
+                    setSelectedChapter(res.data.data[0]);
+                    setSelectedChapterGrade(res.data.data[0].grade ?? null);
+                    console.log('Selected chapter:', res.data.data[0]);
                 }
             }
         } catch (error) {
@@ -210,11 +217,11 @@ const Home = () => {
             console.error('Error fetching exams:', error);
         }
     }
-    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchExam2ByChapterId(selectedChapterId ?? '');
     }, [selectedChapterId]);
+
     const [lessonLoading, setLessonLoading] = useState<boolean>(false)
     useEffect(() => {
         const fetchAllLessons = async () => {
@@ -243,40 +250,42 @@ const Home = () => {
             return acc;
         }, {});
 
-        setExpandedLessons(newExpandedLessons);
+        setExpandedLessons(newExpandedLessons)
         await Promise.all(
             lessonsData.map(async (lesson) => {
                 if (lesson.id !== undefined) {
-                    await fetchTheoriesAndExercises(lesson.id);
+                    await fetchTheoriesAndExercises(lesson.id)
                 }
             })
         );
     };
 
     const handleCollapseAll = () => {
-        setExpandedLessons({});
+        setExpandedLessons({})
     };
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false)
 
     const toggleExpandCollapse = async () => {
         if (isExpanded) {
-            handleCollapseAll();
+            handleCollapseAll()
         } else {
-            await handleExpandAll();
+            await handleExpandAll()
         }
-        setIsExpanded(!isExpanded);
-    };
+        setIsExpanded(!isExpanded)
+    }
 
     const capitalizeFirstLetter = (string: string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-    const [expandedLessons, setExpandedLessons] = useState<{ [key: string]: boolean }>({});
+        return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+    const [expandedLessons, setExpandedLessons] = useState<{ [key: string]: boolean }>({})
 
 
-    const [theories, setTheories] = useState<{ [key: string]: ITheory[] }>({});
-    const [exams, setExams] = useState<{ [key: string]: IExam[] }>({});
+    const [theories, setTheories] = useState<{ [key: string]: ITheory[] }>({})
+    const [exams, setExams] = useState<{ [key: string]: IExam[] }>({})
     const handleChapterClick = (chapterId: any) => {
         setSelectedChapterId(chapterId);
+        setSelectedChapter(chaptersData?.data.find(chapter => chapter.id === chapterId) ?? null);
+        setSelectedChapterGrade(chaptersData?.data.find(chapter => chapter.id === chapterId)?.grade ?? null);
     };
 
     const handleLessonClick = async (lessonId: any) => {
@@ -336,7 +345,7 @@ const Home = () => {
             setNumberTheoryDone(progress?.data.data.length ?? 0);
         };
         fetchProgress();
-    }, [location.search]);
+    }, [location.search, chaptersData]);
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
             <div className='tw-w-4/5 tw-py-5'>
@@ -403,27 +412,27 @@ const Home = () => {
                                             />
                                         </div>
                                     ) : (
-                                            chaptersData?.data.length ?? 0 > 0 ? (
-                                                <div>
-                                                    <ul className='tw-space-y-2'>
-                                                        {chaptersData?.data.map((chapter, index) => (
-                                                            <div key={chapter.id}>
-                                                                <div
-                                                                    className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${selectedChapterId === chapter.id ? 'tw-bg-blue-200' : 'tw-bg-gray-200'
-                                                                        }`}
-                                                                    onClick={() => handleChapterClick(chapter.id)}
-                                                                >
-                                                                    <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
-                                                                        {index + 1}. {chapter.name}
-                                                                    </li>
-                                                                    <div>
-                                                                        {lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} {t('homepage.lesson')}
-                                                                        {(currentLanguage === 'en' && lessonsData.filter(lesson => lesson.chapterId === chapter.id).length >= 2) ? 's' : ''}
-                                                                    </div>
+                                        chaptersData?.data.length ?? 0 > 0 ? (
+                                            <div>
+                                                <ul className='tw-space-y-2'>
+                                                    {chaptersData?.data.map((chapter, index) => (
+                                                        <div key={chapter.id}>
+                                                            <div
+                                                                className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${selectedChapterId === chapter.id ? 'tw-bg-blue-200' : 'tw-bg-gray-200'
+                                                                    }`}
+                                                                onClick={() => handleChapterClick(chapter.id)}
+                                                            >
+                                                                <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
+                                                                    {index + 1}. {chapter.name}
+                                                                </li>
+                                                                <div>
+                                                                    {lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} {t('homepage.lesson')}
+                                                                    {(currentLanguage === 'en' && lessonsData.filter(lesson => lesson.chapterId === chapter.id).length >= 2) ? 's' : ''}
                                                                 </div>
                                                             </div>
-                                                        ))}
-                                                    </ul>
+                                                        </div>
+                                                    ))}
+                                                </ul>
                                                 <div className='tw-flex tw-justify-center tw-mt-10 md:tw-mt-5 lg:tw-mt-3'>
                                                     <CustomPagination
                                                         count={totalPage}
@@ -447,7 +456,6 @@ const Home = () => {
                     <div className='tw-bg-transparent tw-w-3/5'>
                         <div>
                             <div className='tw-flex tw-justify-between'>
-                                {/* <div className='tw-text-4xl tw-font-bold'>{t('homepage.course_content')}</div> */}
                                 <Select
                                     value={selectedClass}
                                     onChange={handleClassChange}
@@ -541,8 +549,8 @@ const Home = () => {
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            {selectedChapterId && (
+                        {/* <div>
+                            {selectedChapter && (
                                 <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
                                     <h2 className='tw-font-bold tw-text-xl'>Bài học</h2>
                                     <div className='tw-flex tw-justify-end tw-mb-4'>
@@ -554,7 +562,7 @@ const Home = () => {
                                         </button>
                                     </div>
                                     <ul className='tw-space-y-2'>
-                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapterId).map((lesson) => (
+                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapter.id).map((lesson) => (
                                             <React.Fragment key={lesson.id}>
                                                 <li
                                                     className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
@@ -589,6 +597,68 @@ const Home = () => {
                                                                         key={exam.id}
                                                                         className='tw-p-1 tw-text-blue-500 hover:tw-underline tw-cursor-pointer'
                                                                         onClick={() => handleTheoryExamClick('exam', exam.id ?? '')}
+                                                                    >
+                                                                        {exam.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div> */}
+                        <div>
+                            {(selectedChapter && selectedChapterGrade) && (
+                                <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
+                                    <h2 className='tw-font-bold tw-text-xl'>Bài học</h2>
+                                    <div className='tw-flex tw-justify-end tw-mb-4'>
+                                        <button
+                                            className='tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded-md'
+                                            onClick={toggleExpandCollapse}
+                                        >
+                                            {isExpanded ? 'Thu gọn tất cả' : 'Mở rộng tất cả'}
+                                        </button>
+                                    </div>
+                                    <ul className='tw-space-y-2'>
+                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapter.id).map((lesson) => (
+                                            <React.Fragment key={lesson.id}>
+                                                <li
+                                                    className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
+                                                    onClick={() => handleLessonClick(lesson.id)}
+                                                >
+                                                    <span className='tw-font-bold tw-text-lg'>{lesson.name}</span>
+                                                    {lesson.id !== undefined && (
+                                                        expandedLessons[lesson.id] ? <RemoveIcon /> : <AddIcon />
+                                                    )}
+                                                </li>
+                                                {lesson.id !== undefined && expandedLessons[lesson.id] && (
+                                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg tw-flex'>
+                                                        <div className='tw-flex-1'>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Bài lý thuyết</h3>
+                                                            <ul className='tw-space-y-2'>
+                                                                {theories[lesson.id]?.map((theory) => (
+                                                                    <li
+                                                                        key={theory.id}
+                                                                        className={`tw-p-1 ${selectedChapterGrade > (userRedux?.grade ?? 0) ? 'tw-text-gray-500' : 'tw-text-blue-500 hover:tw-underline'} ${selectedChapterGrade > (userRedux?.grade ?? 0) ? '' : 'tw-cursor-pointer'}`}
+                                                                        onClick={selectedChapterGrade > (userRedux?.grade ?? 0) ? undefined : () => handleTheoryExamClick('theory', theory.id ?? '')}
+                                                                    >
+                                                                        {theory.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                        <div className='tw-flex-1'>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Bài tập</h3>
+                                                            <ul className='tw-space-y-2'>
+                                                                {exams[lesson.id]?.map((exam) => (
+                                                                    <li
+                                                                        key={exam.id}
+                                                                        className={`tw-p-1 ${selectedChapterGrade > (userRedux?.grade ?? 0)  ? 'tw-text-gray-500' : 'tw-text-blue-500 hover:tw-underline'} ${selectedChapterGrade > (userRedux?.grade ?? 0) ? '' : 'tw-cursor-pointer'}`}
+                                                                        onClick={selectedChapterGrade > (userRedux?.grade ?? 0) ? undefined : () => handleTheoryExamClick('exam', exam.id ?? '')}
                                                                     >
                                                                         {exam.name}
                                                                     </li>
