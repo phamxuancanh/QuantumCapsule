@@ -604,22 +604,21 @@ const Home = () => {
                             )}
                         </div>
                         <div>
-                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
-                                        <h2 className='tw-font-bold tw-text-xl'>Bài kiểm tra</h2>
-                                        <ul className='tw-space-y-2'>
-                                            {exams2
-                                                 // Lọc những exam có chapterId bằng selectedChapterId
-                                                .map((exam) => (
-                                                    <li
-                                                        key={exam.id}
-                                                        className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
-                                                        onClick={() => handleExam2Click('exam', exam.id!)}
-                                                    >
-                                                        <span className='tw-font-bold tw-text-lg'>{exam.name}</span>
-                                                    </li>
-                                                ))}
-                                        </ul>
-                                    </div>
+                            <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
+                                <h2 className='tw-font-bold tw-text-xl'>Bài kiểm tra</h2>
+                                <ul className='tw-space-y-2'>
+                                    {exams2
+                                        .map((exam) => (
+                                            <li
+                                                key={exam.id}
+                                                className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
+                                                onClick={() => handleExam2Click('exam', exam.id!)}
+                                            >
+                                                <span className='tw-font-bold tw-text-lg'>{exam.name}</span>
+                                            </li>
+                                        ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
