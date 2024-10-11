@@ -18,6 +18,7 @@ import TheoryManager from './TheoryManager/TheoryManagerProvider';
 import TabMenu from 'components/menus/tabMenu/TabMenu';
 import { Box, IconButton, Typography } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import ExamQuestionManager from './ExamQuestionManager/ExamQuestionManagerProvider';
 const Admin: React.FC = () => {
     const handleImportChapter = async (listData: IChapter[]) => {
         try {
@@ -79,7 +80,7 @@ const Admin: React.FC = () => {
         }
     };
     const handleDownloadTemplate = () => {
-        const url = 'https://example.com/template.xlsx'; 
+        const url = 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/excel_mau.xlsx'; 
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', 'template.xlsx'); 
@@ -95,7 +96,8 @@ const Admin: React.FC = () => {
                         { index: 0, label: 'Quản lý bài kiểm tra', item: <ExamManager /> },
                         { index: 1, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
                         { index: 2, label: 'Quản lý bình luận', item: <ComentManager /> },
-                        { index: 3, label: 'Quản lý lý thuyết', item: <TheoryManager /> }
+                        { index: 3, label: 'Quản lý lý thuyết', item: <TheoryManager /> },
+                        { index: 4, label: 'Quản lý bài kiểm tra và câu hỏi', item: <ExamQuestionManager /> }
                     ]}
                     defaultIndex={0}
                 />

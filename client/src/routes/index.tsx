@@ -49,6 +49,9 @@ const Profile = loadable(async () => await import('pages/profile'), {
 const SkillPractice = loadable(async () => await import('modules/Practice/PracticeProvider'), {
     fallback: <Loading />
 })
+const SkillPracticeV2 = loadable(async () => await import('modules/Practice-v2/PracticeProviderV2'), {
+    fallback: <Loading />
+})
 const Admin = loadable(async () => await import('modules/Admin/Admin'), {
     fallback: <Loading />
 })
@@ -171,7 +174,7 @@ const routes: RouteObject[] = [
             <LayoutDefault />
         ),
         children: [
-            { path: ROUTES.skill_practice, element: <SkillPractice /> }
+            { path: ROUTES.skill_practice, element: <SkillPracticeV2 /> }
         ]
     }
 ]
