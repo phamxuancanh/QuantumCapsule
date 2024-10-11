@@ -21,6 +21,7 @@ import { toast } from "react-toastify"
 import { getFromLocalStorage } from "utils/functions"
 import ResultBox from "./components/result-box/ResultBox"
 import StarModal from "./components/star-modal/StarModal"
+import TimeCountdown from "components/countdown/timeCountdown/TimeCountdown"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -71,6 +72,11 @@ const Practice: React.FC = () => {
                     <ResultBox isOpen={isSumited === true}/>
                 </Grid>
                 <Grid item xs={3}>
+                    <TimeCountdown initialSeconds={60 * 60* 20} // 20 minutes 
+                        onCountdownEnd={() => {
+                            toast.error("Hết giờ rồi !!!")
+                        }}
+                    />
                     <ListQuestionButton isOpen={isSumited === false}/>
                 </Grid>
             </Grid>
