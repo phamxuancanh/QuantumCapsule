@@ -27,6 +27,8 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Plyr, { APITypes } from 'plyr-react';
 import { toast } from 'react-toastify'
 import { addProgress } from 'api/progress/progress.api'
+import { createNotification } from 'api/notification/notification.api'
+import { title } from 'process'
 interface Comment {
   id?: string;
   theoryId?: string;
@@ -200,6 +202,11 @@ const Learning = () => {
             const addProgressResponse = await addProgress(theory.id);
             console.log('Add progress response:', addProgressResponse);
             if (addProgressResponse.status === 201) {
+              await createNotification({
+                title: 'Học xong video',
+                message: `Bạn đã học xong bài ${theory.name}`,
+                url: '/myCourses',
+              });
               toast.success('Bạn đã học xong video này');
             } else {
               console.error('Failed to add progress, status:', addProgressResponse.status);
@@ -225,11 +232,11 @@ const Learning = () => {
   
     return () => {
       clearInterval(interval);
-      if (playerRef.current?.plyr) {
+      if (playerRef.current && playerRef.current.plyr) {
         playerRef.current.plyr.off('timeupdate', handleTimeUpdate);
       }
     };
-  }, [playerRef, theory]);
+  }, [theory, playerRef]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);

@@ -232,6 +232,16 @@
             "months_ago": "tháng trước",
             "one_year_ago": "1 năm trước",
             "years_ago": "năm trước"
+        },
+        "notification": {
+            "notifications": "Thông báo",
+            "mark_all_as_read": "Đánh dấu tất cả đã đọc",
+            "mark_all_as_unread": "Đánh dấu tất cả chưa đọc",
+            "removed_all_notifications": "Xóa tất cả thông báo",
+            "mark_as_read": "Đánh dấu đã đọc",
+            "mark_as_unread": "Đánh dấu chưa đọc",
+            "removed_notification": "Xóa thông báo",
+            "no_notifications": "Không có thông báo nào"
         }
     }
 }
