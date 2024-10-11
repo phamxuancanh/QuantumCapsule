@@ -179,11 +179,40 @@ const getExamsByLessonId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching exams' })
   }
 }
+// get exams by chapterId
+const getExamsByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const exams = await models.Exam.findAll({
+      where: {
+        chapterId
+      },
+      attributes: [
+        'id',
+        'name',
+        'order',
+        'lessonId',
+        'chapterId',
+        'name',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    res.json({ exams })
+  } catch (error) {
+    console.error('Error fetching exams:', error)
+    res.status(500).json({ message: 'Error fetching exams' })
+  }
+}
 module.exports = {
   importExams,
   getListExam,
   addExam,
   updateExam,
   deleteExam,
-  getExamsByLessonId
+  getExamsByLessonId,
+  getExamsByChapterId
 }

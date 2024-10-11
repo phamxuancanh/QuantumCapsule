@@ -9,4 +9,5 @@ router.post('/', verifyAccessToken, examController.addExam)
 router.put('/:id', verifyAccessToken, examController.updateExam)
 router.delete('/:id', verifyAccessToken, examController.deleteExam)
 router.get('/getExamsByLessonId/:lessonId', verifyAccessToken, examController.getExamsByLessonId)
+router.get('/getExamsByChapterId/:chapterId', verifyAccessToken, examController.getExamsByChapterId)
 module.exports = router

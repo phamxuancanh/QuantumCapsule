@@ -6,7 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
 import { getListSubject } from 'api/subject/subject.api';
 import { ISubject } from 'api/subject/subject.interface';
-import { DataListChapter, IChapter, ListChapterParams } from 'api/chapter/chapter.interface';
+import { DataListChapter, ListChapterParams } from 'api/chapter/chapter.interface';
 import { getListChapter } from 'api/chapter/chapter.api';
 import { styled } from '@mui/system'
 import { Pagination } from '@mui/material'
@@ -20,7 +20,7 @@ import { AppDispatch } from 'redux/store';
 import { fetchUser, selectUser } from '../../redux/auth/authSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { getTheoriesByLessonId } from 'api/theory/theory.api';
-import { getExamsByLessonId } from 'api/exam/exam.api';
+import { getExamsByChapterId, getExamsByLessonId } from 'api/exam/exam.api';
 import { IExam } from 'api/exam/exam.interface';
 import { ITheory } from 'api/theory/theory.interface';
 import Select, { ActionMeta, SingleValue } from 'react-select';
@@ -125,6 +125,8 @@ const Home = () => {
         { value: 2, label: 'Lớp 2' },
         { value: 3, label: 'Lớp 3' },
     ];
+    const [exams2, setExams2] = useState<IExam[]>([]);
+
     const handleClassChange = (newValue: SingleValue<{ value: number; label: string }>, actionMeta: ActionMeta<{ value: number; label: string }>) => {
         if (newValue) {
             setSelectedClass(newValue);
@@ -171,7 +173,7 @@ const Home = () => {
             setChaptersData(res.data);
             if (res.data.data.length > 0) {
                 if (res.data.data[0].id) {
-                    setSelectedChapter(res.data.data[0]);
+                    setSelectedChapterId(res.data.data[0].id);
                 }
             }
         } catch (error) {
@@ -198,8 +200,22 @@ const Home = () => {
             return [];
         }
     }
-    const [lessonLoading, setLessonLoading] = useState<boolean>(false)
+    const fetchExam2ByChapterId = async (chapterId: string) => {
 
+        try {
+            const response = await getExamsByChapterId(chapterId);
+            setExams2(response.data.exams);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching exams:', error);
+        }
+    }
+    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchExam2ByChapterId(selectedChapterId ?? '');
+    }, [selectedChapterId]);
+    const [lessonLoading, setLessonLoading] = useState<boolean>(false)
     useEffect(() => {
         const fetchAllLessons = async () => {
             setLessonLoading(true);
@@ -231,7 +247,7 @@ const Home = () => {
         await Promise.all(
             lessonsData.map(async (lesson) => {
                 if (lesson.id !== undefined) {
-                    await fetchTheoriesAndExams(lesson.id);
+                    await fetchTheoriesAndExercises(lesson.id);
                 }
             })
         );
@@ -254,15 +270,13 @@ const Home = () => {
     const capitalizeFirstLetter = (string: string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
-    const [selectedChapter, setSelectedChapter] = useState<IChapter | null>(null);
     const [expandedLessons, setExpandedLessons] = useState<{ [key: string]: boolean }>({});
 
 
     const [theories, setTheories] = useState<{ [key: string]: ITheory[] }>({});
     const [exams, setExams] = useState<{ [key: string]: IExam[] }>({});
-
-    const handleChapterClick = (chapter: any) => {
-        setSelectedChapter(chapter);
+    const handleChapterClick = (chapterId: any) => {
+        setSelectedChapterId(chapterId);
     };
 
     const handleLessonClick = async (lessonId: any) => {
@@ -272,17 +286,18 @@ const Home = () => {
         }));
 
         if (!expandedLessons[lessonId]) {
-            await fetchTheoriesAndExams(lessonId);
+            await fetchTheoriesAndExercises(lessonId);
         }
     };
 
-    const fetchTheoriesAndExams = async (lessonId: string) => {
+    const fetchTheoriesAndExercises = async (lessonId: string) => {
         try {
             const [theoriesResponse, examsResponse] = await Promise.all([
                 getTheoriesByLessonId(lessonId),
                 getExamsByLessonId(lessonId),
             ]);
             console.log(theoriesResponse);
+            console.log('Exams response:', examsResponse);
             console.log(examsResponse);
             setTheories((prevState) => ({
                 ...prevState,
@@ -297,6 +312,13 @@ const Home = () => {
         }
     };
     const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
+        if (type === 'theory') {
+            navigate(`${ROUTES.learning}?theoryId=${id}`);
+        } else if (type === 'exam') {
+            navigate(`${ROUTES.skill_practice2}?examId=${id}`);
+        }
+    };
+    const handleExam2Click = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
             navigate(`${ROUTES.learning}?theoryId=${id}`);
         } else if (type === 'exam') {
@@ -381,27 +403,27 @@ const Home = () => {
                                             />
                                         </div>
                                     ) : (
-                                        chaptersData?.data.length ?? 0 > 0 ? (
-                                            <div>
-                                                <ul className='tw-space-y-2'>
-                                                    {chaptersData?.data.map((chapter, index) => (
-                                                        <div key={chapter.id}>
-                                                            <div
-                                                                className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${selectedChapter?.id === chapter.id ? 'tw-bg-blue-200' : 'tw-bg-gray-200'
-                                                                    }`}
-                                                                onClick={() => handleChapterClick(chapter.id)}
-                                                            >
-                                                                <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
-                                                                    {index + 1}. {chapter.name}
-                                                                </li>
-                                                                <div>
-                                                                    {lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} {t('homepage.lesson')}
-                                                                    {(currentLanguage === 'en' && lessonsData.filter(lesson => lesson.chapterId === chapter.id).length >= 2) ? 's' : ''}
+                                            chaptersData?.data.length ?? 0 > 0 ? (
+                                                <div>
+                                                    <ul className='tw-space-y-2'>
+                                                        {chaptersData?.data.map((chapter, index) => (
+                                                            <div key={chapter.id}>
+                                                                <div
+                                                                    className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${selectedChapterId === chapter.id ? 'tw-bg-blue-200' : 'tw-bg-gray-200'
+                                                                        }`}
+                                                                    onClick={() => handleChapterClick(chapter.id)}
+                                                                >
+                                                                    <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
+                                                                        {index + 1}. {chapter.name}
+                                                                    </li>
+                                                                    <div>
+                                                                        {lessonsData.filter(lesson => lesson.chapterId === chapter.id).length} {t('homepage.lesson')}
+                                                                        {(currentLanguage === 'en' && lessonsData.filter(lesson => lesson.chapterId === chapter.id).length >= 2) ? 's' : ''}
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                </ul>
+                                                        ))}
+                                                    </ul>
                                                 <div className='tw-flex tw-justify-center tw-mt-10 md:tw-mt-5 lg:tw-mt-3'>
                                                     <CustomPagination
                                                         count={totalPage}
@@ -489,7 +511,7 @@ const Home = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className='tw-flex tw-justify-between tw-p-5'>
+                                        <div className='tw-flex tw-justify-between tw-p-5 tw-w-3/12'>
                                             <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
                                                 <div className='tw-font-bold tw-text-2xl'>{numberTheoryDone}/{lessonsData.length}</div>
                                                 <div>{capitalizeFirstLetter(t('homepage.lesson'))}</div>
@@ -498,7 +520,7 @@ const Home = () => {
                                                 <div className='tw-font-bold tw-text-2xl'>0/0</div>
                                                 <div>{capitalizeFirstLetter(t('homepage.exam'))}</div>
                                             </div>
-                                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
+                                            {/* <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                                 <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
                                                 <div>{t('homepage.not_yet_practice')}</div>
                                             </div>
@@ -513,77 +535,16 @@ const Home = () => {
                                             <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
                                                 <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
                                                 <div>{t('homepage.need_improvement')}</div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div>
-
-                            {selectedChapter?.id && (
+                            {selectedChapterId && (
                                 <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
-                                    <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
-                                    <div className='tw-flex tw-justify-end tw-mb-4'>
-                                        <button
-                                            className='tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded-md'
-                                            onClick={toggleExpandCollapse}
-                                        >
-                                            {isExpanded ? 'Thu gọn tất cả' : 'Mở rộng tất cả'}
-                                        </button>
-                                    </div>
-                                    <ul className='tw-space-y-2'>
-                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapter?.id).map((lesson) => (
-                                            <React.Fragment key={lesson.id}>
-                                                <li
-                                                    className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
-                                                    onClick={() => handleLessonClick(lesson.id)}
-                                                >
-                                                    <span className='tw-font-bold tw-text-lg'>{lesson.name}</span>
-                                                    {lesson.id !== undefined && (
-                                                        expandedLessons[lesson.id] ? <RemoveIcon /> : <AddIcon />
-                                                    )}
-                                                </li>
-                                                {lesson.id !== undefined && expandedLessons[lesson.id] && (
-                                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg tw-flex'>
-                                                        <div className='tw-flex-1'>
-                                                            <h3 className='tw-font-bold tw-text-lg'>Theory</h3>
-                                                            <ul className='tw-space-y-2'>
-                                                                {theories[lesson.id]?.map((theory) => (
-                                                                    <li
-                                                                        key={theory.id}
-                                                                        className={`tw-p-1 ${selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? 'tw-text-gray-500' : 'tw-text-blue-500 hover:tw-underline tw-cursor-pointer'}`}
-                                                                        onClick={selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? undefined : () => handleTheoryExamClick('theory', theory.id ?? '')}
-                                                                    >
-                                                                        {theory.name}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                        <div className='tw-flex-1'>
-                                                            <h3 className='tw-font-bold tw-text-lg'>Exams</h3>
-                                                            <ul className='tw-space-y-2'>
-                                                                {exams[lesson.id]?.map((exam) => (
-                                                                    <li
-                                                                        key={exam.id}
-                                                                        className={`tw-p-1 ${selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? 'tw-text-gray-500' : 'tw-text-blue-500 hover:tw-underline tw-cursor-pointer'}`}
-                                                                        onClick={selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? undefined : () => handleTheoryExamClick('exam', exam.id ?? '')}
-                                                                    >
-                                                                        {exam.name}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-)}
-                                            </React.Fragment>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {/* {selectedChapterId && (
-                                <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
-                                    <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
+                                    <h2 className='tw-font-bold tw-text-xl'>Bài học</h2>
                                     <div className='tw-flex tw-justify-end tw-mb-4'>
                                         <button
                                             className='tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded-md'
@@ -607,7 +568,7 @@ const Home = () => {
                                                 {lesson.id !== undefined && expandedLessons[lesson.id] && (
                                                     <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg tw-flex'>
                                                         <div className='tw-flex-1'>
-                                                            <h3 className='tw-font-bold tw-text-lg'>Theory</h3>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Bài lý thuyết</h3>
                                                             <ul className='tw-space-y-2'>
                                                                 {theories[lesson.id]?.map((theory) => (
                                                                     <li
@@ -621,7 +582,7 @@ const Home = () => {
                                                             </ul>
                                                         </div>
                                                         <div className='tw-flex-1'>
-                                                            <h3 className='tw-font-bold tw-text-lg'>Exams</h3>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Bài tập</h3>
                                                             <ul className='tw-space-y-2'>
                                                                 {exams[lesson.id]?.map((exam) => (
                                                                     <li
@@ -640,7 +601,25 @@ const Home = () => {
                                         ))}
                                     </ul>
                                 </div>
-                            )} */}
+                            )}
+                        </div>
+                        <div>
+                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
+                                        <h2 className='tw-font-bold tw-text-xl'>Bài kiểm tra</h2>
+                                        <ul className='tw-space-y-2'>
+                                            {exams2
+                                                 // Lọc những exam có chapterId bằng selectedChapterId
+                                                .map((exam) => (
+                                                    <li
+                                                        key={exam.id}
+                                                        className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
+                                                        onClick={() => handleExam2Click('exam', exam.id!)}
+                                                    >
+                                                        <span className='tw-font-bold tw-text-lg'>{exam.name}</span>
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    </div>
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,7 @@ const ROUTES = {
     reset_password: '/reset_password',
     profile: '/profile',
     skill_practice: '/skill_practice',
+    skill_practice2: '/skill_practice2',
     admin: '/admin',
     search_result: '/search_result',
     lessonDetail: '/lessonDetail',
