@@ -6,7 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined';
 import { getListSubject } from 'api/subject/subject.api';
 import { ISubject } from 'api/subject/subject.interface';
-import { DataListChapter, ListChapterParams } from 'api/chapter/chapter.interface';
+import { DataListChapter, IChapter, ListChapterParams } from 'api/chapter/chapter.interface';
 import { getListChapter } from 'api/chapter/chapter.api';
 import { styled } from '@mui/system'
 import { Pagination } from '@mui/material'
@@ -137,7 +137,8 @@ const Home = () => {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const currentPage = parseInt(queryParams.get('page') || '1', 10);
-        const currentGrade = parseInt(queryParams.get('grade') || '1', 10);
+        console.log('userReduxGrade:', userRedux?.grade);
+        const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
         const currentSubject = queryParams.get('subject') || 'subject1';
         setPage(currentPage);
         setSelectedSubject(currentSubject);
@@ -145,7 +146,7 @@ const Home = () => {
         if (currentSubject && currentGrade) {
             fetchChapters({ page: currentPage, subjectId: currentSubject, grade: currentGrade });
         }
-    }, [location.search]);
+    }, [location.search, userRedux]);
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject()
@@ -170,7 +171,7 @@ const Home = () => {
             setChaptersData(res.data);
             if (res.data.data.length > 0) {
                 if (res.data.data[0].id) {
-                    setSelectedChapterId(res.data.data[0].id);
+                    setSelectedChapter(res.data.data[0]);
                 }
             }
         } catch (error) {
@@ -253,15 +254,15 @@ const Home = () => {
     const capitalizeFirstLetter = (string: string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
-    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
+    const [selectedChapter, setSelectedChapter] = useState<IChapter | null>(null);
     const [expandedLessons, setExpandedLessons] = useState<{ [key: string]: boolean }>({});
 
 
     const [theories, setTheories] = useState<{ [key: string]: ITheory[] }>({});
     const [exams, setExams] = useState<{ [key: string]: IExam[] }>({});
 
-    const handleChapterClick = (chapterId: any) => {
-        setSelectedChapterId(chapterId);
+    const handleChapterClick = (chapter: any) => {
+        setSelectedChapter(chapter);
     };
 
     const handleLessonClick = async (lessonId: any) => {
@@ -386,7 +387,8 @@ const Home = () => {
                                                     {chaptersData?.data.map((chapter, index) => (
                                                         <div key={chapter.id}>
                                                             <div
-                                                                className='tw-flex tw-justify-between tw-items-center tw-bg-gray-200 tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5'
+                                                                className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${selectedChapter?.id === chapter.id ? 'tw-bg-blue-200' : 'tw-bg-gray-200'
+                                                                    }`}
                                                                 onClick={() => handleChapterClick(chapter.id)}
                                                             >
                                                                 <li className='tw-font-bold tw-flex tw-items-center tw-cursor-pointer hover:tw-bg-gray-200 hover:tw-text-gray-700'>
@@ -472,6 +474,7 @@ const Home = () => {
                                                     bgColor='orange'
                                                     className='tw-w-2/3'
                                                     maxCompleted={100}
+                                                    isLabelVisible={false}
                                                     completed={numberTheoryDone / lessonsData.length * 100}
                                                 />
                                                 <div className="tw-flex tw-items-center">
@@ -517,7 +520,68 @@ const Home = () => {
                             </div>
                         </div>
                         <div>
-                            {selectedChapterId && (
+
+                            {selectedChapter?.id && (
+                                <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
+                                    <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
+                                    <div className='tw-flex tw-justify-end tw-mb-4'>
+                                        <button
+                                            className='tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded-md'
+                                            onClick={toggleExpandCollapse}
+                                        >
+                                            {isExpanded ? 'Thu gọn tất cả' : 'Mở rộng tất cả'}
+                                        </button>
+                                    </div>
+                                    <ul className='tw-space-y-2'>
+                                        {lessonsData.filter(lesson => lesson.chapterId === selectedChapter?.id).map((lesson) => (
+                                            <React.Fragment key={lesson.id}>
+                                                <li
+                                                    className='tw-p-2 tw-bg-white tw-rounded-md tw-shadow tw-cursor-pointer tw-flex tw-justify-between tw-items-center'
+                                                    onClick={() => handleLessonClick(lesson.id)}
+                                                >
+                                                    <span className='tw-font-bold tw-text-lg'>{lesson.name}</span>
+                                                    {lesson.id !== undefined && (
+                                                        expandedLessons[lesson.id] ? <RemoveIcon /> : <AddIcon />
+                                                    )}
+                                                </li>
+                                                {lesson.id !== undefined && expandedLessons[lesson.id] && (
+                                                    <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg tw-flex'>
+                                                        <div className='tw-flex-1'>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Theory</h3>
+                                                            <ul className='tw-space-y-2'>
+                                                                {theories[lesson.id]?.map((theory) => (
+                                                                    <li
+                                                                        key={theory.id}
+                                                                        className={`tw-p-1 ${selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? 'tw-text-gray-500' : 'tw-text-blue-500 hover:tw-underline tw-cursor-pointer'}`}
+                                                                        onClick={selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? undefined : () => handleTheoryExamClick('theory', theory.id ?? '')}
+                                                                    >
+                                                                        {theory.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                        <div className='tw-flex-1'>
+                                                            <h3 className='tw-font-bold tw-text-lg'>Exams</h3>
+                                                            <ul className='tw-space-y-2'>
+                                                                {exams[lesson.id]?.map((exam) => (
+                                                                    <li
+                                                                        key={exam.id}
+                                                                        className={`tw-p-1 ${selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? 'tw-text-gray-500' : 'tw-text-blue-500 hover:tw-underline tw-cursor-pointer'}`}
+                                                                        onClick={selectedChapter?.grade !== undefined && selectedChapter?.grade > (userRedux?.grade ?? 0) ? undefined : () => handleTheoryExamClick('exam', exam.id ?? '')}
+                                                                    >
+                                                                        {exam.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+)}
+                                            </React.Fragment>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            {/* {selectedChapterId && (
                                 <div className='tw-bg-gray-100 tw-p-4 tw-mt-4 tw-rounded-lg'>
                                     <h2 className='tw-font-bold tw-text-xl'>Lessons</h2>
                                     <div className='tw-flex tw-justify-end tw-mb-4'>
@@ -576,7 +640,7 @@ const Home = () => {
                                         ))}
                                     </ul>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
