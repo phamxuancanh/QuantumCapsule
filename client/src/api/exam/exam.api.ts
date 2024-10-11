@@ -29,3 +29,6 @@ export const getListExam = async ({params}: {params?: ListExamParams}): Promise<
 export const getExamsByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/exams/getExamsByLessonId/${lessonId}`);
 }
+export const getExamsByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/exams/getExamsByChapterId/${chapterId}`);
+}

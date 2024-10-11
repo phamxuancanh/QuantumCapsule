@@ -174,7 +174,16 @@ const routes: RouteObject[] = [
             <LayoutDefault />
         ),
         children: [
-            { path: ROUTES.skill_practice, element: <SkillPracticeV2 /> }
+            { path: ROUTES.skill_practice, element: <SkillPractice /> }
+        ]
+    },
+    {
+        path: ROUTES.skill_practice2,
+        element: (
+            <LayoutDefault />
+        ),
+        children: [
+            { path: ROUTES.skill_practice2, element: <SkillPracticeV2 /> }
         ]
     }
 ]
