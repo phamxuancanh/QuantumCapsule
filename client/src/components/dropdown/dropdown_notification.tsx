@@ -243,7 +243,7 @@ function DropdownNotification({ align }: DropdownNotificationProps) {
         <NotificationsNoneOutlinedIcon sx={{ color: 'green' }} />
       </button>
       <Transition
-        className={`tw-min-h-52 tw-w-80 tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-full tw-bg-red-200 tw-border tw-border-slate-200 tw-rounded tw-shadow-lg tw-overflow-hidden ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
+        className={`tw-min-h-52 tw-w-80 tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-full tw-bg-slate-200 tw-border tw-border-slate-200 tw-rounded tw-shadow-lg tw-overflow-hidden ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
         show={dropdownOpen}
         enter="tw-transition tw-ease-out tw-duration-200 tw-transform"
         enterStart="tw-opacity-0"

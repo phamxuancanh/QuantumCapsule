@@ -16,6 +16,52 @@ const importChapters = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding chapters' })
   }
 }
+// ge list chapters no paging
+const getListChapterNoPaging = async (req, res, next) => {
+  try {
+    const { search: nameCondition, subjectId, grade } = req.query
+
+    const searchConditions = {
+      where: {}
+    }
+
+    if (nameCondition) {
+      searchConditions.where.name = {
+        [Op.like]: `%${nameCondition}%`
+      }
+    }
+
+    if (subjectId) {
+      searchConditions.where.subjectId = subjectId
+    }
+
+    if (grade) {
+      searchConditions.where.grade = grade
+    }
+
+    const chapters = await models.Chapter.findAll({
+      ...searchConditions,
+      attributes: [
+        'id',
+        'subjectId',
+        'name',
+        'description',
+        'grade',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    res.json({
+      data: chapters
+    })
+  } catch (error) {
+    console.error('Error fetching chapters:', error)
+    res.status(500).json({ message: 'Error fetching chapters' })
+  }
+}
 // get list chapters by many conditions
 const getListChapter = async (req, res, next) => {
   try {
@@ -137,6 +183,7 @@ const getChapterById = async (req, res, next) => {
 }
 module.exports = {
   importChapters,
+  getListChapterNoPaging,
   getListChapter,
   addChapter,
   updateChapter,
