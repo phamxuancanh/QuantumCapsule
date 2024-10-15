@@ -5,7 +5,11 @@ export interface IChapter {
     description?: string
     grade?: number
     order?: number
-    status?: boolean
+    status?: boolean,
+    exams?: any
+    theories?: any
+    theoryCount?: any
+    examCount?: any
 }
 
 export interface ListChapterParams {
@@ -17,7 +21,7 @@ export interface ListChapterParams {
 }
 
 export interface DataListChapter{
-    data: IChapter[]
+    data: IChapter[],
     page: number
     size: number
     totalRecords: number

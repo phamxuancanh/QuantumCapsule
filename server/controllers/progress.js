@@ -125,7 +125,56 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
   }
 }
 
+const findProgressByChapter = async (req, res, next) => {
+  try {
+    const loginedUserId = req.userId
+    const { chapterId } = req.query
+    console.log('chapterId:', chapterId)
+    if (!chapterId) {
+      return res.status(400).json({ message: 'Missing chapterId' })
+    }
+
+    const progressList = await models.Progress.findAll({
+      where: {
+        userId: loginedUserId
+      },
+      include: [
+        {
+          model: models.Theory,
+          required: true,
+          attributes: ['id'],
+          include: [
+            {
+              model: models.Lesson,
+              required: true,
+              include: [
+                {
+                  model: models.Chapter,
+                  required: true,
+                  where: {
+                    id: chapterId
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    })
+
+    const theoryIds = progressList.map(progress => progress.Theory.id)
+
+    return res.status(200).json({
+      message: 'Progress retrieved successfully',
+      data: theoryIds
+    })
+  } catch (error) {
+    console.error('Error finding Progress:', error.message)
+    return res.status(500).json({ message: 'An error occurred while retrieving progress', error: error.message })
+  }
+}
 module.exports = {
   addProgress,
-  findProgressByGradeAndSubject
+  findProgressByGradeAndSubject,
+  findProgressByChapter
 }

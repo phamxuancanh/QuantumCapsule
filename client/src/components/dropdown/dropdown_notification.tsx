@@ -31,7 +31,7 @@ function DropdownNotification({ align }: DropdownNotificationProps) {
   const [hasMore, setHasMore] = useState(true)
   const trigger = useRef<HTMLButtonElement | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false)
   const { t } = useTranslation()
   const [selectedLanguage, setSelectedLanguage] = useState(() => {
@@ -40,7 +40,7 @@ function DropdownNotification({ align }: DropdownNotificationProps) {
   useEffect(() => {
     setSelectedLanguage(localStorage.getItem('selectedLanguage') ?? 'en')
   }, [localStorage.getItem('selectedLanguage')])
-  const toggleMenu = (id: number) => {
+  const toggleMenu = (id: string) => {
     setOpenMenuId(openMenuId === id ? null : id)
     setIsMainMenuOpen(false)
   }
@@ -243,10 +243,10 @@ function DropdownNotification({ align }: DropdownNotificationProps) {
         <NotificationsNoneOutlinedIcon sx={{ color: 'green' }} />
       </button>
       <Transition
-        className={`tw-min-h-60 tw-w-80 tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-full tw-bg-white tw-border tw-border-slate-200 tw-py-1.5 tw-rounded tw-shadow-lg tw-overflow-hidden tw-mt-1 ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
+        className={`tw-min-h-52 tw-w-80 tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-full tw-bg-slate-200 tw-border tw-border-slate-200 tw-rounded tw-shadow-lg tw-overflow-hidden ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
         show={dropdownOpen}
         enter="tw-transition tw-ease-out tw-duration-200 tw-transform"
-        enterStart="tw-opacity-0 -tw-translate-y-2"
+        enterStart="tw-opacity-0"
         enterEnd="tw-opacity-100 tw-translate-y-0"
         leave="tw-transition tw-ease-out tw-duration-200"
         leaveStart="tw-opacity-100"
@@ -348,9 +348,9 @@ function DropdownNotification({ align }: DropdownNotificationProps) {
                   <div className="tw-relative">
                     <MoreHorizIcon
                       className="tw-cursor-pointer tw-rounded-full hover:tw-bg-slate-200 tw-mx-4"
-                      onClick={() => toggleMenu(parseInt(notification.id))}
+                      onClick={() => toggleMenu(notification.id)}
                     />
-                    {openMenuId === parseInt(notification.id) && (
+                    {openMenuId === (notification.id) && (
                       <div className="tw-absolute tw-right-0 tw-mt-2 tw-w-72 tw-bg-green-500 tw-shadow-2xl tw-rounded-2xl tw-border tw-z-30">
                         <div className="tw-absolute -tw-top-2 tw-right-5 tw-w-0 tw-h-0 tw-border-l-8 tw-border-r-8 tw-border-b-8 tw-border-transparent tw-border-b-green-200"></div>
                         <ul className='tw-m-2 tw-text-xs tw-text-slate-800'>
@@ -391,103 +391,6 @@ function DropdownNotification({ align }: DropdownNotificationProps) {
               ))}
             </ul>
           )}
-          {/* <ul className="tw-h-128 tw-overflow-y-auto" onScroll={handleScroll}>
-            {notifications.map((notification) => (
-              <li key={notification.id} className={`tw-duration-300 tw-border-b tw-border-slate-200  ${isLoading ? '' : 'last: tw-border-0'} tw-flex tw-items-center ${notification.status ? 'tw-bg-white hover:tw-bg-slate-100' : 'tw-bg-slate-100'}`}>
-                <Link
-                  className='tw-block tw-py-2 tw-px-4 tw-transition tw-w-5/6 tw-space-y-2'
-                  to={notification.notificationDetails.url}
-                  onClick={async () => {
-                    setDropdownOpen(!dropdownOpen)
-                    if (!notification.status) {
-                      await handleMarkAsRead(notification.id)
-                    }
-                    console.log('notification', notification.notificationDetails.url)
-                  }}
-                >
-                  <div className='tw-flex tw-justify-between'>
-                    <div className='tw-flex tw-space-x-2 tw-items-center'>
-                      <img className='tw-rounded-full tw-w-10 tw-h-10 tw-bg-black' src={NotifiyIcon}></img>
-                      <span className="tw-block tw-font-bold tw-text-black tw-mb-2">{notification.notificationDetails.title}</span>
-                    </div>
-                  </div>
-                  <span className="tw-block tw-text-sm tw-mb-2">
-                    📣{' '}
-                    {notification.notificationDetails.message.split(' ').map((word: string, index: React.Key | null | undefined) => (
-                      word === 'Congratulations!' || word === 'completed!'
-                        ? (
-                          <span key={index} className="tw-font-medium tw-text-slate-800">{word}</span>
-                          )
-                        : (
-                          <span key={index} className="tw-font-bold tw-text-slate-800"> {word} </span>
-                          )
-                    ))}
-                  </span>
-                  {selectedLanguage === 'en'
-                    ? <span className="tw-block tw-text-xs tw-font-medium tw-text-slate-400">
-                      {new Date(notification.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
-                    : <span className="tw-block tw-text-xs tw-font-medium tw-text-slate-400">
-                      {new Date(notification.createdAt).toLocaleDateString('vi-VN', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  }
-
-                </Link>
-                {notification.status ? <div></div> : <LensIcon className='tw-text-blue-300' fontSize='small' />}
-                {notification.status ? <div></div> : <div className='tw-rounded-full tw-bg-teal-300'></div>}
-                <div className="tw-relative">
-                  <MoreHorizIcon
-                    className="tw-cursor-pointer tw-rounded-full hover:tw-bg-slate-200 tw-mx-4"
-                    onClick={() => toggleMenu(parseInt(notification.id))}
-                  />
-                  {openMenuId === parseInt(notification.id) && (
-                    <div className="tw-absolute tw-right-0 tw-mt-2 tw-w-72 tw-bg-teal-200 tw-shadow-2xl tw-rounded-2xl tw-border tw-z-30">
-                      <div className="tw-absolute -tw-top-2 tw-right-5 tw-w-0 tw-h-0 tw-border-l-8 tw-border-r-8 tw-border-b-8 tw-border-transparent tw-border-b-teal-200"></div>
-                      <ul className='tw-m-2 tw-text-xs tw-text-slate-800'>
-                        <li
-                          className={`tw-px-4 tw-py-2 tw-cursor-pointer tw-font-bold tw-rounded-2xl ${notification.status ? 'tw-cursor-not-allowed tw-opacity-50' : 'hover:tw-bg-slate-100'}`}
-                          onClick={async () => {
-                            if (!notification.status) {
-                              console.log('notification.id', notification.id)
-                              await handleMarkAsRead(notification.id)
-                            }
-                          }}
-                        >
-                          <CheckIcon className='tw-mr-2' />{t('notification.mark_as_read')}
-                        </li>
-                        <li
-                          className={`tw-px-4 tw-py-2 tw-cursor-pointer tw-font-bold tw-rounded-2xl ${notification.status ? 'hover:tw-bg-slate-100' : 'tw-cursor-not-allowed tw-opacity-50'}`}
-                          onClick={async () => {
-                            if (notification.status) {
-                              await handleMarkAsUnread(notification.id)
-                            }
-                          }}
-                        >
-                          <NotificationsIcon className='tw-mr-2' />{t('notification.mark_as_unread')}
-                        </li>
-                        <li
-                          className='tw-px-4 tw-py-2 hover:tw-bg-slate-100 tw-cursor-pointer tw-font-bold tw-rounded-2xl'
-                          onClick={async () => {
-                            await handleRemoveNotification(notification.id)
-                          }}
-                        >
-                          <CloseIcon className='tw-mr-2' />{t('notification.removed_notification')}
-                        </li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul> */}
           {isLoading && (
             <PulseLoader
               className="tw-flex tw-justify-center tw-items-center tw-w-full tw-mt-20 tw-text-center"

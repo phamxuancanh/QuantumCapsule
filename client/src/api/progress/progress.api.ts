@@ -7,3 +7,6 @@ export const addProgress = async (theoryId: string): Promise<AxiosResponse<any>>
 export const findProgressByGradeAndSubject = async (grade: number, subject: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/progress/findProgressByGradeAndSubject?grade=${grade}&subjectId=${subject}`);
 }
+export const findProgressByChapter = async (chapterId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/progress/findProgressByChapter?chapterId=${chapterId}`);
+}

@@ -9,6 +9,9 @@ export const importChapters = async (chapters: any[]): Promise<AxiosResponse<any
 export const getListChapter = async ({params}: {params?: ListChapterParams}): Promise<AxiosResponse<DataListChapter>> => {
     return await requestWithJwt.get<DataListChapter>('/chapters', { params })
 }
+export const getListChapterNoPaging = async ({params}: {params?: ListChapterParams}): Promise<AxiosResponse<DataListChapter>> => {
+    return await requestWithJwt.get<DataListChapter>('/chapters/getListChapterNoPaging', { params })
+}
 export const getChapterById = async (chapterId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/chapters/${chapterId}`);
 }
