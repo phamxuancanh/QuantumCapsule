@@ -172,7 +172,55 @@ const getLessonByChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching lessons by chapterId' })
   }
 }
+// const getLessonByChapterId = async (req, res, next) => {
+//   try {
+//     const { chapterId } = req.params
 
+//     const lessons = await models.Lesson.findAll({
+//       where: {
+//         chapterId
+//       },
+//       attributes: [
+//         'id',
+//         'chapterId',
+//         'name',
+//         'order',
+//         'status',
+//         'createdAt',
+//         'updatedAt'
+//       ],
+//       include: [
+//         {
+//           model: models.Theory,
+//           attributes: ['id', 'lessonId'],
+//           separate: true
+//         },
+//         {
+//           model: models.Exam,
+//           attributes: ['id', 'lessonId'],
+//           separate: true
+//         }
+//       ]
+//     })
+
+//     const lessonsWithCounts = lessons.map((lesson) => {
+//       const theoryCount = lesson.Theories ? lesson.Theories.length : 0
+//       const examCount = lesson.Exams ? lesson.Exams.length : 0
+//       return {
+//         ...lesson.toJSON(),
+//         theoryCount,
+//         examCount,
+//         theories: lesson.theories,
+//         exams: lesson.exams
+//       }
+//     })
+
+//     res.json({ data: lessonsWithCounts })
+//   } catch (error) {
+//     console.error('Error fetching lessons by chapterId:', error)
+//     res.status(500).json({ message: 'Error fetching lessons by chapterId' })
+//   }
+// }
 // get lessons and exams
 // const getLessonsandExams = async (req, res, next) => {
 //   try {

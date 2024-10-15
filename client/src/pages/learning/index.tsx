@@ -295,7 +295,7 @@ const Learning = () => {
 
         </div>
       </div>
-      <div className='tw-w-full tw-border-y-2 tw-flex tw-justify-center'>
+      {/* <div className='tw-w-full tw-border-y-2 tw-flex tw-justify-center'>
         <div className='tw-flex tw-justify-between tw-w-4/5 tw-p-5'>
           <button className='tw-cursor-pointer tw-p-2 tw-bg-gray-600 tw-text-white tw-rounded-xl tw-font-bold hover:tw-bg-gray-500' onClick={handleUnPause}>{t('learning.continue_watching')}</button>
           <div className='tw-flex tw-space-x-4'>
@@ -312,7 +312,7 @@ const Learning = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className='tw-w-4/5 tw-mx-auto tw-pt-5'>
         <Tabs selectedIndex={currentTab} onSelect={(index) => setCurrentTab(index)}>
           <TabList className="tw-flex lg:tw-w-2/5 sm:tw-w-4/5 tw-w-full tw-mt-5">

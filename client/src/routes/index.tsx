@@ -13,9 +13,6 @@ import React from 'react'
 const Home = loadable(async () => await import('pages/home'), {
     fallback: <Loading />
 })
-const SkillList = loadable(async () => await import('pages/skill_list'), {
-    fallback: <Loading />
-})
 const SignIn = loadable(async () => await import('pages/sign_in'), {
     fallback: <Loading />
 })
@@ -150,7 +147,6 @@ const routes: RouteObject[] = [
             { index: true, element: <Home /> },
             { path: ROUTES.notfound, element: <NotFound /> },
             { path: ROUTES.profile, element: <Profile /> },
-            { path: ROUTES.skill_list, element: <SkillList /> },
             { path: ROUTES.admin, element: <Admin /> },
             { path: ROUTES.search_result, element: <SearchResultPage /> },
             { path: ROUTES.lessonDetail, element: <LessonDetail /> },

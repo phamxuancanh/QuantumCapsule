@@ -142,29 +142,31 @@ const Navbar = () => {
               <div className='tw-w-full tw-h-2'></div>
             )}
           </div>
-
           <div className="tw-flex tw-items-center tw-space-x-2 tw-w-auto">
             <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
-            <div className="tw-py-1">
+            {/* <div className="tw-py-1">
               <span className="tw-font-bold">Nội dung:</span>
-            </div>
+            </div> */}
             <Select
               value={selectedClass}
               onChange={handleClassChange}
               options={classes}
               placeholder="Chọn lớp"
-              className="tw-w-auto"
+              className="tw-w-auto tw-rounded-full tw-py-1 tw-px-2 tw-text-sm"
             />
             <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
 
           </div>
+
           <div className="tw-flex tw-items-center tw-space-x-3 tw-w-auto tw-justify-end">
             <div className="tw-flex tw-items-center tw-space-x-3">
+
               {data !== 'R1' && data !== 'R2' && <Notifications align="right" />}
               <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
               <UserMenu align="right" />
             </div>
           </div>
+
           {/* <div className="tw-flex tw-items-center tw-space-x-3 tw-w-1/5 tw-justify-end">
             <div className="tw-flex tw-items-center tw-space-x-3">
               {data !== 'R1' && data !== 'R2' && <Notifications align="right" />}
@@ -188,7 +190,7 @@ const Navbar = () => {
         <div className='tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-w-full tw-flex tw-justify-center tw-bg-green-400'>
           <div className="tw-flex tw-items-center tw-justify-between tw-h-16 tw--mb-px tw-w-3/5">
             <div className="tw-flex tw-items-center tw-justify-center tw-flex-1 tw-space-x-2">
-              <Link to="/skill_list" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/skill_list' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
+              <Link to="/" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/skill_list' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
                 {t('navbar.learning')}
               </Link>
               <Link to="/result_history" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/result_history' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
