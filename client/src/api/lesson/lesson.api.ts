@@ -21,3 +21,6 @@ export const getLessonsandExams = async ({params}: {params?: ListLessonandExamPa
 export const getSuggestions = async (search: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>('/lessons/getSuggestions', { params: { search } });
 }
+export const getFirstLessonByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/lessons/getFirstLessonByChapterId/${chapterId}`);
+}

@@ -522,6 +522,33 @@ const getLessonsandExams = async (req, res, next) => {
     res.status(500).json({ message: 'Error searching lessons and exams' })
   }
 }
+const getFirstLessonByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const lesson = await models.Lesson.findOne({
+      where: {
+        chapterId
+      },
+      attributes: [
+        'id',
+        'chapterId',
+        'name',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ],
+      order: [['order', 'ASC']],
+      limit: 1
+    })
+
+    res.json({ data: lesson })
+  } catch (error) {
+    console.error('Error fetching first lesson by chapterId:', error)
+    res.status(500).json({ message: 'Error fetching first lesson by chapterId' })
+  }
+}
 // get suggestions
 const getSuggestions = async (req, res, next) => {
   try {
@@ -564,5 +591,6 @@ module.exports = {
   getLessonById,
   getLessonByChapterId,
   getLessonsandExams,
-  getSuggestions
+  getSuggestions,
+  getFirstLessonByChapterId
 }
