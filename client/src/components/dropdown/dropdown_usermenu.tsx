@@ -181,7 +181,9 @@ const handleChange = useCallback(
           <img className="tw-w-8 tw-h-8 tw-rounded-full" src={userAVT} width="32" height="32" alt="User" />
           <div className='tw-flex-col tw-flex tw-justify-start tw-items-start'>
             <div className='tw-font-bold'>{userLastName} {userFirstName}</div>
+            {(data !== 'R1' && data !== 'R2') && (
             <div className='tw-text-gray-500 tw-text-sm'>Lớp {userGrade}</div>
+            )}
           </div>
         </div>
       </button>

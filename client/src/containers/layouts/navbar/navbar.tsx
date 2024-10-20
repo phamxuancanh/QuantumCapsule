@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, FC, useState } from 'react'
+import React, { useCallback, useMemo, FC, useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'services/i18n'
 import CryptoJS from 'crypto-js'
@@ -23,20 +23,32 @@ const Navbar = () => {
   const { pathname } = location
   const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'))
   const userRole = currentUser?.currentUser.key
+  const userGrade = currentUser?.currentUser.grade
   const classes = [
     { value: 1, label: 'Lớp 1' },
     { value: 2, label: 'Lớp 2' },
     { value: 3, label: 'Lớp 3' },
 ];
   const [selectedClass, setSelectedClass] = useState<{ value: number; label: string } | null>(null);
-  const handleClassChange = (newValue: SingleValue<{ value: number; label: string }>, actionMeta: ActionMeta<{ value: number; label: string }>) => {
-    if (newValue) {
-        setSelectedClass(newValue);
-        // const queryParams = new URLSearchParams(location.search);
-        // queryParams.set('grade', newValue.value.toString());
-        // queryParams.set('page', '1');
-        // navigate(`?${queryParams.toString()}`);
+  useEffect(() => {
+    if (userGrade) {
+      const initialClass = classes.find(cls => cls.value === userGrade);
+      setSelectedClass(initialClass || null);
     }
+  }, []);
+//   const handleClassChange = (newValue: SingleValue<{ value: number; label: string }>, actionMeta: ActionMeta<{ value: number; label: string }>) => {
+//     if (newValue) {
+//         // const queryParams = new URLSearchParams(location.search);
+//         // queryParams.set('grade', newValue.value.toString());
+//         // queryParams.set('page', '1');
+//         // navigate(`?${queryParams.toString()}`);
+//     }
+// };
+const handleClassChange = (selectedClass: any) => {
+  setSelectedClass(selectedClass);
+  const searchParams = new URLSearchParams(location.search);
+  searchParams.set('grade', selectedClass.value); // Cập nhật giá trị grade trong URL
+  navigate({ search: searchParams.toString() }); // Thay đổi URL với giá trị mới
 };
   let data: string | undefined
   if (userRole) {
@@ -142,21 +154,22 @@ const Navbar = () => {
               <div className='tw-w-full tw-h-2'></div>
             )}
           </div>
-          <div className="tw-flex tw-items-center tw-space-x-2 tw-w-auto">
-            <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
-            {/* <div className="tw-py-1">
-              <span className="tw-font-bold">Nội dung:</span>
-            </div> */}
-            <Select
-              value={selectedClass}
-              onChange={handleClassChange}
-              options={classes}
-              placeholder="Chọn lớp"
-              className="tw-w-auto tw-rounded-full tw-py-1 tw-px-2 tw-text-sm"
-            />
-            <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
-
-          </div>
+          {ROUTES.home == pathname && data !== 'R1' && data !== 'R2' && (
+        <div className="tw-flex tw-items-center tw-space-x-2 tw-w-auto">
+          <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
+          {/* <div className="tw-py-1">
+            <span className="tw-font-bold">Nội dung:</span>
+          </div> */}
+          <Select
+            value={selectedClass}
+            onChange={handleClassChange}
+            options={classes}
+            placeholder="Chọn lớp"
+            className="tw-w-auto tw-rounded-full tw-py-1 tw-px-2 tw-text-sm"
+          />
+          <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
+        </div>
+      )}
 
           <div className="tw-flex tw-items-center tw-space-x-3 tw-w-auto tw-justify-end">
             <div className="tw-flex tw-items-center tw-space-x-3">
