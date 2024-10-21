@@ -9,8 +9,9 @@ router.put('/:id', verifyAccessToken, lessonController.updateLesson)
 router.delete('/:id', verifyAccessToken, lessonController.deleteLesson)
 router.get('/getSuggestions', verifyAccessToken, lessonController.getSuggestions)
 router.get('/getLessonsandExams', verifyAccessToken, lessonController.getLessonsandExams)
-router.get('/:id', verifyAccessToken, lessonController.getLessonById)
+// router.get('/:id', verifyAccessToken, lessonController.getLessonById)
 router.get('/chapter/:chapterId', verifyAccessToken, lessonController.getLessonByChapterId)
 router.get('/getFirstLessonByChapterId/:chapterId', verifyAccessToken, lessonController.getFirstLessonByChapterId)
+router.get('/getListLessonByChapterId/:chapterId', verifyAccessToken, lessonController.getListLessonByChapterId)
 
 module.exports = router

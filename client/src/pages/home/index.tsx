@@ -713,7 +713,7 @@ const Home = () => {
                                                         {examProgress ? (
                                                             <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
                                                                 {/* <Rating name="customized-10" value={starRating} max={3} readOnly /> */}
-                                                                <div>Điểm: <span className='tw-font-bold'>{calculateScore(yourScore, totalScore)}</span></div>
+                                                                <div>Điểm: <span className='tw-font-bold'>{calculateScore(totalScore, yourScore)}</span></div>
                                                                 <div>Làm đúng: {yourScore}/{totalScore} câu</div>
                                                             </div>
                                                         ) : (

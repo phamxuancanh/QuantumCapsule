@@ -23,8 +23,8 @@ const StarModal: React.FC<IProps> = (props) => {
                     alignItems: 'center',
                 }}
             >
-                <Typography variant='h1'>
-                    Bạn đã đạt được {calculateScore(result.totalScore, result.yourScore)} điểm
+                <Typography variant='h1' color={"#72BF78"}>
+                    {calculateScore(result.totalScore, result.yourScore)} điểm
                 </Typography>
             </Box>
         </CustomModal>

@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Box, Card, CardContent, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { getListAllChapter, getListChapter } from 'api/chapter/chapter.api';
 import { IChapter } from 'api/chapter/chapter.interface';
 import { getListLesson } from 'api/lesson/lesson.api';
@@ -75,42 +75,52 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
 
     return (
         <Box>
-            <Card>
-                <CardContent>
-                <FormControl fullWidth style={{ marginBottom: '1rem' }}>
-                    <InputLabel>Chương</InputLabel>
-                    <Select
-                        name="subjectId"
-                        value={selectedSubjectId}
-                        label="Môn"
-                        onChange={e =>handleChange(e)}
-                    >
-                    {subjects?.map((subject) => (
-                        <MenuItem key={subject.id} value={subject.id}>
-                            {subject.name}
-                        </MenuItem>
-                    ))}
-                    </Select>
-                </FormControl>
+            <Card sx={{
+                p: "1rem",
+            }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={2}>
+                        <FormControl fullWidth style={{ marginBottom: '1rem' }}>
+                            <InputLabel>Môn</InputLabel>
+                            <Select
+                                name="subjectId"
+                                value={selectedSubjectId}
+                                label="Môn"
+                                onChange={e =>handleChange(e)}
+                            >
+                            {subjects?.map((subject) => (
+                                <MenuItem key={subject.id} value={subject.id}>
+                                    {subject.name}
+                                </MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl>
 
-                {/* Dropdown chọn lesson */}
-                <FormControl fullWidth>
-                    <InputLabel>Chương</InputLabel>
-                    <Select
-                        name="chapterId"
-                        value={selectedChapterId}
-                        label="Chương"
-                        onChange={(e)=>handleChange(e)}
-                        // disabled={selectedSubjectId === ''} // Disable nếu chưa chọn chapter
-                    >
-                    {filteredChapter?.map((item) => (
-                        <MenuItem key={item.id} value={item.id}>
-                            {item.name}
-                        </MenuItem>
-                    ))}
-                    </Select>
-                </FormControl>
-                </CardContent>
+                    </Grid>
+                    <Grid item xs={12} md={5}>
+                        <FormControl fullWidth>
+                            <InputLabel>Chương</InputLabel>
+                            <Select
+                                name="chapterId"
+                                value={selectedChapterId}
+                                label="Chương"
+                                onChange={(e)=>handleChange(e)}
+                                // disabled={selectedSubjectId === ''} // Disable nếu chưa chọn chapter
+                            >
+                            {filteredChapter?.map((item) => (
+                                <MenuItem key={item.id} value={item.id}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl>
+
+                    </Grid>
+
+                    {/* Dropdown chọn lesson */}
+
+
+                </Grid>
             </Card>
         </Box>
     );

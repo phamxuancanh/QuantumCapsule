@@ -48,3 +48,9 @@ export function generateExamQuestionUID(): string {
     const ID = `examquestion${currentDateString()}_${randomNum1}_${randomNum2}`;
     return ID;
 }
+export function generateLessonUID(): string {
+    const randomNum1 = generateRandomNumber();
+    const randomNum2 = generateRandomNumber();
+    const ID = `lesson${currentDateString()}_${randomNum1}_${randomNum2}`;
+    return ID;
+}

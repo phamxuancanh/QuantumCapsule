@@ -7,15 +7,18 @@ import { ACTIONS } from "utils/enums"
 import ToolbarComponent from "./components/toolbar/ToolbarComponent"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
 import AddQuestionBox from "./components/add-questions/AddQuestionBox"
-import { addExam, deleteExam, getListExam, importExamQuestions, importExams, updateExam } from "api/exam/exam.api"
+import { addExam, deleteExam, getListExam, getListExamByChapterId, importExamQuestions, importExams, updateExam } from "api/exam/exam.api"
 import { IExam, ListExamParams } from "api/exam/exam.interface"
 import Loading from "containers/loadable-fallback/loading"
 import loadable from "@loadable/component"
-import { getListChapter } from "api/chapter/chapter.api"
+import { getListAllChapter, getListChapter } from "api/chapter/chapter.api"
 import { IChapter } from "api/chapter/chapter.interface"
-import { getListLesson } from "api/lesson/lesson.api"
+import { getListLesson, getListLessonByChapterId } from "api/lesson/lesson.api"
 import { ILesson } from "api/lesson/lesson.interface"
 import { toast } from "react-toastify"
+import QCChapterFilter, { IChapterFilter } from "QCComponents/QCChapterFilter.tsx/ChapterFilter"
+import QCDateFilter from "QCComponents/QCDateFilter/QCDateFilter"
+import RenderEditCell from "../components/RenderEditCell/RenderEditCell"
 const SimpleTable = loadable(() => import("components/tables/simpleTable/SimpleTable"), { fallback: <Loading /> });
 
 interface IProps {
@@ -29,44 +32,18 @@ const ExamManager: React.FC<IProps> = () => {
     const [chapterParams, setChapterParams] = React.useState<IChapter[]>([])
     const [lessonParams, setLessonParams] = React.useState<ILesson[]>([])
 
-    useEffect(() => {
-        setLoading(true)
-        const fetchData = async () => {
-            try {
-                const response = await getListExam({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 200,
-                    },
-                })
-
-                setDataTable(response.data.data as IExam[])
-
-                const response2 = await getListChapter({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 100,
-                    },
-                })
-                setChapterParams(response2.data.data)
-
-                const response3 = await getListLesson({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 100,
-                    },
-                })
-                setLessonParams(response3.data.data)
-            } catch (error) {
-                console.error("Error fetching data:", error)
-            }
+    const handleFilter = async (data: IChapterFilter) => {
+        try {
+            const response = await getListExamByChapterId(data.chapterId ?? '')
+            setDataTable(response.data.data)
+            const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
+            setLessonParams(resLessons.data.data)
+            const resChapters = await getListAllChapter()
+            setChapterParams(resChapters.data.data)
+        }catch (error: any) {
+            toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
-        fetchData()
-        setLoading(false)
-    }, [])
+    }
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
@@ -100,83 +77,74 @@ const ExamManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={1}>
-                {!dataTable?.length ? <Loading /> :
-                    <SimpleTable
-                        initData={dataTable as unknown as IExam[]}
-                        loading={loading}
-                        getRowId={(row) => row.id}
-                        initNewRow={{
-                            id: generateExamId(),
-                            name: "",
-                            chapterId: "",
-                            lessonId: "",
-                            order: 0,
-                            status: true,
-                        }}
-                        toolbarComponent={<ToolbarComponent />}
-                        columns={
-                            [
-                                {
-                                    field: "name",
-                                    headerName: "Tên bài tập",
-                                    width: 130,
-                                    editable: true,
+                <QCChapterFilter 
+                    onChange={handleFilter}
+                />
+                <SimpleTable
+                    initData={dataTable as unknown as IExam[]}
+                    loading={loading}
+                    getRowId={(row) => row.id}
+                    initNewRow={{
+                        id: generateExamId(),
+                        name: "",
+                        chapterId: "",
+                        lessonId: "",
+                        order: 0,
+                        status: true,
+                    }}
+                    // toolbarComponent={<ToolbarComponent />}
+                    columns={
+                        [
+                            {
+                                field: "name",
+                                headerName: "Tên bài tập",
+                                width: 130,
+                                editable: true,
+                            },
+                            { field: 'chapterId', headerName: 'Chương', width: 130, 
+                                editable: true,
+                                valueFormatter: (value: string) => {
+                                    const temp = chapterParams?.find((item) => item.id === value)
+                                    return temp?.name
                                 },
-                                {
-                                    field: "chapterId",
-                                    headerName: "Chương",
-                                    width: 130,
-                                    valueOptions: chapterParams.map(
-                                        (chapter) => {
-                                            return {
-                                                value: chapter.id,
-                                                label: chapter.name,
-                                            }
-                                        },
-                                    ),
-                                    editable: true,
-                                    type: "singleSelect",
+                                renderEditCell(params) {
+                                    return <RenderEditCell params={params} dataParams={chapterParams} label='name' editCellField='chapterId'/>
                                 },
-                                {
-                                    field: "lessonId",
-                                    headerName: "Bài học",
-                                    width: 130,
-                                    valueOptions: lessonParams.map(
-                                        (lesson) => {
-                                            return {
-                                                value: lesson.id,
-                                                label: lesson.name,
-                                            }
-                                        },
-                                    ),
-                                    editable: true,
-                                    type: "singleSelect",
+                            },
+                            { field: 'lessonId', headerName: 'Bài học', width: 180, 
+                                editable: true,
+                                valueFormatter: (value: string) => {
+                                    const temp = lessonParams?.find((item) => item.id === value)
+                                    return temp?.name
                                 },
-                                {
-                                    field: "order",
-                                    headerName: "Sắp xếp",
-                                    width: 130,
-                                    editable: true,
-                                    type: "number",
+                                renderEditCell(params) {
+                                    return <RenderEditCell params={params} dataParams={lessonParams} label='name' editCellField='lessonId'/>
                                 },
-                                {
-                                    field: "status",
-                                    headerName: "Trạng thái",
-                                    width: 130,
-                                },
-                            ] as GridColDef[]
-                        }
-                        onRowClick={(row) => {
-                            setDataSelected(row.row)
-                            // setOpenForm(true);
-                        }}
-                        onUpdateRow={(data, action) =>
-                            handleUpdateRow(data, action)
-                        }
-                    />
-                }
-                </Box>
-            <AddQuestionBox />
+                            },
+                            {
+                                field: "order",
+                                headerName: "Sắp xếp",
+                                width: 130,
+                                editable: true,
+                                type: "number",
+                            },
+                            {
+                                field: "status",
+                                headerName: "Trạng thái",
+                                width: 100,
+                            },
+                        ] as GridColDef[]
+                    }
+                    onRowClick={(row) => {
+                        setDataSelected(row.row)
+                        // setOpenForm(true);
+                    }}
+                    onUpdateRow={(data, action) =>
+                        handleUpdateRow(data, action)
+                    }
+                />
+            </Box>
+            {/* <AddQuestionBox /> */}
         </Box>
     )
 }

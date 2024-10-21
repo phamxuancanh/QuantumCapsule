@@ -8,11 +8,12 @@ import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
 import { IQuestion } from 'api/question/question.interfaces';
-import { addQuestion, deleteQuestion, getListQuesion, importQuestions, updateQuestion } from 'api/question/question.api';
+import { addQuestion, deleteQuestion, getListQuesion, getListQuestionByChapterId, importQuestions, updateQuestion } from 'api/question/question.api';
 import { ILesson } from 'api/lesson/lesson.interface';
-import { getListLesson, importLessons } from 'api/lesson/lesson.api';
+import { getListLesson, getListLessonByChapterId, importLessons } from 'api/lesson/lesson.api';
 import { toast } from 'react-toastify';
-import { addExam } from 'api/exam/exam.api';
+import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
+import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -26,45 +27,16 @@ const ExamManager: React.FC<IProps> = () => {
     const [loading, setLoading] = React.useState(false)
     const [lessonParams, setLessonParams] = React.useState<ILesson[]>([])
 
-    useEffect(() => {
-        setLoading(true)
-        const fetchData = async () => {
-            try {
-                const response = await getListQuesion({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 30,
-                    },
-                })
-
-                setDataTable(response.data.data as IQuestion[])
-
-                // const response2 = await getListChapter({
-                //     params: {
-                //         page: 1,
-                //         search: "",
-                //         size: 100,
-                //     },
-                // })
-                // setChapterParams(response2.data.data)
-
-                const response3 = await getListLesson({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 100,
-                    },
-                })
-                setLessonParams(response3.data.data)
-            } catch (error) {
-                console.error("Error fetching data:", error)
-            }
+    const handleFilter = async (data: IChapterFilter) => {
+        try {
+            const response = await getListQuestionByChapterId(data.chapterId ?? '')
+            setDataTable(response.data.data)
+            const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
+            setLessonParams(resLessons.data.data)
+        }catch (error: any) {
+            toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
-        fetchData()
-        setLoading(false)
-    }, [])
-
+    }
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
@@ -97,9 +69,10 @@ const ExamManager: React.FC<IProps> = () => {
     }
     return (
         <Box>
-            <Box p={5}>
-            {!dataTable?.length ? <Loading /> :
-
+            <Box p={2}>
+            <QCChapterFilter 
+                onChange={handleFilter}
+            />
                 <SimpleTable 
                     initData={dataTable ? dataTable : [] as IQuestion[]}
                     initNewRow={{
@@ -131,15 +104,15 @@ const ExamManager: React.FC<IProps> = () => {
                         { field: 'E', headerName: 'E', width: 130, editable: true },
                         { field: 'correctAnswer', headerName: 'Đáp án đúng', width: 130, editable: true },
                         { field: 'explainAnswer', headerName: 'Giải thích đáp án', width: 130, editable: true },
-                        { field: 'lessonId', headerName: 'Bài học', width: 130, 
-                            valueOptions: lessonParams.map((item) => {
-                                return {
-                                    value: item.id,
-                                    label: item.name
-                                }
-                            }),
+                        { field: 'lessonId', headerName: 'Bài học', width: 180, 
                             editable: true,
-                            type: 'singleSelect',
+                            valueFormatter: (value: string) => {
+                                const temp = lessonParams?.find((item) => item.id === value)
+                                return temp?.name
+                            },
+                            renderEditCell(params) {
+                                return <RenderEditCell params={params} dataParams={lessonParams} label='name' editCellField='lessonId'/>
+                            },
                         },
                         { field: 'status', headerName: 'Trạng thái', width: 130 }
                     ] as GridColDef[]}
@@ -149,8 +122,6 @@ const ExamManager: React.FC<IProps> = () => {
                     }}
                     onUpdateRow={(data, action) => handleUpdateRow(data, action)}
                 />
-            }
-
             </Box>
         </Box>
     );
