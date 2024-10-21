@@ -12,3 +12,8 @@ export const getListChapter = async ({params}: {params?: ListChapterParams}): Pr
 export const getChapterById = async (chapterId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/chapters/${chapterId}`);
 }
+
+export const getListAllChapter = async (): Promise<AxiosResponse<DataListChapter>> => {
+    console.log('getListAllChapter');
+    return await requestWithJwt.get<DataListChapter>('/chapters/getListAllChapter', { withCredentials: true });
+}

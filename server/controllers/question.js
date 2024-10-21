@@ -182,6 +182,22 @@ const getListQuestionByExamId = async (req, res, next) => {
     res.status(500).json({ message: 'Error getting questions by examId' })
   }
 }
+const getListQuestionByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const query = queries.getListQuestionByChapterId
+
+    // Thực hiện truy vấn
+    const listQuestions = await sequelize.query(query, {
+      replacements: { chapterId }, // Thay thế chapterId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listQuestions })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 
 module.exports = {
   importQuestions,
@@ -189,5 +205,6 @@ module.exports = {
   addQuestion,
   updateQuestion,
   deleteQuestion,
-  getListQuestionByExamId
+  getListQuestionByExamId,
+  getListQuestionByChapterId
 }

@@ -23,7 +23,9 @@ export const deleteQuestion = async (id: string): Promise<AxiosResponse<any>> =>
 }
 
 export const getListQuesionByExamId = async (examId: string): Promise<AxiosResponse<any>> => {
-    console.log(examId);
-    
     return await requestWithJwt.get<any>('/questions/getListQuestionByExamId/'+ examId,  { withCredentials: true });
+}
+
+export const getListQuestionByChapterId = async (examId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>('/questions/getListQuestionByChapterId/'+ examId,  { withCredentials: true });
 }

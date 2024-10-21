@@ -19,6 +19,30 @@ const queries = {
     from questions q
     join exam_questions eq on q.id = eq.questionId
     where examId = :examId
+  `,
+  getListExamQuestionByChapterId: `
+    select eq.* from exam_questions eq
+    join exams e on eq.examId = e.id
+    join lessons l on e.lessonId = l.id
+    where l.chapterId = :chapterId and eq.status = 1
+    order by eq.updatedAt desc
+  `,
+  getListQuestionByChapterId: `
+    select q.* from questions q
+    join lessons l on q.lessonId = l.id
+    where q.status = 1 and l.chapterId = :chapterId
+    order by q.updatedAt desc
+  `,
+  getListExamByChapterId: `
+    select e.* from exams e
+    left join lessons l on e.lessonId = l.id
+    where (l.chapterId = :chapterId or e.chapterId = :chapterId) and e.status = 1
+    order by e.updatedAt desc
+  `,
+  getListLessonByChapterId: `
+    select l.* from lessons l
+    where l.chapterId = :chapterId and l.status = 1
+    order by l.updatedAt desc
   `
 }
 module.exports = { queries }

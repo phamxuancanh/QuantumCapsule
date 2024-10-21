@@ -1,5 +1,6 @@
 import React, { useEffect } from "react"
 import {
+    useActStarModal,
     useCurrentQuestion,
     useExamId,
     useIsSumited,
@@ -11,7 +12,7 @@ import {
 } from "./context/context"
 import QuestionBox from "modules/Practice/components/question-box/QuestionBox"
 import { data } from "./data/questions"
-import { InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
+import { caculateStar, InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
 import { Box, Button, Grid } from "@mui/material"
 import { IQuestion } from "api/question/question.interfaces"
 import ListQuestionButton from "./components/list-question-button/ListQuestionButton"
@@ -22,6 +23,10 @@ import { getFromLocalStorage } from "utils/functions"
 import ResultBox from "./components/result-box/ResultBox"
 import StarModal from "./components/star-modal/StarModal"
 import TimeCountdown from "components/countdown/timeCountdown/TimeCountdown"
+import { insertResult } from "api/result/result.api"
+import { insertListAnswer } from "api/answer/answer.api"
+import { ACTIONS } from "utils/enums"
+import { IResult } from "api/result/result.interface"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -34,6 +39,7 @@ const Practice: React.FC = () => {
     const { openResult, setOpenResult } = useOpenResult()
     const {isSumited, setIsSumited} = useIsSumited()
     const {examId, setExamId} = useExamId()
+    const {setActStarModal} = useActStarModal()
     // const[]
     
     useEffect(() => {
@@ -59,7 +65,21 @@ const Practice: React.FC = () => {
         }
         fetchData()
     }, [])
-
+    const handleSubmit = async () => {
+        try {
+            const res2 = await insertResult({
+                ...result,
+                star: caculateStar(result),
+            } as IResult)        
+            const res1 = await insertListAnswer(listAnswer)
+            toast.success("Nộp bài thành công")
+            setIsSumited(true)
+            setActStarModal({open: true, payload: caculateStar(result), type: ACTIONS.VIEW})
+        } catch (error: any) {
+            toast.error(error.message)
+            toast.error(error.message)
+        }
+    }
     return (
         <Box>
             <StarModal />
@@ -74,7 +94,7 @@ const Practice: React.FC = () => {
                 <Grid item xs={3}>
                     <TimeCountdown initialSeconds={60 *20} // 20 minutes 
                         onCountdownEnd={() => {
-                            toast.error("Hết giờ rồi !!!")
+                            handleSubmit()
                         }}
                     />
                     <ListQuestionButton isOpen={isSumited === false}/>

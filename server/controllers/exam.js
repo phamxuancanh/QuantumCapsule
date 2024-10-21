@@ -1,5 +1,7 @@
-const { models } = require('../models')
+const { queries } = require('../helpers/QueryHelper')
+const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
+const ExamQuestion = require('../models/exam_question')
 
 // import exams data
 const importExams = async (req, res, next) => {
@@ -207,6 +209,91 @@ const getExamsByChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching exams' })
   }
 }
+
+const getListExamByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const query = queries.getListExamByChapterId
+
+    // Thực hiện truy vấn
+    const listExams = await sequelize.query(query, {
+      replacements: { chapterId }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listExams })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// #region exam_question
+const getListExamQuestionByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const query = queries.getListExamQuestionByChapterId
+
+    // Thực hiện truy vấn
+    const listExamQuestions = await sequelize.query(query, {
+      replacements: { chapterId }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listExamQuestions })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+const insertExamQuestion = async (req, res, next) => {
+  try {
+    const { examId, questionId } = req.body
+    const examQuestion = await models.ExamQuestion.create({ examId, questionId })
+    res.status(201).json({ message: 'Exam Question added successfully', data: examQuestion })
+  } catch (error) {
+    console.error('Error adding exam question:', error)
+    res.status(500).json({ message: 'Error adding exam question' })
+  }
+}
+const deleteExamQuestion = async (req, res, next) => {
+  try {
+    const { id } = req.params
+
+    const examQuestion = await models.ExamQuestion.findByPk(id)
+    if (!examQuestion) {
+      return res.status(404).json({ message: 'Không tìm thấy' })
+    }
+    // update status 0
+    await examQuestion.update({ status: 0 })
+    res.json({ message: 'xóa thành công' })
+  } catch (error) {
+    res.status(500).json({ message: 'lỗi khi xóa: ' + error.message })
+  }
+}
+const updateExamQuestion = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+    const examQuestion = await models.ExamQuestion.findOne({ where: { id } })
+    console.log('--------------updateData', updateData, examQuestion)
+    if (!examQuestion) {
+      return res.status(404).json({ message: 'Không tìm thấy' })
+    }
+
+    await ExamQuestion.update(
+      { ...updateData, updatedAt: new Date() },
+      {
+        where: {
+          id
+        }
+      }
+    )
+    res.json({ message: 'Cập nhật thành công', data: examQuestion })
+  } catch (error) {
+    res.status(500).json({ message: 'lỗi khi cập nhật: ' + error.message })
+  }
+}
+// #endregion
+
 module.exports = {
   importExams,
   getListExam,
@@ -214,5 +301,11 @@ module.exports = {
   updateExam,
   deleteExam,
   getExamsByLessonId,
-  getExamsByChapterId
+  getExamsByChapterId,
+  getListExamByChapterId,
+  // exam_question
+  getListExamQuestionByChapterId,
+  insertExamQuestion,
+  deleteExamQuestion,
+  updateExamQuestion
 }

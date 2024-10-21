@@ -85,9 +85,10 @@ export interface ISimpleTableProps {
 }
 
 export default function SimpleTable(props: ISimpleTableProps) {
-    const [rows, setRows] = React.useState(
-        props.initData
-    );
+    const [rows, setRows] = React.useState<any[]>([]);
+    React.useEffect (() => {
+        setRows(props.initData)
+    }, [props.initData])
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {

@@ -4,7 +4,8 @@ import React from 'react';
 
 interface IProps {
     params: GridRenderEditCellParams<any, any, any, GridTreeNodeWithRender>
-    dataParams: any
+    dataParams: any,
+    editCellField: string
 }
 
 const RenderEditCell: React.FC<IProps> = (props) => {
@@ -18,7 +19,7 @@ const RenderEditCell: React.FC<IProps> = (props) => {
             onChange={(event, newValue) => {
                 props.params.api.setEditCellValue({
                     id: props.params.id,
-                    field: 'lessonId',
+                    field: props.editCellField,
                     value: newValue?.id, // Assign the ID value to the cell
                 });
             }}
@@ -26,7 +27,7 @@ const RenderEditCell: React.FC<IProps> = (props) => {
             <TextField
               {...params}
               fullWidth
-              label="Chọn bài học"
+              label="Chọn"
               variant="outlined"
             />
           )}
