@@ -30,6 +30,7 @@ import thumnail from '../../assets/thumnail.png';
 import thumnail_exercise from '../../assets/thumnail_exercises.png';
 import thumnail_exam from '../../assets/thumnail_exam.png';
 import { getListUniqueDoneResultByUserId } from 'api/result/result.api';
+import { calculateScore } from 'helpers/Nam-helper/Caculate';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -690,7 +691,7 @@ const Home = () => {
                                                         {starRating && (
                                                             <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
                                                                 {/* <Rating name="customized-10" value={starRating} max={3} readOnly /> */}
-                                                                <div>Điểm: <span className='tw-font-bold'>{(yourScore / totalScore * 10).toFixed(2)}</span></div>
+                                                                <div>Điểm: <span className='tw-font-bold'>{calculateScore(yourScore, totalScore)}</span></div>
                                                                 <div>Làm đúng: {yourScore}/{totalScore} câu</div>
                                                             </div>
                                                         )}
