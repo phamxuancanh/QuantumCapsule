@@ -29,6 +29,7 @@ import CryptoJS from 'crypto-js'
 import { signOut } from 'api/user/user.api'
 import { toast } from 'react-toastify'
 import { logoutState } from '../../redux/auth/authSlice'
+import Select, { ActionMeta, SingleValue } from 'react-select';
 interface DropdownProfileProps {
   align: string
 }
@@ -60,6 +61,8 @@ function DropdownProfile({ align }: DropdownProfileProps) {
   const userEmail = currentUser?.currentUser.email
   const userRole = currentUser?.currentUser.key
   const userAVT = currentUser?.currentUser.avatar
+  const userGrade = currentUser?.currentUser.grade
+
   let data: string | undefined
   if (userRole) {
     try {
@@ -165,35 +168,6 @@ const handleChange = useCallback(
   //    }
   //  }, [setTheme, theme])
   const locationPath = 'delete.png'
-  //  const renderThemeSwitcher = useMemo(() => {
-  // //    const icon = theme === 'dark' ? <span className='flex items-center'><div className='mr-3'>☀️</div> <div>{t('dropdown.lightTheme')}</div></span> : <span className='flex items-center'><div className='mr-3'>🌙</div> <div>{t('dropdown.darkTheme')}</div></span>
-
-  //    return (
-  //      <div className='cursor-pointer py-1 px-6 font-medium text-sm text-gray-500 hover:text-teal-600'>
-  //        {/* {icon} */}
-  //      </div>
-  //      //   <Switch.Group as="div" className="flex items-center">
-  //      //   <Switch.Label as="span" className="mr-3">
-  //      //     {theme === 'dark' ? 'Dark mode' : 'Light mode'}
-  //      //   </Switch.Label>
-  //      //   <Switch
-  //      //     as="button"
-  //      //     checked={theme === 'dark'}
-  //      //     onChange={handleThemeSwitch}
-  //      //     className={`${
-  //      //       theme === 'dark' ? 'bg-blue-600' : 'bg-gray-400'
-  //      //     } relative inline-block w-10 align-middle select-none transition duration-200 ease-in`}
-  //      //   >
-  //      //     <span
-  //      //       aria-hidden="true"
-  //      //       className={`${
-  //      //         theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
-  //      //       } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ease-in-out`}
-  //      //     />
-  //      //   </Switch>
-  //      // </Switch.Group>
-  //    )
-  //  }, [handleThemeSwitch, theme])
   return (
     <div className="tw-relative tw-inline-flex">
       <button
@@ -203,9 +177,16 @@ const handleChange = useCallback(
         onClick={() => setDropdownOpen(!dropdownOpen)}
         aria-expanded={dropdownOpen}
       >
-        <img className="tw-w-8 tw-h-8 tw-rounded-full" src={userAVT} width="32" height="32" alt="User" />
+        <div className='tw-flex tw-space-x-3 tw-justify-center tw-items-center'>
+          <img className="tw-w-8 tw-h-8 tw-rounded-full" src={userAVT} width="32" height="32" alt="User" />
+          <div className='tw-flex-col tw-flex tw-justify-start tw-items-start'>
+            <div className='tw-font-bold'>{userLastName} {userFirstName}</div>
+            {(data !== 'R1' && data !== 'R2') && (
+            <div className='tw-text-gray-500 tw-text-sm'>Lớp {userGrade}</div>
+            )}
+          </div>
+        </div>
       </button>
-
       <Transition
         className={`tw-w-56 tw-origin-top-right tw-z-10 tw-absolute tw-top-full tw-min-w-44 tw-bg-white tw-border tw-border-slate-200 tw-py-1.5 tw-rounded tw-shadow-lg tw-overflow-hidden tw-mt-1 ${align === 'right' ? 'tw-right-0' : 'tw-left-0'}`}
         show={dropdownOpen}

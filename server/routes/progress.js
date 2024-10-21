@@ -5,4 +5,5 @@ const { verifyAccessToken } = require('../middlewares/jwtService')
 
 router.post('/addProgress', verifyAccessToken, progressController.addProgress)
 router.get('/findProgressByGradeAndSubject', verifyAccessToken, progressController.findProgressByGradeAndSubject)
+router.get('/findProgressByChapter', verifyAccessToken, progressController.findProgressByChapter)
 module.exports = router

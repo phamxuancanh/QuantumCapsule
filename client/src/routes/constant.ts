@@ -1,6 +1,5 @@
 const ROUTES = {
     home: '/',
-    skill_list: '/skill_list',
     notfound: '*',
     sign_in: '/sign_in',
     sign_up: '/sign_up',

@@ -17,6 +17,95 @@ const importChapters = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding chapters' })
   }
 }
+// ge list chapters no paging
+const getListChapterNoPaging = async (req, res, next) => {
+  try {
+    const { search: nameCondition, subjectId, grade } = req.query
+
+    const searchConditions = {
+      where: {}
+    }
+
+    if (nameCondition) {
+      searchConditions.where.name = {
+        [Op.like]: `%${nameCondition}%`
+      }
+    }
+
+    if (subjectId) {
+      searchConditions.where.subjectId = subjectId
+    }
+
+    if (grade) {
+      searchConditions.where.grade = grade
+    }
+
+    const chapters = await models.Chapter.findAll({
+      ...searchConditions,
+      attributes: [
+        'id',
+        'subjectId',
+        'name',
+        'description',
+        'grade',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ]
+    })
+
+    const chapterIds = chapters.map(chapter => chapter.id)
+
+    // Fetch all theories associated with the chapters
+    const theories = await models.Theory.findAll({
+      include: [
+        {
+          model: models.Lesson,
+          attributes: ['chapterId'],
+          where: {
+            chapterId: chapterIds
+          }
+        }
+      ],
+      attributes: ['id', 'lessonId', 'name']
+    })
+
+    // Fetch all exams associated with the chapters
+    const exams = await models.Exam.findAll({
+      include: [
+        {
+          model: models.Lesson,
+          attributes: ['chapterId'],
+          where: {
+            chapterId: chapterIds
+          }
+        }
+      ],
+      attributes: ['id', 'lessonId', 'name']
+    })
+
+    const chaptersWithCounts = chapters.map(chapter => {
+      const chapterTheories = theories.filter(theory => theory.Lesson.chapterId === chapter.id)
+      const chapterExams = exams.filter(exam => exam.Lesson.chapterId === chapter.id)
+
+      return {
+        ...chapter.toJSON(),
+        theoryCount: chapterTheories.length,
+        examCount: chapterExams.length,
+        theories: chapterTheories,
+        exams: chapterExams
+      }
+    })
+
+    res.json({
+      data: chaptersWithCounts
+    })
+  } catch (error) {
+    console.error('Error fetching chapters:', error)
+    res.status(500).json({ message: 'Error fetching chapters' })
+  }
+}
 // get list chapters by many conditions
 const getListChapter = async (req, res, next) => {
   try {
@@ -169,11 +258,43 @@ const getListChapterBySubjectId = async (req, res, next) => {
 const getChapterById = async (req, res, next) => {
   try {
     const { id } = req.params
-    const chapter = await models.Chapter.findByPk(id)
+
+    const chapter = await models.Chapter.findByPk(id, {
+      include: [
+        {
+          model: models.Lesson,
+          attributes: ['id']
+        }
+      ]
+    })
+
     if (!chapter) {
       return res.json({ data: null, message: error.message })
     }
-    res.json({ chapter })
+
+    const lessonIds = chapter.Lessons.map(lesson => lesson.id)
+
+    // Fetch all theories associated with the lessons in the chapter
+    const theories = await models.Theory.findAll({
+      where: {
+        lessonId: lessonIds
+      },
+      attributes: ['id', 'lessonId', 'name']
+    })
+
+    // Fetch all exams associated with the lessons in the chapter
+    const exams = await models.Exam.findAll({
+      where: {
+        lessonId: lessonIds
+      },
+      attributes: ['id', 'lessonId', 'name']
+    })
+
+    res.json({
+      chapter: chapter.toJSON(),
+      theories,
+      exams
+    })
   } catch (error) {
     console.error('Error fetching chapter:', error)
     res.status(500).json({ message: 'Error fetching chapter' })
@@ -182,6 +303,7 @@ const getChapterById = async (req, res, next) => {
 
 module.exports = {
   importChapters,
+  getListChapterNoPaging,
   getListChapter,
   addChapter,
   updateChapter,
