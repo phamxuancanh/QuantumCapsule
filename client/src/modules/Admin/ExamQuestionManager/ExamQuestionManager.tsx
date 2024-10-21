@@ -1,18 +1,21 @@
 import SimpleTable from 'components/tables/simpleTable/SimpleTable';
 import React, { useEffect } from 'react';
 import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
-import { generateExamId, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
+import { generateExamId, generateExamQuestionUID, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
 import { Autocomplete, Box, TextField } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
 import { IQuestion } from 'api/question/question.interfaces';
-import { addQuestion, deleteQuestion, getListQuesion, importQuestions, updateQuestion } from 'api/question/question.api';
+import { getListQuesion, getListQuestionByChapterId, } from 'api/question/question.api';
 import { ILesson } from 'api/lesson/lesson.interface';
 import { getListLesson, importLessons } from 'api/lesson/lesson.api';
 import { toast } from 'react-toastify';
-import { addExam } from 'api/exam/exam.api';
+import { addExam, deleteExamQuestion, getExamsByChapterId, getListExam, getListExamByChapterId, getListExamQuestionByChapterId, insertExamQuestion, updateExamQuestion } from 'api/exam/exam.api';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
+import { IExam, IExamQuestion } from 'api/exam/exam.interface';
+import { update } from 'lodash';
+import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -24,53 +27,27 @@ const ExamQuestionManager: React.FC<IProps> = () => {
     const {setOpenForm} = useOpenForm();
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
-    const [lessonParams, setLessonParams] = React.useState<ILesson[]>([])
+    const [examParams, setExamParams] = React.useState<IExam[]>([])
+    const [questionParams, setQuestionParams] = React.useState<IQuestion[]>([])
 
-    useEffect(() => {
-        setLoading(true)
-        const fetchData = async () => {
-            try {
-                const response = await getListQuesion({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 30,
-                    },
-                })
-
-                setDataTable(response.data.data as IQuestion[])
-
-                // const response2 = await getListChapter({
-                //     params: {
-                //         page: 1,
-                //         search: "",
-                //         size: 100,
-                //     },
-                // })
-                // setChapterParams(response2.data.data)
-
-                const response3 = await getListLesson({
-                    params: {
-                        page: 1,
-                        search: "",
-                        size: 100,
-                    },
-                })
-                setLessonParams(response3.data.data)
-            } catch (error) {
-                console.error("Error fetching data:", error)
-            }
+    const handleFilter = async (data: IChapterFilter) => {
+        try {
+            const response = await getListExamQuestionByChapterId(data.chapterId ?? '')
+            setDataTable(response.data.data)
+            const responseExam = await getListExamByChapterId(data.chapterId ?? '')
+            setExamParams(responseExam.data.data)
+            const responeQuestion = await getListQuestionByChapterId(data.chapterId ?? '')
+        }catch (error: any) {
+            toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
-        fetchData()
-        setLoading(false)
-    }, [])
+    }
 
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
             try {
-                const response = await addQuestion(data)
+                const response = await insertExamQuestion(data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -79,7 +56,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
             try {
-                const response = await updateQuestion(data.id, data)
+                const response = await updateExamQuestion(data.id, data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -88,7 +65,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
             try {
-                const response = await deleteQuestion(data)
+                const response = await deleteExamQuestion(data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -98,51 +75,43 @@ const ExamQuestionManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={5}>
-            {!dataTable?.length ? <Loading /> :
+                <QCChapterFilter 
+                    onChange={handleFilter}
+                />
+            {/* {!dataTable?.length ? <>Không có dữ liệu</>: */}
 
                 <SimpleTable 
-                    initData={dataTable ? dataTable : [] as IQuestion[]}
+                    initData={dataTable ? dataTable : [] as IExamQuestion[]}
                     initNewRow={{
-                        id: generateQuestionUID(),
-                        questionType: 1,
-                        title: "",
-                        content: "",
-                        contentImg: "",
-                        A: "",
-                        B: "",
-                        C: "",
-                        D: "",
-                        E: "",
-                        correctAnswer: "",
-                        explainAnswer: "",
-                        lessonId: "lesson001",
-                        status: true,
-                    }as IQuestion}
+                        id: generateExamQuestionUID(),
+                        examId: '',
+                        questionId: '',
+                    }as IExamQuestion}
                     columns={[
                         // { field: 'id', headerName: 'ID', width: 70 },
-                        { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
-                        { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
-                        { field: 'content', headerName: 'Nội dung', width: 130, editable: true },
-                        { field: 'contentImg', headerName: 'Ảnh', width: 130, editable: true },
-                        { field: 'A', headerName: 'A', width: 130, editable: true },
-                        { field: 'B', headerName: 'B', width: 130, editable: true },
-                        { field: 'C', headerName: 'C', width: 130, editable: true },
-                        { field: 'D', headerName: 'D', width: 130, editable: true },
-                        { field: 'E', headerName: 'E', width: 130, editable: true },
-                        { field: 'correctAnswer', headerName: 'Đáp án đúng', width: 130, editable: true },
-                        { field: 'explainAnswer', headerName: 'Giải thích đáp án', width: 130, editable: true },
-                        { field: 'lessonId', headerName: 'Bài học', width: 130, 
+                        // { field: 'examId', headerName: 'Bài tập', width: 130, editable: true, type: "string" },
+                        { field: 'questionId', headerName: 'Câu hỏi', width: 130, 
                             editable: true,
-                            valueFormatter: (params: string) => {
-                                const lesson = lessonParams.find((lesson) => lesson.id === params)
-                                return lesson?.name
+                            valueFormatter: (value: string) => {
+                                const temp = questionParams?.find((item) => item.id === value)
+                                return temp?.content
                             },
                             renderEditCell(params) {
-                                return <RenderEditCell params={params} dataParams={lessonParams}/>
+                                return <RenderEditCell params={params} dataParams={questionParams} editCellField='questionId'/>
                             },
-
-                            // type: 'singleSelect',
                         },
+
+                        { field: 'examId', headerName: 'Bài tập', width: 130, 
+                            editable: true,
+                            valueFormatter: (value: string) => {
+                                const temp = examParams?.find((item) => item.id === value)
+                                return temp?.name
+                            },
+                            renderEditCell(params) {
+                                return <RenderEditCell params={params} dataParams={examParams} editCellField='examId'/>
+                            },
+                        },
+
                         { field: 'status', headerName: 'Trạng thái', width: 130 }
                     ] as GridColDef[]}
                     onRowClick={(row) => {
@@ -151,7 +120,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
                     }}
                     onUpdateRow={(data, action) => handleUpdateRow(data, action)}
                 />
-            }
+            {/* } */}
 
             </Box>
         </Box>

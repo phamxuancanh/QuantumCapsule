@@ -1,6 +1,7 @@
-import { Box, Rating } from '@mui/material';
+import { Box, Rating, Typography } from '@mui/material';
 import CustomModal from 'components/modals/customModal/CustomModal';
-import { useActStarModal } from 'modules/Practice/context/context';
+import { caculateScore } from 'helpers/Nam-helper/Caculate';
+import { useActStarModal, useResult } from '../../context/context';
 import React from 'react';
 import { defaultAction } from 'utils/interfaces';
 
@@ -10,6 +11,7 @@ interface IProps {
 
 const StarModal: React.FC<IProps> = (props) => {
     const {actStarModal, setActStarModal} = useActStarModal()
+    const {result} = useResult()
     return (
         <CustomModal title='Bạn đã đạt được:' open={actStarModal.open} setOpenModal={()=>{setActStarModal(defaultAction)}}
             width='50%'
@@ -21,11 +23,9 @@ const StarModal: React.FC<IProps> = (props) => {
                     alignItems: 'center',
                 }}
             >
-                <Rating value={actStarModal.payload} max={3} size="large" readOnly
-                    sx={{
-                    fontSize: '5rem' // Gấp 5 lần bình thường (khoảng 80px)
-                    }}
-                />
+                <Typography variant='h1'>
+                    Bạn đã đạt được {caculateScore(result.totalScore, result.yourScore)} điểm
+                </Typography>
             </Box>
         </CustomModal>
     );

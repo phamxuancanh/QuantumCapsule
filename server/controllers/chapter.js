@@ -1,3 +1,4 @@
+const { error } = require('winston')
 const { models } = require('../models')
 const { Op } = require('sequelize')
 // init chapters data
@@ -160,7 +161,35 @@ const getListChapter = async (req, res, next) => {
     })
   } catch (error) {
     console.error('Error fetching chapters:', error)
-    res.status(500).json({ message: 'Error fetching chapters' })
+    res.status(500).json({ message: error.message })
+  }
+}
+const getListAllChapter = async (req, res, next) => {
+  console.log('-------------------------getListAllChapter')
+  try {
+    const chapters = await models.Chapter.findAll({
+      attributes: [
+        'id',
+        'subjectId',
+        'name',
+        'description',
+        'grade',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ],
+      where: {
+        status: 1
+      },
+      order: [['updatedAt', 'DESC']]
+    })
+
+    res.json({
+      data: chapters
+    })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
   }
 }
 // add a new chapter
@@ -183,7 +212,7 @@ const updateChapter = async (req, res, next) => {
 
     const chapter = await models.Chapter.findByPk(id)
     if (!chapter) {
-      return res.status(404).json({ message: 'Chapter not found' })
+      return res.status(404).json({ message: error.message })
     }
 
     await chapter.update(updateData)
@@ -200,7 +229,7 @@ const deleteChapter = async (req, res, next) => {
 
     const chapter = await models.Chapter.findByPk(id)
     if (!chapter) {
-      return res.status(404).json({ message: 'Chapter not found' })
+      return res.status(404).json({ message: error.message })
     }
 
     await chapter.update({ status: 0 })
@@ -210,6 +239,21 @@ const deleteChapter = async (req, res, next) => {
     res.status(500).json({ message: 'Error updating chapter status' })
   }
 }
+
+const getListChapterBySubjectId = async (req, res, next) => {
+  try {
+    const { subjectId } = req.params
+    const chapters = await models.Chapter.findAll({
+      where: {
+        subjectId
+      }
+    })
+    res.json({ data: chapters })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 // get chapters by id
 const getChapterById = async (req, res, next) => {
   try {
@@ -225,7 +269,7 @@ const getChapterById = async (req, res, next) => {
     })
 
     if (!chapter) {
-      return res.json({ data: null, message: 'Chapter not found' })
+      return res.json({ data: null, message: error.message })
     }
 
     const lessonIds = chapter.Lessons.map(lesson => lesson.id)
@@ -256,6 +300,7 @@ const getChapterById = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching chapter' })
   }
 }
+
 module.exports = {
   importChapters,
   getListChapterNoPaging,
@@ -263,5 +308,7 @@ module.exports = {
   addChapter,
   updateChapter,
   deleteChapter,
-  getChapterById
+  getChapterById,
+  getListChapterBySubjectId,
+  getListAllChapter
 }

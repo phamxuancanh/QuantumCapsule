@@ -29,3 +29,10 @@ export interface DataListExam {
     size: number
     totalRecords: number
 }
+
+export interface DataListExamQuestion {
+    data: IExamQuestion[]
+    page: number
+    size: number
+    totalRecords: number
+}
