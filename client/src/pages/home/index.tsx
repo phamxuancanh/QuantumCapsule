@@ -567,32 +567,53 @@ const Home = () => {
 
 
                                     {/* Hiển thị danh sách Exams */}
-                                    {/* <div className="tw-mt-4">
+                                    <div className="tw-mt-4">
                                         <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài luyện tập</h3>
                                         {exams[selectedLessonId] && exams[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                                {exams[selectedLessonId].map((exam) => (
-                                                    <li
-                                                        key={exam.id}
-                                                        className="tw-bg-slate-100 tw-rounded-md tw-shadow-md tw-border tw-border-gray-300 tw-cursor-pointer"
-                                                        onClick={() => exam.id && handleTheoryExamClick('exam', exam.id)}
-                                                    >
-                                                        <div className="tw-overflow-hidden tw-rounded-t-md">
-                                                            <img
-                                                                src={thumnail_exercise}
-                                                                alt={exam.name}
-                                                                className="tw-w-full tw-h-auto tw-mb-2 tw-transition-transform tw-duration-300 hover:tw-scale-105"
-                                                            />
-                                                        </div>
-                                                        <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg">{exam.name}</h4>
-                                                    </li>
-                                                ))}
+                                                {exams[selectedLessonId].map((exam) => {
+                                                    const exerciseProgress = progress.exercises.find((exercise: any) => exercise.examId === exam.id);
+                                                    const starRating = exerciseProgress ? exerciseProgress.star : null;
+                                                    const yourScore = exerciseProgress ? exerciseProgress.yourScore : null;
+                                                    const totalScore = exerciseProgress ? exerciseProgress.totalScore : null;
+
+                                                    return (
+                                                        <li
+                                                            key={exam.id}
+                                                            className="tw-bg-slate-100 tw-rounded-md tw-shadow-md tw-border tw-border-gray-300 tw-cursor-pointer"
+                                                            onClick={() => exam.id && handleTheoryExamClick('exam', exam.id)}
+                                                        >
+                                                            <div className="tw-overflow-hidden tw-rounded-t-md">
+                                                                <img
+                                                                    src={thumnail_exercise}
+                                                                    alt={exam.name}
+                                                                    className="tw-w-full tw-h-auto tw-mb-2 tw-transition-transform tw-duration-300 hover:tw-scale-105"
+                                                                />
+                                                            </div>
+                                                            <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg">{exam.name}</h4>
+                                                            {exerciseProgress ? (
+                                                                <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
+                                                                    <Rating name="customized-10" value={starRating} max={3} readOnly />
+                                                                    <div>Làm đúng: {yourScore}/{totalScore} câu</div>
+                                                                    {/* <div>Điểm: <span style={{ fontWeight: 'bold' }}>{(yourScore / totalScore * 10).toFixed(2)}</span></div> */}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
+                                                                    <Rating name="customized-10" value={0} max={3} readOnly />
+                                                                    <div>Chưa làm</div>
+                                                                    {/* <div>Làm đúng: {yourScore}/{totalScore} câu</div>
+                <div>Điểm: <span style={{ fontWeight: 'bold' }}>{(yourScore / totalScore * 10).toFixed(2)}</span></div> */}
+                                                                </div>
+                                                            )}
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         ) : (
                                             <p>No exams available.</p>
                                         )}
-                                    </div> */}
-                                    <div className="tw-mt-4">
+                                    </div>
+                                    {/* <div className="tw-mt-4">
                                         <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài luyện tập</h3>
                                         {exams[selectedLessonId] && exams[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
@@ -628,7 +649,7 @@ const Home = () => {
                                         ) : (
                                             <p>No exams available.</p>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             ) : (
                                 <p className="tw-text-gray-500">Chọn 1 bài trong chương để xem thông tin bài học.</p>
@@ -674,6 +695,7 @@ const Home = () => {
                                                 const starRating = examProgress ? examProgress.star : null;
                                                 const yourScore = examProgress ? examProgress.yourScore : null;
                                                 const totalScore = examProgress ? examProgress.totalScore : null;
+
                                                 return (
                                                     <li
                                                         key={exam.id}
@@ -688,11 +710,17 @@ const Home = () => {
                                                             />
                                                         </div>
                                                         <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg">{exam.name}</h4>
-                                                        {starRating && (
+                                                        {examProgress ? (
                                                             <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
                                                                 {/* <Rating name="customized-10" value={starRating} max={3} readOnly /> */}
                                                                 <div>Điểm: <span className='tw-font-bold'>{calculateScore(yourScore, totalScore)}</span></div>
                                                                 <div>Làm đúng: {yourScore}/{totalScore} câu</div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
+                                                                <div>Điểm: <span className='tw-font-bold'>{0}</span></div>
+
+                                                                <div>Chưa làm</div>
                                                             </div>
                                                         )}
                                                     </li>
