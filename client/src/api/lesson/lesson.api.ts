@@ -23,6 +23,7 @@ export const getSuggestions = async (search: string): Promise<AxiosResponse<any>
 }
 export const getListLessonByChapterId = async (chapterId: string): Promise<AxiosResponse<DataListLesson>> => {
     return await requestWithJwt.get<DataListLesson>(`/lessons/getListLessonByChapterId/${chapterId}`);
+}
 export const getFirstLessonByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/lessons/getFirstLessonByChapterId/${chapterId}`);
 }
