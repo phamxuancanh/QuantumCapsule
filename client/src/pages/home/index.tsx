@@ -310,7 +310,6 @@ const Home = () => {
     };
     useEffect(() => {
         const fetchChapterProgress = async () => {
-            console.log('Selected subject:', selectedSubject);
             if (selectedChapterId) {
                 const progress = await findProgressByChapter(selectedChapterId);
                 setNumberTheoryDone(progress?.data.data.length ?? 0);
