@@ -209,7 +209,7 @@ const handleClassChange = (selectedClass: any) => {
               <Link to="/result_history" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/result_history' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
                 {t('navbar.journal')}
               </Link>
-              <Link to="/dashboard-report" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/dashboard-report' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
+              <Link to="/dashboard_report" className={`tw-block tw-p-4 tw-font-bold ${pathname === '/dashboard_report' ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname === '/' && 'hover:tw-text-slate-200'} tw-rounded px-2`}>
                 {t('navbar.evaluation')}
               </Link>
               <Link to="/news" className={`tw-block tw-p-4 tw-font-bold ${pathname.includes('news') ? 'tw-text-white tw-bg-green-700' : 'tw-text-white'} tw-truncate tw-transition tw-duration-150 ${pathname.includes('contact') && 'hover:tw-text-slate-200'} tw-rounded px-2`}>

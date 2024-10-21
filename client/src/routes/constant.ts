@@ -19,5 +19,6 @@ const ROUTES = {
     chapterDetail: '/chapterDetail',
     learning: '/learning',
     result_history: '/result_history',
+    dashboard_report: '/dashboard_report'
 }
 export default ROUTES

@@ -6,7 +6,7 @@ export const importLessons = async (lessons: any[]): Promise<AxiosResponse<any>>
     return await requestWithJwt.post<any>('/lessons/importLessons', { lessons }, { withCredentials: true });
 }
 export const getLessonById = async (lessonId: string): Promise<AxiosResponse<ILesson>> => {
-    return await requestWithJwt.get<ILesson>(`/lessons/${lessonId}`);
+    return await requestWithJwt.get<ILesson>(`/lessons/getLessonById/${lessonId}`);
 }
 export const getListLesson = async ({params}: {params?: ListLessonParams}): Promise<AxiosResponse<DataListLesson>> => {
     return await requestWithJwt.get<DataListLesson>('/lessons', { params })

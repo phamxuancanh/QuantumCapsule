@@ -70,6 +70,9 @@ const ResultHistory = loadable(async () => await import('pages/result_history'),
 const GradeChoosePage = loadable(async () => await import('pages/grade_choose'), {
     fallback: <Loading />
 })
+const DashboardReport = loadable(async () => await import('pages/dashboard_report'), {
+    fallback: <Loading />
+})
 
 const routes: RouteObject[] = [
     {
@@ -152,7 +155,8 @@ const routes: RouteObject[] = [
             { path: ROUTES.lessonDetail, element: <LessonDetail /> },
             { path: ROUTES.chapterDetail, element: <ChapterDetail /> },
             { path: ROUTES.learning, element: <Learning /> },
-            { path: ROUTES.result_history, element: <ResultHistory /> }
+            { path: ROUTES.result_history, element: <ResultHistory /> },
+            { path: ROUTES.dashboard_report, element: <DashboardReport /> }
         ]
     },
     {
