@@ -63,24 +63,41 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
 
     const query = `
       SELECT DISTINCT
-        r.id AS resultId, 
+        r.resultId, 
         r.userId, 
         r.examId, 
-        e.lessonId, 
-        l.chapterId,
-        CASE 
-          WHEN e.lessonId IS NULL THEN 'exam' 
-          ELSE 'exercise' 
-        END AS type
-      FROM 
-        Results r
-      JOIN 
-        Exams e ON r.examId = e.id
-      LEFT JOIN 
-        Lessons l ON e.lessonId = l.id
-      WHERE 
-        r.userId = :userId
-        ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''}
+        r.lessonId, 
+        r.chapterId,
+        r.star,
+        r.totalScore,
+        r.yourScore,
+        r.type
+      FROM (
+        SELECT 
+          r.id AS resultId, 
+          r.userId, 
+          r.examId, 
+          e.lessonId, 
+          l.chapterId,
+          r.star,
+          r.totalScore,
+          r.yourScore,
+          CASE 
+            WHEN e.lessonId IS NULL THEN 'exam' 
+            ELSE 'exercise' 
+          END AS type,
+          ROW_NUMBER() OVER (PARTITION BY r.examId ORDER BY r.yourScore / r.totalScore DESC, r.id) AS rn
+        FROM 
+          Results r
+        JOIN 
+          Exams e ON r.examId = e.id
+        LEFT JOIN 
+          Lessons l ON e.lessonId = l.id
+        WHERE 
+          r.userId = :userId
+          ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''}
+      ) r
+      WHERE r.rn = 1
     `
 
     const replacements = { userId: loginedUserId }
@@ -93,18 +110,8 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
       type: sequelize.QueryTypes.SELECT
     })
 
-    // Filter out duplicate examId and exerciseId
-    const uniqueResults = {}
-    resultQuery.forEach(result => {
-      if (!uniqueResults[result.examId]) {
-        uniqueResults[result.examId] = result
-      }
-    })
-
-    const uniqueResultArray = Object.values(uniqueResults)
-
-    const exercises = uniqueResultArray.filter(result => result.type === 'exercise')
-    const exams = uniqueResultArray.filter(result => result.type === 'exam')
+    const exercises = resultQuery.filter(result => result.type === 'exercise')
+    const exams = resultQuery.filter(result => result.type === 'exam')
 
     res.status(200).json({ message: 'success', data: { exercises, exams } })
   } catch (error) {
@@ -112,94 +119,6 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Internal server error' })
   }
 }
-
-// const getListUniqueDoneResultByUserId = async (req, res, next) => {
-//   try {
-//     const loginedUserId = req.userId
-//     const { chapterId } = req.query
-
-//     if (!loginedUserId) {
-//       return res.status(400).json({ message: 'Invalid data format or empty data' })
-//     }
-
-//     const query = `
-//       SELECT
-//         r.id AS resultId,
-//         r.userId,
-//         r.examId,
-//         e.lessonId,
-//         l.chapterId,
-//         CASE
-//           WHEN e.lessonId IS NULL THEN 'exam'
-//           ELSE 'exercise'
-//         END AS type
-//       FROM
-//         Results r
-//       JOIN
-//         Exams e ON r.examId = e.id
-//       LEFT JOIN
-//         Lessons l ON e.lessonId = l.id
-//       WHERE
-//         r.userId = :userId
-//         ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''}
-//     `
-
-//     const replacements = { userId: loginedUserId }
-//     if (chapterId) {
-//       replacements.chapterId = chapterId
-//     }
-
-//     const resultQuery = await sequelize.query(query, {
-//       replacements,
-//       type: sequelize.QueryTypes.SELECT
-//     })
-
-//     const exercises = resultQuery.filter(result => result.type === 'exercise')
-//     const exams = resultQuery.filter(result => result.type === 'exam')
-
-//     res.status(200).json({ message: 'success', data: { exercises, exams } })
-//   } catch (error) {
-//     console.error('Error fetching results:', error)
-//     res.status(500).json({ message: 'Internal server error' })
-//   }
-// }
-
-// const getListUniqueDoneResultByUserId = async (req, res, next) => {
-//   try {
-//     const loginedUserId = req.userId
-//     if (!loginedUserId) {
-//       return res.status(400).json({ message: 'Invalid data format or empty data' })
-//     }
-//     const query = `
-//       SELECT
-//         r.id AS resultId,
-//         r.userId,
-//         r.examId,
-//         e.lessonId,
-//         e.chapterId,
-//         CASE
-//           WHEN e.lessonId IS NULL THEN 'exercise'
-//           ELSE 'exam'
-//         END AS type
-//       FROM
-//         Results r
-//       JOIN
-//         Exams e ON r.examId = e.id
-//       WHERE
-//         r.userId = :userId
-//     `
-//     const resultQuery = await sequelize.query(query, {
-//       replacements: { userId: loginedUserId },
-//       type: sequelize.QueryTypes.SELECT
-//     })
-//     const exercises = resultQuery.filter(result => result.type === 'exercise')
-//     const exams = resultQuery.filter(result => result.type === 'exam')
-//     res.status(200).json({ message: 'success', data: { exercises, exams } })
-//   } catch (error) {
-//     console.error('Error fetching results:', error)
-//     res.status(500).json({ message: 'Internal server error' })
-//   }
-// }
 const getResultDetail = async (req, res, next) => {
   try {
     console.log('-------getResultDetail')
