@@ -1,6 +1,6 @@
 import { Box, Rating, Typography } from '@mui/material';
 import CustomModal from 'components/modals/customModal/CustomModal';
-import { caculateScore } from 'helpers/Nam-helper/Caculate';
+import { calculateScore } from 'helpers/Nam-helper/Caculate';
 import { useActStarModal, useResult } from '../../context/context';
 import React from 'react';
 import { defaultAction } from 'utils/interfaces';
@@ -24,7 +24,7 @@ const StarModal: React.FC<IProps> = (props) => {
                 }}
             >
                 <Typography variant='h1'>
-                    Bạn đã đạt được {caculateScore(result.totalScore, result.yourScore)} điểm
+                    Bạn đã đạt được {calculateScore(result.totalScore, result.yourScore)} điểm
                 </Typography>
             </Box>
         </CustomModal>
