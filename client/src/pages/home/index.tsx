@@ -480,13 +480,45 @@ const Home = () => {
                                         {t('homepage.completed')}: {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0} bài lý thuyết ({t('homepage.archived')} {(numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100).toFixed(2)}  %)
                                     </span>
                                 </div>
-                                <button className='tw-cursor-pointer tw-bg-green-500 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
+                                {/* <button className='tw-cursor-pointer tw-bg-green-500 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
                                     <ArrowCircleRightOutlinedIcon className='tw-mr-2' />
                                     {t('homepage.continue_learning')}
-                                </button>
+                                </button> */}
+                            </div>
+                            <div className='tw-flex-col tw-flex tw-justify-start tw-items-start tw-space-y-3'>
+                                <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
+                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                        <div>Bài lý thuyết: </div>
+                                    </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                        <div className='tw-font-bold tw-text-xl'>
+                                            {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
+                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                        <div>Bài tập: </div>
+                                    </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                        <div className='tw-font-bold tw-text-xl'>
+                                            {numberExcersiceDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
+                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                        <div>{capitalizeFirstLetter(t('homepage.exam'))}: </div>
+                                    </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                        <div className='tw-font-bold tw-text-xl'>
+                                            {numberExamDone}/{exams2?.length}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className='tw-flex tw-justify-between tw-p-5 tw-w-4/12'>
+                        {/* <div className='tw-flex tw-p-5 tw-w-11/12 tw-space-x-20'>
                             <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
                                 <div className='tw-font-bold tw-text-2xl'>
                                     {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0}
@@ -506,35 +538,27 @@ const Home = () => {
 
                                 <div>{capitalizeFirstLetter(t('homepage.exam'))}</div>
                             </div>
-                            {/* <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                                <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                                <div>{t('homepage.not_yet_practice')}</div>
-                                            </div>
-                                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                                <div className="tw-border-4 tw-border-sky-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                                <div>{t('homepage.in_progress')}</div>
-                                            </div>
-                                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                                <div className="tw-border-4 tw-border-green-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                                <div>{t('homepage.completed')}</div>
-                                            </div>
-                                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                                <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                                <div>{t('homepage.need_improvement')}</div>
-                                            </div> */}
-                        </div>
+                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
+                                <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                <div>{t('homepage.not_yet_practice')}</div>
+                            </div>
+                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
+                                <div className="tw-border-4 tw-border-sky-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                <div>{t('homepage.in_progress')}</div>
+                            </div>
+                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
+                                <div className="tw-border-4 tw-border-green-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                <div>{t('homepage.completed')}</div>
+                            </div>
+                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
+                                <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
+                                <div>{t('homepage.need_improvement')}</div>
+                            </div>
+                        </div> */}
                     </div>
 
                     <div className='tw-bg-transparent tw-w-full'>
-                        <div>
-                            <div className='tw-flex tw-w-full tw-space-x-16 tw-py-5'>
-                                <div className='tw-flex-col tw-w-full tw-space-y-5'>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div className="tw-container tw-mx-auto tw-p-4">
-                            <h1 className="tw-text-2xl tw-font-bold tw-mb-6">Chi tiết bài học</h1>
+                        <div className="tw-container tw-mx-auto tw-p-1">
                             {selectedLessonId ? (
                                 <div className="tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-md tw-space-y-6">
                                     {/* Hiển thị danh sách Theories */}
@@ -568,7 +592,7 @@ const Home = () => {
 
                                     {/* Hiển thị danh sách Exams */}
                                     <div className="tw-mt-4">
-                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài luyện tập</h3>
+                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài tập</h3>
                                         {exams[selectedLessonId] && exams[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
                                                 {exams[selectedLessonId].map((exam) => {
@@ -688,10 +712,10 @@ const Home = () => {
                             <div className='tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-md tw-space-y-6'>
                                 <div className="tw-mt-4">
                                     <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài kiểm tra</h3>
-                                    {exams2.length > 0 ? (
+                                    {exams2?.length > 0 ? (
                                         <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                            {exams2.map((exam) => {
-                                                const examProgress = progress.exams.find((prog: any) => prog.examId === exam.id);
+                                            {exams2?.map((exam) => {
+                                                const examProgress = progress?.exams?.find((prog: any) => prog.examId === exam.id);
                                                 const starRating = examProgress ? examProgress.star : null;
                                                 const yourScore = examProgress ? examProgress.yourScore : null;
                                                 const totalScore = examProgress ? examProgress.totalScore : null;
@@ -719,7 +743,6 @@ const Home = () => {
                                                         ) : (
                                                             <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
                                                                 <div>Điểm: <span className='tw-font-bold'>{0}</span></div>
-
                                                                 <div>Chưa làm</div>
                                                             </div>
                                                         )}
