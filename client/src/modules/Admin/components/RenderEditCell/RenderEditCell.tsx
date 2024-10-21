@@ -6,6 +6,7 @@ interface IProps {
     params: GridRenderEditCellParams<any, any, any, GridTreeNodeWithRender>
     dataParams: any,
     editCellField: string
+    label: string
 }
 
 const RenderEditCell: React.FC<IProps> = (props) => {
@@ -15,8 +16,10 @@ const RenderEditCell: React.FC<IProps> = (props) => {
             fullWidth
             options={props.dataParams}
             value={props.dataParams.find((item: any) => item?.id === props.params?.value) || null}
-            getOptionLabel={(option: any) => option.name || ''}
+            getOptionLabel={(option: any) => option[props.label] || ''}
             onChange={(event, newValue) => {
+              console.log("newValue", newValue);
+              
                 props.params.api.setEditCellValue({
                     id: props.params.id,
                     field: props.editCellField,

@@ -582,6 +582,31 @@ const getSuggestions = async (req, res, next) => {
   }
 }
 
+const getListLessonByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+    const lessons = await models.Lesson.findAll({
+      where: {
+        chapterId
+      },
+      attributes: [
+        'id',
+        'chapterId',
+        'name',
+        'order',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ],
+      order: [['updatedAt', 'ASC']]
+    })
+    res.json({ data: lessons })
+  } catch (error) {
+    console.error('Error fetching lessons by chapterId:', error)
+    res.status(500).json({ message: 'Error fetching lessons by chapterId' })
+  }
+}
+
 module.exports = {
   importLessons,
   getListLesson,
@@ -592,5 +617,6 @@ module.exports = {
   getLessonByChapterId,
   getLessonsandExams,
   getSuggestions,
-  getFirstLessonByChapterId
+  getFirstLessonByChapterId,
+  getListLessonByChapterId
 }

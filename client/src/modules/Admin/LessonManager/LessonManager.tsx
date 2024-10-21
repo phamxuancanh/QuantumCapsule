@@ -1,43 +1,36 @@
 import SimpleTable from 'components/tables/simpleTable/SimpleTable';
-import React, { useEffect } from 'react';
-import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
-import { generateExamId, generateExamQuestionUID, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
+import React from 'react';
+import { GridColDef,  } from '@mui/x-data-grid';
+import { generateExamQuestionUID, generateLessonUID,  } from 'helpers/Nam-helper/GenerateUID';
 import { Autocomplete, Box, TextField } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
-import Loading from 'containers/loadable-fallback/loading';
-import { IQuestion } from 'api/question/question.interfaces';
-import { getListQuesion, getListQuestionByChapterId, } from 'api/question/question.api';
 import { ILesson } from 'api/lesson/lesson.interface';
-import { getListLesson, importLessons } from 'api/lesson/lesson.api';
+import { deleteLesson, getListLessonByChapterId, insertLesson, updateLesson } from 'api/lesson/lesson.api';
 import { toast } from 'react-toastify';
-import { addExam, deleteExamQuestion, getExamsByChapterId, getListExam, getListExamByChapterId, getListExamQuestionByChapterId, insertExamQuestion, updateExamQuestion } from 'api/exam/exam.api';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { IExam, IExamQuestion } from 'api/exam/exam.interface';
-import { update } from 'lodash';
 import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
+import { getListAllChapter } from 'api/chapter/chapter.api';
+import { IChapter } from 'api/chapter/chapter.interface';
 
 interface IProps {
     // Define the props for the ExamManager component here
 }
 
-const ExamQuestionManager: React.FC<IProps> = () => {
+const LessonManager: React.FC<IProps> = () => {
 
     const {setDataSelected} = useDataSelected(); 
     const {setOpenForm} = useOpenForm();
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
-    const [examParams, setExamParams] = React.useState<IExam[]>([])
-    const [questionParams, setQuestionParams] = React.useState<IQuestion[]>([])
-
+    const [chapterParams, setChapterParams] = React.useState<IChapter[]>([])
     const handleFilter = async (data: IChapterFilter) => {
         try {
-            const response = await getListExamQuestionByChapterId(data.chapterId ?? '')
+            const response = await getListLessonByChapterId(data.chapterId ?? '')
             setDataTable(response.data.data)
-            const responseExam = await getListExamByChapterId(data.chapterId ?? '')
-            setExamParams(responseExam.data.data)
-            const responeQuestion = await getListQuestionByChapterId(data.chapterId ?? '')
-            setQuestionParams(responeQuestion.data.data)
+            const responseChapter = await getListAllChapter()
+            setChapterParams(responseChapter.data.data)
         }catch (error: any) {
             toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
@@ -48,7 +41,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
             try {
-                const response = await insertExamQuestion(data)
+                const response = await insertLesson(data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -57,7 +50,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
             try {
-                const response = await updateExamQuestion(data.id, data)
+                const response = await updateLesson(data.id, data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -66,7 +59,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
             try {
-                const response = await deleteExamQuestion(data)
+                const response = await deleteLesson(data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -84,35 +77,26 @@ const ExamQuestionManager: React.FC<IProps> = () => {
                 <SimpleTable 
                     initData={dataTable ? dataTable : [] as IExamQuestion[]}
                     initNewRow={{
-                        id: generateExamQuestionUID(),
+                        id: generateLessonUID(),
                         examId: '',
-                        questionId: '',
-                    }as IExamQuestion}
+                        chapterId: '',
+                        name: '',
+                        order: 0,
+                        status: true
+                    }as ILesson}
                     columns={[
-                        // { field: 'id', headerName: 'ID', width: 70 },
-                        // { field: 'examId', headerName: 'Bài tập', width: 130, editable: true, type: "string" },
-                        { field: 'questionId', headerName: 'Câu hỏi', width: 130, 
+                        { field: 'chapterId', headerName: 'Chương', width: 130, 
                             editable: true,
                             valueFormatter: (value: string) => {
-                                const temp = questionParams?.find((item) => item.id === value)
-                                return temp?.content
-                            },
-                            renderEditCell(params) {
-                                return <RenderEditCell params={params} dataParams={questionParams} label='content' editCellField='questionId'/>
-                            },
-                        },
-
-                        { field: 'examId', headerName: 'Bài tập', width: 130, 
-                            editable: true,
-                            valueFormatter: (value: string) => {
-                                const temp = examParams?.find((item) => item.id === value)
+                                const temp = chapterParams?.find((item) => item.id === value)
                                 return temp?.name
                             },
                             renderEditCell(params) {
-                                return <RenderEditCell params={params} dataParams={examParams} label='name' editCellField='examId'/>
+                                return <RenderEditCell params={params} dataParams={chapterParams} label='name' editCellField='chapterId'/>
                             },
                         },
-
+                        { field: 'name', headerName: 'Tên bài học', width: 130, editable: true, type: "string" },
+                        { field: 'order', headerName: 'Thứ tự', width: 130, editable: true, type: "number" },
                         { field: 'status', headerName: 'Trạng thái', width: 130 }
                     ] as GridColDef[]}
                     onRowClick={(row) => {
@@ -128,4 +112,4 @@ const ExamQuestionManager: React.FC<IProps> = () => {
     );
 };
 
-export default ExamQuestionManager;
+export default LessonManager;

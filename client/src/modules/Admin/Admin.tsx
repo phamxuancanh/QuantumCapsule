@@ -12,13 +12,14 @@ import { importExamQuestions, importExams } from 'api/exam/exam.api';
 import { importQuestions } from 'api/question/question.api';
 import { toast } from 'react-toastify';
 import ExamManager from './ExamManager/ExamManagerProvider';
-import ComentManager from './ComentManager/CommentManagerProvider';
+// import ComentManager from './ComentManager/CommentManagerProvider';
 import QuestionManager from './QuestionManager/QuestionManagerProvider';
 import TheoryManager from './TheoryManager/TheoryManagerProvider';
 import TabMenu from 'components/menus/tabMenu/TabMenu';
 import { Box, IconButton, Typography } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ExamQuestionManager from './ExamQuestionManager/ExamQuestionManagerProvider';
+import LessonManager from './LessonManager/LessonManagerProvider';
 const Admin: React.FC = () => {
     const handleImportChapter = async (listData: IChapter[]) => {
         try {
@@ -95,7 +96,7 @@ const Admin: React.FC = () => {
                     listItems={[
                         { index: 0, label: 'Quản lý bài bài tập', item: <ExamManager /> },
                         { index: 1, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
-                        { index: 2, label: 'Quản lý bài học', item: <ComentManager /> },
+                        { index: 2, label: 'Quản lý bài học', item: <LessonManager /> },
                         { index: 3, label: 'Quản lý bài giảng (lý thuyết)', item: <TheoryManager /> },
                         { index: 4, label: 'Quản lý bài kiểm tra và câu hỏi', item: <ExamQuestionManager /> }
                     ]}

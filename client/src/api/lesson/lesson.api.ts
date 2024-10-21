@@ -27,3 +27,12 @@ export const getListLessonByChapterId = async (chapterId: string): Promise<Axios
 export const getFirstLessonByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/lessons/getFirstLessonByChapterId/${chapterId}`);
 }
+export const insertLesson = async (lesson: ILesson): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.post<any>('/lessons', lesson);
+}
+export const updateLesson = async (lessonId: string, lesson: ILesson): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.put<any>(`/lessons/${lessonId}`, lesson);
+}
+export const deleteLesson = async (lessonId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.delete<any>(`/lessons/${lessonId}`);
+}
