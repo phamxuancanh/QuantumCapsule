@@ -45,7 +45,7 @@ const DashboardReport = () => {
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center'>
             <div className='tw-w-11/12 tw-h-auto tw-flex tw-flex-col tw-items-center tw-py-2'>
-                <div className='tw-flex tw-w-full tw-space-x-3 tw-bg-red-100 tw-justify-center'>
+                <div className='tw-flex tw-w-full tw-space-x-3 tw-justify-center'>
                     {subjects?.map((subject) => (
                         <div
                             key={subject.id}
@@ -62,7 +62,7 @@ const DashboardReport = () => {
                         </div>
                     ))}
                 </div>
-                <div className='tw-flex tw-space-x-3 tw-mt-4'>
+                <div className='tw-flex tw-space-x-3 tw-mt-4 tw-text-lg'>
                     <div
                         className={`tw-border tw-font-bold tw-p-2 tw-px-2 tw-rounded-md tw-shadow-2xl tw-cursor-pointer ${activeTab === 'general' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-white tw-text-black'}`}
                         onClick={() => handleTabClick('general')}
@@ -82,10 +82,48 @@ const DashboardReport = () => {
                         Tiến độ học tập
                     </div>
                 </div>
-                <div className='tw-mt-4 tw-w-11/12 tw-bg-blue-200'>
-                    {activeTab === 'general' && <div>Danh gia chung content</div>}
-                    {activeTab === 'history' && <div>Lich su luyen tap content</div>}
-                    {activeTab === 'progress' && <div>Tien do hoc tap content</div>}
+                <div className='tw-mt-4 tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
+                    {activeTab === 'general' &&
+                        <div className='tw-flex tw-flex-col'>
+                            <div className='tw-flex tw-justify-between tw-px-10'>
+                                <div>Trong 7 ngay qua</div>
+                                <div className='tw-flex'>
+                                    <div>Tu</div>
+                                    <div>Den</div>
+                                </div>
+                            </div>
+                            <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
+
+
+                            <div className='tw-flex tw-flex-col tw-items-center tw-px-10'>
+                                <div className='tw-flex'>
+                                    <div>1</div>
+                                    <div>2</div>
+                                    <div>3</div>
+                                    <div>4</div>
+                                    <div>5</div>
+                                </div>
+                                <div>
+                                    TONG QUAN TOAN BO KIEN THUC - TEN
+                                </div>
+                            </div>
+                            <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
+                            <div className='tw-flex tw-flex-col tw-px-10 tw-items-center'>
+                                Noi dung
+                            </div>
+
+                        </div>
+                    }
+                    {activeTab === 'history' &&
+                        <div>
+                            Lich su luyen tap content
+                        </div>
+                    }
+                    {activeTab === 'progress' &&
+                        <div>
+                            Tien do hoc tap content
+                        </div>
+                    }
                 </div>
             </div>
         </div>
