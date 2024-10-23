@@ -131,10 +131,8 @@ const Home = () => {
         console.log('userReduxGrade:', userRedux?.grade);
         const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
         const currentSubject = queryParams.get('subject') || 'subject1';
-        console.log('currentSubject currentSubjectcurrentSubjectcurrentSubjectcurrentSubjectcurrentSubject:', currentSubject);
         setSelectedSubject(currentSubject);
         if (currentSubject && currentGrade && currentPage) {
-            console.log('AAAAAAAAAAAAAAAA:', currentGrade);
             fetchChapters({ subjectId: currentSubject, grade: currentGrade });
         }
     }, [location.search, userRedux]);
