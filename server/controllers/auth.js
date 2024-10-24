@@ -94,6 +94,7 @@ const signIn = async (req, res, next) => {
       city: user.city,
       district: user.district,
       ward: user.ward,
+      startPoint: user.starPoint,
       dob: user.birthOfDate ? user.birthOfDate.toISOString().split('T')[0] : ''
     }
     return res.status(200).json({ success: true, accessToken, user: userResult })
@@ -438,7 +439,8 @@ const signInOrRegisterWithFacebook = async (req, res) => {
       avatar: existingUser.avatar,
       grade: existingUser.grade,
       key: encryptedRole,
-      emailVerified: true
+      emailVerified: true,
+      starPoint: existingUser.starPoint
     }
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {
@@ -507,7 +509,8 @@ const signInOrRegisterWithGoogle = async (req, res) => {
       avatar: existingUser.avatar,
       grade: existingUser.grade,
       key: encryptedRole,
-      emailVerified: true
+      emailVerified: true,
+      starPoint: existingUser.starPoint
     }
 
     return res.status(200).json({ success: true, accessToken, user: userResult })
@@ -573,7 +576,8 @@ const signInOrRegisterWithGitHub = async (req, res) => {
       email: existingUser.email,
       grade: existingUser.grade,
       avatar: existingUser.avatar,
-      key: encryptedRole
+      key: encryptedRole,
+      starPoint: existingUser.starPoint
     }
     return res.status(200).json({ success: true, accessToken, user: userResult })
   } catch (error) {

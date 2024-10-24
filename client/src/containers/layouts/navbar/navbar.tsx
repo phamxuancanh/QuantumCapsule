@@ -154,7 +154,7 @@ const handleClassChange = (selectedClass: any) => {
               <div className='tw-w-full tw-h-2'></div>
             )}
           </div>
-          {ROUTES.home == pathname && data !== 'R1' && data !== 'R2' && (
+          {(ROUTES.home == pathname || ROUTES.dashboard_report == pathname) && data !== 'R1' && data !== 'R2' && (
         <div className="tw-flex tw-items-center tw-space-x-2 tw-w-auto">
           <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
           {/* <div className="tw-py-1">
@@ -170,7 +170,6 @@ const handleClassChange = (selectedClass: any) => {
           <hr className="tw-w-px tw-h-6 tw-bg-slate-200 tw-mx-3" />
         </div>
       )}
-
           <div className="tw-flex tw-items-center tw-space-x-3 tw-w-auto tw-justify-end">
             <div className="tw-flex tw-items-center tw-space-x-3">
 

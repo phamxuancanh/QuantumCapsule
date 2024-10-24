@@ -29,7 +29,7 @@ import { findProgressByChapter, findProgressByGradeAndSubject } from 'api/progre
 import thumnail from '../../assets/thumnail.png';
 import thumnail_exercise from '../../assets/thumnail_exercises.png';
 import thumnail_exam from '../../assets/thumnail_exam.png';
-import { getListUniqueDoneResultByUserId } from 'api/result/result.api';
+import { getListUniqueDoneResultByChapterId } from 'api/result/result.api';
 import { calculateScore } from 'helpers/Nam-helper/Caculate';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -131,10 +131,8 @@ const Home = () => {
         console.log('userReduxGrade:', userRedux?.grade);
         const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
         const currentSubject = queryParams.get('subject') || 'subject1';
-        console.log('currentSubject currentSubjectcurrentSubjectcurrentSubjectcurrentSubjectcurrentSubject:', currentSubject);
         setSelectedSubject(currentSubject);
         if (currentSubject && currentGrade && currentPage) {
-            console.log('AAAAAAAAAAAAAAAA:', currentGrade);
             fetchChapters({ subjectId: currentSubject, grade: currentGrade });
         }
     }, [location.search, userRedux]);
@@ -318,12 +316,13 @@ const Home = () => {
         };
         fetchChapterProgress();
     }, [selectedChapterId])
+
     const [progress, setProgress] = useState<any>(null);
     useEffect(() => {
         const fetchResultProgress = async () => {
             if (userRedux?.grade && selectedSubject) {
                 if (selectedChapterId) {
-                    const progress = await getListUniqueDoneResultByUserId(selectedChapterId);
+                    const progress = await getListUniqueDoneResultByChapterId(selectedChapterId);
                     console.log('Progress:', progress);
                     setProgress(progress.data.data);
                     setNumberExamDone(progress?.data.data.exams.length ?? 0);
@@ -331,12 +330,11 @@ const Home = () => {
                 }
             }
         };
-
         fetchResultProgress();
     }, [selectedChapterId]);
+
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
-
             <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3'>
                 {lessonLoading && (
                     <div className='tw-absolute tw-inset-0 tw-flex tw-justify-center tw-items-center tw-bg-white tw-bg-opacity-75'>
@@ -395,7 +393,6 @@ const Home = () => {
                                     </div>
                                 </div>
                             </div>
-
                             <div className='tw-bg-white tw-border tw-rounded-2xl tw-h-screen tw-overflow-y-auto'>
                                 <div className='tw-p-2'>
                                     {chaptersData?.data.length ?? 0 > 0 ? (
@@ -440,7 +437,6 @@ const Home = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div className='tw-flex tw-flex-col tw-space-y-5 tw-w-3/5'>
                     <div className='tw-w-full tw-border tw-rounded-2xl tw-bg-white'>

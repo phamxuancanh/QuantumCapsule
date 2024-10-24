@@ -55,10 +55,15 @@ const getListResultByUserId = async (req, res, next) => {
 const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
-    const { chapterId } = req.query
+    const { chapterId, from, to } = req.query
 
     if (!loginedUserId) {
       return res.status(400).json({ message: 'Invalid data format or empty data' })
+    }
+
+    let dateFilter = ''
+    if (from && to) {
+      dateFilter = 'AND r.createdAt BETWEEN :from AND :to'
     }
 
     const query = `
@@ -96,6 +101,7 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
         WHERE 
           r.userId = :userId
           ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''}
+          ${dateFilter}
       ) r
       WHERE r.rn = 1
     `
@@ -103,6 +109,10 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
     const replacements = { userId: loginedUserId }
     if (chapterId) {
       replacements.chapterId = chapterId
+    }
+    if (from && to) {
+      replacements.from = from
+      replacements.to = to
     }
 
     const resultQuery = await sequelize.query(query, {

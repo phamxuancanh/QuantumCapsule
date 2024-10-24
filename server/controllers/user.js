@@ -76,7 +76,8 @@ const getUserById = async (req, res, next) => {
         'city',
         'district',
         'ward',
-        'birthOfDate'
+        'birthOfDate',
+        'starPoint'
       ]
     })
 
@@ -100,6 +101,7 @@ const getUserById = async (req, res, next) => {
       city: user.city,
       district: user.district,
       ward: user.ward,
+      starPoint: user.starPoint,
       dob: user.birthOfDate ? user.birthOfDate.toISOString().split('T')[0] : ''
     }
 

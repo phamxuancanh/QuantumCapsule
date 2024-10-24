@@ -16,6 +16,7 @@ interface User {
   ward: string;
   phone: string;
   dob: string;
+  starPoint: number;
 }
 
 interface AuthState {

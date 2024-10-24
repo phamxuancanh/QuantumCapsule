@@ -15,6 +15,7 @@ export const getResultDetailByResultId = async (resultId: string): Promise<Axios
     
     return await requestWithJwt.get<IDTOResponse<IResultDetail>>(`/results/getResultDetailByResultId/${resultId}`, { withCredentials: true })
 }
-export const getListUniqueDoneResultByUserId = async (chapterId: string): Promise<AxiosResponse<any>> => {
-    return await requestWithJwt.get<IDTOResponse<IResult[]>>(`/results/getListUniqueDoneResultByUserIdandChapterId?chapterId=${chapterId}`, { withCredentials: true });
-}
+export const getListUniqueDoneResultByChapterId = async (chapterId: string, filter?: IGetResultByUserIdFilterParams): Promise<AxiosResponse<any>> => {
+    const params = filter ? { ...filter, chapterId } : { chapterId };
+    return await requestWithJwt.get<IDTOResponse<IResult[]>>('/results/getListUniqueDoneResultByUserIdandChapterId', { params, withCredentials: true });
+};
