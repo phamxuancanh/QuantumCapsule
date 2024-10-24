@@ -11,6 +11,12 @@ import { getListChapterNoPaging } from 'api/chapter/chapter.api';
 import star from '../../assets/star.svg';
 import list from '../../assets/list.svg';
 import { getLessonByChapterId } from 'api/lesson/lesson.api';
+import { IExam } from 'api/exam/exam.interface';
+import { getExamsByChapterId, getExamsByLessonId } from 'api/exam/exam.api';
+import { ITheory } from 'api/theory/theory.interface';
+import { getTheoriesByLessonId } from 'api/theory/theory.api';
+import { getListUniqueDoneResultByChapterId } from 'api/result/result.api';
+import { findProgressByChapter } from 'api/progress/progress.api';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -25,10 +31,17 @@ const DashboardReport = () => {
     const [selectedSubject, setSelectedSubject] = useState<string>(initialSubject);
     const [activeTab, setActiveTab] = useState<string>('general');
     const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'))
-    const [chapters, setChapters] = useState<{ value: number; label: string }[]>([]);
+    const [chapters, setChapters] = useState<{ value: string; label: string }[]>([]);
 
-    const [selectedChapter, setSelectedChapter] = useState<{ value: number; label: string } | null>(null);
+    const [selectedChapter, setSelectedChapter] = useState<{ value: string; label: string } | null>(null);
     const [lessons, setLessons] = useState<any[]>([]);
+    const [theories, setTheories] = useState<{ [key: string]: ITheory[] }>({});
+    const [exercises, setExercises] = useState<{ [key: string]: IExam[] }>({});
+    const [exams, setExams] = useState<IExam[]>([]);
+    const [examProgress, setExamProgress] = useState<any>(null);
+    const [numberExcersiceDone, setNumberExcersiceDone] = useState<number>(0);
+    const [numberExamDone, setNumberExamDone] = useState<number>(0);
+    const [numberTheoryDone, setNumberTheoryDone] = useState<number>(0);
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject();
@@ -49,8 +62,11 @@ const DashboardReport = () => {
                 label: chapter.name,
             }));
             setChapters(chaptersData);
-
-            console.log('Chapters:', res.data.data);
+            const firstChapter = {
+                value: res.data.data[0]?.id || '',
+                label: res.data.data[0]?.name || ''
+            }
+            setSelectedChapter(firstChapter)
         } catch (error) {
             console.log(error);
         }
@@ -58,7 +74,7 @@ const DashboardReport = () => {
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const currentPage = parseInt(queryParams.get('page') || '1', 10);
-        const currentGrade = 1
+        const currentGrade = 2
         const currentSubject = queryParams.get('subject') || 'subject1';
         setSelectedSubject(currentSubject);
         if (currentSubject && currentGrade && currentPage) {
@@ -74,18 +90,57 @@ const DashboardReport = () => {
     };
     const handleChapterChange = (selectedChapter: any) => {
         setSelectedChapter(selectedChapter);
-        // const searchParams = new URLSearchParams(location.search);
-        // searchParams.set('grade', selectedChapter.name); // Cập nhật giá trị grade trong URL
-        // navigate({ search: searchParams.toString() }); // Thay đổi URL với giá trị mới
     };
+    const fetchExamByChapterId = async (chapterId: string) => {
+        try {
+            const response = await getExamsByChapterId(chapterId);
+            setExams(response.data.exams);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching exams:', error);
+        }
+    };
+    const fetchTheoriesAndExercises = async (lessonId: string) => {
+        try {
+            const theoriesResponse = await getTheoriesByLessonId(lessonId);
+            const examsResponse = await getExamsByLessonId(lessonId);
+            setTheories(prevState => ({
+                ...prevState,
+                [lessonId]: theoriesResponse.data.theories,
+            }));
+            setExercises(prevState => ({
+                ...prevState,
+                [lessonId]: examsResponse.data.exams,
+            }));
+        } catch (error) {
+            console.error('Error fetching theories and exercises:', error);
+        }
+    };
+    const fetchAllTheoriesAndExercises = async (lessons: any) => {
+        for (const lesson of lessons) {
+            await fetchTheoriesAndExercises(lesson.id);
+        }
+    };
+    useEffect(() => {
+        if (selectedChapter) {
+            fetchAllTheoriesAndExercises(lessons);
+        }
+        console.log(theories)
+        console.log(exercises)
+    }, [lessons]);
+    useEffect(() => {
+        if (selectedChapter) {
+            fetchExamByChapterId(selectedChapter.value);
+        }
+    }, [selectedChapter]);
+
     const handleTabClick = (tab: string) => {
         setActiveTab(tab);
     };
-    const fetchLessons = async (chapterId: number) => {
+    const fetchLessons = async (chapterId: string) => {
         try {
             const response = await getLessonByChapterId(chapterId.toString());
-            setLessons(response.data.data); // Assuming response.data contains the lessons array
-            console.log('Lessons:', response.data.data);
+            setLessons(response.data.data);
         } catch (error) {
             console.error('Lỗi khi lấy danh sách bài học:', error);
         }
@@ -95,6 +150,32 @@ const DashboardReport = () => {
             fetchLessons(selectedChapter.value);
         }
     }, [selectedChapter])
+    useEffect(() => {
+        const fetchExamResultProgress = async () => {
+            if (currentUser?.currentUser?.id && selectedSubject) {
+                if (selectedChapter) {
+                    const progress = await findProgressByChapter(selectedChapter.value);
+                    setNumberTheoryDone(progress?.data.data.length ?? 0);
+                }
+            }
+        };
+        const fetchTheoryProgress = async () => {
+            if (currentUser?.currentUser?.id && selectedSubject) {
+                if (selectedChapter) {
+                    console.log('Selected Chapter:', selectedChapter)
+                    const progress = await getListUniqueDoneResultByChapterId(selectedChapter.value)
+                    console.log('Progress:', progress)
+                    setExamProgress(progress.data.data)
+                    setNumberExamDone(progress?.data.data.exams.length ?? 0)
+                    setNumberExcersiceDone(progress?.data.data.exercises.length ?? 0)
+                }
+            }
+        }
+        fetchExamResultProgress()
+        fetchTheoryProgress()
+    }, [selectedChapter])
+
+
     const handleFilter = async (filter: IDateFilter) => {
         try {
             console.log(filter);
@@ -138,7 +219,7 @@ const DashboardReport = () => {
                         onChange={handleChapterChange}
                         options={chapters}
                         placeholder="Chọn"
-                        className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm"
+                        className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-50"
                     />
                 </div>
                 <div className='tw-flex tw-space-x-3 tw-text-lg'>
@@ -182,21 +263,21 @@ const DashboardReport = () => {
                                         <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
                                         <div>
                                             <div>Số bài đã học</div>
-                                            <div className='tw-font-bold tw-text-lg'>10</div>
+                                            <div className='tw-font-bold tw-text-lg'>{numberTheoryDone}</div>
                                         </div>
                                     </div>
                                     <div className='tw-flex tw-items-center tw-p-2'>
                                         <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
                                         <div>
                                             <div>Số bài tập đã làm</div>
-                                            <div className='tw-font-bold tw-text-lg'>5</div>
+                                            <div className='tw-font-bold tw-text-lg'>{numberExcersiceDone}</div>
                                         </div>
                                     </div>
                                     <div className='tw-flex tw-items-center tw-p-2'>
                                         <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
                                         <div>
                                             <div>Số bài kiểm tra đã làm</div>
-                                            <div className='tw-font-bold tw-text-lg'>3</div>
+                                            <div className='tw-font-bold tw-text-lg'>{numberExamDone}</div>
                                         </div>
                                     </div>
                                     <div className='tw-flex tw-items-center tw-p-2'>
@@ -254,8 +335,11 @@ const DashboardReport = () => {
                                                     <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
                                                         Bài lý thuyết
                                                     </div>
-                                                    <div className='tw-bg-white tw-border tw-p-2'>
-                                                        Cac bai LT
+                                                    <div className='tw-bg-white tw-p-2'>
+                                                        {Array.isArray(theories[lesson.id]) && theories[lesson.id]
+                                                            .map(t => (
+                                                                <div key={t.id}>{t.name}</div>
+                                                            ))}
                                                     </div>
                                                 </div>
                                                 <div>
@@ -263,7 +347,10 @@ const DashboardReport = () => {
                                                         Bài tập
                                                     </div>
                                                     <div className='tw-bg-white tw-border tw-p-2'>
-                                                        Cac bai tap
+                                                        {Array.isArray(exercises[lesson.id]) && exercises[lesson.id]
+                                                            .map(e => (
+                                                                <div key={e.id}>{e.name}</div>
+                                                            ))}
                                                     </div>
                                                 </div>
                                             </div>
@@ -276,7 +363,13 @@ const DashboardReport = () => {
                                                 Bài thi chương 1
                                             </div>
                                             <div className='tw-bg-white tw-border tw-p-2'>
-                                                Cac bai thi
+                                                <div className='tw-bg-white tw-border tw-p-2'>
+                                                    {exams.map((exam, index) => (
+                                                        <div key={index} className='tw-mb-2'>
+                                                            {exam.name}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
