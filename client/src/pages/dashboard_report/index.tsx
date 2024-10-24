@@ -8,7 +8,9 @@ import QCDateFilter, { IDateFilter } from 'QCComponents/QCDateFilter/QCDateFilte
 import Select from 'react-select';
 import { ListChapterParams } from 'api/chapter/chapter.interface';
 import { getListChapterNoPaging } from 'api/chapter/chapter.api';
-
+import star from '../../assets/star.svg';
+import list from '../../assets/list.svg';
+import { getLessonByChapterId } from 'api/lesson/lesson.api';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -17,19 +19,16 @@ const DashboardReport = () => {
     const { t, i18n } = useTranslation();
     const query = useQuery();
     const navigate = useNavigate();
-    const location = useLocation(); // Use the useLocation hook
+    const location = useLocation();
     const [subjects, setSubjects] = useState<ISubject[]>([]);
     const initialSubject = query.get('subject') || 'subject1';
     const [selectedSubject, setSelectedSubject] = useState<string>(initialSubject);
     const [activeTab, setActiveTab] = useState<string>('general');
     const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'))
-    const chapters = [
-        { value: 1, label: 'C 1' },
-        { value: 2, label: 'c 2' },
-        { value: 3, label: 'c 3' },
-    ];
-    const [selectedChapter, setSelectedChapter] = useState<{ value: number; label: string } | null>(null);
+    const [chapters, setChapters] = useState<{ value: number; label: string }[]>([]);
 
+    const [selectedChapter, setSelectedChapter] = useState<{ value: number; label: string } | null>(null);
+    const [lessons, setLessons] = useState<any[]>([]);
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject();
@@ -45,8 +44,13 @@ const DashboardReport = () => {
     const fetchChapters = async (params?: ListChapterParams) => {
         try {
             const res = await getListChapterNoPaging({ params });
-            // setChaptersData(res.data);
-            console.log('Chapters:', res.data);
+            const chaptersData = res.data.data.map((chapter: any) => ({
+                value: chapter.id,
+                label: chapter.name,
+            }));
+            setChapters(chaptersData);
+
+            console.log('Chapters:', res.data.data);
         } catch (error) {
             console.log(error);
         }
@@ -77,6 +81,20 @@ const DashboardReport = () => {
     const handleTabClick = (tab: string) => {
         setActiveTab(tab);
     };
+    const fetchLessons = async (chapterId: number) => {
+        try {
+            const response = await getLessonByChapterId(chapterId.toString());
+            setLessons(response.data.data); // Assuming response.data contains the lessons array
+            console.log('Lessons:', response.data.data);
+        } catch (error) {
+            console.error('Lỗi khi lấy danh sách bài học:', error);
+        }
+    };
+    useEffect(() => {
+        if (selectedChapter) {
+            fetchLessons(selectedChapter.value);
+        }
+    }, [selectedChapter])
     const handleFilter = async (filter: IDateFilter) => {
         try {
             console.log(filter);
@@ -159,11 +177,35 @@ const DashboardReport = () => {
                             </div>
                             <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
                             <div className='tw-flex tw-flex-col tw-items-center tw-px-10'>
-                                <div className='tw-flex'>
-                                    <div className='tw-border'>Số bài đã học</div>
-                                    <div className='tw-border'>Số bài tập đã làm</div>
-                                    <div className='tw-border'>Số bài kiểm tra đã làm</div>
-                                    <div className='tw-border'>Tổng số sao đạt được</div>
+                                <div className='tw-flex tw-w-full tw-justify-between'>
+                                    <div className='tw-flex tw-items-center tw-p-2'>
+                                        <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
+                                        <div>
+                                            <div>Số bài đã học</div>
+                                            <div className='tw-font-bold tw-text-lg'>10</div>
+                                        </div>
+                                    </div>
+                                    <div className='tw-flex tw-items-center tw-p-2'>
+                                        <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
+                                        <div>
+                                            <div>Số bài tập đã làm</div>
+                                            <div className='tw-font-bold tw-text-lg'>5</div>
+                                        </div>
+                                    </div>
+                                    <div className='tw-flex tw-items-center tw-p-2'>
+                                        <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
+                                        <div>
+                                            <div>Số bài kiểm tra đã làm</div>
+                                            <div className='tw-font-bold tw-text-lg'>3</div>
+                                        </div>
+                                    </div>
+                                    <div className='tw-flex tw-items-center tw-p-2'>
+                                        <img className='tw-w-10 tw-h-10 tw-mr-2' src={star} alt="Star Icon" />
+                                        <div>
+                                            <div>Tổng số sao đạt được</div>
+                                            <div className='tw-font-bold tw-text-lg'>15</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className='tw-text-2xl'>
                                     TỔNG QUAN TOÀN BỘ KIẾN THỨC - <span className='tw-text-blue-500'>{`${currentUser?.currentUser?.firstName?.toUpperCase()} ${currentUser?.currentUser?.lastName?.toUpperCase()}`}</span>
@@ -171,8 +213,8 @@ const DashboardReport = () => {
                             </div>
                             <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
                             <div className='tw-flex tw-flex-col tw-px-10 tw-items-center tw-space-y-10'>
-                                <div className='tw-flex tw-justify-between tw-w-3/5'>
-                                    <div>
+                                <div className='tw-grid tw-grid-cols-2 tw-w-4/5'>
+                                    <div className='tw-border-r tw-border-gray-400'>
                                         <h4 className="tw-text-md tw-font-semibold">Bài học</h4>
                                         <div className="tw-flex tw-items-center tw-space-x-4">
                                             <div className="tw-flex tw-items-center tw-space-x-1">
@@ -185,8 +227,7 @@ const DashboardReport = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <hr className="tw-w-px tw-h-auto tw-bg-slate-200 tw-mx-3" />
-                                    <div>
+                                    <div className='tw-px-2'>
                                         <h4 className="tw-text-md tw-font-semibold">Bài tập & Kiểm tra</h4>
                                         <div className="tw-flex tw-items-center tw-space-x-4">
                                             <div className="tw-flex tw-items-center tw-space-x-1">
@@ -204,7 +245,42 @@ const DashboardReport = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className='tw-bg-blue-100 tw-w-full'>Nội dung</div>
+                                <div className='tw-w-full tw-space-y-5 tw-pb-10'>
+                                    {lessons.map((lesson) => (
+                                        <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border' key={lesson.id}>
+                                            <div className='tw-p-2 tw-bg-green-400'>{lesson.name.toUpperCase()}</div>
+                                            <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-2 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
+                                                <div className='tw-border-r tw-border-gray-400'>
+                                                    <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
+                                                        Bài lý thuyết
+                                                    </div>
+                                                    <div className='tw-bg-white tw-border tw-p-2'>
+                                                        Cac bai LT
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
+                                                        Bài tập
+                                                    </div>
+                                                    <div className='tw-bg-white tw-border tw-p-2'>
+                                                        Cac bai tap
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border'>
+                                        <div className='tw-p-2 tw-bg-yellow-400'>BAI THI</div>
+                                        <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-1 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
+                                            <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-yellow-100'>
+                                                Bài thi chương 1
+                                            </div>
+                                            <div className='tw-bg-white tw-border tw-p-2'>
+                                                Cac bai thi
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     }
