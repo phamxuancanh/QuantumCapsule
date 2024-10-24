@@ -1,5 +1,5 @@
 const { models } = require('../models')
-
+const { Op } = require('sequelize')
 const addProgress = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
@@ -128,16 +128,25 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
 const findProgressByChapter = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
-    const { chapterId } = req.query
+    const { chapterId, from, to } = req.query
     console.log('chapterId:', chapterId)
+
     if (!chapterId) {
       return res.status(400).json({ message: 'Missing chapterId' })
     }
 
+    const whereClause = {
+      userId: loginedUserId
+    }
+
+    if (from && to) {
+      whereClause.createdAt = {
+        [Op.between]: [new Date(from), new Date(to)]
+      }
+    }
+
     const progressList = await models.Progress.findAll({
-      where: {
-        userId: loginedUserId
-      },
+      where: whereClause,
       include: [
         {
           model: models.Theory,

@@ -30,6 +30,7 @@ export interface IUser {
     otp?: string
     otpExprire?: Date
     roleId?: number
+    starPoint?: number
 }
 export interface IGetTableData {
     tableName: string;

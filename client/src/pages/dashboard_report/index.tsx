@@ -17,6 +17,10 @@ import { ITheory } from 'api/theory/theory.interface';
 import { getTheoriesByLessonId } from 'api/theory/theory.api';
 import { getListUniqueDoneResultByChapterId } from 'api/result/result.api';
 import { findProgressByChapter } from 'api/progress/progress.api';
+import { calculateScore } from 'helpers/Nam-helper/Caculate';
+import { IGetResultByUserIdFilterParams } from 'api/result/result.interface';
+import { differenceInDays } from 'date-fns';
+import { toast } from 'react-toastify';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -29,7 +33,7 @@ const DashboardReport = () => {
     const [subjects, setSubjects] = useState<ISubject[]>([]);
     const initialSubject = query.get('subject') || 'subject1';
     const [selectedSubject, setSelectedSubject] = useState<string>(initialSubject);
-    const [activeTab, setActiveTab] = useState<string>('general');
+    // const [activeTab, setActiveTab] = useState<string>('general');
     const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'))
     const [chapters, setChapters] = useState<{ value: string; label: string }[]>([]);
 
@@ -39,6 +43,8 @@ const DashboardReport = () => {
     const [exercises, setExercises] = useState<{ [key: string]: IExam[] }>({});
     const [exams, setExams] = useState<IExam[]>([]);
     const [examProgress, setExamProgress] = useState<any>(null);
+    const [theoryProgress, setTheoryProgress] = useState<any>(null);
+
     const [numberExcersiceDone, setNumberExcersiceDone] = useState<number>(0);
     const [numberExamDone, setNumberExamDone] = useState<number>(0);
     const [numberTheoryDone, setNumberTheoryDone] = useState<number>(0);
@@ -50,7 +56,7 @@ const DashboardReport = () => {
             console.error('Lỗi khi lấy danh sách môn học:', error);
         }
     };
-
+    const [daysDifference, setDaysDifference] = useState(0)
     useEffect(() => {
         fetchSubjects();
     }, []);
@@ -134,9 +140,9 @@ const DashboardReport = () => {
         }
     }, [selectedChapter]);
 
-    const handleTabClick = (tab: string) => {
-        setActiveTab(tab);
-    };
+    // const handleTabClick = (tab: string) => {
+    //     setActiveTab(tab);
+    // };
     const fetchLessons = async (chapterId: string) => {
         try {
             const response = await getLessonByChapterId(chapterId.toString());
@@ -151,21 +157,24 @@ const DashboardReport = () => {
         }
     }, [selectedChapter])
     useEffect(() => {
-        const fetchExamResultProgress = async () => {
+        const fetchTheoryProgress = async () => {
             if (currentUser?.currentUser?.id && selectedSubject) {
                 if (selectedChapter) {
                     const progress = await findProgressByChapter(selectedChapter.value);
+                    setTheoryProgress(progress.data.data)
+                    console.log('Progress 1:', theoryProgress)
                     setNumberTheoryDone(progress?.data.data.length ?? 0);
                 }
             }
-        };
-        const fetchTheoryProgress = async () => {
+        }
+        const fetchExamResultProgress = async () => {
             if (currentUser?.currentUser?.id && selectedSubject) {
                 if (selectedChapter) {
                     console.log('Selected Chapter:', selectedChapter)
                     const progress = await getListUniqueDoneResultByChapterId(selectedChapter.value)
-                    console.log('Progress:', progress)
                     setExamProgress(progress.data.data)
+                    console.log('Progress 2:', examProgress)
+                    console.log('Progress2:', progress)
                     setNumberExamDone(progress?.data.data.exams.length ?? 0)
                     setNumberExcersiceDone(progress?.data.data.exercises.length ?? 0)
                 }
@@ -175,22 +184,53 @@ const DashboardReport = () => {
         fetchTheoryProgress()
     }, [selectedChapter])
 
-
     const handleFilter = async (filter: IDateFilter) => {
         try {
             console.log(filter);
-            // const res = await getListResultByUserId(
-            //     getUserIDLogin(), 
-            //     {
-            //         from: filter.from,
-            //         to: filter.to
-            //     } as IGetResultByUserIdFilterParams
-            // );
-            // setListResult(res.data.data);
+            const chapterId = selectedChapter?.value ?? '';
+                if (filter.to && filter.from) {
+                const fromDate = new Date(filter.from);
+                const toDate = new Date(filter.to);
+                if (toDate < fromDate) {
+                    toast.error("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.");
+                    return;
+                }
+                const daysDifference = differenceInDays(toDate, fromDate);
+                setDaysDifference(daysDifference);
+                console.log(`Số ngày chênh lệch: ${daysDifference}`);
+            }
+            const [examProgressResponse, theoryProgressResponse] = await Promise.all([
+                getListUniqueDoneResultByChapterId(chapterId, {
+                    from: filter.from,
+                    to: filter.to
+                } as IGetResultByUserIdFilterParams),
+                findProgressByChapter(chapterId, {
+                    from: filter.from,
+                    to: filter.to
+                } as IGetResultByUserIdFilterParams)
+            ]);
+            const examProgress = examProgressResponse?.data?.data;
+            if (examProgress) {
+                setExamProgress(examProgress);
+                setNumberExamDone(examProgress.exams?.length ?? 0)
+                setNumberExcersiceDone(examProgress.exercises?.length ?? 0)
+            } else {
+                setNumberExamDone(0);
+                setNumberExcersiceDone(0);
+            }
+                const theoryProgress = theoryProgressResponse?.data?.data;
+            if (theoryProgress) {
+                setTheoryProgress(theoryProgress);
+                setNumberTheoryDone(theoryProgress.length ?? 0)
+            } else {
+                setNumberTheoryDone(0)
+            }
+    
         } catch (err: any) {
-            // toast.error(err.message);
+            console.error(err);
         }
     }
+
 
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center'>
@@ -222,7 +262,7 @@ const DashboardReport = () => {
                         className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-50"
                     />
                 </div>
-                <div className='tw-flex tw-space-x-3 tw-text-lg'>
+                {/* <div className='tw-flex tw-space-x-3 tw-text-lg'>
                     <div
                         className={`tw-border tw-font-bold tw-p-2 tw-px-2 tw-rounded-md tw-shadow-2xl tw-cursor-pointer ${activeTab === 'general' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-white tw-text-black'}`}
                         onClick={() => handleTabClick('general')}
@@ -241,12 +281,12 @@ const DashboardReport = () => {
                     >
                         Tiến độ học tập
                     </div>
-                </div>
+                </div> */}
                 <div className='tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
-                    {activeTab === 'general' &&
+                    {/* {activeTab === 'general' && */}
                         <div className='tw-flex tw-flex-col'>
                             <div className='tw-flex tw-justify-between tw-items-center tw-px-10 tw-pt-3'>
-                                <div className='tw-text-2xl tw-font-bold'>Trong 7 ngay qua</div>
+                                <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div>
                                 <div className='tw-flex tw-items-center'>
                                     <QCDateFilter
                                         onChange={(filter) => {
@@ -284,7 +324,7 @@ const DashboardReport = () => {
                                         <img className='tw-w-10 tw-h-10 tw-mr-2' src={star} alt="Star Icon" />
                                         <div>
                                             <div>Tổng số sao đạt được</div>
-                                            <div className='tw-font-bold tw-text-lg'>15</div>
+                                            <div className='tw-font-bold tw-text-lg'>{currentUser?.currentUser.starPoint}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -336,39 +376,103 @@ const DashboardReport = () => {
                                                         Bài lý thuyết
                                                     </div>
                                                     <div className='tw-bg-white tw-p-2'>
-                                                        {Array.isArray(theories[lesson.id]) && theories[lesson.id]
-                                                            .map(t => (
-                                                                <div key={t.id}>{t.name}</div>
-                                                            ))}
+                                                        {Array.isArray(theories[lesson.id]) && theories[lesson.id].map(t => {
+                                                            const isInProgress = theoryProgress.includes(t.id);
+                                                            return (
+                                                                <div key={t.id} className="tw-flex tw-items-center tw-space-x-2">
+                                                                    <div className={`tw-w-4 tw-h-4 tw-border-2 tw-rounded-full ${isInProgress ? 'tw-border-blue-500 tw-bg-blue-500 tw-bg-opacity-20' : 'tw-border-gray-300 tw-bg-gray-300 tw-bg-opacity-20'}`}></div>
+                                                                    <span className='tw-font-bold'>{t.name}</span>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
                                                 <div>
                                                     <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
                                                         Bài tập
                                                     </div>
-                                                    <div className='tw-bg-white tw-border tw-p-2'>
-                                                        {Array.isArray(exercises[lesson.id]) && exercises[lesson.id]
-                                                            .map(e => (
-                                                                <div key={e.id}>{e.name}</div>
-                                                            ))}
+                                                    <div className='tw-bg-white tw-p-2'>
+                                                        {Array.isArray(exercises[lesson.id]) && exercises[lesson.id].map(e => {
+                                                            const progress = examProgress?.exercises?.find((progress: any) => progress.examId === e.id);
+                                                            let statusElement;
+
+                                                            if (progress) {
+                                                                const scoreRatio = calculateScore(progress.totalScore, progress.yourScore);
+                                                                if (scoreRatio >= 8) {
+                                                                    statusElement = (
+                                                                        <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
+                                                                        </div>
+                                                                    );
+                                                                } else {
+                                                                    statusElement = (
+                                                                        <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            } else {
+                                                                statusElement = (
+                                                                    <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                        <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            return (
+                                                                <div key={e.id} className="tw-flex tw-items-center tw-space-x-2">
+                                                                    {statusElement}
+                                                                    <span className='tw-font-bold'>{e.name}</span>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                     <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border'>
-                                        <div className='tw-p-2 tw-bg-yellow-400'>BAI THI</div>
+                                        <div className='tw-p-2 tw-bg-yellow-400'>BÀI KIỂM TRA</div>
                                         <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-1 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
                                             <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-yellow-100'>
-                                                Bài thi chương 1
+                                                Bài thi {selectedChapter?.label}
                                             </div>
                                             <div className='tw-bg-white tw-border tw-p-2'>
-                                                <div className='tw-bg-white tw-border tw-p-2'>
-                                                    {exams.map((exam, index) => (
-                                                        <div key={index} className='tw-mb-2'>
-                                                            {exam.name}
-                                                        </div>
-                                                    ))}
+                                                <div className='tw-bg-white tw-p-2'>
+                                                    {exams.map((exam, index) => {
+                                                        const progress = examProgress?.exams?.find((progress: any) => progress.examId === exam.id);
+                                                        let statusElement;
+
+                                                        if (progress) {
+                                                            const scoreRatio = calculateScore(progress.totalScore, progress.yourScore);
+                                                            if (scoreRatio >= 8) {
+                                                                statusElement = (
+                                                                    <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                        <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                statusElement = (
+                                                                    <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                        <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                        } else {
+                                                            statusElement = (
+                                                                <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        return (
+                                                            <div key={index} className="tw-flex tw-items-center tw-space-x-2 tw-mb-2">
+                                                                {statusElement}
+                                                                <span className='tw-font-bold'>{exam.name}</span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>
@@ -376,8 +480,8 @@ const DashboardReport = () => {
                                 </div>
                             </div>
                         </div>
-                    }
-                    {activeTab === 'history' &&
+                    
+                    {/* {activeTab === 'history' &&
                         <div>
                             Lich su luyen tap content
                         </div>
@@ -386,7 +490,7 @@ const DashboardReport = () => {
                         <div>
                             Tien do hoc tap content
                         </div>
-                    }
+                    } */}
                 </div>
             </div>
         </div>
