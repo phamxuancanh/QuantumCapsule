@@ -5,7 +5,11 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   content: [],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        'spin-slow': 'spin 5s linear infinite',
+      },
+    },
   },
   plugins: [
     require('tailwind-scrollbar'),

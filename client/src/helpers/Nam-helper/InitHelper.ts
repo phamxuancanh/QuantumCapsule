@@ -48,7 +48,7 @@ export const getUserIDLogin = () => {
 
 export const caculateStar = (result : IResult): number => {
     const percent = result.yourScore! / result.totalScore! * 100
-    if (percent >= 90) {
+    if (percent >= 80) {
         return 3
     }
     if (percent >= 50) {

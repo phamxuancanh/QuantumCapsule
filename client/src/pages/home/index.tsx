@@ -385,12 +385,12 @@ const Home = () => {
                                         {t('homepage.lesson')}
                                         {(currentLanguage !== 'vi' && lessonsData.length >= 2) ? 's' : ''}
                                     </div>
-                                    <div>•</div>
+                                    {/* <div>•</div>
                                     <div>
                                         <span className='tw-font-bold'>{lessonsData.length} </span>
-                                        {t('homepage.exam')}
+                                        bài tập
                                         {(currentLanguage !== 'vi' && lessonsData.length >= 2) ? 's' : ''}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className='tw-bg-white tw-border tw-rounded-2xl tw-h-screen tw-overflow-y-auto'>
@@ -473,7 +473,7 @@ const Home = () => {
                                 <div className="tw-flex tw-items-center">
                                     <BarChartIcon className="tw-mr-2" />
                                     <span>
-                                        {t('homepage.completed')}: {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0} bài lý thuyết ({t('homepage.archived')} {(numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100).toFixed(2)}  %)
+                                        {t('homepage.completed')}: {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0} bài học ({t('homepage.archived')} {(numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100).toFixed(2)}  %)
                                     </span>
                                 </div>
                                 {/* <button className='tw-cursor-pointer tw-bg-green-500 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
@@ -484,7 +484,7 @@ const Home = () => {
                             <div className='tw-flex-col tw-flex tw-justify-start tw-items-start tw-space-y-3'>
                                 <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
                                     <div className='tw-flex tw-justify-start tw-items-center'>
-                                        <div>Bài lý thuyết: </div>
+                                        <div>Bài học: </div>
                                     </div>
                                     <div className='tw-flex tw-justify-start tw-items-center'>
                                         <div className='tw-font-bold tw-text-xl'>
@@ -504,7 +504,7 @@ const Home = () => {
                                 </div>
                                 <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
                                     <div className='tw-flex tw-justify-start tw-items-center'>
-                                        <div>{capitalizeFirstLetter(t('homepage.exam'))}: </div>
+                                        <div>Bài thi: </div>
                                     </div>
                                     <div className='tw-flex tw-justify-start tw-items-center'>
                                         <div className='tw-font-bold tw-text-xl'>
@@ -553,13 +553,13 @@ const Home = () => {
                         </div> */}
                     </div>
 
-                    <div className='tw-bg-transparent tw-w-full'>
+                    <div className='tw-bg-transparent tw-w-full tw-overflow-auto tw-h-screen'>
                         <div className="tw-container tw-mx-auto tw-p-1">
                             {selectedLessonId ? (
                                 <div className="tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-md tw-space-y-6">
                                     {/* Hiển thị danh sách Theories */}
                                     <div className="">
-                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài lý thuyết</h3>
+                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài học</h3>
                                         {theories[selectedLessonId] && theories[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
                                                 {theories[selectedLessonId].map((theory) => (
@@ -707,7 +707,7 @@ const Home = () => {
                         <div className="tw-container tw-mx-auto tw-p-4">
                             <div className='tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-md tw-space-y-6'>
                                 <div className="tw-mt-4">
-                                    <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài kiểm tra</h3>
+                                    <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài thi</h3>
                                     {exams2?.length > 0 ? (
                                         <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
                                             {exams2?.map((exam) => {
