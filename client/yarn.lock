@@ -3242,6 +3242,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-resizable@^3.0.8":
+  version "3.0.8"
+  resolved "https://registry.npmjs.org/@types/react-resizable/-/react-resizable-3.0.8.tgz"
+  integrity sha512-Pcvt2eGA7KNXldt1hkhVhAgZ8hK41m0mp89mFgQi7LAAEZiaLgm4fHJ5zbJZ/4m2LVaAyYrrRRv1LHDcrGQanA==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-slick@^0.23.13":
   version "0.23.13"
   resolved "https://registry.npmjs.org/@types/react-slick/-/react-slick-0.23.13.tgz"
