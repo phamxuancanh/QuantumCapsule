@@ -133,7 +133,10 @@ const handleClassChange = (selectedClass: any) => {
                             onClick={() => setSearchTerm(suggestion.name)}
                           >
                             <div>{suggestion.name}</div>
-                            <div className="tw-text-sm">({suggestion.type})</div>
+                            {/* <div className="tw-text-sm">({suggestion.type})</div> */}
+                            <div className="tw-text-sm">
+                              ({suggestion.type === 'Lesson' ? 'bài học' : suggestion.type === 'Exam' ? 'bài tập' : suggestion.type})
+                            </div>
                             {/* <div>{suggestion?.Chapter?.grade}</div> */}
                           </li>
                         ))}

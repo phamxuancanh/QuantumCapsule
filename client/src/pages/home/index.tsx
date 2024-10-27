@@ -414,11 +414,11 @@ const Home = () => {
                                                         </div>
 
                                                         {chapter.id && expandedChapters[chapter.id] && (
-                                                            <ul className='tw-mx-8 tw-mt-2 tw-space-y-2'>
+                                                            <ul className='tw-mx-20 tw-mt-2 tw-space-y-2'>
                                                                 {lessonsData.filter(lesson => lesson.chapterId === chapter.id).map((lesson) => (
                                                                     <li
                                                                         key={lesson.id}
-                                                                        className={`tw-p-2 tw-cursor-pointer tw-border-b tw-border-b-1 tw-border-gray-300 ${selectedLessonId === lesson.id ? 'tw-font-bold' : ''}`}
+                                                                        className={`tw-pl-4 tw-p-2 tw-cursor-pointer tw-border-b tw-border-b-1 tw-border-gray-300 ${selectedLessonId === lesson.id ? 'tw-font-bold' : ''}`}
                                                                         onClick={() => handleLessonClick(lesson.id ?? '')}
                                                                     >
                                                                         {lesson.name}
