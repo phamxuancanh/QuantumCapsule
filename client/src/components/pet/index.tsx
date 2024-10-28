@@ -51,17 +51,17 @@ const Pet = () => {
     return (
         <Draggable>
             <div
-                className="tw-fixed tw-bottom-4 tw-right-4 tw-w-40 tw-h-40 tw-flex tw-items-center tw-justify-center tw-cursor-grab tw-z-30"
+                className="tw-fixed tw-bottom-4 tw-right-4 tw-w-36 tw-h-36 tw-flex tw-items-center tw-justify-center tw-cursor-grab tw-z-30"
                 onMouseEnter={handleMouseEnter}
             >
                 <div className="tw-relative tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center">
                     <img
-                        className="tw-absolute tw-h-40 tw-w-40 tw-animate-spin-slow"
+                        className="tw-absolute tw-h-36 tw-w-36 tw-animate-spin-slow"
                         src={pokemon_bg}
                         alt="Pokemon Background"
                         onDragStart={handleDragStart}
                     />
-                    <div className="tw-relative tw-w-24 tw-h-24 tw-flex tw-items-center tw-justify-center">
+                    <div className="tw-relative tw-w-20 tw-h-20 tw-flex tw-items-center tw-justify-center">
                         <img
                             className="tw-absolute tw-h-full tw-w-full"
                             src={pokemon_circle_bg}
@@ -69,7 +69,7 @@ const Pet = () => {
                             onDragStart={handleDragStart}
                         />
                         <img
-                            className="tw-relative tw-h-20 tw-w-20"
+                            className="tw-relative tw-h-16 tw-w-16"
                             src={pikachu}
                             alt="Pet"
                             onDragStart={handleDragStart}

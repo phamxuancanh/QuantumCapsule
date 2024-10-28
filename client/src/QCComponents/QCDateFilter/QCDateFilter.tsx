@@ -3,9 +3,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-// import GridLayout from 'components/layouts/grid/GridLayout';
 import { Box, Card, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import 'dayjs/locale/vi'
+import 'dayjs/locale/vi';
 
 export enum DateFilterMode {
     MONTH = 'month',
@@ -13,13 +12,15 @@ export enum DateFilterMode {
     DATE = 'date',
     QUARTER = 'quarter'
 }
+
 export interface IDateFilter {
     mode: DateFilterMode,
     from: Date | undefined,
-    to: Date  | undefined,
+    to: Date | undefined,
     month: Date | undefined,
-    year:  Date | undefined
+    year: Date | undefined
 }
+
 export interface IDateFilterProps {
     onChange?: (filter: IDateFilter) => void
     isFirstFilter?: boolean
@@ -29,43 +30,52 @@ export interface IDateFilterProps {
 const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
     const [filter, setFilter] = React.useState<IDateFilter>({
         mode: DateFilterMode.DATE,
-        from: new Date(new Date().setHours(0, 0, 0, 0)), // Đầu ngày hôm nay (00:00:00)
-        to: new Date(new Date().setHours(23, 59, 59, 999)),
+        from: undefined, // Initially undefined
+        to: undefined, // Initially undefined
         month: undefined,
         year: undefined
     });
-    const flat = React.useRef(false);
+
     useEffect(() => {
         props.onChange && props.onChange(filter);
     }, [filter.from, filter.to]);
 
-    const handleChangeMode = (mode: DateFilterMode)=>{
-        if(mode === DateFilterMode.DATE){
-            setFilter({...filter, mode, month: undefined, year: undefined,
+    const handleChangeMode = (mode: DateFilterMode) => {
+        if (mode === DateFilterMode.DATE) {
+            setFilter({
+                ...filter,
+                mode,
+                month: undefined,
+                year: undefined,
                 from: filter.from,
                 to: filter.to
             });
         }
-        if(mode === DateFilterMode.MONTH){
-            setFilter({...filter, mode, year: undefined,
-                month: dayjs(filter.from).startOf('month').toDate(),
-                from: dayjs(filter.from).startOf('month').toDate(),
-                to: dayjs(filter.from).endOf('month').toDate()
+        if (mode === DateFilterMode.MONTH) {
+            setFilter({
+                ...filter,
+                mode,
+                year: undefined,
+                month: filter.from ? dayjs(filter.from).startOf('month').toDate() : undefined,
+                from: filter.from ? dayjs(filter.from).startOf('month').toDate() : undefined,
+                to: filter.from ? dayjs(filter.from).endOf('month').toDate() : undefined
             });
         }
-        if(mode === DateFilterMode.YEAR){
-            setFilter({...filter, mode, month: undefined,
-                // year: dayjs(filter.from).startOf('year').add(1, 'days').toDate(),
-                from: dayjs(filter.from).startOf('year').toDate(),
-                to: dayjs(filter.from).endOf('year').toDate()
+        if (mode === DateFilterMode.YEAR) {
+            setFilter({
+                ...filter,
+                mode,
+                month: undefined,
+                from: filter.from ? dayjs(filter.from).startOf('year').toDate() : undefined,
+                to: filter.from ? dayjs(filter.from).endOf('year').toDate() : undefined
             });
         }
-    }
+    };
 
     return (
-        <Card sx={{ maxWidth: '790px', padding: '5px 10px'}}>
+        <Card sx={{ maxWidth: '790px', padding: '5px 10px' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="vi">
-                <Box sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
+                <Box sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <FormControl key='mode' sx={{ margin: '10px 0' }}>
                         <InputLabel>Lọc theo</InputLabel>
                         <Select
@@ -79,47 +89,46 @@ const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
                             <MenuItem value={DateFilterMode.YEAR}>Năm</MenuItem>
                         </Select>
                     </FormControl>
-                    {
-                        filter.mode === DateFilterMode.MONTH && 
+                    {filter.mode === DateFilterMode.MONTH && (
                         <DatePicker
                             key="month"
                             views={['year', 'month']}
                             label="Năm"
-                            value={dayjs(filter.month)}
+                            value={filter.month ? dayjs(filter.month) : null}
                             onChange={(newValue) => {
                                 setFilter({
                                     ...filter,
-                                    month: dayjs(newValue?.toDate() ?? '').startOf('month').toDate(),
-                                    from: dayjs(newValue?.toDate() ?? '').startOf('month').toDate(),
-                                    to: dayjs(newValue?.toDate() ?? '').endOf('month').toDate()
+                                    month: newValue ? dayjs(newValue.toDate()).startOf('month').toDate() : undefined,
+                                    from: newValue ? dayjs(newValue.toDate()).startOf('month').toDate() : undefined,
+                                    to: newValue ? dayjs(newValue.toDate()).endOf('month').toDate() : undefined
                                 });
                             }}
-                            sx={{ margin: '10px 0', width: '182px'}}
+                            sx={{ margin: '10px 0', width: '182px' }}
                         />
-                    }
-                    {
-                        filter.mode === DateFilterMode.YEAR && <DatePicker
+                    )}
+                    {filter.mode === DateFilterMode.YEAR && (
+                        <DatePicker
                             key="year"
                             views={['year']}
                             label="Năm"
-                            value={dayjs(filter.year)}
+                            value={filter.year ? dayjs(filter.year) : null}
                             onChange={(newValue) => {
                                 setFilter({
                                     ...filter,
-                                    year: dayjs(newValue?.toDate() ?? '').startOf('year').toDate(),
-                                    from: dayjs(newValue?.toDate() ?? '').startOf('year').toDate(),
-                                    to: dayjs(newValue?.toDate() ?? '').endOf('year').toDate()
+                                    year: newValue ? dayjs(newValue.toDate()).startOf('year').toDate() : undefined,
+                                    from: newValue ? dayjs(newValue.toDate()).startOf('year').toDate() : undefined,
+                                    to: newValue ? dayjs(newValue.toDate()).endOf('year').toDate() : undefined
                                 });
                             }}
-                            sx={{ margin: '10px 0', width: '100px'}}
+                            sx={{ margin: '10px 0', width: '100px' }}
                         />
-                    }
+                    )}
                     <DatePicker
                         key="from"
                         label="Từ ngày"
-                        value={dayjs(filter.from)}
+                        value={filter.from ? dayjs(filter.from) : null}
                         onChange={(newValue) => {
-                            setFilter({ ...filter, from: newValue?.toDate() });
+                            setFilter({ ...filter, from: newValue ? newValue.toDate() : undefined });
                         }}
                         sx={{ margin: '10px 0' }}
                         disabled={filter.mode !== DateFilterMode.DATE}
@@ -127,9 +136,9 @@ const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
                     <DatePicker
                         key="to"
                         label="Đến ngày"
-                        value={dayjs(filter.to)}
+                        value={filter.to ? dayjs(filter.to) : null}
                         onChange={(newValue) => {
-                            setFilter({ ...filter, to: newValue?.toDate() });
+                            setFilter({ ...filter, to: newValue ? newValue.toDate() : undefined });
                         }}
                         sx={{ margin: '10px 0' }}
                         disabled={filter.mode !== DateFilterMode.DATE}

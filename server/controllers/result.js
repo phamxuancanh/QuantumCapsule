@@ -38,15 +38,34 @@ const insertResult = async (req, res, next) => {
 const getListResultByUserId = async (req, res, next) => {
   try {
     const { userId } = req.params
-    const { from, to } = req.query
+    let { from, to } = req.query
+
     if (!userId) {
       return res.status(400).json({ message: 'Invalid data format or empty data' })
     }
-    const query = queries.getListResultAndExamNameByUserId
+
+    // Set default values for from and to if they are not provided
+    from = from || null
+    to = to || null
+
+    let dateFilter = ''
+    if (from && to) {
+      dateFilter = 'AND r.createdAt BETWEEN :from AND :to'
+    }
+
+    const query = `
+      SELECT r.*, e.name as examName
+      FROM Results r
+      JOIN Exams e ON r.examId = e.id
+      WHERE r.userId = :userId
+      ${dateFilter}
+    `
+
     const resultQuery = await sequelize.query(query, {
       replacements: { userId, from, to },
       type: sequelize.QueryTypes.SELECT
     })
+
     res.status(200).json({ message: 'success', data: resultQuery })
   } catch (error) {
     res.status(500).json({ message: error.message })
