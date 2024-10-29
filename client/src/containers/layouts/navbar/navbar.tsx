@@ -44,6 +44,8 @@ const Navbar = () => {
   const handleClassChange = (selectedClass: any) => {
     setSelectedClass(selectedClass);
     const searchParams = new URLSearchParams(location.search);
+    searchParams.set('chapterId', '');
+    searchParams.set('lessonId', '');
     searchParams.set('grade', selectedClass.value); // Cập nhật giá trị grade trong URL
     navigate({ search: searchParams.toString() }); // Thay đổi URL với giá trị mới
   };
