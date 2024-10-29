@@ -564,7 +564,7 @@ const DashboardReport = () => {
                         )}
                     </div>
                 ) : (
-                    <div className='tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
+                    <div className='tw-w-full tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
                         <div className="tw-min-h-screen tw-bg-gray-100 tw-p-6">
                             <div className="tw-max-w-7xl tw-mx-auto">
                                 <h1 className="tw-text-3xl tw-font-bold tw-text-gray-800 tw-mb-8">Learning Dashboard</h1>
