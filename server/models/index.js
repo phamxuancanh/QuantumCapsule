@@ -21,6 +21,11 @@ const Message = require('./message')
 const ExamQuestion = require('./exam_question')
 const Progress = require('./progress')
 const Enrollment = require('./enrollment')
+const Pet = require('./pet')
+
+Pet.hasMany(User, { foreignKey: 'petId' })
+User.belongsTo(Pet, { foreignKey: 'petId' })
+
 Role.hasMany(User, { foreignKey: 'roleId' })
 User.belongsTo(Role, { foreignKey: 'roleId' })
 
@@ -100,6 +105,7 @@ module.exports = {
   sequelize,
   models: {
     User,
+    Pet,
     Role,
     Grid,
     Subject,

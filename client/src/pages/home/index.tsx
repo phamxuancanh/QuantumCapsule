@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ProgressBar from '@ramonak/react-progress-bar'
 import icon_category from '../../assets/icon_category.png';
@@ -31,6 +31,7 @@ import thumnail_exercise from '../../assets/thumnail_exercises.png';
 import thumnail_exam from '../../assets/thumnail_exam.png';
 import { getListUniqueDoneResultByChapterId } from 'api/result/result.api';
 import { calculateScore } from 'helpers/Nam-helper/Caculate';
+import { set } from 'lodash';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -124,18 +125,25 @@ const Home = () => {
     const [numberTheoryDone, setNumberTheoryDone] = useState<number>(0);
     const [numberExcersiceDone, setNumberExcersiceDone] = useState<number>(0);
     const [numberExamDone, setNumberExamDone] = useState<number>(0);
+    const previousSubjectRef = useRef<string | null>(null);
+    const previousGradeRef = useRef<number | null>(null);
+    // useEffect(() => {
+    //     const queryParams = new URLSearchParams(location.search);
+    //     const currentPage = parseInt(queryParams.get('page') || '1', 10);
+    //     console.log('userReduxGrade:', userRedux?.grade);
+    //     const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
+    //     const currentSubject = queryParams.get('subject') || 'subject1';
+    //     setSelectedSubject(currentSubject);
 
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const currentPage = parseInt(queryParams.get('page') || '1', 10);
-        console.log('userReduxGrade:', userRedux?.grade);
-        const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
-        const currentSubject = queryParams.get('subject') || 'subject1';
-        setSelectedSubject(currentSubject);
-        if (currentSubject && currentGrade && currentPage) {
-            fetchChapters({ subjectId: currentSubject, grade: currentGrade });
-        }
-    }, [location.search, userRedux]);
+    //     // Check if the subject or grade has changed
+    //     if (currentSubject && currentGrade && currentPage) {
+    //         if (previousSubjectRef.current !== currentSubject || previousGradeRef.current !== currentGrade) {
+    //             fetchChapters({ subjectId: currentSubject, grade: currentGrade });
+    //             previousSubjectRef.current = currentSubject; // Update the previous subject
+    //             previousGradeRef.current = currentGrade; // Update the previous grade
+    //         }
+    //     }
+    // }, [location.search, userRedux]);
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject()
@@ -152,6 +160,9 @@ const Home = () => {
         const queryParams = new URLSearchParams(location.search);
         queryParams.set('subject', subject);
         queryParams.set('page', '1');
+        queryParams.set('chapterId', '');
+        queryParams.set('lessonId', '');
+        setExpandedChapters({});
         navigate(`?${queryParams.toString()}`);
     }
     const fetchChapters = async (params?: ListChapterParams) => {
@@ -231,32 +242,69 @@ const Home = () => {
     }, [selectedLessonId]);
 
     const [expandedChapters, setExpandedChapters] = useState<{ [key: string]: boolean }>({})
-
+    // useEffect(() => {
+    //     setExpandedChapters({});
+    // }
+    // , [selectedSubject])
     const handleChapterClick = async (chapterId: string) => {
         setExpandedChapters(prevState => ({
             ...prevState,
             [chapterId]: !prevState[chapterId]
         }));
-
+    
         if (!expandedChapters[chapterId]) {
             setSelectedChapterId(chapterId);
             setSelectedChapter(chaptersData?.data.find(chapter => chapter.id === chapterId) ?? null);
-
-            const selectedLessonForChapter = selectedLessonsByChapter[chapterId];
-            if (selectedLessonForChapter) {
-                setSelectedLessonId(selectedLessonForChapter);
-            } else {
-                const firstLessonInChapter = await getFirstLessonByChapterId(chapterId);
-                const firstLessonId = firstLessonInChapter?.data.data.id ?? null;
-                setSelectedLessonId(firstLessonId);
-
-                setSelectedLessonsByChapter(prev => ({
-                    ...prev,
-                    [chapterId]: firstLessonId,
-                }));
-            }
+    
+            // Always fetch and set the first lesson in the chapter
+            const firstLessonInChapter = await getFirstLessonByChapterId(chapterId);
+            const firstLessonId = firstLessonInChapter?.data.data.id ?? null;
+            setSelectedLessonId(firstLessonId);
+    
+            setSelectedLessonsByChapter(prev => ({
+                ...prev,
+                [chapterId]: firstLessonId,
+            }));
+    
+            // Update URL parameters
+            const searchParams = new URLSearchParams(location.search);
+            searchParams.set('chapterId', chapterId);
+            searchParams.set('lessonId', firstLessonId ?? '');
+            navigate({ search: searchParams.toString() });
         }
     };
+    // const handleChapterClick = async (chapterId: string) => {
+    //     setExpandedChapters(prevState => ({
+    //         ...prevState,
+    //         [chapterId]: !prevState[chapterId]
+    //     }));
+
+    //     if (!expandedChapters[chapterId]) {
+    //         setSelectedChapterId(chapterId);
+    //         setSelectedChapter(chaptersData?.data.find(chapter => chapter.id === chapterId) ?? null);
+
+    //         const selectedLessonForChapter = selectedLessonsByChapter[chapterId];
+    //         let firstLessonId = selectedLessonForChapter;
+    //         if (selectedLessonForChapter) {
+    //             setSelectedLessonId(selectedLessonForChapter);
+    //         } else {
+    //             const firstLessonInChapter = await getFirstLessonByChapterId(chapterId);
+    //             firstLessonId = firstLessonInChapter?.data.data.id ?? null;
+    //             setSelectedLessonId(firstLessonId);
+
+    //             setSelectedLessonsByChapter(prev => ({
+    //                 ...prev,
+    //                 [chapterId]: firstLessonId,
+    //             }));
+    //         }
+
+    //         // Update URL parameters
+    //         const searchParams = new URLSearchParams(location.search);
+    //         searchParams.set('chapterId', chapterId);
+    //         searchParams.set('lessonId', firstLessonId ?? '');
+    //         navigate({ search: searchParams.toString() });
+    //     }
+    // };
     const handleLessonClick = (lessonId: string) => {
         setSelectedLessonId(lessonId);
 
@@ -264,8 +312,61 @@ const Home = () => {
             ...prev,
             [selectedChapterId as string]: lessonId,
         }));
+
+        // Update the URL with the selected lesson ID
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set('lessonId', lessonId);
+        navigate({ search: searchParams.toString() });
     };
 
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const chapterIdParam = searchParams.get('chapterId');
+        const lessonIdParam = searchParams.get('lessonId');
+        const currentSubject = searchParams.get('subject') || 'subject1';
+        const currentGrade = parseInt(searchParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
+
+        if (chapterIdParam) {
+            setSelectedChapterId(chapterIdParam);
+            setExpandedChapters(prevState => ({
+                ...prevState,
+                [chapterIdParam]: true
+            }));
+        }
+        if (lessonIdParam) {
+            setSelectedLessonId(lessonIdParam);
+            setSelectedLessonsByChapter(prevState => ({
+                ...prevState,
+                [chapterIdParam as string]: lessonIdParam
+            }));
+        }
+
+        // Check if the subject or grade has changed
+        if (currentSubject && currentGrade) {
+            if (previousSubjectRef.current !== currentSubject || previousGradeRef.current !== currentGrade) {
+                setExpandedChapters({});
+                fetchChapters({ subjectId: currentSubject, grade: currentGrade }).then(() => {
+                    // Ensure the chapter and lesson are set after fetching chapters
+                    if (chapterIdParam) {
+                        setSelectedChapterId(chapterIdParam);
+                        setExpandedChapters(prevState => ({
+                            ...prevState,
+                            [chapterIdParam]: true
+                        }));
+                    }
+                    if (lessonIdParam) {
+                        setSelectedLessonId(lessonIdParam);
+                        setSelectedLessonsByChapter(prevState => ({
+                            ...prevState,
+                            [chapterIdParam as string]: lessonIdParam
+                        }));
+                    }
+                });
+                previousSubjectRef.current = currentSubject; // Update the previous subject
+                previousGradeRef.current = currentGrade; // Update the previous grade
+            }
+        }
+    }, [location.search, userRedux]);
     const [lessonLoading, setLessonLoading] = useState<boolean>(false)
     useEffect(() => {
         const fetchAllLessons = async () => {
@@ -288,10 +389,6 @@ const Home = () => {
         };
         fetchAllLessons();
     }, [chaptersData]);
-
-    const capitalizeFirstLetter = (string: string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1)
-    }
 
     const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
@@ -414,11 +511,11 @@ const Home = () => {
                                                         </div>
 
                                                         {chapter.id && expandedChapters[chapter.id] && (
-                                                            <ul className='tw-mx-8 tw-mt-2 tw-space-y-2'>
+                                                            <ul className='tw-mx-20 tw-mt-2 tw-space-y-2'>
                                                                 {lessonsData.filter(lesson => lesson.chapterId === chapter.id).map((lesson) => (
                                                                     <li
                                                                         key={lesson.id}
-                                                                        className={`tw-p-2 tw-cursor-pointer tw-border-b tw-border-b-1 tw-border-gray-300 ${selectedLessonId === lesson.id ? 'tw-font-bold' : ''}`}
+                                                                        className={`tw-pl-4 tw-p-2 tw-cursor-pointer tw-border-b tw-border-b-1 tw-border-gray-300 ${selectedLessonId === lesson.id ? 'tw-font-bold' : ''}`}
                                                                         onClick={() => handleLessonClick(lesson.id ?? '')}
                                                                     >
                                                                         {lesson.name}
@@ -454,7 +551,7 @@ const Home = () => {
                                                 : 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/tiengviet2.jpg'
                                 }
                             />
-                            <div className='tw-space-y-3 '>
+                            <div className='tw-space-y-3 tw-w-3/5'>
                                 <div>
                                     <div className='tw-flex tw-space-x-3 tw-w-full'>
                                         <img src={icon_category} alt="icon_category" />
@@ -463,106 +560,80 @@ const Home = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <ProgressBar
-                                    bgColor='orange'
-                                    className='tw-w-2/3'
-                                    maxCompleted={100}
-                                    isLabelVisible={false}
-                                    completed={numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100}
-                                />
-                                <div className="tw-flex tw-items-center">
-                                    <BarChartIcon className="tw-mr-2" />
-                                    <span>
-                                        {t('homepage.completed')}: {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0} bài học ({t('homepage.archived')} {(numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100).toFixed(2)}  %)
-                                    </span>
-                                </div>
-                                {/* <button className='tw-cursor-pointer tw-bg-green-500 tw-border tw-rounded-lg tw-p-2 tw-flex tw-items-center'>
-                                    <ArrowCircleRightOutlinedIcon className='tw-mr-2' />
-                                    {t('homepage.continue_learning')}
-                                </button> */}
-                            </div>
-                            <div className='tw-flex-col tw-flex tw-justify-start tw-items-start tw-space-y-3'>
-                                <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
-                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                <div className='tw-flex tw-w-full'>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
                                         <div>Bài học: </div>
                                     </div>
-                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
                                         <div className='tw-font-bold tw-text-xl'>
                                             {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0}
                                         </div>
                                     </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-3/5'>
+                                        <ProgressBar
+                                            bgColor='orange'
+                                            className='tw-w-full tw-items-center'
+                                            maxCompleted={100}
+                                            isLabelVisible={false}
+                                            completed={numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100}
+                                        />
+                                    </div>
                                 </div>
-                                <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
-                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                <div className='tw-flex tw-w-full'>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
                                         <div>Bài tập: </div>
                                     </div>
-                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
+
                                         <div className='tw-font-bold tw-text-xl'>
                                             {numberExcersiceDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0}
                                         </div>
                                     </div>
-                                </div>
-                                <div className='tw-grid tw-grid-cols-2 tw-gap-4 tw-w-full'>
-                                    <div className='tw-flex tw-justify-start tw-items-center'>
-                                        <div>Bài thi: </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-3/5'>
+                                        <ProgressBar
+                                            bgColor='orange'
+                                            className='tw-w-full tw-items-center'
+                                            maxCompleted={100}
+                                            isLabelVisible={false}
+                                            completed={numberExcersiceDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0) * 100}
+                                        />
                                     </div>
-                                    <div className='tw-flex tw-justify-start tw-items-center'>
+                                </div>
+                                <div className='tw-flex tw-w-full'>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
+                                        <div>Bài kiểm tra: </div>
+                                    </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
                                         <div className='tw-font-bold tw-text-xl'>
                                             {numberExamDone}/{exams2?.length}
                                         </div>
                                     </div>
+                                    <div className='tw-flex tw-justify-start tw-items-center tw-w-3/5'>
+                                        <ProgressBar
+                                            bgColor='orange'
+                                            className='tw-w-full tw-items-center'
+                                            maxCompleted={100}
+                                            isLabelVisible={false}
+                                            completed={numberExamDone / exams2?.length * 100}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        {/* <div className='tw-flex tw-p-5 tw-w-11/12 tw-space-x-20'>
-                            <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
-                                <div className='tw-font-bold tw-text-2xl'>
-                                    {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0}
-                                </div>
-
-                                <div>Bài lý thuyết</div>
-                            </div>
-                            <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
-                                <div className='tw-font-bold tw-text-2xl'>
-                                    {numberExcersiceDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0}
-                                </div>
-                                <div>Bài luyện tập</div>
-                            </div>
-
-                            <div className='tw-flex tw-flex-col tw-justify-center tw-items-center'>
-                                <div className='tw-font-bold tw-text-2xl'>{numberExamDone}/{exams2?.length}</div>
-
-                                <div>{capitalizeFirstLetter(t('homepage.exam'))}</div>
-                            </div>
-                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                <div className="tw-border-4 tw-border-gray-500 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                <div>{t('homepage.not_yet_practice')}</div>
-                            </div>
-                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                <div className="tw-border-4 tw-border-sky-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                <div>{t('homepage.in_progress')}</div>
-                            </div>
-                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                <div className="tw-border-4 tw-border-green-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                <div>{t('homepage.completed')}</div>
-                            </div>
-                            <div className='tw-flex tw-items-center tw-justify-center tw-space-x-1'>
-                                <div className="tw-border-4 tw-border-orange-700 tw-w-5 tw-h-5 tw-bg-white tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1"></div>
-                                <div>{t('homepage.need_improvement')}</div>
-                            </div>
-                        </div> */}
                     </div>
 
                     <div className='tw-bg-transparent tw-w-full tw-overflow-auto tw-h-screen'>
                         <div className="tw-container tw-mx-auto tw-p-1">
                             {selectedLessonId ? (
-                                <div className="tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-md tw-space-y-6">
+                                <div className="tw-bg-white tw-px-4 tw-p-2 tw-rounded-lg tw-shadow-md tw-space-y-6">
                                     {/* Hiển thị danh sách Theories */}
                                     <div className="">
-                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài học</h3>
+                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2 tw-bg-blue-500 tw-text-white tw-p-4 tw-rounded-md tw-shadow-md tw-border tw-border-blue-700 tw-w-1/2">
+                                            Bài học
+                                        </h3>
                                         {theories[selectedLessonId] && theories[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                                {theories[selectedLessonId].map((theory) => (
+                                                {theories[selectedLessonId]?.map((theory) => (
                                                     <li
                                                         key={theory.id}
                                                         className="tw-bg-slate-100 tw-rounded-md tw-shadow-md tw-border tw-border-gray-300 tw-cursor-pointer"
@@ -575,8 +646,7 @@ const Home = () => {
                                                                 className="tw-w-full tw-h-auto tw-mb-2 tw-transition-transform tw-duration-300 hover:tw-scale-105"
                                                             />
                                                         </div>
-                                                        <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg">{theory.name}</h4>
-                                                        <p className="tw-text-sm tw-mt-2">{theory.description}</p>
+                                                        <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg tw-text-center">{theory.name}</h4>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -588,15 +658,16 @@ const Home = () => {
 
                                     {/* Hiển thị danh sách Exams */}
                                     <div className="tw-mt-4">
-                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài tập</h3>
+                                        <h3 className="tw-text-xl tw-font-semibold tw-mb-2 tw-bg-green-500 tw-text-white tw-p-4 tw-rounded-md tw-shadow-md tw-border tw-border-green-700 tw-w-1/2">
+                                            Bài tập
+                                        </h3>
                                         {exams[selectedLessonId] && exams[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                                {exams[selectedLessonId].map((exam) => {
-                                                    const exerciseProgress = progress.exercises.find((exercise: any) => exercise.examId === exam.id);
+                                                {exams[selectedLessonId]?.map((exam) => {
+                                                    const exerciseProgress = progress?.exercises?.find((exercise: any) => exercise.examId === exam.id);
                                                     const starRating = exerciseProgress ? exerciseProgress.star : null;
                                                     const yourScore = exerciseProgress ? exerciseProgress.yourScore : null;
                                                     const totalScore = exerciseProgress ? exerciseProgress.totalScore : null;
-
                                                     return (
                                                         <li
                                                             key={exam.id}
@@ -610,19 +681,17 @@ const Home = () => {
                                                                     className="tw-w-full tw-h-auto tw-mb-2 tw-transition-transform tw-duration-300 hover:tw-scale-105"
                                                                 />
                                                             </div>
-                                                            <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg">{exam.name}</h4>
+                                                            <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg tw-text-center">{exam.name}</h4>
                                                             {exerciseProgress ? (
-                                                                <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
+                                                                <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-center">
                                                                     <Rating name="customized-10" value={starRating} max={3} readOnly />
-                                                                    <div>Làm đúng: {yourScore}/{totalScore} câu</div>
+                                                                    <div className="tw-text-center">Làm đúng: {yourScore}/{totalScore} câu</div>
                                                                     {/* <div>Điểm: <span style={{ fontWeight: 'bold' }}>{(yourScore / totalScore * 10).toFixed(2)}</span></div> */}
                                                                 </div>
                                                             ) : (
-                                                                <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
+                                                                <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-center">
                                                                     <Rating name="customized-10" value={0} max={3} readOnly />
-                                                                    <div>Chưa làm</div>
-                                                                    {/* <div>Làm đúng: {yourScore}/{totalScore} câu</div>
-                <div>Điểm: <span style={{ fontWeight: 'bold' }}>{(yourScore / totalScore * 10).toFixed(2)}</span></div> */}
+                                                                    <div className="tw-text-center">Chưa làm</div>
                                                                 </div>
                                                             )}
                                                         </li>
@@ -704,10 +773,12 @@ const Home = () => {
                                 </div>
                             </div>
                         </div> */}
-                        <div className="tw-container tw-mx-auto tw-p-4">
-                            <div className='tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-md tw-space-y-6'>
+                        <div className="tw-container tw-mx-auto tw-p-1">
+                            <div className='tw-bg-white tw-px-4 tw-p-2 tw-rounded-lg tw-shadow-md tw-space-y-6'>
                                 <div className="tw-mt-4">
-                                    <h3 className="tw-text-xl tw-font-semibold tw-mb-2">Bài thi</h3>
+                                    <h3 className="tw-text-xl tw-font-semibold tw-mb-2 tw-bg-yellow-500 tw-text-white tw-p-4 tw-rounded-md tw-shadow-md tw-border tw-border-yellow-700 tw-w-1/2">
+                                        Bài kiểm tra
+                                    </h3>
                                     {exams2?.length > 0 ? (
                                         <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
                                             {exams2?.map((exam) => {
@@ -715,7 +786,6 @@ const Home = () => {
                                                 const starRating = examProgress ? examProgress.star : null;
                                                 const yourScore = examProgress ? examProgress.yourScore : null;
                                                 const totalScore = examProgress ? examProgress.totalScore : null;
-
                                                 return (
                                                     <li
                                                         key={exam.id}
@@ -729,17 +799,16 @@ const Home = () => {
                                                                 className="tw-w-full tw-h-auto tw-mb-2 tw-transition-transform tw-duration-300 hover:tw-scale-105"
                                                             />
                                                         </div>
-                                                        <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg">{exam.name}</h4>
+                                                        <h4 className="tw-p-4 tw-pt-0 tw-font-bold tw-text-lg tw-text-center">{exam.name}</h4>
                                                         {examProgress ? (
-                                                            <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
-                                                                {/* <Rating name="customized-10" value={starRating} max={3} readOnly /> */}
-                                                                <div>Điểm: <span className='tw-font-bold'>{calculateScore(totalScore, yourScore)}</span></div>
-                                                                <div>Làm đúng: {yourScore}/{totalScore} câu</div>
+                                                            <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-center">
+                                                                <div className="tw-text-center">Điểm: <span className='tw-font-bold'>{calculateScore(totalScore, yourScore)}</span></div>
+                                                                <div className="tw-text-center">Làm đúng: {yourScore}/{totalScore} câu</div>
                                                             </div>
                                                         ) : (
-                                                            <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-start">
-                                                                <div>Điểm: <span className='tw-font-bold'>{0}</span></div>
-                                                                <div>Chưa làm</div>
+                                                            <div className="tw-p-4 tw-pt-0 tw-flex tw-flex-col tw-items-center">
+                                                                <div className="tw-text-center">Điểm: <span className='tw-font-bold'>{0}</span></div>
+                                                                <div className="tw-text-center">Chưa làm</div>
                                                             </div>
                                                         )}
                                                     </li>

@@ -31,11 +31,24 @@ const Navbar = () => {
 ];
   const [selectedClass, setSelectedClass] = useState<{ value: number; label: string } | null>(null);
   useEffect(() => {
-    if (userGrade) {
-      const initialClass = classes.find(cls => cls.value === userGrade);
-      setSelectedClass(initialClass || null);
+    const searchParams = new URLSearchParams(location.search);
+    const gradeParam = searchParams.get('grade');
+    if (gradeParam) {
+        const initialClass = classes.find(cls => cls.value === parseInt(gradeParam, 10));
+        setSelectedClass(initialClass || null);
+    } else if (userGrade) {
+        const initialClass = classes.find(cls => cls.value === userGrade);
+        setSelectedClass(initialClass || null);
     }
-  }, []);
+}, [location.search, userGrade]);
+  const handleClassChange = (selectedClass: any) => {
+    setSelectedClass(selectedClass);
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set('chapterId', '');
+    searchParams.set('lessonId', '');
+    searchParams.set('grade', selectedClass.value); // Cập nhật giá trị grade trong URL
+    navigate({ search: searchParams.toString() }); // Thay đổi URL với giá trị mới
+  };
 //   const handleClassChange = (newValue: SingleValue<{ value: number; label: string }>, actionMeta: ActionMeta<{ value: number; label: string }>) => {
 //     if (newValue) {
 //         // const queryParams = new URLSearchParams(location.search);
@@ -44,12 +57,7 @@ const Navbar = () => {
 //         // navigate(`?${queryParams.toString()}`);
 //     }
 // };
-const handleClassChange = (selectedClass: any) => {
-  setSelectedClass(selectedClass);
-  const searchParams = new URLSearchParams(location.search);
-  searchParams.set('grade', selectedClass.value); // Cập nhật giá trị grade trong URL
-  navigate({ search: searchParams.toString() }); // Thay đổi URL với giá trị mới
-};
+
   let data: string | undefined
   if (userRole) {
     try {
@@ -133,7 +141,10 @@ const handleClassChange = (selectedClass: any) => {
                             onClick={() => setSearchTerm(suggestion.name)}
                           >
                             <div>{suggestion.name}</div>
-                            <div className="tw-text-sm">({suggestion.type})</div>
+                            {/* <div className="tw-text-sm">({suggestion.type})</div> */}
+                            <div className="tw-text-sm">
+                              ({suggestion.type === 'Lesson' ? 'bài học' : suggestion.type === 'Exam' ? 'bài tập' : suggestion.type})
+                            </div>
                             {/* <div>{suggestion?.Chapter?.grade}</div> */}
                           </li>
                         ))}

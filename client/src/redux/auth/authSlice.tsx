@@ -17,6 +17,7 @@ interface User {
   phone: string;
   dob: string;
   starPoint: number;
+  petId: string;
 }
 
 interface AuthState {

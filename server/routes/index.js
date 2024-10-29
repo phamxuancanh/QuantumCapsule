@@ -15,6 +15,7 @@ const answerRoutes = require('./answer')
 const resultRoutes = require('./result')
 const progressRoutes = require('./progress')
 const notificationRoutes = require('./notification')
+const petRoutes = require('./pet')
 const { API_PREFIX } = require('../utils')
 // const { rateLimitAndTimeout, services } = require('../middlewares/gateway')
 // const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware')
@@ -34,7 +35,7 @@ router.use(`${API_PREFIX}/answers`, answerRoutes)
 router.use(`${API_PREFIX}/results`, resultRoutes)
 router.use(`${API_PREFIX}/progress`, progressRoutes)
 router.use(`${API_PREFIX}/notifications`, notificationRoutes)
-
+router.use(`${API_PREFIX}/pets`, petRoutes)
 // router.use(`${API_PREFIX}/grids`, )
 // services.forEach(({ route, target }) => {
 //   const proxyOptions = {

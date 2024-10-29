@@ -44,7 +44,7 @@ const changeAVT = async (req, res, next) => {
 const editUserById = async (req, res, next) => {
   try {
     const { id } = req.params
-    const { firstName, lastName, dob, phone, email, city, district, ward } = req.body.data
+    const { firstName, lastName, dob, phone, email, city, district, ward, petId } = req.body.data
     const userToEdit = await models.User.findByPk(id)
     console.log('------------------------------------------------------')
     console.log('check payload', req.body.data)
@@ -53,7 +53,7 @@ const editUserById = async (req, res, next) => {
     if (!userToEdit) {
       return res.status(404).json({ message: 'MASSAGE.USER_NOT_FOUND' })
     }
-    const updatedUser = await userToEdit.update({ firstName, lastName, dob, phone, email, city, district, ward })
+    const updatedUser = await userToEdit.update({ firstName, lastName, dob, phone, email, city, district, ward, petId })
 
     return res.json(updatedUser)
   } catch (error) {
@@ -77,7 +77,8 @@ const getUserById = async (req, res, next) => {
         'district',
         'ward',
         'birthOfDate',
-        'starPoint'
+        'starPoint',
+        'petId'
       ]
     })
 
@@ -102,6 +103,7 @@ const getUserById = async (req, res, next) => {
       district: user.district,
       ward: user.ward,
       starPoint: user.starPoint,
+      petId: user.petId,
       dob: user.birthOfDate ? user.birthOfDate.toISOString().split('T')[0] : ''
     }
 

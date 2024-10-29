@@ -23,6 +23,11 @@ import { differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ClockLoader } from 'react-spinners';
 import ROUTES from 'routes/constant';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -50,6 +55,7 @@ const DashboardReport = () => {
     const [numberExamDone, setNumberExamDone] = useState<number>(0);
     const [numberTheoryDone, setNumberTheoryDone] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<string>('general');
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject();
@@ -59,6 +65,7 @@ const DashboardReport = () => {
         }
     };
     const [daysDifference, setDaysDifference] = useState(0)
+
     useEffect(() => {
         fetchSubjects();
     }, []);
@@ -247,7 +254,53 @@ const DashboardReport = () => {
             navigate(`${ROUTES.skill_practice}?examId=${id}`);
         }
     };
+    // CHART VIEWING 
 
+    const mockTheoryData = [
+        { name: "Chapter 1", count: 45 },
+        { name: "Chapter 2", count: 35 },
+        { name: "Chapter 3", count: 60 },
+        { name: "Chapter 4", count: 30 },
+        { name: "Chapter 5", count: 50 }
+    ];
+
+    const mockExamData = [
+        { name: "Jan", score: 85 },
+        { name: "Feb", score: 75 },
+        { name: "Mar", score: 90 },
+        { name: "Apr", score: 82 },
+        { name: "May", score: 88 }
+    ];
+
+    const mockExerciseData = [
+        { name: "Mathematics", value: 30 },
+        { name: "Physics", value: 25 },
+        { name: "Chemistry", value: 20 },
+        { name: "Biology", value: 25 }
+    ];
+
+    const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+    const StatCard = ({ icon: Icon, title, value, bgColor }: { icon: React.ElementType, title: string, value: string, bgColor: string }) => (
+        <div className={`${bgColor} tw-p-6 tw-rounded-lg tw-shadow-lg tw-transition-transform hover:tw-scale-105`} role="region" aria-label={`${title} statistics`}>
+            <div className="tw-flex tw-items-center tw-justify-between">
+                <div>
+                    <p className="tw-text-white tw-text-sm tw-font-medium">{title}</p>
+                    <p className="tw-text-white tw-text-2xl tw-font-bold tw-mt-2">{value}</p>
+                </div>
+                <Icon className="tw-text-white tw-text-3xl" />
+            </div>
+        </div>
+    );
+
+    const FilterSection = () => (
+        <div className="tw-mb-6" role="group" aria-label="Dashboard filters">
+            <QCDateFilter
+                onChange={(filter) => {
+                }}
+            />
+        </div>
+    );
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center'>
             <div className='tw-w-11/12 tw-h-auto tw-flex tw-flex-col tw-items-center tw-py-2 tw-space-y-3'>
@@ -278,223 +331,308 @@ const DashboardReport = () => {
                         className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-10"
                     />
                 </div>
-                <div className='tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
-                {loading ? (
-                <div className='tw-flex tw-justify-center tw-items-center tw-h-64'>
-                    <div className='tw-text-xl tw-font-bold'>Loading...</div>
+                <div className='tw-flex tw-space-x-3 tw-mt-4'>
+                    <div
+                        className={`tw-border tw-font-bold tw-p-2 tw-px-2 tw-rounded-md tw-shadow-2xl tw-cursor-pointer ${activeTab === 'general' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-white tw-text-black'}`}
+                        onClick={() => setActiveTab('general')}
+                    >
+                        Đánh giá chung
+                    </div>
+                    <div
+                        className={`tw-border tw-font-bold tw-p-2 tw-px-2 tw-rounded-md tw-shadow-2xl tw-cursor-pointer ${activeTab === 'chartView' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-white tw-text-black'}`}
+                        onClick={() => setActiveTab('chartView')}
+                    >
+                        Xem biểu đồ 
+                    </div>
                 </div>
-            ) : (
-                    <div className='tw-flex tw-flex-col'>
-                        <div className='tw-flex tw-justify-between tw-items-center tw-px-10 tw-pt-3'>
-                            <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div>
-                            <div className='tw-flex tw-items-center'>
-                                <QCDateFilter
-                                    onChange={(filter) => {
-                                        console.log(filter);
-                                        handleFilter(filter);
-                                    }}
-                                />
+                {activeTab === 'general' ? (
+                    <div className='tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
+                        {loading ? (
+                            <div className='tw-flex tw-justify-center tw-items-center tw-h-64'>
+                                <div className='tw-text-xl tw-font-bold'>Loading...</div>
                             </div>
-                        </div>
-                        <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
-                        <div className='tw-flex tw-flex-col tw-items-center tw-px-10'>
-                            <div className='tw-flex tw-w-full tw-justify-between'>
-                                <div className='tw-flex tw-items-center tw-p-2'>
-                                    <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
-                                    <div>
-                                        <div>Số bài đã học</div>
-                                        <div className='tw-font-bold tw-text-lg'>{numberTheoryDone}</div>
+                        ) : (
+                            <div className='tw-flex tw-flex-col'>
+                                <div className='tw-flex tw-justify-between tw-items-center tw-px-10 tw-pt-3'>
+                                    <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div>
+                                    <div className='tw-flex tw-items-center'>
+                                        <QCDateFilter
+                                            onChange={(filter) => {
+                                                console.log(filter);
+                                                handleFilter(filter);
+                                            }}
+                                        />
                                     </div>
                                 </div>
-                                <div className='tw-flex tw-items-center tw-p-2'>
-                                    <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
-                                    <div>
-                                        <div>Số bài tập đã làm</div>
-                                        <div className='tw-font-bold tw-text-lg'>{numberExcersiceDone}</div>
-                                    </div>
-                                </div>
-                                <div className='tw-flex tw-items-center tw-p-2'>
-                                    <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
-                                    <div>
-                                        <div>Số bài kiểm tra đã làm</div>
-                                        <div className='tw-font-bold tw-text-lg'>{numberExamDone}</div>
-                                    </div>
-                                </div>
-                                <div className='tw-flex tw-items-center tw-p-2'>
-                                    <img className='tw-w-10 tw-h-10 tw-mr-2' src={star} alt="Star Icon" />
-                                    <div>
-                                        <div>Tổng số sao đạt được</div>
-                                        <div className='tw-font-bold tw-text-lg'>{currentUser?.currentUser.starPoint}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='tw-text-2xl'>
-                                TỔNG QUAN TOÀN BỘ KIẾN THỨC - <span className='tw-text-blue-500'>{`${currentUser?.currentUser?.firstName?.toUpperCase()} ${currentUser?.currentUser?.lastName?.toUpperCase()}`}</span>
-                            </div>
-                        </div>
-                        <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
-                        <div className='tw-flex tw-flex-col tw-px-10 tw-items-center tw-space-y-10'>
-                            <div className='tw-grid tw-grid-cols-2 tw-w-full'>
-                                <div>
-                                    <h4 className="tw-text-md tw-font-semibold">Bài học</h4>
-                                    <div className="tw-flex tw-items-center tw-space-x-4">
-                                        <div className="tw-flex tw-items-center tw-space-x-1">
-                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-blue-500 tw-rounded-full tw-bg-blue-500 tw-bg-opacity-20"></div>
-                                            <span>Học rồi</span>
+                                <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
+                                <div className='tw-flex tw-flex-col tw-items-center tw-px-10'>
+                                    <div className='tw-flex tw-w-full tw-justify-between'>
+                                        <div className='tw-flex tw-items-center tw-p-2'>
+                                            <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
+                                            <div>
+                                                <div>Số bài đã học</div>
+                                                <div className='tw-font-bold tw-text-lg'>{numberTheoryDone}</div>
+                                            </div>
                                         </div>
-                                        <div className="tw-flex tw-items-center tw-space-x-1">
-                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
-                                            <span>Chưa học</span>
+                                        <div className='tw-flex tw-items-center tw-p-2'>
+                                            <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
+                                            <div>
+                                                <div>Số bài tập đã làm</div>
+                                                <div className='tw-font-bold tw-text-lg'>{numberExcersiceDone}</div>
+                                            </div>
+                                        </div>
+                                        <div className='tw-flex tw-items-center tw-p-2'>
+                                            <img className='tw-w-10 tw-h-10 tw-mr-2' src={list} alt="List Icon" />
+                                            <div>
+                                                <div>Số bài kiểm tra đã làm</div>
+                                                <div className='tw-font-bold tw-text-lg'>{numberExamDone}</div>
+                                            </div>
+                                        </div>
+                                        <div className='tw-flex tw-items-center tw-p-2'>
+                                            <img className='tw-w-10 tw-h-10 tw-mr-2' src={star} alt="Star Icon" />
+                                            <div>
+                                                <div>Tổng số sao đạt được</div>
+                                                <div className='tw-font-bold tw-text-lg'>{currentUser?.currentUser.starPoint}</div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className='tw-px-2'>
-                                    <h4 className="tw-text-md tw-font-semibold">Bài tập & Kiểm tra</h4>
-                                    <div className="tw-flex tw-items-center tw-space-x-4">
-                                        <div className="tw-flex tw-items-center tw-space-x-1">
-                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
-                                            <span>Tốt (Đúng &gt;= 80%)</span>
-                                        </div>
-                                        <div className="tw-flex tw-items-center tw-space-x-1">
-                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
-                                            <span>Chưa tốt (Đúng &lt; 80%)</span>
-                                        </div>
-                                        <div className="tw-flex tw-items-center tw-space-x-1">
-                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
-                                            <span>Chưa làm</span>
-                                        </div>
+                                    <div className='tw-text-2xl'>
+                                        TỔNG QUAN TOÀN BỘ KIẾN THỨC - <span className='tw-text-blue-500'>{`${currentUser?.currentUser?.firstName?.toUpperCase()} ${currentUser?.currentUser?.lastName?.toUpperCase()}`}</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div className='tw-w-full tw-space-y-5 tw-pb-10'>
-                                {lessons.map((lesson) => (
-                                    <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border' key={lesson.id}>
-                                        <div className='tw-p-2 tw-bg-green-400'>{lesson.name.toUpperCase()}</div>
-                                        <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-2 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
-                                            <div className='tw-border-r tw-border-gray-400'>
-                                                <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
-                                                    Bài lý thuyết
+                                <hr className='tw-my-4 tw-border-gray-300 tw-mx-4' />
+                                <div className='tw-flex tw-flex-col tw-px-10 tw-items-center tw-space-y-10'>
+                                    <div className='tw-grid tw-grid-cols-2 tw-w-full'>
+                                        <div>
+                                            <h4 className="tw-text-md tw-font-semibold">Bài học</h4>
+                                            <div className="tw-flex tw-items-center tw-space-x-4">
+                                                <div className="tw-flex tw-items-center tw-space-x-1">
+                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-blue-500 tw-rounded-full tw-bg-blue-500 tw-bg-opacity-20"></div>
+                                                    <span>Học rồi</span>
                                                 </div>
-                                                <div className='tw-bg-white tw-p-2'>
-                                                    {Array.isArray(theories[lesson.id]) && theories[lesson.id].map(t => {
-                                                        const isInProgress = theoryProgress.includes(t.id);
-                                                        return (
-                                                            <div
-                                                                key={t.id}
-                                                                className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
-                                                                onClick={() => t.id && handleTheoryExercisesClick('theory', t.id)}
-                                                            >
-                                                                <div className={`tw-w-4 tw-h-4 tw-border-2 tw-rounded-full ${isInProgress ? 'tw-border-blue-500 tw-bg-blue-500 tw-bg-opacity-20' : 'tw-border-gray-300 tw-bg-gray-300 tw-bg-opacity-20'}`}></div>
-                                                                <span className='tw-font-bold'>{t.name}</span>
-                                                            </div>
-                                                        );
-                                                    })}
+                                                <div className="tw-flex tw-items-center tw-space-x-1">
+                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
+                                                    <span>Chưa học</span>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
-                                                    Bài tập
+                                        </div>
+                                        <div className='tw-px-2'>
+                                            <h4 className="tw-text-md tw-font-semibold">Bài tập & Kiểm tra</h4>
+                                            <div className="tw-flex tw-items-center tw-space-x-4">
+                                                <div className="tw-flex tw-items-center tw-space-x-1">
+                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
+                                                    <span>Tốt (Đúng &gt;= 80%)</span>
                                                 </div>
-                                                <div className='tw-bg-white tw-p-2'>
-                                                    {Array.isArray(exercises[lesson.id]) && exercises[lesson.id].map(e => {
-                                                        const progress = examProgress?.exercises?.find((progress: any) => progress.examId === e.id);
-                                                        let statusElement;
-
-                                                        if (progress) {
-                                                            const scoreRatio = calculateScore(progress.totalScore, progress.yourScore);
-                                                            if (scoreRatio >= 8) {
-                                                                statusElement = (
-                                                                    <div className="tw-flex tw-items-center tw-space-x-1">
-                                                                        <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
+                                                <div className="tw-flex tw-items-center tw-space-x-1">
+                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
+                                                    <span>Chưa tốt (Đúng &lt; 80%)</span>
+                                                </div>
+                                                <div className="tw-flex tw-items-center tw-space-x-1">
+                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
+                                                    <span>Chưa làm</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='tw-w-full tw-space-y-5 tw-pb-10'>
+                                        {lessons.map((lesson) => (
+                                            <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border' key={lesson.id}>
+                                                <div className='tw-p-2 tw-bg-green-400'>{lesson.name.toUpperCase()}</div>
+                                                <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-2 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
+                                                    <div className='tw-border-r tw-border-gray-400'>
+                                                        <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
+                                                            Bài lý thuyết
+                                                        </div>
+                                                        <div className='tw-bg-white tw-p-2'>
+                                                            {Array.isArray(theories[lesson.id]) && theories[lesson.id].map(t => {
+                                                                const isInProgress = theoryProgress.includes(t.id);
+                                                                return (
+                                                                    <div
+                                                                        key={t.id}
+                                                                        className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
+                                                                        onClick={() => t.id && handleTheoryExercisesClick('theory', t.id)}
+                                                                    >
+                                                                        <div className={`tw-w-4 tw-h-4 tw-border-2 tw-rounded-full ${isInProgress ? 'tw-border-blue-500 tw-bg-blue-500 tw-bg-opacity-20' : 'tw-border-gray-300 tw-bg-gray-300 tw-bg-opacity-20'}`}></div>
+                                                                        <span className='tw-font-bold'>{t.name}</span>
                                                                     </div>
                                                                 );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
+                                                            Bài tập
+                                                        </div>
+                                                        <div className='tw-bg-white tw-p-2'>
+                                                            {Array.isArray(exercises[lesson.id]) && exercises[lesson.id].map(e => {
+                                                                const progress = examProgress?.exercises?.find((progress: any) => progress.examId === e.id);
+                                                                let statusElement;
+
+                                                                if (progress) {
+                                                                    const scoreRatio = calculateScore(progress.totalScore, progress.yourScore);
+                                                                    if (scoreRatio >= 8) {
+                                                                        statusElement = (
+                                                                            <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                                <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
+                                                                            </div>
+                                                                        );
+                                                                    } else {
+                                                                        statusElement = (
+                                                                            <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                                <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                } else {
+                                                                    statusElement = (
+                                                                        <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
+                                                                        </div>
+                                                                    );
+                                                                }
+
+                                                                return (
+                                                                    <div
+                                                                        key={e.id}
+                                                                        className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
+                                                                        onClick={() => handleTheoryExercisesClick('exam', e.id ?? '')}
+                                                                    >
+                                                                        {statusElement}
+                                                                        <span className='tw-font-bold'>{e.name}</span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border'>
+                                            <div className='tw-p-2 tw-bg-yellow-400'>BÀI KIỂM TRA</div>
+                                            <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-1 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
+                                                <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-yellow-100'>
+                                                    Bài thi {selectedChapter?.label}
+                                                </div>
+                                                <div className='tw-bg-white tw-border tw-p-2'>
+                                                    <div className='tw-bg-white tw-p-2'>
+                                                        {exams.map((exam, index) => {
+                                                            const progress = examProgress?.exams?.find((progress: any) => progress.examId === exam.id);
+                                                            let statusElement;
+
+                                                            if (progress) {
+                                                                const scoreRatio = calculateScore(progress.totalScore, progress.yourScore);
+                                                                if (scoreRatio >= 8) {
+                                                                    statusElement = (
+                                                                        <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
+                                                                        </div>
+                                                                    );
+                                                                } else {
+                                                                    statusElement = (
+                                                                        <div className="tw-flex tw-items-center tw-space-x-1">
+                                                                            <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
+                                                                        </div>
+                                                                    );
+                                                                }
                                                             } else {
                                                                 statusElement = (
                                                                     <div className="tw-flex tw-items-center tw-space-x-1">
-                                                                        <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
+                                                                        <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
                                                                     </div>
                                                                 );
                                                             }
-                                                        } else {
-                                                            statusElement = (
-                                                                <div className="tw-flex tw-items-center tw-space-x-1">
-                                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
+
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    className="tw-flex tw-items-center tw-space-x-2 tw-mb-2 tw-cursor-pointer"
+                                                                    onClick={() => exam.id && handleExamClick('exam', exam.id)}
+                                                                >
+                                                                    {statusElement}
+                                                                    <span className='tw-font-bold'>{exam.name}</span>
                                                                 </div>
                                                             );
-                                                        }
-
-                                                        return (
-                                                            <div
-                                                                key={e.id}
-                                                                className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
-                                                                onClick={() => handleTheoryExercisesClick('exam', e.id ?? '')}
-                                                            >
-                                                                {statusElement}
-                                                                <span className='tw-font-bold'>{e.name}</span>
-                                                            </div>
-                                                        );
-                                                    })}
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                ))}
-                                <div className='tw-text-2xl tw-font-bold tw-text-white tw-border-gray-400 tw-border'>
-                                    <div className='tw-p-2 tw-bg-yellow-400'>BÀI KIỂM TRA</div>
-                                    <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-1 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
-                                        <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-yellow-100'>
-                                            Bài thi {selectedChapter?.label}
-                                        </div>
-                                        <div className='tw-bg-white tw-border tw-p-2'>
-                                            <div className='tw-bg-white tw-p-2'>
-                                                {exams.map((exam, index) => {
-                                                    const progress = examProgress?.exams?.find((progress: any) => progress.examId === exam.id);
-                                                    let statusElement;
+                                </div>
+                            </div>
 
-                                                    if (progress) {
-                                                        const scoreRatio = calculateScore(progress.totalScore, progress.yourScore);
-                                                        if (scoreRatio >= 8) {
-                                                            statusElement = (
-                                                                <div className="tw-flex tw-items-center tw-space-x-1">
-                                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-green-500 tw-rounded-full tw-bg-green-500 tw-bg-opacity-20"></div>
-                                                                </div>
-                                                            );
-                                                        } else {
-                                                            statusElement = (
-                                                                <div className="tw-flex tw-items-center tw-space-x-1">
-                                                                    <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-red-500 tw-rounded-full tw-bg-red-500 tw-bg-opacity-20"></div>
-                                                                </div>
-                                                            );
-                                                        }
-                                                    } else {
-                                                        statusElement = (
-                                                            <div className="tw-flex tw-items-center tw-space-x-1">
-                                                                <div className="tw-w-4 tw-h-4 tw-border-2 tw-border-gray-300 tw-rounded-full tw-bg-gray-300 tw-bg-opacity-20"></div>
-                                                            </div>
-                                                        );
-                                                    }
+                        )}
+                    </div>
+                ) : (
+                    <div className='tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
+                        <div className="tw-min-h-screen tw-bg-gray-100 tw-p-6">
+                            <div className="tw-max-w-7xl tw-mx-auto">
+                                <h1 className="tw-text-3xl tw-font-bold tw-text-gray-800 tw-mb-8">Learning Dashboard</h1>
 
-                                                    return (
-                                                        <div
-                                                            key={index}
-                                                            className="tw-flex tw-items-center tw-space-x-2 tw-mb-2 tw-cursor-pointer"
-                                                            onClick={() => exam.id && handleExamClick('exam', exam.id)}
-                                                        >
-                                                            {statusElement}
-                                                            <span className='tw-font-bold'>{exam.name}</span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+                                <FilterSection />
+
+                                <div className="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-6 tw-mb-8">
+                                    <StatCard icon={AutoStoriesIcon} title="Theory Completion" value="75%" bgColor="tw-bg-blue-600" />
+                                    <StatCard icon={AssignmentIcon} title="Exams Taken" value="24" bgColor="tw-bg-green-600" />
+                                    <StatCard icon={DriveFileRenameOutlineIcon} title="Exercises Completed" value="156" bgColor="tw-bg-purple-600" />
+                                </div>
+
+                                <div className="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6">
+                                    <div className="tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-lg">
+                                        <h2 className="tw-text-xl tw-font-bold tw-mb-4">Theory Progress</h2>
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <BarChart data={mockTheoryData}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="name" />
+                                                <YAxis />
+                                                <Tooltip />
+                                                <Legend />
+                                                <Bar dataKey="count" fill="#0088FE" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+
+                                    <div className="tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-lg">
+                                        <h2 className="tw-text-xl tw-font-bold tw-mb-4">Exam Performance</h2>
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <LineChart data={mockExamData}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="name" />
+                                                <YAxis />
+                                                <Tooltip />
+                                                <Legend />
+                                                <Line type="monotone" dataKey="score" stroke="#00C49F" strokeWidth={2} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+
+                                    <div className="tw-bg-white tw-p-6 tw-rounded-lg tw-shadow-lg">
+                                        <h2 className="tw-text-xl tw-font-bold tw-mb-4">Exercise Distribution</h2>
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={mockExerciseData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                                    outerRadius={100}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                >
+                                                    {mockExerciseData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                            </PieChart>
+                                        </ResponsiveContainer>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-)}
-                </div>
+                )}
             </div>
         </div>
     );

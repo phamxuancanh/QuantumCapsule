@@ -21,6 +21,7 @@ export interface ListChapterParams {
 }
 
 export interface DataListChapter{
+    [x: string]: any
     data: IChapter[],
     page: number
     size: number
