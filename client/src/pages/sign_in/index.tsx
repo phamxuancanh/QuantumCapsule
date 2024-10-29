@@ -84,7 +84,6 @@ const SignIn = () => {
                     accessToken: result.accessToken,
                     currentUser: result.currentUser
                 };
-    
                 let data: string | undefined;
                 const userRole = currentUser?.currentUser.key;
                 if (userRole) {
@@ -95,7 +94,7 @@ const SignIn = () => {
                         console.error('Decryption error:', error);
                     }
                 }
-    
+                console.log(currentUser);
                 setToLocalStorage('persist:auth', JSON.stringify(currentUser));
     
                 if (data !== 'R1' && data !== 'R2' && currentUser.currentUser.grade === null) {
@@ -120,51 +119,6 @@ const SignIn = () => {
             console.log(error);
         }
     };
-    // const handleGoogleSignIn = async () => {
-    //     try {
-    //         const result = await googleSignIn();
-    //         if (result) {
-    //             const currentUser = {
-    //                 accessToken: result.accessToken,
-    //                 currentUser: result.currentUser
-    //             };
-    
-    //             let data: string | undefined;
-    //             const userRole = currentUser?.currentUser.key;
-    //             if (userRole) {
-    //                 try {
-    //                     const giaiMa = CryptoJS.AES.decrypt(userRole, 'Access_Token_Secret_#$%_ExpressJS_Authentication');
-    //                     data = giaiMa.toString(CryptoJS.enc.Utf8);
-    //                 } catch (error) {
-    //                     console.error('Decryption error:', error);
-    //                 }
-    //             }
-    
-    //             if (data !== 'R1' && data !== 'R2' && currentUser.currentUser.grade === null) {
-    //                 // alert('User grade is null');
-    //                 navigate(ROUTES.grade_choose);
-    //                 return;
-    //             }
-    
-    //             console.log(currentUser);
-    //             setToLocalStorage('persist:auth', JSON.stringify(currentUser));
-    //             dispatch(loginState(currentUser.currentUser));
-    
-    //             if (data === 'R1' || data === 'R2') {
-    //                 navigate(ROUTES.admin);
-    //             } else {
-    //                 navigate(ROUTES.home);
-    //             }
-    
-    //             socket.on('connection', () => {
-    //                 console.log('User Connect');
-    //             });
-    //             toast.success(t('signIn.success'));
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
     
     const handleGithubSignIn = async () => {
         try {

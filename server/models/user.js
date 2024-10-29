@@ -79,7 +79,8 @@ const User = sequelize.define(
     },
     petId: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: 'pet1'
     },
     status: {
       type: DataTypes.BOOLEAN,

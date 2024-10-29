@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ProgressBar from '@ramonak/react-progress-bar'
 import icon_category from '../../assets/icon_category.png';
@@ -31,6 +31,7 @@ import thumnail_exercise from '../../assets/thumnail_exercises.png';
 import thumnail_exam from '../../assets/thumnail_exam.png';
 import { getListUniqueDoneResultByChapterId } from 'api/result/result.api';
 import { calculateScore } from 'helpers/Nam-helper/Caculate';
+import { set } from 'lodash';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -124,18 +125,25 @@ const Home = () => {
     const [numberTheoryDone, setNumberTheoryDone] = useState<number>(0);
     const [numberExcersiceDone, setNumberExcersiceDone] = useState<number>(0);
     const [numberExamDone, setNumberExamDone] = useState<number>(0);
+    const previousSubjectRef = useRef<string | null>(null);
+    const previousGradeRef = useRef<number | null>(null);
+    // useEffect(() => {
+    //     const queryParams = new URLSearchParams(location.search);
+    //     const currentPage = parseInt(queryParams.get('page') || '1', 10);
+    //     console.log('userReduxGrade:', userRedux?.grade);
+    //     const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
+    //     const currentSubject = queryParams.get('subject') || 'subject1';
+    //     setSelectedSubject(currentSubject);
 
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const currentPage = parseInt(queryParams.get('page') || '1', 10);
-        console.log('userReduxGrade:', userRedux?.grade);
-        const currentGrade = parseInt(queryParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
-        const currentSubject = queryParams.get('subject') || 'subject1';
-        setSelectedSubject(currentSubject);
-        if (currentSubject && currentGrade && currentPage) {
-            fetchChapters({ subjectId: currentSubject, grade: currentGrade });
-        }
-    }, [location.search, userRedux]);
+    //     // Check if the subject or grade has changed
+    //     if (currentSubject && currentGrade && currentPage) {
+    //         if (previousSubjectRef.current !== currentSubject || previousGradeRef.current !== currentGrade) {
+    //             fetchChapters({ subjectId: currentSubject, grade: currentGrade });
+    //             previousSubjectRef.current = currentSubject; // Update the previous subject
+    //             previousGradeRef.current = currentGrade; // Update the previous grade
+    //         }
+    //     }
+    // }, [location.search, userRedux]);
     const fetchSubjects = async () => {
         try {
             const response = await getListSubject()
@@ -243,11 +251,12 @@ const Home = () => {
             setSelectedChapter(chaptersData?.data.find(chapter => chapter.id === chapterId) ?? null);
 
             const selectedLessonForChapter = selectedLessonsByChapter[chapterId];
+            let firstLessonId = selectedLessonForChapter;
             if (selectedLessonForChapter) {
                 setSelectedLessonId(selectedLessonForChapter);
             } else {
                 const firstLessonInChapter = await getFirstLessonByChapterId(chapterId);
-                const firstLessonId = firstLessonInChapter?.data.data.id ?? null;
+                firstLessonId = firstLessonInChapter?.data.data.id ?? null;
                 setSelectedLessonId(firstLessonId);
 
                 setSelectedLessonsByChapter(prev => ({
@@ -255,17 +264,76 @@ const Home = () => {
                     [chapterId]: firstLessonId,
                 }));
             }
+
+            // Update URL parameters
+            const searchParams = new URLSearchParams(location.search);
+            searchParams.set('chapterId', chapterId);
+            searchParams.set('lessonId', firstLessonId ?? '');
+            navigate({ search: searchParams.toString() });
         }
     };
     const handleLessonClick = (lessonId: string) => {
+        alert('handleLessonClick');
         setSelectedLessonId(lessonId);
 
         setSelectedLessonsByChapter(prev => ({
             ...prev,
             [selectedChapterId as string]: lessonId,
         }));
+
+        // Update the URL with the selected lesson ID
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set('lessonId', lessonId);
+        navigate({ search: searchParams.toString() });
     };
 
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const chapterIdParam = searchParams.get('chapterId');
+        const lessonIdParam = searchParams.get('lessonId');
+        const currentSubject = searchParams.get('subject') || 'subject1';
+        const currentGrade = parseInt(searchParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
+
+        if (chapterIdParam) {
+            setSelectedChapterId(chapterIdParam);
+            setExpandedChapters(prevState => ({
+                ...prevState,
+                [chapterIdParam]: true
+            }));
+        }
+        if (lessonIdParam) {
+            setSelectedLessonId(lessonIdParam);
+            setSelectedLessonsByChapter(prevState => ({
+                ...prevState,
+                [chapterIdParam as string]: lessonIdParam
+            }));
+        }
+
+        // Check if the subject or grade has changed
+        if (currentSubject && currentGrade) {
+            if (previousSubjectRef.current !== currentSubject || previousGradeRef.current !== currentGrade) {
+                fetchChapters({ subjectId: currentSubject, grade: currentGrade }).then(() => {
+                    // Ensure the chapter and lesson are set after fetching chapters
+                    if (chapterIdParam) {
+                        setSelectedChapterId(chapterIdParam);
+                        setExpandedChapters(prevState => ({
+                            ...prevState,
+                            [chapterIdParam]: true
+                        }));
+                    }
+                    if (lessonIdParam) {
+                        setSelectedLessonId(lessonIdParam);
+                        setSelectedLessonsByChapter(prevState => ({
+                            ...prevState,
+                            [chapterIdParam as string]: lessonIdParam
+                        }));
+                    }
+                });
+                previousSubjectRef.current = currentSubject; // Update the previous subject
+                previousGradeRef.current = currentGrade; // Update the previous grade
+            }
+        }
+    }, [location.search, userRedux]);
     const [lessonLoading, setLessonLoading] = useState<boolean>(false)
     useEffect(() => {
         const fetchAllLessons = async () => {
@@ -288,10 +356,6 @@ const Home = () => {
         };
         fetchAllLessons();
     }, [chaptersData]);
-
-    const capitalizeFirstLetter = (string: string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1)
-    }
 
     const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
@@ -536,7 +600,7 @@ const Home = () => {
                                         </h3>
                                         {theories[selectedLessonId] && theories[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                                {theories[selectedLessonId].map((theory) => (
+                                                {theories[selectedLessonId]?.map((theory) => (
                                                     <li
                                                         key={theory.id}
                                                         className="tw-bg-slate-100 tw-rounded-md tw-shadow-md tw-border tw-border-gray-300 tw-cursor-pointer"
@@ -566,8 +630,8 @@ const Home = () => {
                                         </h3>
                                         {exams[selectedLessonId] && exams[selectedLessonId].length > 0 ? (
                                             <ul className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                                {exams[selectedLessonId].map((exam) => {
-                                                    const exerciseProgress = progress.exercises.find((exercise: any) => exercise.examId === exam.id);
+                                                {exams[selectedLessonId]?.map((exam) => {
+                                                    const exerciseProgress = progress?.exercises?.find((exercise: any) => exercise.examId === exam.id);
                                                     const starRating = exerciseProgress ? exerciseProgress.star : null;
                                                     const yourScore = exerciseProgress ? exerciseProgress.yourScore : null;
                                                     const totalScore = exerciseProgress ? exerciseProgress.totalScore : null;
