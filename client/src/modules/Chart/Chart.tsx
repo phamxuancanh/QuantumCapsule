@@ -10,7 +10,7 @@ import { getListChapterNoPaging } from "api/chapter/chapter.api";
 import { useLocation } from "react-router-dom";
 import { findProgressByChapter } from "api/progress/progress.api";
 import { getFromLocalStorage } from "utils/functions";
-import QCDateFilter, { IDateFilter } from "QCComponents/QCDateFilter/QCDateFilter";
+import QCDateFilter, { DateFilterMode, IDateFilter } from "QCComponents/QCDateFilter/QCDateFilter";
 import { toast } from 'react-toastify';
 import { getListUniqueDoneResultByChapterId } from "api/result/result.api";
 import { IGetResultByUserIdFilterParams } from "api/result/result.interface";
@@ -33,7 +33,7 @@ interface ExerciseData {
 interface MockData {
     exam: ExamData[];
     exercise: ExerciseData[];
-    chapter: { value: string; label: string; count: number }[];
+    chapter: { value: string; label: string; count: number, theories: any[] }[];
 }
 
 const Chart: React.FC = React.memo(() => {
@@ -47,8 +47,14 @@ const Chart: React.FC = React.memo(() => {
     const [filteredExamData, setFilteredExamData] = useState<ExamData[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
     const [activeTab, setActiveTab] = useState<"theory" | "exercise" | "exam">("theory");
-    const [chapters, setChapters] = useState<{ value: string; label: string; count: number }[]>([]);
-    // TAB LY THUYET
+    const [chapters, setChapters] = useState<{ value: string; label: string; count: number; theories: any[] }[]>([]);
+    const [dateFilter, setDateFilter] = useState<IDateFilter>({
+        mode: DateFilterMode.DATE,
+        from: undefined,
+        to: undefined,
+        month: undefined,
+        year: undefined
+    });
     const fetchTheoryProgress = useCallback(async (chaptersData: { value: string; label: string; count: number }[]) => {
         try {
             const progressPromises = chaptersData.map(async (chapter) => {
@@ -58,30 +64,40 @@ const Chart: React.FC = React.memo(() => {
                 return {
                     chapterId: chapter.value,
                     count: progressRes.data.data.length,
+                    theories: progressRes.data.data
                 };
             });
+
             const progressCounts = await Promise.all(progressPromises);
-            const chapterCounts: { [key: string]: number } = {};
-            progressCounts.forEach(({ chapterId, count }) => {
-                chapterCounts[chapterId] = count;
+
+            const chapterDataMap: { [key: string]: { count: number; theories: any[] } } = {};
+            progressCounts.forEach(({ chapterId, count, theories }) => {
+                chapterDataMap[chapterId] = {
+                    count,
+                    theories
+                };
             });
+
             const updatedChapters = chaptersData.map((chapter) => ({
                 ...chapter,
-                count: chapterCounts[chapter.value] || 0,
-            }))
-            setChapters(updatedChapters)
+                count: chapterDataMap[chapter.value]?.count || 0,
+                theories: chapterDataMap[chapter.value]?.theories || []
+            }));
+
+            setChapters(updatedChapters);
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
     }, []);
-    
+
     const fetchChapters = async (params?: ListChapterParams) => {
         try {
             const res = await getListChapterNoPaging({ params });
             const chaptersData = res.data.data.map((chapter: any) => ({
                 value: chapter.id,
                 label: chapter.name,
-                count: 0
+                count: 0,
+                theories: []
             }));
             setChapters(chaptersData);
             await fetchTheoryProgress(chaptersData);
@@ -90,7 +106,7 @@ const Chart: React.FC = React.memo(() => {
         } finally {
         }
     };
-    
+
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search)
         const currentPage = parseInt(queryParams.get('page') || '1', 10)
@@ -101,7 +117,7 @@ const Chart: React.FC = React.memo(() => {
             fetchChapters({ subjectId: currentSubject, grade: currentGrade })
         }
     }, [location.search]);
-    
+
     const handleFilter = async (filter: IDateFilter) => {
         try {
             console.log(filter);
@@ -119,16 +135,16 @@ const Chart: React.FC = React.memo(() => {
                     from: filter.from,
                     to: filter.to
                 } as IGetResultByUserIdFilterParams);
-    
+
                 const theoryProgress = theoryProgressResponse?.data?.data || [];
                 return {
                     chapterId: chapter.value,
                     count: theoryProgress.length
                 };
             });
-    
+
             const progressCounts = await Promise.all(progressPromises);
-    
+
             const updatedChapters = chapters.map((chapter) => {
                 const foundProgress = progressCounts.find((progress) => progress.chapterId === chapter.value);
                 return {
@@ -136,15 +152,15 @@ const Chart: React.FC = React.memo(() => {
                     count: foundProgress?.count || 0
                 };
             });
-    
+
             setChapters(updatedChapters);
-    
+
         } catch (err) {
             console.error(err);
             toast.error("Đã xảy ra lỗi khi lọc dữ liệu.");
         }
     };
-    
+
     const mockData: MockData = {
         chapter: chapters,
         exam: [
@@ -214,23 +230,25 @@ const Chart: React.FC = React.memo(() => {
         </div>
     );
 
-    const FilterSection: React.FC = () => (
-        <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md tw-mb-6">
-            <div className="tw-flex tw-items-center tw-gap-4 tw-flex-wrap">
-                <div className="tw-flex tw-items-center tw-gap-2">
-                    <FilterAltIcon className="tw-text-gray-600" />
-                    <span className="tw-text-gray-700 tw-font-medium">Bộ lọc:</span>
-                    <div className='tw-flex tw-items-center'>
-                        <QCDateFilter
-                            onChange={(filter) => {
-                                handleFilter(filter);
-                            }}
-                        />
+    const FilterSection: React.FC = React.memo(() => {
+        return (
+            <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md tw-mb-6">
+                <div className="tw-flex tw-items-center tw-gap-4 tw-flex-wrap">
+                    <div className="tw-flex tw-items-center tw-gap-2">
+                        <FilterAltIcon className="tw-text-gray-600" />
+                        <span className="tw-text-gray-700 tw-font-medium">Bộ lọc:</span>
+                        <div className='tw-flex tw-items-center'>
+                            <QCDateFilter
+                                onChange={(filter) => {
+                                    handleFilter(filter);
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    });
     const TheoryDashboard: React.FC = React.memo(() => {
         useEffect(() => {
             const ctx = document.getElementById("theoryChart") as HTMLCanvasElement;
@@ -240,31 +258,32 @@ const Chart: React.FC = React.memo(() => {
                     data: {
                         labels: mockData.chapter.map(item => item.label),
                         datasets: [{
-                            label: "Theory Progress",
+                            label: "Tiến trình bài học",
                             data: mockData.chapter.map(item => item.count),
                             backgroundColor: "rgba(54, 162, 235, 0.5)",
                             borderColor: "rgba(54, 162, 235, 1)",
-                            borderWidth: 1
-                        }]
+                            borderWidth: 1,
+                        }],
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                position: "top"
+                                position: "top",
                             },
                             tooltip: {
                                 callbacks: {
                                     label: function (context) {
                                         const index = context.dataIndex;
-                                        const id = mockData.chapter[index].value;
-                                        return `ID: ${id}, Value: ${context.raw}`;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                        const theories = mockData.chapter[index].theories;
+                                        const theoryNames = theories.map((theory) => `• ${theory.name}`);
+                                        return ['Bài học:'].concat(theoryNames);
+                                    },
+                                },
+                            },
+                        },
+                    },
                 });
                 return () => chart.destroy();
             }

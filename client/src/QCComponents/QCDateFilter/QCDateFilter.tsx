@@ -42,7 +42,7 @@ const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
             props.onChange(filter);
         }
     }, [filter.from, filter.to]);
-
+    
     const handleChangeMode = (mode: DateFilterMode) => {
         if (mode === DateFilterMode.DATE) {
             setFilter({
@@ -50,27 +50,29 @@ const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
                 mode,
                 month: undefined,
                 year: undefined,
-                from: filter.from,
-                to: filter.to
+                // Keep 'from' and 'to' as they are
             });
         }
         if (mode === DateFilterMode.MONTH) {
+            const fromDate = filter.from || new Date(); // Use 'from' or current date
             setFilter({
                 ...filter,
                 mode,
                 year: undefined,
-                month: filter.from ? dayjs(filter.from).startOf('month').toDate() : undefined,
-                from: filter.from ? dayjs(filter.from).startOf('month').toDate() : undefined,
-                to: filter.from ? dayjs(filter.from).endOf('month').toDate() : undefined
+                month: dayjs(fromDate).startOf('month').toDate(),
+                from: dayjs(fromDate).startOf('month').toDate(),
+                to: dayjs(fromDate).endOf('month').toDate(),
             });
         }
         if (mode === DateFilterMode.YEAR) {
+            const fromDate = filter.from || new Date(); // Use 'from' or current date
             setFilter({
                 ...filter,
                 mode,
                 month: undefined,
-                from: filter.from ? dayjs(filter.from).startOf('year').toDate() : undefined,
-                to: filter.from ? dayjs(filter.from).endOf('year').toDate() : undefined
+                year: dayjs(fromDate).startOf('year').toDate(),
+                from: dayjs(fromDate).startOf('year').toDate(),
+                to: dayjs(fromDate).endOf('year').toDate(),
             });
         }
     };
