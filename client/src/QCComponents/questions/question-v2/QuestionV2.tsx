@@ -36,7 +36,7 @@ const QuestionV2: React.FC<IProps> = (props) => {
             <Typography color={"#257180"} fontWeight={800}>
                 {props.question.title}
             </Typography>
-            <Typography color={"#1E201E"} fontWeight={600}>
+            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "30px"}}>
                 {props.question.content}
             </Typography>
             <RenderContentImg imageContent={props.question.contentImg!}/>

@@ -15,6 +15,7 @@ export interface IQuestion {
     status?: boolean
     lessonId?: string
     examQuestionId?: string // for display
+    flat?: boolean
 }
 
 export interface ListQuesionParams {
