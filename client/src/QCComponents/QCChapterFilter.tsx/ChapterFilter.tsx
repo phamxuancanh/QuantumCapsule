@@ -17,10 +17,11 @@ interface IProps {
 
 const QCChapterFilter: React.FC<IProps> = (props) => {
 
+    const [grades, setGrades] = useState<number[]>([1, 2, 3, 4, 5]);
     const [chapters, setChapters] = useState<IChapter[]>([]);
     const [subjects, setSubjects] = useState<ISubject[]>([]);
 
-
+    const [selectedGrade, setSelectedGrade] = useState<number>(1);
     const [selectedChapterId, setSelectedChapterId] = useState('');
     const [selectedSubjectId, setSelectedSubjectId] = useState('');
     const [filteredChapter, setFilteredChapter] = useState<IChapter[]>([]);
@@ -46,22 +47,28 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
     }, []);
 
 
-    const handleChange = (event : SelectChangeEvent<string>) => {
+    const handleChange = (event : SelectChangeEvent<any>) => {
         const { name, value } = event.target;
         console.log(name, value);
-        
-        if (name === 'subjectId') {
+        if(!selectedGrade || !selectedSubjectId) return;
+
+        if (name === 'grade') {
+            setSelectedGrade(value);
+        } else if (name === 'subjectId') {
             setSelectedSubjectId(value);
-            const filtered = chapters?.filter(item => item.subjectId === value);
-            
+        }
+
+        if (name === 'grade' || name === 'subjectId') {
+            const grade = name === 'grade' ? value : selectedGrade;
+            const subjectId = name === 'subjectId' ? value : selectedSubjectId;
+            const filtered = chapters?.filter(item => 
+                (!grade || item.grade === grade) &&
+                (!subjectId || item.subjectId === subjectId)
+            );
+        
             setFilteredChapter(filtered);
             setSelectedChapterId('');
 
-            // if (props.onChange) {
-            //     props.onChange({
-            //         chapterId: '',
-            //     } as IChapterFilter);
-            // }
         } else if (name === 'chapterId') {
             setSelectedChapterId(value);
         
@@ -81,6 +88,23 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={2}>
                         <FormControl fullWidth style={{ marginBottom: '1rem' }}>
+                            <InputLabel>Lớp</InputLabel>
+                            <Select
+                                name="grade"
+                                value={selectedGrade}
+                                label="Môn"
+                                onChange={e =>handleChange(e)}
+                            >
+                            {grades?.map((grade) => (
+                                <MenuItem key={grade} value={grade}>
+                                    {grade}
+                                </MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={2}>
+                        <FormControl fullWidth style={{ marginBottom: '1rem' }}>
                             <InputLabel>Môn</InputLabel>
                             <Select
                                 name="subjectId"
@@ -95,7 +119,6 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
                             ))}
                             </Select>
                         </FormControl>
-
                     </Grid>
                     <Grid item xs={12} md={5}>
                         <FormControl fullWidth>

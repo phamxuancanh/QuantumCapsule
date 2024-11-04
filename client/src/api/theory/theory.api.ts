@@ -29,3 +29,7 @@ export const getTheoryById = async (id: string): Promise<AxiosResponse<any>> => 
 export const getTheoriesByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/theories/getTheoriesByLessonId/${lessonId}`);
 }
+
+export const getListTheoryByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/theories/getListTheoryByChapterId/${chapterId}`, { withCredentials: true });
+}

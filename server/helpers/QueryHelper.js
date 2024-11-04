@@ -43,6 +43,12 @@ const queries = {
     select l.* from lessons l
     where l.chapterId = :chapterId and l.status = 1
     order by l.updatedAt desc
+  `,
+  getListTheoryByChapterId: `
+    select t.* from theories t
+    join lessons l on t.lessonId = l.id
+    where l.chapterId = :chapterId and t.status = 1
+    order by t.updatedAt desc
   `
 }
 module.exports = { queries }
