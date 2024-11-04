@@ -1,5 +1,5 @@
 const { queries } = require('../helpers/QueryHelper')
-const { models } = require('../models')
+const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 
 // import theories data
@@ -110,6 +110,8 @@ const addTheory = async (req, res, next) => {
 // update a theory by id
 const updateTheory = async (req, res, next) => {
   try {
+    console.log('---------------------', req.body);
+    
     const { id } = req.params
     const updateData = req.body
 

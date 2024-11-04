@@ -20,3 +20,15 @@ export const getListAllChapter = async (): Promise<AxiosResponse<DataListChapter
     console.log('getListAllChapter');
     return await requestWithJwt.get<DataListChapter>('/chapters/getListAllChapter', { withCredentials: true });
 }
+
+export const addChapter = async (chapter: IChapter): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.post<any>('/chapters', chapter, { withCredentials: true });
+}
+
+export const updateChapter = async (id: string, chapter: IChapter): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.put<any>('/chapters/'+ id, chapter , { withCredentials: true });
+}
+
+export const deleteChapter = async (id: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.delete<any>('/chapters/'+ id,  { withCredentials: true });
+}

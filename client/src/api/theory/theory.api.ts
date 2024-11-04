@@ -15,7 +15,7 @@ export const addTheory = async (theory: any): Promise<AxiosResponse<any>> => {
 }
 
 export const updateTheory = async (id: string, theory: ITheory): Promise<AxiosResponse<any>> => {
-    return await requestWithJwt.put<any>('/theories', theory, { withCredentials: true });
+    return await requestWithJwt.put<any>('/theories/'+id, theory, { withCredentials: true });
 }
 
 export const deleteTheory = async (id: string): Promise<AxiosResponse<any>> => {

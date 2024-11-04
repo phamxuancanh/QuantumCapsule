@@ -20,6 +20,7 @@ import { Box, IconButton, Typography } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ExamQuestionManager from './ExamQuestionManager/ExamQuestionManagerProvider';
 import LessonManager from './LessonManager/LessonManagerProvider';
+import ChapterManagerProvider from './ChapterManager/ChapterManagerProvider';
 const Admin: React.FC = () => {
     const handleImportChapter = async (listData: IChapter[]) => {
         try {
@@ -94,11 +95,12 @@ const Admin: React.FC = () => {
             <Box p={2}>
                 <TabMenu
                     listItems={[
-                        { index: 0, label: 'Quản lý bài bài tập', item: <ExamManager /> },
-                        { index: 1, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
-                        { index: 2, label: 'Quản lý bài học', item: <LessonManager /> },
-                        { index: 3, label: 'Quản lý bài giảng (lý thuyết)', item: <TheoryManager /> },
-                        { index: 4, label: 'Quản lý bài kiểm tra và câu hỏi', item: <ExamQuestionManager /> }
+                        { index: 0, label: 'Quản lý chương', item: <ChapterManagerProvider /> },
+                        { index: 1, label: 'Quản lý bài học', item: <LessonManager /> },
+                        { index: 2, label: 'Quản lý bài giảng (lý thuyết)', item: <TheoryManager /> },
+                        { index: 3, label: 'Quản lý bài bài tập', item: <ExamManager /> },
+                        { index: 4, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
+                        { index: 5, label: 'Quản lý bài kiểm tra và câu hỏi', item: <ExamQuestionManager /> }
                     ]}
                     defaultIndex={0}
                 />

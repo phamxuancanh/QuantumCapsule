@@ -124,7 +124,7 @@ const ExamManager: React.FC<IProps> = () => {
 
                             {
                                 field: "lessonId",
-                                headerName: "Lesson ID",
+                                headerName: "bài học",
                                 width: 130,
                                 editable: true,
                                 valueFormatter: (value: string) => {
@@ -138,7 +138,7 @@ const ExamManager: React.FC<IProps> = () => {
 
                             {
                                 field: "order",
-                                headerName: "Order",
+                                headerName: "thứ tự",
                                 width: 130,
                             },
                             {
