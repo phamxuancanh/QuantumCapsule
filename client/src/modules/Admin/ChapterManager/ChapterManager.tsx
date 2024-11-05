@@ -13,6 +13,7 @@ import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { addChapter, deleteChapter, getListAllChapter, updateChapter } from 'api/chapter/chapter.api';
 import { ISubject } from 'api/subject/subject.interface';
 import { IChapter } from 'api/chapter/chapter.interface';
+import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -105,7 +106,15 @@ const ChapterManager: React.FC<IProps> = () => {
                     mode={1}
                 />
                 <SimpleTable 
-                    initData={dataTable ? dataTable : [] as IQuestion[]}
+                    initData={dataTable ? dataTable : [] as IChapter[]}
+                    toolbarComponent={<Box>
+                        <ExcelExportBtn 
+                            data={dataTable ? dataTable : [] as IChapter[]}
+                            headers={['id', 'name', 'subjectId', 'description', 'grade', 'order', 'status']}
+                            variant='outlined'
+                            fileName="chapter" 
+                        />
+                    </Box>}
                     initNewRow={{
                         id: generateQuestionUID(),
                         subjectId: "subject1",

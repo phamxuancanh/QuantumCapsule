@@ -2,6 +2,7 @@ import { Box, Button, Card } from "@mui/material"
 import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import {
+    useActCongratulation,
     useCurrentQuestion,
     useListAnswer,
     useListQuestion,
@@ -26,6 +27,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
     const { result, setResult } = useResult()
     const {openResult, setOpenResult} = useOpenResult()
     const [isNextQuestion, setIsNextQuestion] = React.useState(false)
+    const {actCongratulation,setActCongratulation} = useActCongratulation()
     const handleAnswer = (yourAnswer: string) => {
         const newListAnswer = listAnswer.map((answer: IAnswer) => {
             if (answer.questionId === currentQuestion.id) {
@@ -50,6 +52,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
             setIsNextQuestion(true)
             return
         }
+        
         setIsNextQuestion(false)
         const index = listQuestion.findIndex(
             (question: IQuestion) => question.id === currentQuestion.id,

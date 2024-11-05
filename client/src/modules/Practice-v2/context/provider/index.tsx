@@ -48,6 +48,10 @@ export interface IProvider {
         actStarModal: IAction
         setActStarModal: React.Dispatch<React.SetStateAction<IAction>>
     }
+    actCongratulation: {
+        actCongratulation: IAction
+        setActCongratulation: React.Dispatch<React.SetStateAction<IAction>>
+    }
 }
 
 const Provider: React.FC<IProps> = ({ children }) => {
@@ -61,6 +65,7 @@ const Provider: React.FC<IProps> = ({ children }) => {
     const [openResult, setOpenResult] = React.useState<boolean>(false)
     const [isSumited, setIsSumited] = React.useState<boolean>(false)
     const [actStarModal, setActStarModal] = React.useState<IAction>(defaultAction)
+    const [actCongratulation, setActCongratulation] = React.useState<IAction>(defaultAction)
 
     const state: IProvider = {
         examId: {
@@ -98,6 +103,10 @@ const Provider: React.FC<IProps> = ({ children }) => {
         actStarModal: {
             actStarModal,
             setActStarModal
+        },
+        actCongratulation: {
+            actCongratulation,
+            setActCongratulation
         }
     }
     return <Context.Provider value={state}>{children}</Context.Provider>

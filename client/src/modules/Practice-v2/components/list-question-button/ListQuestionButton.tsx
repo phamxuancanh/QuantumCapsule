@@ -1,4 +1,4 @@
-import { Box, Button, Grid } from "@mui/material"
+import { Box, Button, Grid, Typography } from "@mui/material"
 import {
     useActStarModal,
     useCurrentQuestion,
@@ -65,6 +65,11 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
                 </Grid>
             </Box> */}
             {/* </div> */}
+            <Box>
+                <Typography variant={"h4"}>Đã làm: {listAnswer.filter(ans=>ans.isCorrect).length}/{listAnswer.length}</Typography>
+                {/* <Typography variant={"h6"}>{listAnswer.filter(ans=>ans.isCorrect).length}/{listAnswer.length}</Typography> */}
+
+            </Box>
             <Button
                 onClick={() => {
                     setOpenResult(true)

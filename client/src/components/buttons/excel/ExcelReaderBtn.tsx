@@ -119,6 +119,7 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
     const handleExcelFileMulti = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         const fileExtension = file?.name?.split('.').pop()?.toLowerCase();
+        console.log("importing multi sheet1");
     
         if (!file) {
             alert('No file selected');
@@ -128,7 +129,8 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
             alert('Unsupported file type. Please upload an Excel file.');
             return;
         }
-    
+        console.log("importing multi sheet");
+        
         try {
             const listData = await Promise.all(
                 props.listSheetIndex?.map((index) => handleExcelFileByIndex(file, index)) || []

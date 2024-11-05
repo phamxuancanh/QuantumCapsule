@@ -154,7 +154,7 @@ const Admin: React.FC = () => {
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Nhập dữ liệu excel</h1>
-                        <ExcelReaderBtn listSheetIndex={[0,1,2,3,5,4]} name='Nhập dữ liệu chương' onUpload={handleImportMulti} />
+                        <ExcelReaderBtn listSheetIndex={[0,1,2,3,5,4]} name='Nhập dữ liệu từ file excel' onUploadMulti={handleImportMulti} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Chương</h1>

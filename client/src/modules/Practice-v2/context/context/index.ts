@@ -66,5 +66,12 @@ export const useActStarModal = () => {
     }
     return context.actStarModal
 }
+export const useActCongratulation = () => {
+    const context = useContext(Context)
+    if (!context) {
+        throw new Error("useActCongratulation must be used within a Provider")
+    }
+    return context.actCongratulation
+}
 
 export default Context

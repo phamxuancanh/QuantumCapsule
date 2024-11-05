@@ -1,5 +1,6 @@
 import React, { useEffect } from "react"
 import {
+    useActCongratulation,
     useCurrentQuestion,
     useExamId,
     useIsSumited,
@@ -20,6 +21,7 @@ import { getFromLocalStorage } from "utils/functions"
 import ResultBox from "./components/result-box/ResultBox"
 import StarModal from "./components/star-modal/StarModal"
 import QuestionBox from "./components/question-box/QuestionBox"
+import CongratulationBox from "./components/congratulation-box/CongratulationBox"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -32,6 +34,7 @@ const Practice: React.FC = () => {
     const { openResult, setOpenResult } = useOpenResult()
     const {isSumited, setIsSumited} = useIsSumited()
     const {examId, setExamId} = useExamId()
+    const {actCongratulation, setActCongratulation} = useActCongratulation()
     // const[]
     
     useEffect(() => {
@@ -68,6 +71,10 @@ const Practice: React.FC = () => {
                     />
                     <SubmitResultBox isOpen={openResult === true && isSumited === false} />
                     <ResultBox isOpen={isSumited === true}/>
+                    <CongratulationBox 
+                        open={actCongratulation.open}
+                        answer={actCongratulation.payload}
+                    />
                 </Grid>
                 <Grid item xs={3}>
                     <ListQuestionButton isOpen={isSumited === false}/>

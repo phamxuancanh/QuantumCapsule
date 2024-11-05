@@ -16,6 +16,7 @@ import Loading from "containers/loadable-fallback/loading"
 import { toast } from "react-toastify"
 import QCChapterFilter, { IChapterFilter } from "QCComponents/QCChapterFilter.tsx/ChapterFilter"
 import RenderEditCell from "../components/RenderEditCell/RenderEditCell"
+import ExcelExportBtn from "components/buttons/excel/ExcelExportBtn"
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -76,6 +77,14 @@ const ExamManager: React.FC<IProps> = () => {
                 />
                 <SimpleTable
                     initData={dataTable ? dataTable : ([] as ITheory[])}
+                    toolbarComponent={<Box>
+                        <ExcelExportBtn 
+                            data={dataTable ? dataTable : [] as ITheory[]}
+                            headers={['id', 'lessonId', 'name', 'description', 'summary', 'url', 'type', 'order', 'status', 'lessonName']}
+                            variant='outlined'
+                            fileName="theory" 
+                        />
+                    </Box>}
                     initNewRow={
                         {
                             id: generateTheoryUID(),
