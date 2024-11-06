@@ -32,6 +32,9 @@ export const getExamsByLessonId = async (lessonId: string): Promise<AxiosRespons
 export const getExamsByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/exams/getExamsByChapterId/${chapterId}`);
 }
+export const getExercisesByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/exams/getExercisesByChapterId/${chapterId}`);
+}
 // ----------------- Exam Question -----------------
 export const getListExamQuestionByChapterId = async (chapterId: string): Promise<AxiosResponse<DataListExamQuestion>> => {
     return await requestWithJwt.get<DataListExamQuestion>(`/exams/getListExamQuestionByChapterId/${chapterId}`);

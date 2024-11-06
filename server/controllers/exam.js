@@ -292,6 +292,25 @@ const updateExamQuestion = async (req, res, next) => {
     res.status(500).json({ message: 'lỗi khi cập nhật: ' + error.message })
   }
 }
+const getExercisesByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+    const query = `
+      SELECT e.*
+      FROM exams e
+      JOIN lessons l ON e.lessonId = l.id
+      JOIN chapters c ON l.chapterId = c.id
+      WHERE c.id = :chapterId
+    `
+    const listExams = await sequelize.query(query, {
+      replacements: { chapterId },
+      type: sequelize.QueryTypes.SELECT
+    })
+    res.json({ data: listExams })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 // #endregion
 
 module.exports = {
@@ -303,6 +322,7 @@ module.exports = {
   getExamsByLessonId,
   getExamsByChapterId,
   getListExamByChapterId,
+  getExercisesByChapterId,
   // exam_question
   getListExamQuestionByChapterId,
   insertExamQuestion,
