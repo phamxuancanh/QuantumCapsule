@@ -52,12 +52,12 @@ const ResultHistory: React.FC = () => {
         <Box p={3}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    {/* <QCDateFilter 
+                    <QCDateFilter 
                         onChange={(filter) => {
                             console.log(filter);
                             handleFilter(filter)
                         }}
-                    /> */}
+                    />
                 </Grid>
                 <Grid item md={4} xs={12}>
                     <Box p={2}>

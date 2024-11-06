@@ -44,6 +44,7 @@ const QCDateFilter: React.FC<IDateFilterProps> = (props: IDateFilterProps) => {
     }, [filter.from, filter.to]);
     
     const handleChangeMode = (mode: DateFilterMode) => {
+        console.log("thay doi mode");
         if (mode === DateFilterMode.DATE) {
             setFilter({
                 ...filter,
