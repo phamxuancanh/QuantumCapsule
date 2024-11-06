@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, SxProps } from "@mui/material"
 import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import { IResult } from "api/result/result.interface"
@@ -11,13 +11,18 @@ interface ListResultsProps {
     result: IResult
     listAnswer: IAnswer[]
     listQuestion: IQuestion[]
+    sx?: SxProps
 }
 
 const ListResults: React.FC<ListResultsProps> = (props) => {
     const renderListResult = () => {
         return (
-            <Box>
-                {props.listQuestion.map((question, index) => {
+            <Box sx={props.sx}>
+                {props.listQuestion.sort((a, b) => {
+                    const numA = parseInt(a.title!.toLocaleLowerCase().replace("câu ", ""));
+                    const numB = parseInt(b.title!.toLocaleLowerCase().replace("câu ", ""));
+                    return numA - numB;
+                }).map((question, index) => {
                     if (question.questionType === 1) {
                         return (
                             <QuestionV1

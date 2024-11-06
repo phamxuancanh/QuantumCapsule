@@ -54,11 +54,14 @@ const getListResultByUserId = async (req, res, next) => {
     }
 
     const query = `
-      SELECT r.*, e.name as examName
-      FROM Results r
-      JOIN Exams e ON r.examId = e.id
+      SELECT r.*, e.name AS examName, c.name as chapterName, l.name as lessonName
+      FROM results r
+      JOIN exams e ON r.examId = e.id
+      left join chapters c on e.chapterId = c.id
+      left join lessons l on e.lessonId = l.id
       WHERE r.userId = :userId
       ${dateFilter}
+      order by r.timeStart desc;
     `
 
     const resultQuery = await sequelize.query(query, {
