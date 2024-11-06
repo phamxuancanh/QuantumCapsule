@@ -1,7 +1,8 @@
-import { Box, Button } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import { insertListAnswer } from "api/answer/answer.api"
 import { insertResult } from "api/result/result.api"
 import { IResult } from "api/result/result.interface"
+import ComfirmModal from "components/modals/comfirmModal/ComfirmModal"
 import { caculateStar } from "helpers/Nam-helper/InitHelper"
 import {
     useActStarModal,
@@ -16,6 +17,7 @@ import QuestionV3 from "QCComponents/questions/question-v3/QuestionV3"
 import React from "react"
 import { toast } from "react-toastify"
 import { ACTIONS } from "utils/enums"
+import { defaultAction, IAction } from "utils/interfaces"
 
 interface IProps {
     isOpen: boolean
@@ -27,7 +29,18 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     const {setIsSumited} = useIsSumited()
     const {result} = useResult()
     const {setActStarModal}  = useActStarModal()
+    const [isComfirmSubmited, setIsComfirmSubmited] = React.useState(false)
+    const [actComfirmModal, setActComfirmModal] = React.useState<IAction>(defaultAction)
     const handleSubmit = async () => {
+        // check có câu chưa trả lời không, toaat câu đó ra
+        const listQuestionNotAnswer = listQuestion.filter(question => {
+            return !listAnswer.find(ans => ans.questionId === question.id)?.yourAnswer
+        })
+        if (listQuestionNotAnswer.length > 0 || isComfirmSubmited) {
+            setActComfirmModal({open: true, payload: listQuestionNotAnswer.map(q => q.title).join(", ")} as IAction)
+            return
+        }
+        
         try {
             const res2 = await insertResult({
                 ...result,
@@ -95,6 +108,19 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
             >
                 Nộp bài
             </Button>
+            <ComfirmModal 
+                children={<Typography>
+                    {actComfirmModal.payload ?? ""}
+                </Typography>}
+                title="Xác nhận nộp bài"
+                open={actComfirmModal.open}
+                setOpenModal={(bool)=>setActComfirmModal({open: bool} as IAction)}
+                width="50%"
+                onComfirm={()=>{
+                    setIsComfirmSubmited(true)
+                    handleSubmit()
+                }}
+            />
         </Box>
     )
 }

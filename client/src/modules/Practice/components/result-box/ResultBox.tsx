@@ -18,6 +18,10 @@ const ResultBox: React.FC<ResultBoxProps> = (props) => {
             result={result}
             listQuestion={listQuestion}
             listAnswer={listAnswer}
+            sx={{
+              height: '100vh',
+              overflowY: 'auto',
+            }}
           />
         </Box>
     );

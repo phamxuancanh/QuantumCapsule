@@ -1,4 +1,5 @@
-const { models } = require('../models')
+const { queries } = require('../helpers/QueryHelper')
+const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 
 // import theories data
@@ -109,6 +110,8 @@ const addTheory = async (req, res, next) => {
 // update a theory by id
 const updateTheory = async (req, res, next) => {
   try {
+    console.log('---------------------', req.body);
+    
     const { id } = req.params
     const updateData = req.body
 
@@ -233,6 +236,23 @@ const getTheoriesByLessonId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching theories' })
   }
 }
+const getListTheoryByChapterId = async (req, res, next) => {
+  try {
+    const { chapterId } = req.params
+
+    const query = queries.getListTheoryByChapterId
+    const listTheory = await sequelize.query(query, {
+      replacements: { chapterId }, // Thay thế chapterId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+
+    res.json({ data: listTheory })
+  } catch (error) {
+    console.error('Error fetching theories:', error)
+    res.status(500).json({ message: 'Error fetching theories' })
+  }
+}
+
 module.exports = {
   importTheories,
   getListTheory,
@@ -240,5 +260,6 @@ module.exports = {
   updateTheory,
   deleteTheory,
   getTheoryById,
-  getTheoriesByLessonId
+  getTheoriesByLessonId,
+  getListTheoryByChapterId
 }

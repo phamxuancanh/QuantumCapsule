@@ -84,6 +84,27 @@ const Practice: React.FC = () => {
         <Box>
             <StarModal />
             <Grid container spacing={2}>
+                <Grid item xs={12} display={"flex"} gap={2}>
+                    <TimeCountdown initialSeconds={60 *40} // 40 minutes 
+                        onCountdownEnd={() => {
+                            handleSubmit()
+                        }}
+                        sx={{width: "500px", height:"40px", fontSize: "1.5rem", fontWeight: "bold", color: "#FF9D3D"}}
+                    />
+                    <Button
+                        onClick={() => {
+                            setOpenResult(true)
+                        }}
+                        variant={"contained"}
+                        color="success"
+                        sx={{
+                            width: "100px",
+                            height: "40px",
+                        }}
+                    >
+                        Nộp bài
+                    </Button>
+                </Grid>
                 <Grid item xs={9}>
                     <QuestionBox
                         isOpen={openResult === false && isSumited === false}
@@ -92,11 +113,6 @@ const Practice: React.FC = () => {
                     <ResultBox isOpen={isSumited === true}/>
                 </Grid>
                 <Grid item xs={3}>
-                    <TimeCountdown initialSeconds={60 *20} // 20 minutes 
-                        onCountdownEnd={() => {
-                            handleSubmit()
-                        }}
-                    />
                     <ListQuestionButton isOpen={isSumited === false}/>
                 </Grid>
             </Grid>

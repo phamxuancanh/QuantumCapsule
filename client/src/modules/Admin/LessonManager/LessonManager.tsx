@@ -13,6 +13,7 @@ import { IExam, IExamQuestion } from 'api/exam/exam.interface';
 import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
 import { getListAllChapter } from 'api/chapter/chapter.api';
 import { IChapter } from 'api/chapter/chapter.interface';
+import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -75,7 +76,15 @@ const LessonManager: React.FC<IProps> = () => {
             {/* {!dataTable?.length ? <>Không có dữ liệu</>: */}
 
                 <SimpleTable 
-                    initData={dataTable ? dataTable : [] as IExamQuestion[]}
+                    initData={dataTable ? dataTable : [] as ILesson[]}
+                    toolbarComponent={<Box>
+                        <ExcelExportBtn 
+                            data={dataTable ? dataTable : [] as ILesson[]}
+                            headers={["id", "chapterId", "name", "order", "status"]}
+                            variant='outlined'
+                            fileName="lesson" 
+                        />
+                    </Box>}
                     initNewRow={{
                         id: generateLessonUID(),
                         examId: '',

@@ -15,7 +15,7 @@ export const addTheory = async (theory: any): Promise<AxiosResponse<any>> => {
 }
 
 export const updateTheory = async (id: string, theory: ITheory): Promise<AxiosResponse<any>> => {
-    return await requestWithJwt.put<any>('/theories', theory, { withCredentials: true });
+    return await requestWithJwt.put<any>('/theories/'+id, theory, { withCredentials: true });
 }
 
 export const deleteTheory = async (id: string): Promise<AxiosResponse<any>> => {
@@ -28,4 +28,8 @@ export const getTheoryById = async (id: string): Promise<AxiosResponse<any>> => 
 
 export const getTheoriesByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/theories/getTheoriesByLessonId/${lessonId}`);
+}
+
+export const getListTheoryByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/theories/getListTheoryByChapterId/${chapterId}`, { withCredentials: true });
 }
