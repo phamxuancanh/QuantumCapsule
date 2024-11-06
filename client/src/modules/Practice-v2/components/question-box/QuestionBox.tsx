@@ -3,7 +3,9 @@ import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import {
     useActCongratulation,
+    useActStarModal,
     useCurrentQuestion,
+    useIsSumited,
     useListAnswer,
     useListQuestion,
     useOpenResult,
@@ -17,6 +19,12 @@ import SpeakerV1 from "QCComponents/speakers/speaker-v1/SpeakerV1"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import ReactCanvasConfetti from 'react-canvas-confetti';
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
+import { insertResult } from "api/result/result.api"
+import { caculateStar } from "helpers/Nam-helper/InitHelper"
+import { IResult } from "api/result/result.interface"
+import { insertListAnswer } from "api/answer/answer.api"
+import { toast } from "react-toastify"
+import { ACTIONS } from "utils/enums"
 
 interface IProps {
     isOpen?: boolean
@@ -31,19 +39,20 @@ const QuestionBox: React.FC<IProps> = (props) => {
     const [isNextQuestion, setIsNextQuestion] = React.useState(false)
     const {actCongratulation,setActCongratulation} = useActCongratulation()
     const confettiRef = useRef(null);
-    const correctSoundUrl = '/path/to/congrats.mp3';
-    const errorSoundUrl = '/path/to/error.mp3';
+    const correctSoundUrl = `${process.env.PUBLIC_URL}/clap.mp3`;
+    const errorSoundUrl = `${process.env.PUBLIC_URL}/error.mp3`;
     const [isFireworksRunning, setIsFireworksRunning] = useState(false);
-
+    const {setIsSumited} = useIsSumited()
+    const {setActStarModal}  = useActStarModal()
 
     useEffect(() => {
         if (isFireworksRunning) {
           const timer = setTimeout(() => {
             setIsFireworksRunning(false); // Dừng pháo hoa sau 3 giây
-          }, 3000);
+          }, 2000);
           return () => clearTimeout(timer); // Xóa bộ đếm thời gian khi component unmount
         }
-      }, [isFireworksRunning]);
+    }, [isFireworksRunning]);
 
     const handleAnswer = (yourAnswer: string) => {
         const newListAnswer = listAnswer.map((answer: IAnswer) => {
@@ -64,14 +73,30 @@ const QuestionBox: React.FC<IProps> = (props) => {
 
         })
     }
+    const handleSubmit = async () => {
+        try {
+            const res2 = await insertResult({
+                ...result,
+                star: caculateStar(result),
+            } as IResult)        
+            const res1 = await insertListAnswer(listAnswer)
+            toast.success("Nộp bài thành công")
+            setIsSumited(true)
+            setActStarModal({open: true, payload: caculateStar(result), type: ACTIONS.VIEW})
+            playSound(true)
+            setIsFireworksRunning(true)
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+    }
     const handleClickNextQuestion = () => {
         if(!isNextQuestion) {
             setIsNextQuestion(true)
+            const yourAnswer = listAnswer.find((ans) => ans.questionId === currentQuestion.id)
+            playSound(yourAnswer?.isCorrect!)
+            setIsFireworksRunning(yourAnswer?.isCorrect!)
             return
         }
-        const yourAnswer = listAnswer.find((ans) => ans.questionId === currentQuestion.id)
-        playSound(yourAnswer?.isCorrect!)
-        setIsFireworksRunning(yourAnswer?.isCorrect!)
         setIsNextQuestion(false)
         const index = listQuestion.findIndex(
             (question: IQuestion) => question.id === currentQuestion.id,
@@ -80,6 +105,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
             setCurrentQuestion(listQuestion[index + 1])
         } else {
             setOpenResult(true)
+            handleSubmit()
         }
     }
     const renderQuestion = (question: IQuestion) => {
