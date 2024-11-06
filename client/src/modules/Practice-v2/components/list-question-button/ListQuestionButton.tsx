@@ -66,9 +66,9 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
             </Box> */}
             {/* </div> */}
             <Box>
-                <Typography variant={"h4"}>Đã làm: {listAnswer.filter(ans=>ans.isCorrect).length}/{listAnswer.length}</Typography>
-                {/* <Typography variant={"h6"}>{listAnswer.filter(ans=>ans.isCorrect).length}/{listAnswer.length}</Typography> */}
-
+                <Typography variant={"h4"}>Đã làm: {listAnswer.filter(ans=>ans.yourAnswer).length}/{listAnswer.length}</Typography>
+                <Typography variant={"h4"}>Số câu đúng: {listAnswer.filter(ans=>ans.isCorrect).length}</Typography>
+                <Typography variant={"h4"}>Số câu sai: {listAnswer.filter(ans=>!ans.isCorrect).length}</Typography>
             </Box>
             <Button
                 onClick={() => {

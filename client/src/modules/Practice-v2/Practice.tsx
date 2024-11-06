@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import {
     useActCongratulation,
+    useActStarModal,
     useCurrentQuestion,
     useExamId,
     useIsSumited,
@@ -10,7 +11,7 @@ import {
     useResult,
     useTotalScore,
 } from "./context/context"
-import { InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
+import { caculateStar, InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
 import { Box, Button, Grid } from "@mui/material"
 import { IQuestion } from "api/question/question.interfaces"
 import ListQuestionButton from "./components/list-question-button/ListQuestionButton"
@@ -22,6 +23,10 @@ import ResultBox from "./components/result-box/ResultBox"
 import StarModal from "./components/star-modal/StarModal"
 import QuestionBox from "./components/question-box/QuestionBox"
 import CongratulationBox from "./components/congratulation-box/CongratulationBox"
+import { insertResult } from "api/result/result.api"
+import { IResult } from "api/result/result.interface"
+import { insertListAnswer } from "api/answer/answer.api"
+import { ACTIONS } from "utils/enums"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -35,7 +40,21 @@ const Practice: React.FC = () => {
     const {isSumited, setIsSumited} = useIsSumited()
     const {examId, setExamId} = useExamId()
     const {actCongratulation, setActCongratulation} = useActCongratulation()
+    const {actStarModal, setActStarModal} = useActStarModal()
     // const[]
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            handleSubmit()
+        };
+    
+        // Đăng ký sự kiện
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    
+        // Cleanup khi component bị unmount
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
     
     useEffect(() => {
         const fetchData = async () => {
@@ -60,7 +79,21 @@ const Practice: React.FC = () => {
         }
         fetchData()
     }, [])
-
+    const handleSubmit = async () => {
+        try {
+            const res2 = await insertResult({
+                ...result,
+                star: caculateStar(result),
+            } as IResult)        
+            const res1 = await insertListAnswer(listAnswer)
+            toast.success("Nộp bài thành công")
+            setIsSumited(true)
+            setActStarModal({open: true, payload: caculateStar(result), type: ACTIONS.VIEW})
+        } catch (error: any) {
+            toast.error(error.message)
+            toast.error(error.message)
+        }
+    }
     return (
         <Box minHeight={700} p={2}>
             <StarModal />

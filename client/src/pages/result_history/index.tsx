@@ -126,7 +126,7 @@ const ResultHistory: React.FC = () => {
                 </Grid>
                 <Grid item md={8} xs={12}>
                     <Box p={2}>
-                        <Typography variant="h3" color="#4caf50" textAlign={"center"}>Kết quả: {resultDetail?.result.yourScore} / {resultDetail?.result.totalScore}</Typography>
+                        <Typography variant="h4" color="#4caf50" textAlign={"center"}>Kết quả: {resultDetail?.result.yourScore} / {resultDetail?.result.totalScore}</Typography>
                         <ListResults 
                             result={resultDetail?.result ?? {}}
                             listQuestion={resultDetail?.listQuestion ?? []}
