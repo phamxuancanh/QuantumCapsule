@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { IGetResultByUserIdFilterParams } from "api/result/result.interface";
 import Select from 'react-select';
 import { getListUniqueDoneResultByChapterId } from "api/result/result.api";
-import { set } from "lodash";
+import { result, set } from "lodash";
 import { getExamsByChapterId, getExercisesByChapterId } from "api/exam/exam.api";
 import { calculateScore } from "helpers/Nam-helper/Caculate";
 
@@ -136,16 +136,26 @@ const Chart: React.FC = () => {
         if (currentSubject && currentGrade && currentPage) {
             fetchChapters({ subjectId: currentSubject, grade: currentGrade });
         }
-    }, [location.search]);
+    }, [location.search, activeTab]);
 
     useEffect(() => {
-        if (!isLoading && chapters.length > 0) {
-            setMockData({ chapter: chapters, exercise: [], exam: [] });
-        }
-        if (exerciseResults === null && examResults === null) {
-            fetchExamResultProgress();
-        }
-    }, [chapters, selectedChapter]);
+        const fetchData = async () => {
+            console.log('load lai du lieu');
+            console.log(examResults)
+            console.log(exerciseResults)
+            if (!isLoading && chapters.length > 0) {
+                setMockData({ chapter: chapters, exercise: [], exam: [] });
+            }
+            if (exerciseResults === null && examResults === null) {
+                console.log('CO NULL')
+                await fetchExamResultProgress();
+                console.log('load xong du lieu');
+                console.log(examResults)
+                console.log(exerciseResults)
+            }
+        };
+        fetchData();
+    }, [chapters, selectedChapter, activeTab]);
 
     const handleChapterChange = async (selectedChapter: any) => {
         setSelectedChapter(selectedChapter);
@@ -377,6 +387,12 @@ const Chart: React.FC = () => {
             return () => chart.destroy();
         }
     }, [examResults, listExams, activeTab]);
+    const handleTabClick = (tabId: "theory" | "exercise" | "exam") => {
+        setActiveTab(tabId);
+        setExamResults(null);
+        setExerciseResults(null);
+        setMockData({ chapter: [], exercise: [], exam: [] });
+    };
     return (
         <div className="tw-flex">
             {/* Sidebar */}
@@ -400,12 +416,21 @@ const Chart: React.FC = () => {
                     ].map((item) => (
                         <div
                             key={item.id}
-                            onClick={() => setActiveTab(item.id as "theory" | "exercise" | "exam")}
-                            className={`tw-flex tw-items-center tw-px-4 tw-py-3 tw-cursor-pointer ${activeTab === item.id ? "tw-bg-blue-600" : "hover:tw-bg-gray-700"}`}
+                            onClick={() => handleTabClick(item.id as "theory" | "exercise" | "exam")}
+                            className={`tw-flex tw-items-center tw-px-4 tw-py-3 tw-cursor-pointer ${activeTab === item.id ? "tw-bg-blue-600" : "hover:tw-bg-gray-700"
+                                }`}
                         >
                             {item.icon}
                             {isSidebarOpen && <span className="tw-ml-3">{item.label}</span>}
                         </div>
+                        // <div
+                        //     key={item.id}
+                        //     onClick={() => setActiveTab(item.id as "theory" | "exercise" | "exam")}
+                        //     className={`tw-flex tw-items-center tw-px-4 tw-py-3 tw-cursor-pointer ${activeTab === item.id ? "tw-bg-blue-600" : "hover:tw-bg-gray-700"}`}
+                        // >
+                        //     {item.icon}
+                        //     {isSidebarOpen && <span className="tw-ml-3">{item.label}</span>}
+                        // </div>
                     ))}
                 </nav>
             </div>
@@ -422,7 +447,13 @@ const Chart: React.FC = () => {
                                 <FilterAltIcon className="tw-text-gray-600" />
                                 <span className="tw-text-gray-700 tw-font-medium">Bộ lọc:</span>
                                 <div className="tw-flex tw-items-center">
+                                    {/* <QCDateFilter
+                                        onChange={(filter) => {
+                                            handleFilter(filter);
+                                        }}
+                                    /> */}
                                     <QCDateFilter
+                                        key={activeTab}
                                         onChange={(filter) => {
                                             handleFilter(filter);
                                         }}
