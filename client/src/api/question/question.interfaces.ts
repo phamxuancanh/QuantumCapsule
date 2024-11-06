@@ -12,9 +12,10 @@ export interface IQuestion {
     correctAnswer?: string
     explainAnswer?: string
     // score?: number
-    status?: boolean
     lessonId?: string
+    status?: boolean
     examQuestionId?: string // for display
+    flat?: boolean
 }
 
 export interface ListQuesionParams {

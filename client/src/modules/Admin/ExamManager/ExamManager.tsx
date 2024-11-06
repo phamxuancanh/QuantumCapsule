@@ -19,6 +19,7 @@ import { toast } from "react-toastify"
 import QCChapterFilter, { IChapterFilter } from "QCComponents/QCChapterFilter.tsx/ChapterFilter"
 import QCDateFilter from "QCComponents/QCDateFilter/QCDateFilter"
 import RenderEditCell from "../components/RenderEditCell/RenderEditCell"
+import ExcelExportBtn from "components/buttons/excel/ExcelExportBtn"
 const SimpleTable = loadable(() => import("components/tables/simpleTable/SimpleTable"), { fallback: <Loading /> });
 
 interface IProps {
@@ -82,6 +83,14 @@ const ExamManager: React.FC<IProps> = () => {
                 />
                 <SimpleTable
                     initData={dataTable as unknown as IExam[]}
+                    toolbarComponent={<Box>
+                        <ExcelExportBtn 
+                            data={dataTable ? dataTable : [] as IExam[]}
+                            headers={['id', 'name', 'order', 'lessonId', 'chapterId', 'status']}
+                            variant='outlined'
+                            fileName="exam" 
+                        />
+                    </Box>}
                     loading={loading}
                     getRowId={(row) => row.id}
                     initNewRow={{

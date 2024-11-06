@@ -16,6 +16,7 @@ import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { IExam, IExamQuestion } from 'api/exam/exam.interface';
 import { update } from 'lodash';
 import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
+import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -83,6 +84,14 @@ const ExamQuestionManager: React.FC<IProps> = () => {
 
                 <SimpleTable 
                     initData={dataTable ? dataTable : [] as IExamQuestion[]}
+                    toolbarComponent={<Box>
+                        <ExcelExportBtn 
+                            data={dataTable ? dataTable : [] as IExamQuestion[]}
+                            headers={['id', 'examId', 'questionId', 'status']}
+                            variant='outlined'
+                            fileName="theory" 
+                        />
+                    </Box>}
                     initNewRow={{
                         id: generateExamQuestionUID(),
                         examId: '',

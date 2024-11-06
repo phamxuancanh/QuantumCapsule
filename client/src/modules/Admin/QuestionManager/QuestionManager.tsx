@@ -14,6 +14,7 @@ import { getListLesson, getListLessonByChapterId, importLessons } from 'api/less
 import { toast } from 'react-toastify';
 import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
+import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 
 interface IProps {
     // Define the props for the ExamManager component here
@@ -75,6 +76,14 @@ const ExamManager: React.FC<IProps> = () => {
             />
                 <SimpleTable 
                     initData={dataTable ? dataTable : [] as IQuestion[]}
+                    toolbarComponent={<Box>
+                        <ExcelExportBtn 
+                            data={dataTable ? dataTable : [] as IQuestion[]}
+                            headers={['id', 'questionType', 'title', 'content', 'contentImg', 'A', 'B', 'C', 'D', 'E', 'correctAnswer', 'explainAnswer', 'lessonId', 'status']}
+                            variant='outlined'
+                            fileName="exam" 
+                        />
+                    </Box>}
                     initNewRow={{
                         id: generateQuestionUID(),
                         questionType: 1,

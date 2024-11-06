@@ -11,4 +11,7 @@ router.put('/:id', verifyAccessToken, chapterController.updateChapter)
 router.delete('/:id', verifyAccessToken, chapterController.deleteChapter)
 router.get('/getChapterById/:id', verifyAccessToken, chapterController.getChapterById)
 router.get('/getListAllChapter', verifyAccessToken, chapterController.getListAllChapter)
+router.post('/', verifyAccessToken, chapterController.addChapter)
+router.put('/:id', verifyAccessToken, chapterController.updateChapter)
+router.delete('/:id', verifyAccessToken, chapterController.deleteChapter)
 module.exports = router

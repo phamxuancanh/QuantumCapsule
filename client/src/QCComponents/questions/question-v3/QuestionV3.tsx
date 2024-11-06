@@ -41,8 +41,6 @@ const QuestionV3: React.FC<IProps> = (props) => {
         else {
             newChecked.splice(currentIndex, 1)
         }
-        console.log(newChecked);
-        
         props.onAnswer && props.onAnswer(convertArrToSortedString(newChecked))
         setCheckedItems(newChecked)
     }
@@ -57,12 +55,12 @@ const QuestionV3: React.FC<IProps> = (props) => {
     }
     const renderAllAnswerNotNull = (question: IQuestion) => {
         const answers = [
-            question.A,
-            question.B,
-            question.C,
-            question.D,
-            question.E,
-        ]
+            {value: "a", label: question.A, },
+            {value: "b", label: question.B, },
+            {value: "c", label: question.C, },
+            {value: "d", label: question.D, },
+            {value: "e", label: question.E, },
+        ].filter((answer) => answer.label)
         return answers.map((answer, index) => {
             if (answer) {
                 return (
@@ -70,17 +68,17 @@ const QuestionV3: React.FC<IProps> = (props) => {
                         key={index}
                         control={
                             <Checkbox
-                                value={answer}
+                                value={answer.value}
                                 onChange={handleChange}
                                 checked={
-                                    props.yourAnswer?.yourAnswer?.includes(answer)
+                                    props.yourAnswer?.yourAnswer?.includes(answer.value)
                                 }
                                 disabled={props.mode === "result" || props.mode === "submit"}
                             />
                         }
                         label={ 
-                            <Typography style={{color: renderColor(answer)}}>
-                                {answer}
+                            <Typography style={{color: renderColor(answer.value)}} sx={{fontSize: "30px"}}>
+                                {answer.label}
                             </Typography>
                         }
                     />
@@ -92,10 +90,10 @@ const QuestionV3: React.FC<IProps> = (props) => {
 
     return (
         <Card sx={{ p: 5 }}>
-            <Typography color={"#257180"} fontWeight={800}>
+            <Typography color={"#257180"} fontWeight={800} sx={{fontSize: "20px"}}>
                 {props.question.title}
             </Typography>
-            <Typography color={"#1E201E"} fontWeight={600}>
+            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "30px"}}>
                 {props.question.content}
             </Typography>
             {/* <img src={props.question.contentImg} alt="question" /> */}

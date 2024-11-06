@@ -1,4 +1,4 @@
-import { Box, Button, Grid } from "@mui/material"
+import { Box, Button, Grid, Typography } from "@mui/material"
 import {
     useActStarModal,
     useCurrentQuestion,
@@ -26,46 +26,35 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
     const { openResult, setOpenResult } = useOpenResult()
     const {result} = useResult()
     const { listAnswer } = useListAnswer()
-    const {setIsSumited} = useIsSumited()
-    const {setActStarModal}  = useActStarModal()
 
 
-    const handleSubmit = async () => {
-        try {
-            const res2 = await insertResult({
-                ...result,
-                star: caculateStar(result),
-            } as IResult)        
-            const res1 = await insertListAnswer(listAnswer)
-            toast.success("Nộp bài thành công")
-            setIsSumited(true)
-            setActStarModal({open: true, payload: caculateStar(result), type: ACTIONS.VIEW})
-        } catch (error: any) {
-            toast.error(error.message)
-            toast.error(error.message)
-        }
-    }
+    
     return (
         <Box display={props.isOpen ? "block" : "none"}>
-            {/* <Box sx={{maxHeight: "350px", overflowY: "scroll", borderRadius: "5px"}}>
-                <Grid container spacing={2} p={2}>
-                    {listQuestion.map((question) => (
-                        <Grid item xs={12} md={4} xl={3} key={question.id}>
-                            <Button
-                                onClick={() => {
-                                    setCurrentQuestion(question)
-                                    setOpenResult(false)
-                                }}
-                                variant={"outlined"}
-                            >
-                                {question.title}
-                            </Button>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box> */}
-            {/* </div> */}
-            <Button
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: 3,
+                    borderRadius: 2,
+                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                    backgroundColor: '#f5f5f5',
+                    maxWidth: 300,
+                    margin: 'auto',
+                }}
+            >
+                <Typography variant="h4" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                    Đã làm: {listAnswer.filter(ans => ans.yourAnswer).length}/{listAnswer.length}
+                </Typography>
+                <Typography variant="h4" gutterBottom sx={{ color: '#4caf50', fontWeight: 'bold' }}>
+                    Số câu đúng: {listAnswer.filter(ans => {return ans.isCorrect && ans.questionId !== currentQuestion.id}).length}
+                </Typography>
+                <Typography variant="h4" gutterBottom sx={{ color: '#f44336', fontWeight: 'bold' }}>
+                    Số câu sai: {listAnswer.filter(ans => {return !ans.isCorrect && ans.yourAnswer && ans.questionId !== currentQuestion.id}).length}
+                </Typography>
+            </Box>
+            {/* <Button
                 onClick={() => {
                     setOpenResult(true)
                     handleSubmit()
@@ -75,7 +64,7 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
                 fullWidth
             >
                 Hoàn thành
-            </Button>
+            </Button> */}
         </Box>
     )
 }

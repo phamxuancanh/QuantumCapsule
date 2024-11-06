@@ -7,4 +7,5 @@ export interface IAnswer {
     questionId?: string
     status?: boolean
     orderAnswer?: string
+    flat?: boolean
 }

@@ -60,7 +60,7 @@ const QuestionV1: React.FC<IProps> = (props) => {
                         value={answer.value}
                         control={<Radio />}
                         label={ 
-                            <Typography style={{color: renderColor(answer)}}>
+                            <Typography style={{color: renderColor(answer)}} sx={{fontSize: "30px"}}>
                                 {answer.label}
                             </Typography>
                         }
@@ -80,10 +80,10 @@ const QuestionV1: React.FC<IProps> = (props) => {
     }
     return (
         <Card sx={{ p: 5 }}>
-            <Typography color={"#257180"} fontWeight={800}>
+            <Typography color={"#257180"} fontWeight={800} sx={{fontSize: "20px"}}>
                 {question.title}
             </Typography>
-            <Typography color={"#1E201E"} fontWeight={600}>
+            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "30px"}}>
                 {question.content}
             </Typography>
             <RenderContentImg imageContent={question.contentImg!}/>
