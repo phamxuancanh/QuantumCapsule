@@ -46,33 +46,35 @@ const QuestionV1: React.FC<IProps> = (props) => {
     }
 
     const renderAllAnswerNotNull = (question: IQuestion) => {
-        const answers = [
+        let answers = [
             { value: "a", label: question.A },
             { value: "b", label: question.B },
             { value: "c", label: question.C },
             { value: "d", label: question.D },
             { value: "e", label: question.E },
         ]
+        answers = answers.filter(answer => answer.label);
+        for (let i = answers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [answers[i], answers[j]] = [answers[j], answers[i]];
+        }
         return answers.map((answer, index) => {
-            if (answer.label) {
-                return (
-                    <FormControlLabel
-                        value={answer.value}
-                        control={<Radio />}
-                        label={ 
-                            <Typography style={{color: renderColor(answer)}} sx={{fontSize: "30px"}}>
-                                {answer.label}
-                            </Typography>
-                        }
-                        key={index}
-                        checked={props.yourAnswer?.yourAnswer === answer.value}
-                        disabled={props.mode === "result" || props.mode === "submit"}
-                        sx={{ color: renderColor(answer) }}
-                        color={renderColor(answer)}
-                    />
-                )
-            }
-            return <></>
+            return (
+                <FormControlLabel
+                    value={answer.value}
+                    control={<Radio />}
+                    label={ 
+                        <Typography style={{color: renderColor(answer)}} sx={{fontSize: "30px"}}>
+                            {answer.label}
+                        </Typography>
+                    }
+                    key={index}
+                    checked={props.yourAnswer?.yourAnswer === answer.value}
+                    disabled={props.mode === "result" || props.mode === "submit"}
+                    sx={{ color: renderColor(answer) }}
+                    color={renderColor(answer)}
+                />
+            )
         })
     }
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

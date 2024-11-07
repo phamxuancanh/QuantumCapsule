@@ -54,37 +54,38 @@ const QuestionV3: React.FC<IProps> = (props) => {
         return "#000"
     }
     const renderAllAnswerNotNull = (question: IQuestion) => {
-        const answers = [
+        let answers = [
             {value: "a", label: question.A, },
             {value: "b", label: question.B, },
             {value: "c", label: question.C, },
             {value: "d", label: question.D, },
             {value: "e", label: question.E, },
         ].filter((answer) => answer.label)
+        for (let i = answers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [answers[i], answers[j]] = [answers[j], answers[i]];
+        }
         return answers.map((answer, index) => {
-            if (answer) {
-                return (
-                    <FormControlLabel
-                        key={index}
-                        control={
-                            <Checkbox
-                                value={answer.value}
-                                onChange={handleChange}
-                                checked={
-                                    props.yourAnswer?.yourAnswer?.includes(answer.value)
-                                }
-                                disabled={props.mode === "result" || props.mode === "submit"}
-                            />
-                        }
-                        label={ 
-                            <Typography style={{color: renderColor(answer.value)}} sx={{fontSize: "30px"}}>
-                                {answer.label}
-                            </Typography>
-                        }
-                    />
-                )
-            }
-            return <></>
+            return (
+                <FormControlLabel
+                    key={index}
+                    control={
+                        <Checkbox
+                            value={answer.value}
+                            onChange={handleChange}
+                            checked={
+                                props.yourAnswer?.yourAnswer?.includes(answer.value)
+                            }
+                            disabled={props.mode === "result" || props.mode === "submit"}
+                        />
+                    }
+                    label={ 
+                        <Typography style={{color: renderColor(answer.value)}} sx={{fontSize: "30px"}}>
+                            {answer.label}
+                        </Typography>
+                    }
+                />
+            )
         })
     }
 
