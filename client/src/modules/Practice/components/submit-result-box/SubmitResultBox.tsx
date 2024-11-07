@@ -98,7 +98,11 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
         )
     }
     return (
-        <Box display={props.isOpen ? "block" : "none"}>
+        <Box display={props.isOpen ? "block" : "none"}
+        sx={{
+            height: '100vh',
+            overflowY: 'auto',
+          }}>
             {renderYourAnswer()}
             <Button
                 variant="contained"

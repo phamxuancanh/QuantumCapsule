@@ -123,7 +123,7 @@ const Admin: React.FC = () => {
         const url = `${process.env.PUBLIC_URL}/excel_mau.xlsm`; 
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'template.xlsx'); 
+        link.setAttribute('download', 'template.xlsm'); 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

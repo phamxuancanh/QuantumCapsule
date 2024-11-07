@@ -399,7 +399,7 @@ const Chart: React.FC = () => {
             <div className={`tw-min-h-screen tw-bg-gray-800 tw-text-white tw-transition-all tw-duration-300 ${isSidebarOpen ? "tw-w-64" : "tw-w-16"}`}>
                 <div className="tw-p-4">
                     <div className="tw-flex tw-items-center tw-justify-between">
-                        {isSidebarOpen && <h2 className="tw-text-xl tw-font-bold">Academic</h2>}
+                        {isSidebarOpen && <h2 className="tw-text-xl tw-font-bold">Biểu đồ</h2>}
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             className="tw-p-2 hover:tw-bg-gray-700 tw-rounded-lg"
@@ -435,10 +435,10 @@ const Chart: React.FC = () => {
                 </nav>
             </div>
             {/* Main Content */}
-            <div className="tw-flex-1 tw-flex tw-justify-center">
-                <div className="tw-p-6 tw-flex tw-flex-col tw-justify-center tw-items-center tw-w-full">
+            <div className="tw-flex-1 tw-flex tw-justify-center tw-bg-slate-200">
+                <div className="tw-px-6 tw-flex tw-flex-col tw-pt-10 tw-items-center tw-w-full">
                     <h1 className="tw-text-3xl tw-font-bold tw-text-gray-800 tw-mb-6">
-                        Academic Dashboard
+                        BIỂU ĐỒ TIẾN TRÌNH HỌC TẬP
                     </h1>
                     {/* Filter Section */}
                     <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md tw-mb-6">
@@ -469,7 +469,7 @@ const Chart: React.FC = () => {
                         <div className="tw-grid tw-grid-cols-1 tw-gap-6 tw-w-full">
                             {activeTab === "theory" && (
                                 <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md">
-                                    <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê tiến trình học lý thuyết</h2>
+                                    <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê các bài đã học theo từng chương</h2>
                                     <div className="tw-h-[500px]">
                                         <canvas id="theoryChart"></canvas>
                                     </div>
@@ -477,7 +477,7 @@ const Chart: React.FC = () => {
                             )}
                             {activeTab === "exercise" && (
                                 <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md">
-                                    <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê tiến trình làm bài tập</h2>
+                                    <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê điểm bài tập</h2>
                                     <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>
                                         <div className='tw-font-semibold'>Chọn chương: </div>
                                         <Select
@@ -495,7 +495,7 @@ const Chart: React.FC = () => {
                             )}
                             {activeTab === "exam" && (
                                 <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md">
-                                    <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê tiến trình làm bài kiểm tra</h2>
+                                    <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê điểm bài kiểm tra</h2>
                                     <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>
                                         <div className='tw-font-semibold'>Chọn chương: </div>
                                         <Select

@@ -81,7 +81,7 @@ const Practice: React.FC = () => {
         }
     }
     return (
-        <Box>
+        <Box p={2}>
             <StarModal />
             <Grid container spacing={2}>
                 <Grid item xs={12} display={"flex"} gap={2}>

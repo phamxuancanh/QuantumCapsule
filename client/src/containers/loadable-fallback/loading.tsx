@@ -3,7 +3,7 @@
    import React from 'react'
    import { ClockLoader } from 'react-spinners'
    const Loading = () => {
-     return <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-140 tw-mt-20">
+     return <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-min-h-screen tw-mt-20">
        <ClockLoader
          className='tw-flex tw-justify-center tw-items-center tw-w-full tw-mt-20'
          color='#5EEAD4'
