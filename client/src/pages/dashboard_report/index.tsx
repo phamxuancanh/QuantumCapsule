@@ -254,22 +254,39 @@ const DashboardReport = () => {
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center'>
             <div className='tw-w-11/12 tw-h-auto tw-flex tw-flex-col tw-items-center tw-py-2 tw-space-y-3'>
-                <div className='tw-flex tw-w-full tw-space-x-3 tw-justify-center'>
-                    {subjects?.map((subject) => (
-                        <div
-                            key={subject.id}
-                            className={`tw-flex tw-space-y-2 tw-flex-col tw-justify-center tw-items-center tw-w-48 tw-h-36 tw-bg-slate-100 tw-border tw-p-5 tw-shadow-lg tw-rounded-2xl tw-cursor-pointer hover:tw-bg-white tw-transition-colors tw-duration-300 ${selectedSubject === subject.id ? 'tw-bg-white' : ''}`}
-                            onClick={() => handleSelectSubject(subject.id ?? '')}
-                        >
-                            <img
+                <div className='tw-flex tw-items-center'>
+                    <div className='tw-flex tw-w-full tw-space-x-3 tw-justify-center'>
+                        {subjects?.map((subject) => (
+                            <div
+                                key={subject.id}
+                                className={`tw-flex tw-py-6 tw-flex-col tw-justify-center tw-items-center tw-w-36  tw-border tw-p-2 tw-rounded-2xl tw-cursor-pointer tw-transition-colors tw-duration-300 ${selectedSubject === subject.id ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-gray-200'}`}
+                                onClick={() => handleSelectSubject(subject.id ?? '')}
+                            >
+                                {/* <img
                                 src={selectedSubject === subject.id ? subject.image_on : subject.image_off}
                                 alt={subject.name}
-                            />
-                            <div className='tw-font-bold tw-text-lg'>
-                                {subject.name === 'Toán' ? t('homepage.math') : t('homepage.literature')}
+                            /> */}
+                                <div className='tw-font-bold tw-text-lg'>
+                                    {subject.name === 'Toán' ? t('homepage.math') : t('homepage.literature')}
+                                </div>
                             </div>
+                        ))}
+                    </div>
+                    <hr className="tw-w-px tw-h-20 tw-bg-slate-500 tw-mx-3 " />
+                    <div className='tw-flex tw-w-full tw-space-x-3'>
+                        <div
+                            className={`tw-border tw-font-bold tw-p-2 tw-py-6 tw-text-lg tw-px-2 tw-rounded-2xl tw-cursor-pointer ${activeTab === 'general' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-gray-200 tw-text-black'}`}
+                            onClick={() => setActiveTab('general')}
+                        >
+                            Đánh giá chung
                         </div>
-                    ))}
+                        <div
+                            className={`tw-border tw-font-bold tw-p-2 tw-py-6 tw-text-lg tw-px-2 tw-rounded-2xl tw-cursor-pointer ${activeTab === 'chartView' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-gray-200 tw-text-black'}`}
+                            onClick={() => setActiveTab('chartView')}
+                        >
+                            Xem biểu đồ
+                        </div>
+                    </div>
                 </div>
                 {activeTab === 'general' && (
                     <div className='tw-flex tw-items-center tw-justify-between tw-w-2/5'>
@@ -283,20 +300,6 @@ const DashboardReport = () => {
                         />
                     </div>
                 )}
-                <div className='tw-flex tw-space-x-3 tw-mt-4'>
-                    <div
-                        className={`tw-border tw-font-bold tw-p-2 tw-px-2 tw-rounded-md tw-shadow-2xl tw-cursor-pointer ${activeTab === 'general' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-white tw-text-black'}`}
-                        onClick={() => setActiveTab('general')}
-                    >
-                        Đánh giá chung
-                    </div>
-                    <div
-                        className={`tw-border tw-font-bold tw-p-2 tw-px-2 tw-rounded-md tw-shadow-2xl tw-cursor-pointer ${activeTab === 'chartView' ? 'tw-bg-green-400 tw-text-white' : 'tw-bg-white tw-text-black'}`}
-                        onClick={() => setActiveTab('chartView')}
-                    >
-                        Xem biểu đồ
-                    </div>
-                </div>
                 {activeTab === 'general' ? (
                     <div className='tw-w-11/12 tw-bg-white tw-shadow-2xl tw-border-black tw-border'>
                         {loading ? (
@@ -306,7 +309,9 @@ const DashboardReport = () => {
                         ) : (
                             <div className='tw-flex tw-flex-col'>
                                 <div className='tw-flex tw-justify-between tw-items-center tw-px-10 tw-pt-3'>
-                                    <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div>
+                                    {/* <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div> */}
+                                    <div className='tw-text-2xl tw-font-bold'>Tìm theo ngày</div>
+
                                     <div className='tw-flex tw-items-center'>
                                         <QCDateFilter
                                             onChange={(filter) => {
