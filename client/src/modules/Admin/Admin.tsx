@@ -120,7 +120,7 @@ const Admin: React.FC = () => {
         }
     };
     const handleDownloadTemplate = () => {
-        const url = 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/excel_mau.xlsx'; 
+        const url = `${process.env.PUBLIC_URL}/excel_mau.xlsm`; 
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', 'template.xlsx'); 
