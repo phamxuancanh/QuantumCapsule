@@ -116,7 +116,6 @@ const Chart: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (selectedChapter) {
-                console.log('fetch lai select')
                 const responseExcercises = await getExercisesByChapterId(selectedChapter?.value);
                 setListExercises(responseExcercises.data.data);
                 const responseExams = await getExamsByChapterId(selectedChapter?.value);
@@ -210,7 +209,7 @@ const Chart: React.FC = () => {
             console.log(updatedChapters);
             setChapters(updatedChapters);
             setChaptersForSelect(updatedChapters);
-            setSelectedChapter(updatedChapters[0]);
+            // setSelectedChapter(updatedChapters[0]);
             console.log(mockData);
         } catch (err) {
             console.error(err);
