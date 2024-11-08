@@ -60,24 +60,20 @@ const QuestionBox: React.FC<IProps> = (props) => {
         const index = listQuestion.findIndex(
             (question: IQuestion) => question.id === currentQuestion.id,
         )
-        if (index < listQuestion.length - 1) {
+        if (index > 0) {
             setCurrentQuestion(listQuestion[index - 1])
         } else {
-            setCurrentQuestion(listQuestion[listQuestion.length - 1])
 
-            // setOpenResult(true)
         }
     }
     const handleClickNextQuestion = () => {
         const index = listQuestion.findIndex(
             (question: IQuestion) => question.id === currentQuestion.id,
         )
+
         if (index < listQuestion.length - 1) {
             setCurrentQuestion(listQuestion[index + 1])
         } else {
-            setCurrentQuestion(listQuestion[0])
-
-            // setOpenResult(true)
         }
     }
     const renderQuestion = (question: IQuestion) => {
@@ -125,6 +121,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
                     color="success"
                     onClick={handleClickFowardQuestion}
                     sx={{width: "49%"}}
+                    // disabled={currentQuestion.id === listQuestion[0].id}
                 >
                     <ArrowBackIcon fontSize="large" />
                     <Typography variant="button">Câu Trước</Typography>
@@ -134,6 +131,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
                     color="success"
                     onClick={handleClickNextQuestion}
                     sx={{width: "49%"}}
+                    // disabled={currentQuestion.id === listQuestion[listQuestion.length - 1].id}
 
                 >
                     Câu tiếp theo
