@@ -61,10 +61,10 @@ const QuestionV3: React.FC<IProps> = (props) => {
             {value: "d", label: question.D, },
             {value: "e", label: question.E, },
         ].filter((answer) => answer.label)
-        for (let i = answers.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [answers[i], answers[j]] = [answers[j], answers[i]];
-        }
+        // for (let i = answers.length - 1; i > 0; i--) {
+        //     const j = Math.floor(Math.random() * (i + 1));
+        //     [answers[i], answers[j]] = [answers[j], answers[i]];
+        // }
         return answers.map((answer, index) => {
             return (
                 <FormControlLabel
@@ -90,7 +90,7 @@ const QuestionV3: React.FC<IProps> = (props) => {
     }
 
     return (
-        <Card sx={{ p: 5 }}>
+        <Card sx={{ p: 5, minHeight: "350px" }}>
             <Typography color={"#257180"} fontWeight={800} sx={{fontSize: "20px"}}>
                 {props.question.title}
             </Typography>
