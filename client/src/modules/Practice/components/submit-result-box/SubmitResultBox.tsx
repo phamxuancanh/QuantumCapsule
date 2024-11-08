@@ -98,9 +98,9 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     return (
         <Box display={props.isOpen ? "block" : "none"}>
             <Box  sx={{
-            height: '100vh',
-            overflowY: 'auto',
-          }}>
+                height: '60vh',
+                overflowY: 'auto',
+            }}>
                 {renderYourAnswer()}
 
             </Box>
