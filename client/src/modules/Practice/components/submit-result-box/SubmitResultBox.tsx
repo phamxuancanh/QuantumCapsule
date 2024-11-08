@@ -29,14 +29,12 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     const {setIsSumited} = useIsSumited()
     const {result} = useResult()
     const {setActStarModal}  = useActStarModal()
-    const [isComfirmSubmited, setIsComfirmSubmited] = React.useState(false)
     const [actComfirmModal, setActComfirmModal] = React.useState<IAction>(defaultAction)
-    const handleSubmit = async () => {
-        // check có câu chưa trả lời không, toaat câu đó ra
+    const handleSubmit = async (comfirm: boolean) => {
         const listQuestionNotAnswer = listQuestion.filter(question => {
             return !listAnswer.find(ans => ans.questionId === question.id)?.yourAnswer
         })
-        if (listQuestionNotAnswer.length > 0 || isComfirmSubmited) {
+        if (listQuestionNotAnswer.length > 0 && !comfirm) {
             setActComfirmModal({open: true, payload: listQuestionNotAnswer.map(q => q.title).join(", ")} as IAction)
             return
         }
@@ -98,22 +96,25 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
         )
     }
     return (
-        <Box display={props.isOpen ? "block" : "none"}
-        sx={{
+        <Box display={props.isOpen ? "block" : "none"}>
+            <Box  sx={{
             height: '100vh',
             overflowY: 'auto',
           }}>
-            {renderYourAnswer()}
+                {renderYourAnswer()}
+
+            </Box>
             <Button
                 variant="contained"
                 fullWidth
                 color="success"
-                onClick={handleSubmit}
+                onClick={()=>handleSubmit(false)}
             >
                 Nộp bài
             </Button>
             <ComfirmModal 
                 children={<Typography>
+                    Bạn chưa trả lời các câu hỏi sau: <br/>
                     {actComfirmModal.payload ?? ""}
                 </Typography>}
                 title="Xác nhận nộp bài"
@@ -121,8 +122,8 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
                 setOpenModal={(bool)=>setActComfirmModal({open: bool} as IAction)}
                 width="50%"
                 onComfirm={()=>{
-                    setIsComfirmSubmited(true)
-                    handleSubmit()
+                    // setIsComfirmSubmited(true)
+                    handleSubmit(true)
                 }}
             />
         </Box>
