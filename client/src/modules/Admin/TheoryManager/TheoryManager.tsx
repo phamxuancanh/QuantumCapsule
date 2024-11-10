@@ -28,8 +28,11 @@ const ExamManager: React.FC<IProps> = () => {
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
     const [lessonParams, setLessonParams] = React.useState<ILesson[]>([])
+    const [filter, setFilter] = React.useState<IChapterFilter>({} as IChapterFilter)
+
 
     const handleFilter = async (data: IChapterFilter) => {
+        setFilter(data)
         try {
             const response = await getListTheoryByChapterId(data.chapterId ?? '')
             setDataTable(response.data.data)
@@ -42,32 +45,46 @@ const ExamManager: React.FC<IProps> = () => {
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
+            if(!data.name || !data.lessonId || !data.description || !data.summary
+                || !data.url || !data.type  || data.order === null) {
+                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                return false
+            }
             console.log("CREATE", data)
             try {
                 const response = await addTheory(data)
-                toast.success(response.data.message)
+                toast.success("Thêm thành công")
             } catch (error: any) {
-                console.error("data chưa được lưu: ", error.message)
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
             }
         }
         if (action === ACTIONS.UPDATE) {
+            if(!data.name || !data.lessonId || !data.description || !data.summary
+                || !data.url || !data.type  || data.order === null) {
+                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                return false
+            }
             console.log("UPDATE", data)
             try {
                 const response = await updateTheory(data.id, data)
-                toast.success(response.data.message)
+                toast.success("Cập nhật thành công")
             } catch (error: any) {
-                console.error("data chưa được lưu: ", error.message )
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
             }
         }
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data)
             try {
                 const response = await deleteTheory(data)
-                toast.success(response.data.message)
+                toast.success("Xóa thành công")
             } catch (error: any) {
-                console.error("data chưa được lưu: ", error.message)
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
             }
         }
+        return true
     }
     return (
         <Box>
@@ -88,18 +105,25 @@ const ExamManager: React.FC<IProps> = () => {
                     initNewRow={
                         {
                             id: generateTheoryUID(),
-                            lessonId: "lesson001",
-                            name: "",
-                            description: "",
-                            summary: "",
-                            url: "",
-                            type: "",
+                            lessonId: "",
+                            name: "Tên bài lý thuyết",
+                            description: "Mô tả",
+                            summary: "Tóm tắt",
+                            url: "Link",
+                            type: "MP4",
                             order: 0,
                             status: true,
                         } as ITheory
                     }
                     columns={
                         [
+                            {
+                                field: "order",
+                                headerName: "Thứ tự",
+                                width: 130,
+                                editable: true,
+                                type: "number",
+                            },
                             {
                                 field: "name",
                                 headerName: "Tên",
@@ -130,7 +154,6 @@ const ExamManager: React.FC<IProps> = () => {
                                 width: 130,
                                 editable: true,
                             },
-
                             {
                                 field: "lessonId",
                                 headerName: "bài học",
@@ -144,17 +167,11 @@ const ExamManager: React.FC<IProps> = () => {
                                     return <RenderEditCell params={params} dataParams={lessonParams} label='name' editCellField='lessonId'/>
                                 },
                             },
-
-                            {
-                                field: "order",
-                                headerName: "thứ tự",
-                                width: 130,
-                            },
-                            {
-                                field: "status",
-                                headerName: "Status",
-                                width: 130,
-                            },
+                            // {
+                            //     field: "status",
+                            //     headerName: "Status",
+                            //     width: 130,
+                            // },
                         ] as GridColDef[]
                     }
                     onRowClick={(row) => {

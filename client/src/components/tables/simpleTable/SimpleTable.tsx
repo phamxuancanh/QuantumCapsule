@@ -78,7 +78,7 @@ export interface ISimpleTableProps {
 
     processRowAdd?: (newRow: any) => void;
     onRowClick?: (param: GridRowParams<any>) => void;
-    onUpdateRow?: (data: any, action: ACTIONS) => void;
+    onUpdateRow?: (data: any, action: ACTIONS) => Promise<boolean>;
     toolbarComponent?: React.ReactNode;
     loading?: boolean;
     getRowId?: (row: any) => string;
@@ -122,17 +122,23 @@ export default function SimpleTable(props: ISimpleTableProps) {
         }
     };
 
-    const processRowUpdate = (newRow: GridRowModel) => {
+    const processRowUpdate = async (newRow: GridRowModel) => {
         // const row = rows.find((r) => r.id === newRow.id);
-        
-        if(newRow.isNew){
-            props.onUpdateRow && props.onUpdateRow(newRow, ACTIONS.CREATE);
+        if(!props.onUpdateRow){
+            return
+        }
+        let isValid = false;
+        if(newRow.isNew ){
+            isValid = await props.onUpdateRow(newRow, ACTIONS.CREATE);
         }
         if(!newRow.isNew){
-            props.onUpdateRow && props.onUpdateRow(newRow, ACTIONS.UPDATE);
+            isValid = await props.onUpdateRow(newRow, ACTIONS.UPDATE);
         }
 
         const updatedRow = { ...newRow, isNew: false };
+        if(!isValid){
+            return
+        }
         setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };

@@ -54,3 +54,9 @@ export function generateLessonUID(): string {
     const ID = `lesson${currentDateString()}_${randomNum1}_${randomNum2}`;
     return ID;
 }
+export function generateChapterUID(): string {
+    const randomNum1 = generateRandomNumber();
+    const randomNum2 = generateRandomNumber();
+    const ID = `chapter${currentDateString()}_${randomNum1}_${randomNum2}`;
+    return ID;
+}
