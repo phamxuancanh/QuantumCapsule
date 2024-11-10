@@ -36,7 +36,7 @@ const LessonManager: React.FC<IProps> = () => {
             const responseChapter = await getListAllChapter()
             setChapterParams(responseChapter.data.data)
         }catch (error: any) {
-            toast.error("Dữ liệu chưa được lấy: " + error.message)
+            // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }
 

@@ -16,4 +16,5 @@ router.post('/insertExamQuestion', verifyAccessToken, examController.insertExamQ
 router.post('/updateExamQuestion/:id', verifyAccessToken, examController.updateExamQuestion)
 router.post('/deleteExamQuestion/:id', verifyAccessToken, examController.deleteExamQuestion)
 router.get('/getListExamByChapterId/:chapterId', verifyAccessToken, examController.getListExamByChapterId)
+router.get('/getListExamByLessonId/:lessonId', verifyAccessToken, examController.getListExamByLessonId)
 module.exports = router

@@ -35,8 +35,12 @@ const queries = {
   `,
   getListExamByChapterId: `
     select e.* from exams e
-    left join lessons l on e.lessonId = l.id
-    where (l.chapterId = :chapterId or e.chapterId = :chapterId) and e.status = 1
+    where  e.chapterId = :chapterId and e.status = 1
+    order by e.updatedAt desc
+  `,
+  getListExamByLessonId: `
+    select e.* from exams e
+    where  e.lessonId = :lessonId and e.status = 1
     order by e.updatedAt desc
   `,
   getListLessonByChapterId: `

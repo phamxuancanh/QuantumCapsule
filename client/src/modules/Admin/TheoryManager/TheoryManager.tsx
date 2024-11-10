@@ -39,7 +39,7 @@ const ExamManager: React.FC<IProps> = () => {
             const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
             setLessonParams(resLessons.data.data)
         }catch (error: any) {
-            toast.error("Dữ liệu chưa được lấy: " + error.message)
+            // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }
 

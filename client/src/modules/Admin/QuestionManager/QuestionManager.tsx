@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { initTableData, listChapterParams } from './data/TheoryData';
 import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
 import { generateExamId, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
-import { Box } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
@@ -19,6 +19,10 @@ import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 interface IProps {
     // Define the props for the ExamManager component here
 }
+const typeExams = [
+    {id: 0, name: "Bài ôn tập"},
+    {id: 2, name: "Bài kiểm tra"}
+]
 
 const ExamManager: React.FC<IProps> = () => {
 
@@ -27,13 +31,19 @@ const ExamManager: React.FC<IProps> = () => {
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
     const [lessonParams, setLessonParams] = React.useState<ILesson[]>([])
+    const [typeExamSelected, setTypeExamSelected] = React.useState<number>(0)
 
     const handleFilter = async (data: IChapterFilter) => {
         try {
+            // if(typeExamSelected === 0){ // bai on tap
+            //     const response = await getList()
+            //     setDataTable(response.data.data)
+
+            // }
             const response = await getListQuestionByChapterId(data.chapterId ?? '')
             setDataTable(response.data.data)
-            const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
-            setLessonParams(resLessons.data.data)
+            // const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
+            // setLessonParams(resLessons.data.data)
         }catch (error: any) {
             toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
@@ -67,13 +77,31 @@ const ExamManager: React.FC<IProps> = () => {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
             }
         }
+        return true
     }
     return (
         <Box>
             <Box p={2}>
-            <QCChapterFilter 
-                onChange={handleFilter}
-            />
+                <FormControl>
+                    <InputLabel>Chọn loại bài tập</InputLabel>
+                    <Select
+                        name="lessonId"
+                        value={typeExamSelected}
+                        label="Bài học"
+                        onChange={(e)=>setTypeExamSelected(e.target.value as number)}
+                        // disabled={selectedChapterId === ''} // Disable nếu chưa chọn lesson
+                    >
+                    {typeExams?.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                            {item.name}
+                        </MenuItem>
+                    ))}
+                    </Select>
+                </FormControl>
+                <QCChapterFilter 
+                    onChange={handleFilter}
+                    mode={typeExamSelected}
+                />
                 <SimpleTable 
                     initData={dataTable ? dataTable : [] as IQuestion[]}
                     toolbarComponent={<Box>

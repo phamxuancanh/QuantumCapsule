@@ -47,7 +47,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 }
             ]);
         }catch (error: any) {
-            toast.error("Dữ liệu chưa được lấy: " + error.message)
+            // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }
 

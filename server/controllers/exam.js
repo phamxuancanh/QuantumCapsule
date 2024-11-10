@@ -107,7 +107,7 @@ const addExam = async (req, res, next) => {
     const lesson = await models.Lesson.findByPk(lessonId)
     const chapter = await models.Chapter.findByPk(chapterId)
 
-    if (!lesson || !chapter) {
+    if (!lesson && !chapter) {
       return res.status(400).json({ message: 'Lesson or Chapter not found' })
     }
 
@@ -226,6 +226,22 @@ const getListExamByChapterId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getListExamByLessonId = async (req, res, next) => {
+  try {
+    const { lessonId } = req.params
+
+    const query = queries.getListExamByLessonId
+
+    // Thực hiện truy vấn
+    const listExams = await sequelize.query(query, {
+      replacements: { lessonId }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listExams })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 
 // #region exam_question
 const getListExamQuestionByChapterId = async (req, res, next) => {
@@ -322,6 +338,7 @@ module.exports = {
   getExamsByLessonId,
   getExamsByChapterId,
   getListExamByChapterId,
+  getListExamByLessonId,
   getExercisesByChapterId,
   // exam_question
   getListExamQuestionByChapterId,

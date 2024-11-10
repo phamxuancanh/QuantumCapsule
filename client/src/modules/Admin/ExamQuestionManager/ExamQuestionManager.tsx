@@ -73,6 +73,7 @@ const ExamQuestionManager: React.FC<IProps> = () => {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
             }
         }
+        return true
     }
     return (
         <Box>
