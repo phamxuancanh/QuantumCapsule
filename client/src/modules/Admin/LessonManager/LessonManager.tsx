@@ -26,26 +26,34 @@ const LessonManager: React.FC<IProps> = () => {
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
     const [chapterParams, setChapterParams] = React.useState<IChapter[]>([])
+    const [filter, setFilter] = React.useState<IChapterFilter>({} as IChapterFilter)
+
     const handleFilter = async (data: IChapterFilter) => {
+        setFilter(data)
         try {
             const response = await getListLessonByChapterId(data.chapterId ?? '')
             setDataTable(response.data.data)
             const responseChapter = await getListAllChapter()
             setChapterParams(responseChapter.data.data)
         }catch (error: any) {
-            toast.error("Dữ liệu chưa được lấy: " + error.message)
+            // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }
 
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
+            if(!data.name || data.order === null) {
+                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                return false
+            }
             console.log("CREATE", data);
             try {
                 const response = await insertLesson(data)
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
             }
         }
         if (action === ACTIONS.UPDATE) {
@@ -55,6 +63,7 @@ const LessonManager: React.FC<IProps> = () => {
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
             }
         }
         if (action === ACTIONS.DELETE) {
@@ -64,8 +73,10 @@ const LessonManager: React.FC<IProps> = () => {
                 toast.success(response.data.message)
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
             }
         }
+        return true
     }
     return (
         <Box>
@@ -87,26 +98,25 @@ const LessonManager: React.FC<IProps> = () => {
                     </Box>}
                     initNewRow={{
                         id: generateLessonUID(),
-                        examId: '',
-                        chapterId: '',
-                        name: '',
+                        chapterId: filter.chapterId ?? "chapter001",
+                        name: 'Nhập tên bài học',
                         order: 0,
                         status: true
                     }as ILesson}
                     columns={[
-                        { field: 'chapterId', headerName: 'Chương', width: 130, 
-                            editable: true,
-                            valueFormatter: (value: string) => {
-                                const temp = chapterParams?.find((item) => item.id === value)
-                                return temp?.name
-                            },
-                            renderEditCell(params) {
-                                return <RenderEditCell params={params} dataParams={chapterParams} label='name' editCellField='chapterId'/>
-                            },
-                        },
-                        { field: 'name', headerName: 'Tên bài học', width: 130, editable: true, type: "string" },
-                        { field: 'order', headerName: 'Thứ tự', width: 130, editable: true, type: "number" },
-                        { field: 'status', headerName: 'Trạng thái', width: 130 }
+                        // { field: 'chapterId', headerName: 'Chương', width: 130, 
+                        //     editable: true,
+                        //     valueFormatter: (value: string) => {
+                        //         const temp = chapterParams?.find((item) => item.id === value)
+                        //         return temp?.name
+                        //     },
+                        //     renderEditCell(params) {
+                        //         return <RenderEditCell params={params} dataParams={chapterParams} label='name' editCellField='chapterId'/>
+                        //     },
+                        // },
+                        // { field: 'status', headerName: 'Trạng thái', width: 130, editable: true, type: "boolean" },
+                        { field: 'order', headerName: 'Thứ tự', maxWidth: 150, editable: true, type: "number" },
+                        { field: 'name', headerName: 'Tên bài học', editable: true, type: "string" },
                     ] as GridColDef[]}
                     onRowClick={(row) => {
                         setDataSelected(row.row)

@@ -52,6 +52,10 @@ export interface IProvider {
         actCongratulation: IAction
         setActCongratulation: React.Dispatch<React.SetStateAction<IAction>>
     }
+    isNextQuestion: {
+        isNextQuestion: boolean
+        setIsNextQuestion: React.Dispatch<React.SetStateAction<boolean>>
+    }
 }
 
 const Provider: React.FC<IProps> = ({ children }) => {
@@ -66,6 +70,7 @@ const Provider: React.FC<IProps> = ({ children }) => {
     const [isSumited, setIsSumited] = React.useState<boolean>(false)
     const [actStarModal, setActStarModal] = React.useState<IAction>(defaultAction)
     const [actCongratulation, setActCongratulation] = React.useState<IAction>(defaultAction)
+    const [isNextQuestion, setIsNextQuestion] = React.useState<boolean>(false)
 
     const state: IProvider = {
         examId: {
@@ -107,6 +112,10 @@ const Provider: React.FC<IProps> = ({ children }) => {
         actCongratulation: {
             actCongratulation,
             setActCongratulation
+        },
+        isNextQuestion: {
+            isNextQuestion,
+            setIsNextQuestion
         }
     }
     return <Context.Provider value={state}>{children}</Context.Provider>

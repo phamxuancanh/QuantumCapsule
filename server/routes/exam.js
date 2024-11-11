@@ -16,4 +16,8 @@ router.post('/insertExamQuestion', verifyAccessToken, examController.insertExamQ
 router.post('/updateExamQuestion/:id', verifyAccessToken, examController.updateExamQuestion)
 router.post('/deleteExamQuestion/:id', verifyAccessToken, examController.deleteExamQuestion)
 router.get('/getListExamByChapterId/:chapterId', verifyAccessToken, examController.getListExamByChapterId)
+router.get('/getListExamByLessonId/:lessonId', verifyAccessToken, examController.getListExamByLessonId)
+router.get('/getListExamQuestionByExamId/:examId', verifyAccessToken, examController.getListExamQuestionByExamId)
+router.get('/getExamInfo/:examId', verifyAccessToken, examController.getExamInfo)
+router.get('/getExamInfoForExam/:examId', verifyAccessToken, examController.getExamInfoForExam)
 module.exports = router

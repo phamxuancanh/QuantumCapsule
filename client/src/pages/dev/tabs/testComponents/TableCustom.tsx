@@ -39,20 +39,20 @@ const TableCustom: React.FC = () => {
             },
         ],
         pageSizeOptions: [5, 10, 20],
-        onUpdateRow: (data, action) => {
+        // onUpdateRow: (data, action) => {
 
-            if (action === ACTIONS.CREATE) {
-                baseData = [data, ...baseData];
-            }
-            if (action === ACTIONS.UPDATE) {
-                baseData = baseData.map((row) => {
-                    return row.id === data.id ? data : row;
-                });
-            }
-            if (action === ACTIONS.DELETE) {
-                baseData = baseData.filter((row) => row.id !== data);
-            }
-        }
+        //     if (action === ACTIONS.CREATE) {
+        //         baseData = [data, ...baseData];
+        //     }
+        //     if (action === ACTIONS.UPDATE) {
+        //         baseData = baseData.map((row) => {
+        //             return row.id === data.id ? data : row;
+        //         });
+        //     }
+        //     if (action === ACTIONS.DELETE) {
+        //         baseData = baseData.filter((row) => row.id !== data);
+        //     }
+        // }
     }
     return (
         <div>

@@ -10,4 +10,5 @@ router.put('/:id', verifyAccessToken, questionController.updateQuestion)
 router.delete('/:id', verifyAccessToken, questionController.deleteQuestion)
 router.get('/getListQuestionByExamId/:id', verifyAccessToken, questionController.getListQuestionByExamId)
 router.get('/getListQuestionByChapterId/:chapterId', verifyAccessToken, questionController.getListQuestionByChapterId)
+router.get('/getListQuestionByLessonId/:lessonId', verifyAccessToken, questionController.getListQuestionByLessonId)
 module.exports = router

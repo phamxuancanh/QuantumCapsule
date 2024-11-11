@@ -587,7 +587,8 @@ const getListLessonByChapterId = async (req, res, next) => {
     const { chapterId } = req.params
     const lessons = await models.Lesson.findAll({
       where: {
-        chapterId
+        chapterId,
+        status: 1
       },
       attributes: [
         'id',

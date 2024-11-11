@@ -18,8 +18,8 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
     const { openResult, setOpenResult } = useOpenResult()
     const {listAnswer} = useListAnswer()
     return (
-        <Box display={props.isOpen ? "block" : "none"} height={"500px"}>
-            <Box sx={{height: "350px", overflowY: "scroll", borderRadius: "5px", border:"1px solid black"}}>
+        <Box display={props.isOpen ? "block" : "none"} sx={{backgroundColor:"white", borderRadius: "5px", border: "1px solid black"}} >
+            <Box sx={{height: "350px", overflowY: "scroll"}}>
                 <Grid container spacing={2} p={2}>
                     {listQuestion.map((question, index) => {
                         const answer = listAnswer.find(answer => answer.questionId === question.id)

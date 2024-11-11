@@ -18,8 +18,9 @@ const queries = {
     select q.*, eq.id as examQuestionId
     from questions q
     join exam_questions eq on q.id = eq.questionId
-    where examId = :examId
+    where examId = :examId and eq.status = 1 
   `,
+  // bỏ
   getListExamQuestionByChapterId: `
     select eq.* from exam_questions eq
     join exams e on eq.examId = e.id
@@ -27,16 +28,44 @@ const queries = {
     where l.chapterId = :chapterId and eq.status = 1
     order by eq.updatedAt desc
   `,
+  getListExamQuestionByExamId: `
+    select eq.* from exam_questions eq
+    where eq.examId = :examId and eq.status = 1
+    order by eq.updatedAt desc
+  `,
+  getExamInfo: `
+    select s.name as subjectName, c.grade as grade, c.name as chapterName, l.name as lessonName, e.name as examName 
+    from exams e
+    left join lessons l on e.lessonId = l.id
+    left join chapters c on l.chapterId = c.id
+    left join subjects s on c.subjectId = s.id
+    where e.id = :examId
+  `,
+  getExamInfoForExam: `
+    select s.name as subjectName, c.grade as grade, c.name as chapterName, e.name as examName 
+    from exams e
+    left join chapters c on e.chapterId = c.id
+    left join subjects s on c.subjectId = s.id
+    where e.id = :examId
+  `,
   getListQuestionByChapterId: `
     select q.* from questions q
-    join lessons l on q.lessonId = l.id
-    where q.status = 1 and l.chapterId = :chapterId
+    where q.status = 1 and q.chapterId = :chapterId
+    order by q.updatedAt desc
+  `,
+  getListQuestionByLessonId: `
+    select q.* from questions q
+    where q.status = 1 and q.lessonId = :lessonId
     order by q.updatedAt desc
   `,
   getListExamByChapterId: `
     select e.* from exams e
-    left join lessons l on e.lessonId = l.id
-    where (l.chapterId = :chapterId or e.chapterId = :chapterId) and e.status = 1
+    where  e.chapterId = :chapterId and e.status = 1
+    order by e.updatedAt desc
+  `,
+  getListExamByLessonId: `
+    select e.* from exams e
+    where  e.lessonId = :lessonId and e.status = 1
     order by e.updatedAt desc
   `,
   getListLessonByChapterId: `

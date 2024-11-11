@@ -51,3 +51,16 @@ export const deleteExamQuestion = async (id: string): Promise<AxiosResponse<any>
 export const getListExamByChapterId = async (chapterId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>(`/exams/getListExamByChapterId/${chapterId}`,  { withCredentials: true });
 }
+export const getListExamByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>(`/exams/getListExamByLessonId/${lessonId}`,  { withCredentials: true });
+}
+export const getListExamQuestionByExamId = async (examId: string): Promise<AxiosResponse<DataListExamQuestion>> => {
+    return await requestWithJwt.get<DataListExamQuestion>(`/exams/getListExamQuestionByExamId/${examId}`,  { withCredentials: true });
+}
+
+export const getExamInfo = async (examId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>('/exams/getExamInfo/'+ examId,  { withCredentials: true });
+}
+export const getExamInfoForExam = async (examId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>('/exams/getExamInfoForExam/'+ examId,  { withCredentials: true });
+}

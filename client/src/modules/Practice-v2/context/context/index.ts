@@ -73,5 +73,13 @@ export const useActCongratulation = () => {
     }
     return context.actCongratulation
 }
+export const useIsNextQuestion = () => {
+    const context = useContext(Context)
+    if (!context) {
+        throw new Error("useIsNextQuestion must be used within a Provider")
+    }
+    return context.isNextQuestion
+}
+
 
 export default Context
