@@ -129,7 +129,7 @@ const ExamManager: React.FC<IProps> = () => {
                         <Card sx={{
                             p: 2,
                         }}>
-                            <FormControl>
+                            <FormControl fullWidth>
                                 <InputLabel>Chọn</InputLabel>
                                 <Select
                                     name="lessonId"

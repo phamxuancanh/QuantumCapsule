@@ -114,13 +114,14 @@ const addQuestion = async (req, res, next) => {
   try {
     const questionData = req.body
 
-    const { lessonId } = questionData
+    const { lessonId, chapterId } = questionData
 
     // Check if the lesson exists
     const lesson = await models.Lesson.findByPk(lessonId)
+    const chapter = await models.Chapter.findByPk(chapterId)
 
-    if (!lesson) {
-      return res.status(400).json({ message: 'Lesson not found' })
+    if (!lesson && !chapter) {
+      return res.status(400).json({ message: 'Không tìm thấy bài học hoặc chương' })
     }
 
     const newQuestion = await models.Question.create(questionData)
@@ -198,6 +199,22 @@ const getListQuestionByChapterId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getListQuestionByLessonId = async (req, res, next) => {
+  try {
+    const { lessonId } = req.params
+
+    const query = queries.getListQuestionByLessonId
+
+    // Thực hiện truy vấn
+    const listQuestions = await sequelize.query(query, {
+      replacements: { lessonId }, // Thay thế chapterId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listQuestions })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 
 module.exports = {
   importQuestions,
@@ -206,5 +223,6 @@ module.exports = {
   updateQuestion,
   deleteQuestion,
   getListQuestionByExamId,
-  getListQuestionByChapterId
+  getListQuestionByChapterId,
+  getListQuestionByLessonId
 }

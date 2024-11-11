@@ -54,7 +54,10 @@ const ChapterManager: React.FC<IProps> = () => {
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         console.log(data);
         if (action === ACTIONS.CREATE) {
-            
+            if(filter.grade === null || !filter.subjectId) {
+                toast.error("Vui lòng chọn lớp và môn học")
+                return false
+            }
             if (data.order === null || !data.name || !data.description) {
                 toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
                 return false
@@ -70,6 +73,10 @@ const ChapterManager: React.FC<IProps> = () => {
             }
         }
         if (action === ACTIONS.UPDATE) {
+            if(filter.grade === null || !filter.subjectId) {
+                toast.error("Vui lòng chọn lớp và môn học")
+                return false
+            }
             if (data.order === null  || !data.name || !data.description) {
                 toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
                 return false

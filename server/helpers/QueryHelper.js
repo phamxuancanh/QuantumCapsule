@@ -18,7 +18,7 @@ const queries = {
     select q.*, eq.id as examQuestionId
     from questions q
     join exam_questions eq on q.id = eq.questionId
-    where examId = :examId
+    where examId = :examId and eq.status = 1 
   `,
   getListExamQuestionByChapterId: `
     select eq.* from exam_questions eq
@@ -29,8 +29,12 @@ const queries = {
   `,
   getListQuestionByChapterId: `
     select q.* from questions q
-    join lessons l on q.lessonId = l.id
-    where q.status = 1 and l.chapterId = :chapterId
+    where q.status = 1 and q.chapterId = :chapterId
+    order by q.updatedAt desc
+  `,
+  getListQuestionByLessonId: `
+    select q.* from questions q
+    where q.status = 1 and q.lessonId = :lessonId
     order by q.updatedAt desc
   `,
   getListExamByChapterId: `

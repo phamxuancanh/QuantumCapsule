@@ -15,6 +15,10 @@ const Question = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
+    chapterId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     questionType: {
       type: DataTypes.INTEGER
     },

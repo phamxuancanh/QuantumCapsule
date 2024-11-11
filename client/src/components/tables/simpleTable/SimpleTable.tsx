@@ -28,6 +28,7 @@ import {
 } from '@mui/x-data-grid';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { ACTIONS } from 'utils/enums';
+import { generateUUID } from 'helpers/Nam-helper/GenerateUID';
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -40,11 +41,11 @@ interface EditToolbarProps {
 
 function EditToolbar(props: EditToolbarProps) {
     const { setRows, setRowModesModel, initNewRow } = props;
-
+    const id = generateUUID();
     const handleClick = () => {
-        setRows((oldRows) => [{...initNewRow, isNew: true}, ...oldRows]);
+        setRows((oldRows) => [{...initNewRow, id: id, isNew: true}, ...oldRows]);
         setRowModesModel((oldModel) => ({
-            [initNewRow.id]: { mode: GridRowModes.Edit },
+            [id]: { mode: GridRowModes.Edit },
             ...oldModel,
         }));
     };
@@ -135,10 +136,10 @@ export default function SimpleTable(props: ISimpleTableProps) {
             isValid = await props.onUpdateRow(newRow, ACTIONS.UPDATE);
         }
 
-        const updatedRow = { ...newRow, isNew: false };
         if(!isValid){
             return
         }
+        const updatedRow = { ...newRow, isNew: false };
         setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
@@ -226,37 +227,6 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 },
             }}
         >
-            {/* {
-                React.useMemo(() => {
-                    return <DataGrid
-                        apiRef={props.apiRef}
-                        rows={rows}
-                        columns={columns}
-                        loading={props.loading}
-                        editMode="row"
-                        rowModesModel={rowModesModel}
-                        onRowModesModelChange={handleRowModesModelChange}
-                        onRowEditStop={handleRowEditStop}
-                        processRowUpdate={processRowUpdate}
-                        slots={{
-                            // baseButton: EditToolbar as GridSlots['baseButton'],
-                            toolbar: EditToolbar as GridSlots['toolbar'],
-                        }}
-                        slotProps={{
-                            toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent },
-                        }}
-                        columnVisibilityModel={props.columnVisibilityModel}
-                        initialState={{
-                            pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 1 } },
-                        }}
-                        pageSizeOptions={props.pageSizeOptions || [10, 20]}
-                        onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
-                        getRowId={props.getRowId}
-                        rowHeight={props.rowHeight || 60}
-                        checkboxSelection={props.checkboxSelection || true}
-                    />
-                }, [rows])
-            } */}
             <DataGrid
                 apiRef={props.apiRef}
                 rows={rows}

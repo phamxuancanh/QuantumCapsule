@@ -1,6 +1,6 @@
 
 const generateRandomNumber = (): number => {
-    return Math.floor(Math.random() * 10000);
+    return Math.floor(Math.random() * 1000000);
 }
 
 export function generateExamId(): string {
@@ -11,20 +11,26 @@ export function generateExamId(): string {
 }
 
 export function currentDateString(): string {
-    const date = new Date();
-    const dateString = `${date.getDate()}${date.getMonth()+1}${date.getFullYear()}`;
+    const dateString = `${new Date().toISOString()}`;
     return dateString;
 }
 
-export function generateQuestionUID(): string {
-    const date = new Date();
+export function generateUUID(): string {
     const randomNum = generateRandomNumber();
-    const ID = `question${currentDateString()}_${randomNum}`;
+    const ID = `uuid${currentDateString()}_${randomNum}`;
+    return ID;
+}
+
+export function generateQuestionUID(): string {
+    const randomNum = generateRandomNumber();
+    const randomNum2 = generateRandomNumber();
+    const ID = `question${currentDateString()}_${randomNum}_${randomNum2}`;
     return ID;
 }
 export function generateTheoryUID(): string {
     const randomNum = generateRandomNumber();
-    const ID = `theory${currentDateString()}_${randomNum}`;
+    const randomNum2 = generateRandomNumber();
+    const ID = `theory${currentDateString()}_${randomNum}_${randomNum2}`;
     return ID;
 }
 
