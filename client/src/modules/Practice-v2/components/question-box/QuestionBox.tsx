@@ -1,10 +1,11 @@
-import { Box, Button, Card } from "@mui/material"
+import { Box, Button, Card, Typography } from "@mui/material"
 import { IAnswer } from "api/answer/answer.interfaces"
 import { IQuestion } from "api/question/question.interfaces"
 import {
     useActCongratulation,
     useActStarModal,
     useCurrentQuestion,
+    useIsNextQuestion,
     useIsSumited,
     useListAnswer,
     useListQuestion,
@@ -36,7 +37,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
     const { listQuestion, setListQuestion } = useListQuestion()
     const { result, setResult } = useResult()
     const {openResult, setOpenResult} = useOpenResult()
-    const [isNextQuestion, setIsNextQuestion] = React.useState(false)
+    const {isNextQuestion, setIsNextQuestion} = useIsNextQuestion()
     const {actCongratulation,setActCongratulation} = useActCongratulation()
     const confettiRef = useRef(null);
     const correctSoundUrl = `${process.env.PUBLIC_URL}/clap.mp3`;
@@ -91,8 +92,12 @@ const QuestionBox: React.FC<IProps> = (props) => {
     }
     const handleClickNextQuestion = () => {
         if(!isNextQuestion) {
-            setIsNextQuestion(true)
             const yourAnswer = listAnswer.find((ans) => ans.questionId === currentQuestion.id)
+            if(!yourAnswer?.yourAnswer) {
+                toast.error("Bạn chưa trả lời")
+                return
+            }
+            setIsNextQuestion(true)
             playSound(yourAnswer?.isCorrect!)
             setIsFireworksRunning(yourAnswer?.isCorrect!)
             return
@@ -131,15 +136,20 @@ const QuestionBox: React.FC<IProps> = (props) => {
      
     return (
         <Box display={props.isOpen ? "block" : "none"}>
-            <SpeakerV1 text={currentQuestion?.content!} label="Đọc câu hỏi" autoSpeak />
+            <SpeakerV1 text={currentQuestion?.content!} label="Đọc câu hỏi" 
+                variant="outlined"
+            />
             {renderQuestion(currentQuestion)}
             <Button
                 variant="contained"
                 fullWidth
-                color="success"
+                color="primary"
                 onClick={handleClickNextQuestion}
+                sx={{textTransform: "none !important"}}
             >
-                {isNextQuestion ?  'Câu tiếp theo' : 'xem kết quả'}
+                <Typography fontSize={"25px"} >
+                    {isNextQuestion ?  'Câu tiếp theo' : 'Trả lời'}
+                </Typography>
             </Button>
             {/* <ReactCanvasConfetti refConfetti={makeConfetti} /> */}
             {isFireworksRunning && (

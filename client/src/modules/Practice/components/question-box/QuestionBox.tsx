@@ -90,7 +90,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
     }
     return (
         <Box display={props.isOpen ? "block" : "none"} >
-            <Box p={2}>
+            <Box>
                 <SpeakerV1 text={currentQuestion?.content!} label="Đọc câu hỏi" autoSpeak />
                 <Button onClick={
                     () => {

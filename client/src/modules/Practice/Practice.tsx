@@ -13,7 +13,7 @@ import {
 import QuestionBox from "modules/Practice/components/question-box/QuestionBox"
 import { data } from "./data/questions"
 import { caculateStar, InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
-import { Box, Button, Grid } from "@mui/material"
+import { Box, Button, Grid, Typography } from "@mui/material"
 import { IQuestion } from "api/question/question.interfaces"
 import ListQuestionButton from "./components/list-question-button/ListQuestionButton"
 import SubmitResultBox from "./components/submit-result-box/SubmitResultBox"
@@ -27,6 +27,7 @@ import { insertResult } from "api/result/result.api"
 import { insertListAnswer } from "api/answer/answer.api"
 import { ACTIONS } from "utils/enums"
 import { IResult } from "api/result/result.interface"
+import { getExamInfoForExam } from "api/exam/exam.api"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -40,7 +41,8 @@ const Practice: React.FC = () => {
     const {isSumited, setIsSumited} = useIsSumited()
     const {examId, setExamId} = useExamId()
     const {setActStarModal} = useActStarModal()
-    // const[]
+    const [examInfo, setExamInfo] = React.useState<any>({})
+    
     
     useEffect(() => {
         const fetchData = async () => {
@@ -48,12 +50,15 @@ const Practice: React.FC = () => {
                 const params = new URLSearchParams(window.location.search)
                 const EXAM_ID = params.get('examId') || "exam00001"
                 const response = await getListQuesionByExamId(EXAM_ID)
+                const resExamInfo = await getExamInfoForExam(EXAM_ID)
+
                 
                 const resListQuestion = response.data.data
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
                 console.log(initListAnswer);
                 
+                setExamInfo(resExamInfo.data.data)
                 setExamId(EXAM_ID)
                 setListQuestion(resListQuestion)
                 setListAnswer(initListAnswer)
@@ -83,14 +88,19 @@ const Practice: React.FC = () => {
     return (
         <Box p={2}>
             <StarModal />
+            <Box >
+                <Typography fontSize={"25px"} color={"#EB8317"}>
+                    {examInfo.subjectName} {examInfo.grade}  &gt; {examInfo.chapterName} &gt; {examInfo.examName}
+                </Typography>
+            </Box>
             <Grid container spacing={2}>
                 {!isSumited && 
                     <Grid item xs={12} display={"flex"} gap={2}>
-                        <TimeCountdown initialSeconds={60 *40} // 40 minutes 
+                        <TimeCountdown initialSeconds={60} // 60 *40: 40 minutes 
                             onCountdownEnd={() => {
                                 handleSubmit()
                             }}
-                            sx={{width: "500px", height:"40px", fontSize: "1.5rem", fontWeight: "bold", color: "#FF9D3D"}}
+                            sx={{width: "500px", height:"40px", fontSize: "1.5rem", fontWeight: "bold", color: "#1976D2"}}
                         />
                         {!openResult &&
                             <Button
@@ -117,7 +127,10 @@ const Practice: React.FC = () => {
                     <ResultBox isOpen={isSumited === true}/>
                 </Grid>
                 <Grid item xs={3}>
-                    <ListQuestionButton isOpen={isSumited === false}/>
+                    <Box pt={4.7}>
+                        <ListQuestionButton isOpen={isSumited === false}/>
+
+                    </Box>
                 </Grid>
             </Grid>
         </Box>

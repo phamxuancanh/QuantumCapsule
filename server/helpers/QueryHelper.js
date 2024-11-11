@@ -33,6 +33,21 @@ const queries = {
     where eq.examId = :examId and eq.status = 1
     order by eq.updatedAt desc
   `,
+  getExamInfo: `
+    select s.name as subjectName, c.grade as grade, c.name as chapterName, l.name as lessonName, e.name as examName 
+    from exams e
+    left join lessons l on e.lessonId = l.id
+    left join chapters c on l.chapterId = c.id
+    left join subjects s on c.subjectId = s.id
+    where e.id = :examId
+  `,
+  getExamInfoForExam: `
+    select s.name as subjectName, c.grade as grade, c.name as chapterName, e.name as examName 
+    from exams e
+    left join chapters c on e.chapterId = c.id
+    left join subjects s on c.subjectId = s.id
+    where e.id = :examId
+  `,
   getListQuestionByChapterId: `
     select q.* from questions q
     where q.status = 1 and q.chapterId = :chapterId

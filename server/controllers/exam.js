@@ -276,6 +276,38 @@ const getListExamQuestionByExamId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getExamInfo = async (req, res, next) => {
+  try {
+    const { examId } = req.params
+
+    const query = queries.getExamInfo
+
+    // Thực hiện truy vấn
+    const examInfo = await sequelize.query(query, {
+      replacements: { examId }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: examInfo[0] })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+const getExamInfoForExam = async (req, res, next) => {
+  try {
+    const { examId } = req.params
+
+    const query = queries.getExamInfoForExam
+
+    // Thực hiện truy vấn
+    const examInfo = await sequelize.query(query, {
+      replacements: { examId }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: examInfo[0] })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 const insertExamQuestion = async (req, res, next) => {
   try {
     const { examId, questionId } = req.body
@@ -372,5 +404,7 @@ module.exports = {
   insertExamQuestion,
   deleteExamQuestion,
   updateExamQuestion,
-  getListExamQuestionByExamId
+  getListExamQuestionByExamId,
+  getExamInfo,
+  getExamInfoForExam
 }
