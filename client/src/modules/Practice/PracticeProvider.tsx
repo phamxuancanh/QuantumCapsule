@@ -15,11 +15,11 @@ const PracticeProvider: React.FC<PracticeProviderProps> = (props) => {
                     position: "relative",
                 }}
             >
-                <Box sx={{position: "absolute", top: 2, right: "110px"}}>
-                    <img src="/student.png" alt="Testing" width={"100px"}/>
+                <Box sx={{position: "absolute", top: 2, right: "130px"}}>
+                    <img src="/student.png" alt="Testing" width={"120px"}/>
                 </Box>
                 <Box sx={{position: "absolute", top: 2, right: "20px"}}>
-                    <img src="/test.png" alt="Testing" width={"100px"}/>
+                    <img src="/test.png" alt="Testing" width={"120px"}/>
                 </Box>
                 <Practice />
 
