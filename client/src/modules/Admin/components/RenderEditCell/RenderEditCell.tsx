@@ -7,6 +7,7 @@ interface IProps {
     dataParams: any,
     editCellField: string
     label: string
+    label2?: string
 }
 
 const RenderEditCell: React.FC<IProps> = (props) => {
@@ -16,7 +17,9 @@ const RenderEditCell: React.FC<IProps> = (props) => {
             fullWidth
             options={props.dataParams}
             value={props.dataParams.find((item: any) => item?.id === props.params?.value) || null}
-            getOptionLabel={(option: any) => option[props.label] || ''}
+            getOptionLabel={(option: any) => {
+              return props.label2 ?  option[props.label] + " - " + option[props.label2] :option[props.label] || ''
+            }}
             onChange={(event, newValue) => {
               console.log("newValue", newValue);
               

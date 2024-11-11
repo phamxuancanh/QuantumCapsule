@@ -20,11 +20,17 @@ const queries = {
     join exam_questions eq on q.id = eq.questionId
     where examId = :examId and eq.status = 1 
   `,
+  // bỏ
   getListExamQuestionByChapterId: `
     select eq.* from exam_questions eq
     join exams e on eq.examId = e.id
     join lessons l on e.lessonId = l.id
     where l.chapterId = :chapterId and eq.status = 1
+    order by eq.updatedAt desc
+  `,
+  getListExamQuestionByExamId: `
+    select eq.* from exam_questions eq
+    where eq.examId = :examId and eq.status = 1
     order by eq.updatedAt desc
   `,
   getListQuestionByChapterId: `

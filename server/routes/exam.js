@@ -17,4 +17,5 @@ router.post('/updateExamQuestion/:id', verifyAccessToken, examController.updateE
 router.post('/deleteExamQuestion/:id', verifyAccessToken, examController.deleteExamQuestion)
 router.get('/getListExamByChapterId/:chapterId', verifyAccessToken, examController.getListExamByChapterId)
 router.get('/getListExamByLessonId/:lessonId', verifyAccessToken, examController.getListExamByLessonId)
+router.get('/getListExamQuestionByExamId/:examId', verifyAccessToken, examController.getListExamQuestionByExamId)
 module.exports = router

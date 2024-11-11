@@ -260,11 +260,31 @@ const getListExamQuestionByChapterId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getListExamQuestionByExamId = async (req, res, next) => {
+  try {
+    const { examId } = req.params
+
+    const query = queries.getListExamQuestionByExamId
+
+    // Thực hiện truy vấn
+    const listExamQuestions = await sequelize.query(query, {
+      replacements: { examId }, // Thay thế examId trong câu truy vấn
+      type: sequelize.QueryTypes.SELECT // Đảm bảo rằng kết quả trả về là dạng SELECT
+    })
+    res.json({ data: listExamQuestions })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 const insertExamQuestion = async (req, res, next) => {
   try {
     const { examId, questionId } = req.body
+    const eq = await models.ExamQuestion.findOne({ where: { examId, questionId } })
+    if(eq) {
+      return res.status(400).json({ message: 'Bài tập đã tồn tại trong bài kiểm tra' })
+    }
     const examQuestion = await models.ExamQuestion.create({ examId, questionId })
-    res.status(201).json({ message: 'Exam Question added successfully', data: examQuestion })
+    res.status(201).json({ message: 'Thêm thành công', data: examQuestion })
   } catch (error) {
     console.error('Error adding exam question:', error)
     res.status(500).json({ message: 'Error adding exam question' })
@@ -289,6 +309,13 @@ const updateExamQuestion = async (req, res, next) => {
   try {
     const { id } = req.params
     const updateData = req.body
+    const eq = await models.ExamQuestion.findOne({ where: { 
+      examId: updateData.examId, 
+      questionId:  updateData.questionId,
+    } })
+    if(eq) {
+      return res.status(400).json({ message: 'Bài tập đã tồn tại trong bài kiểm tra' })
+    }
     const examQuestion = await models.ExamQuestion.findOne({ where: { id } })
     console.log('--------------updateData', updateData, examQuestion)
     if (!examQuestion) {
@@ -344,5 +371,6 @@ module.exports = {
   getListExamQuestionByChapterId,
   insertExamQuestion,
   deleteExamQuestion,
-  updateExamQuestion
+  updateExamQuestion,
+  getListExamQuestionByExamId
 }
