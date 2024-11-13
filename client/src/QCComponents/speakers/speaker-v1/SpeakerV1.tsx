@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import { Button } from "@mui/material";
+import { Button, SxProps } from "@mui/material";
 interface IProps{
     text: string;
     autoSpeak?: boolean;
     label: string;
+    sx?: SxProps
+    variant?: "contained" | "outlined" | "text" | undefined
+    color?: "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning" | undefined
 }
 
-const SpeakerV1: React.FC<IProps> = ({ text, autoSpeak = false, label}) => {
+const SpeakerV1: React.FC<IProps> = ({ text, autoSpeak = false, label, sx, variant, color}) => {
   const speakText = () => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(text);
@@ -26,7 +29,7 @@ const SpeakerV1: React.FC<IProps> = ({ text, autoSpeak = false, label}) => {
   }, [autoSpeak]);
 
   return (
-    <Button onClick={speakText} style={{ cursor: "pointer" }} >
+    <Button onClick={speakText} style={{ cursor: "pointer" }} sx={sx} variant={variant} color={color}>
         <VolumeUpIcon /> {label}
     </Button>
   );

@@ -33,7 +33,7 @@ const QuestionV2: React.FC<IProps> = (props) => {
     }
     return (
         <Card sx={{ p: 5, minHeight: "350px"}}>
-            <Typography color={"#257180"} fontWeight={800} sx={{fontSize: "20px"}}>
+            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "30px"}}>
                 {props.question.title}
             </Typography>
             <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "30px"}}>
@@ -41,7 +41,6 @@ const QuestionV2: React.FC<IProps> = (props) => {
             </Typography>
             <RenderContentImg imageContent={props.question.contentImg!}/>
             <FormControl>
-                <FormLabel component="legend">Trả lời ở đây</FormLabel>
                 <TextField
                     onChange={(e) => {
                         handleChange(e)
@@ -60,13 +59,13 @@ const QuestionV2: React.FC<IProps> = (props) => {
             </FormControl>
             {props.mode === "result" && (
                 <Box>
-                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontWeight={600}>
+                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontWeight={600} fontSize={"30px"}>
                         {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
                     </Typography>
-                    <Typography color={"#4caf50"} fontWeight={600}>
+                    <Typography color={"#4caf50"} fontWeight={600} fontSize={"30px"}>
                         Đáp án đúng là: {props.question.correctAnswer}
                     </Typography>
-                    <Typography color={"#1E201E"} fontWeight={600}>
+                    <Typography color={"#1E201E"} fontWeight={600} fontSize={"30px"}>
                         {props.question.explainAnswer}
                     </Typography>
 

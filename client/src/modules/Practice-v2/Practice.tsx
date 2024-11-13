@@ -4,6 +4,7 @@ import {
     useActStarModal,
     useCurrentQuestion,
     useExamId,
+    useIsNextQuestion,
     useIsSumited,
     useListAnswer,
     useListQuestion,
@@ -12,7 +13,7 @@ import {
     useTotalScore,
 } from "./context/context"
 import { caculateStar, InitListAnswerFromListQuestion, InitResult } from "helpers/Nam-helper/InitHelper"
-import { Box, Button, Grid } from "@mui/material"
+import { Box, Button, Grid, Typography } from "@mui/material"
 import { IQuestion } from "api/question/question.interfaces"
 import ListQuestionButton from "./components/list-question-button/ListQuestionButton"
 import SubmitResultBox from "./components/submit-result-box/SubmitResultBox"
@@ -27,6 +28,8 @@ import { insertResult } from "api/result/result.api"
 import { IResult } from "api/result/result.interface"
 import { insertListAnswer } from "api/answer/answer.api"
 import { ACTIONS } from "utils/enums"
+import { getExamInfo } from "api/exam/exam.api"
+import GameProgress from "./components/game-progress/GameProgress"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -41,6 +44,8 @@ const Practice: React.FC = () => {
     const {examId, setExamId} = useExamId()
     const {actCongratulation, setActCongratulation} = useActCongratulation()
     const {actStarModal, setActStarModal} = useActStarModal()
+    const [examInfo, setExamInfo] = React.useState<any>({})
+    const {isNextQuestion} = useIsNextQuestion()
     // const[]
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -62,12 +67,14 @@ const Practice: React.FC = () => {
                 const params = new URLSearchParams(window.location.search)
                 const EXAM_ID = params.get('examId') || "exam00001"
                 const response = await getListQuesionByExamId(EXAM_ID)
+                const resExamInfo = await getExamInfo(EXAM_ID)
                 
                 const resListQuestion = response.data.data
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
                 console.log(initListAnswer);
                 
+                setExamInfo(resExamInfo.data.data)
                 setExamId(EXAM_ID)
                 setListQuestion(resListQuestion)
                 setListAnswer(initListAnswer)
@@ -95,24 +102,34 @@ const Practice: React.FC = () => {
         }
     }
     return (
-        <Box minHeight={700} p={2}>
+        <Box minHeight={700} p={2} width={{xs: "100vw", md: "70vw", }} mx={"auto"}
+        >
             <StarModal />
-            <Grid container spacing={2}>
-                <Grid item xs={9}>
-                    <QuestionBox
-                        isOpen={openResult === false && isSumited === false}
-                    />
-                    <SubmitResultBox isOpen={openResult === true && isSumited === false} />
-                    <ResultBox isOpen={isSumited === true}/>
-                    <CongratulationBox 
-                        open={actCongratulation.open}
-                        answer={actCongratulation.payload}
-                    />
-                </Grid>
-                <Grid item xs={3}>
-                    <ListQuestionButton isOpen={isSumited === false}/>
-                </Grid>
-            </Grid>
+            <Box >
+                <Typography fontSize={"25px"} color={"#EB8317"}>
+                    {examInfo.subjectName} {examInfo.grade}  &gt; {examInfo.chapterName} &gt; {examInfo.lessonName} &gt; {examInfo.examName}
+                </Typography>
+            </Box>
+            <Box >
+                <ListQuestionButton isOpen={isSumited === false}/>
+            </Box>
+            <Box mb={1}>
+                <GameProgress 
+                    totalQuestions={listAnswer.length}
+                    completedQuestions={isNextQuestion ?  listAnswer.filter(ans => ans.yourAnswer).length : listAnswer.filter(ans => ans.yourAnswer && ans.questionId !== currentQuestion.id).length}
+                />
+            </Box>
+            <Box >
+                <QuestionBox
+                    isOpen={openResult === false && isSumited === false}
+                />
+                <SubmitResultBox isOpen={openResult === true && isSumited === false} />
+                <ResultBox isOpen={isSumited === true}/>
+                <CongratulationBox 
+                    open={actCongratulation.open}
+                    answer={actCongratulation.payload}
+                />
+            </Box>
         </Box>
     )
 }

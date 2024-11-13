@@ -1,7 +1,8 @@
-import { Box, Button, Grid, Typography } from "@mui/material"
+import { Box, Button, Card, Grid, Typography } from "@mui/material"
 import {
     useActStarModal,
     useCurrentQuestion,
+    useIsNextQuestion,
     useIsSumited,
     useListAnswer,
     useListQuestion,
@@ -27,33 +28,31 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
     const {result} = useResult()
     const { listAnswer } = useListAnswer()
 
-
+    const {isNextQuestion} = useIsNextQuestion()
     
     return (
         <Box display={props.isOpen ? "block" : "none"}>
-            <Box
+            <Card
                 sx={{
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    padding: 3,
+                    justifyContent: 'space-around',
+                    padding: 2,
                     borderRadius: 2,
-                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
                     backgroundColor: '#f5f5f5',
-                    maxWidth: 300,
-                    margin: 'auto',
+                    flexWrap: 'wrap',
                 }}
             >
-                <Typography variant="h4" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                    Đã làm: {listAnswer.filter(ans => ans.yourAnswer).length}/{listAnswer.length}
+                <Typography sx={{ color: '#1976d2', fontWeight: 'bold', fontSize: "25px"}}>
+                    Đã làm: {isNextQuestion ?  listAnswer.filter(ans => ans.yourAnswer).length : listAnswer.filter(ans => ans.yourAnswer && ans.questionId !== currentQuestion.id).length}/{listAnswer.length}
                 </Typography>
-                <Typography variant="h4" gutterBottom sx={{ color: '#4caf50', fontWeight: 'bold' }}>
-                    Số câu đúng: {listAnswer.filter(ans => {return ans.isCorrect && ans.questionId !== currentQuestion.id}).length}
+                <Typography sx={{ color: '#4caf50', fontWeight: 'bold', fontSize: "25px"}}>
+                    Số câu đúng: { isNextQuestion ? listAnswer.filter(ans => {return  ans.isCorrect}).length : listAnswer.filter(ans => {return ans.isCorrect && ans.questionId !== currentQuestion.id}).length}
                 </Typography>
-                <Typography variant="h4" gutterBottom sx={{ color: '#f44336', fontWeight: 'bold' }}>
-                    Số câu sai: {listAnswer.filter(ans => {return !ans.isCorrect && ans.yourAnswer && ans.questionId !== currentQuestion.id}).length}
+                <Typography sx={{ color: '#f44336', fontWeight: 'bold', fontSize: "25px" }}>
+                    Số câu sai: {isNextQuestion ?  listAnswer.filter(ans => {return !ans.isCorrect && ans.yourAnswer}).length : listAnswer.filter(ans => {return !ans.isCorrect && ans.yourAnswer && ans.questionId !== currentQuestion.id}).length}
                 </Typography>
-            </Box>
+            </Card>
             {/* <Button
                 onClick={() => {
                     setOpenResult(true)

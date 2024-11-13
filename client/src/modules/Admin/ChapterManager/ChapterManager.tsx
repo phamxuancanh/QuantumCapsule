@@ -1,7 +1,7 @@
 import SimpleTable from 'components/tables/simpleTable/SimpleTable';
 import React, { useEffect } from 'react';
 import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
-import { generateExamId, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
+import { generateChapterUID, generateExamId, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
 import { Box } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
@@ -27,28 +27,10 @@ const ChapterManager: React.FC<IProps> = () => {
     const [loading, setLoading] = React.useState(false)
     const [subjectParams, setSubjectParams] = React.useState<ISubject[]>([])
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await getListAllChapter()
-    //             setDataTable(response.data.data)
-    //             setSubjectParams([
-    //                 {
-    //                     id: 'subject1',
-    //                     name: 'Toán'
-    //                 },
-    //                 {
-    //                     id: 'subject2',
-    //                     name: 'Tiếng việt'
-    //                 }
-    //             ]);
-    //         }catch (error: any) {
-    //             toast.error("Dữ liệu chưa được lấy: " + error.message)
-    //         }
-    //     }
-    //     fetchData()
-    // }, [])
+    const [filter, setFilter] = React.useState<IChapterFilter>({} as IChapterFilter)
+
     const handleFilter = async (data: IChapterFilter) => {
+        setFilter(data)
         try {
             const response = await getListAllChapter()
             setDataTable(response.data.data.filter((item) => {
@@ -65,38 +47,62 @@ const ChapterManager: React.FC<IProps> = () => {
                 }
             ]);
         }catch (error: any) {
-            toast.error("Dữ liệu chưa được lấy: " + error.message)
+            // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
+        console.log(data);
         if (action === ACTIONS.CREATE) {
+            if(filter.grade === null || !filter.subjectId) {
+                toast.error("Vui lòng chọn lớp và môn học")
+                return false
+            }
+            if (data.order === null || !data.name || !data.description) {
+                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                return false
+            }
             console.log("CREATE", data);
             try {
                 const response = await addChapter(data)
-                toast.success(response.data.message)
+                toast.success("Thêm mới thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+
             }
         }
         if (action === ACTIONS.UPDATE) {
+            if(filter.grade === null || !filter.subjectId) {
+                toast.error("Vui lòng chọn lớp và môn học")
+                return false
+            }
+            if (data.order === null  || !data.name || !data.description) {
+                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                return false
+            }
             console.log("UPDATE", data);
             try {
                 const response = await updateChapter(data.id, data)
-                toast.success(response.data.message)
+                toast.success("Cập nhập thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+
             }
         }
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
             try {
                 const response = await deleteChapter(data)
-                toast.success(response.data.message)
+                toast.success("Xóa thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+
             }
         }
+        return true
     }
     return (
         <Box>
@@ -116,39 +122,37 @@ const ChapterManager: React.FC<IProps> = () => {
                         />
                     </Box>}
                     initNewRow={{
-                        id: generateQuestionUID(),
-                        subjectId: "subject1",
-                        name: "chương",
+                        id: generateChapterUID(),
+                        subjectId: filter.subjectId ?? 'subject1',
+                        name: "nhập tên chương",
                         description:"mô tả" ,
-                        grade: 1,
+                        grade: filter.grade ?? 1,
                         order: 0,
                         status: true,
                     }as IChapter}
                     columns={[
-                        // { field: 'id', headerName: 'ID', width: 70 },
-                        { field: 'name', headerName: 'Tên chương', width: 70 },
-                        { field: 'subjectId', headerName: 'môn', width: 130, editable: true, type: "string",
-                            valueFormatter: (value: string) => {
-                                const temp = subjectParams?.find((item) => item.id === value)
-                                return temp?.name
-                            },
-                            renderEditCell(params) {
-                                return <RenderEditCell params={params} dataParams={subjectParams} label='name' editCellField='subjectId'/>
-                            },
-                        },
-                        { field: 'description', headerName: 'Mô tả', width: 130, editable: true },
-                        { field: 'grade', headerName: 'lớp', width: 130,  editable: true, type: "number",
-                            preProcessEditCellProps: (params) => {
-                                const value = Number(params.props.value);
-                                const hasError = value < 1 || value > 5;
-                                if (hasError) {
-                                    toast.error("Lớp phải từ 1 đến 5")
-                                }
-                                return { ...params.props, error: hasError };
-                            },
-                        },
-                        { field: 'order', headerName: 'Thứ tự', width: 130, editable: true, type: "number" },
-                        { field: 'status', headerName: 'Trạng thái', width: 130 }
+                        { field: 'order', headerName: 'Thứ tự', maxWidth: 100, editable: true, type: "number" },
+                        { field: 'name', headerName: 'Tên chương', maxWidth: 500, editable: true, type: "string" },
+                        // { field: 'subjectId', headerName: 'Môn', width: 130, editable: true, type: "string",
+                        //     valueFormatter: (value: string) => {
+                        //         const temp = subjectParams?.find((item) => item.id === value)
+                        //         return temp?.name
+                        //     },
+                        //     renderEditCell(params) {
+                        //         return <RenderEditCell params={params} dataParams={subjectParams} label='name' editCellField='subjectId'/>
+                        //     },
+                        // },
+                        { field: 'description', headerName: 'Mô tả', width: 500, editable: true },
+                        // { field: 'grade', headerName: 'lớp', width: 130,  editable: true, type: "number",
+                        //     preProcessEditCellProps: (params) => {
+                        //         const value = Number(params.props.value);
+                        //         const hasError = value < 1 || value > 5;
+                        //         if (hasError) {
+                        //             toast.error("Lớp phải từ 1 đến 5")
+                        //         }
+                        //         return { ...params.props, error: hasError };
+                        //     },
+                        // },
                     ] as GridColDef[]}
                     onRowClick={(row) => {
                         setDataSelected(row.row)

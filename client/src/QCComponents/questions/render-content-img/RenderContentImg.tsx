@@ -14,7 +14,7 @@ const RenderContentImg: React.FC<IProps> = (props) => {
             const content = props.imageContent.substring(5);
             return (
                 <Box>
-                    <Typography variant="h2">{content}</Typography>
+                    <Typography fontSize={"30px"}>{content}</Typography>
                 </Box>
             );
         }

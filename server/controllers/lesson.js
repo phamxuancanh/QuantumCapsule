@@ -240,7 +240,11 @@ const getLessonByChapterId = async (req, res, next) => {
 //       where: {},
 //       include: [{
 //         model: models.Chapter,
-//         where: {}
+//         where: {},
+//         include: [{
+//           model: models.Subject,
+//           attributes: ['id', 'name']
+//         }]
 //       }]
 //     }
 
@@ -257,6 +261,18 @@ const getLessonByChapterId = async (req, res, next) => {
 //       searchConditions.include[0].where.grade = grade
 //     }
 
+//     const mapResultsWithSubject = (results, type) => {
+//       return results.map(result => {
+//         const { id, name } = result.Chapter.Subject
+//         return {
+//           ...result.dataValues,
+//           subjectId: id,
+//           subjectName: name,
+//           type // Thêm type vào kết quả
+//         }
+//       })
+//     }
+
 //     if (type === 'lesson') {
 //       const totalLessons = await models.Lesson.count(searchConditions)
 
@@ -267,10 +283,7 @@ const getLessonByChapterId = async (req, res, next) => {
 //         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
 //       })
 
-//       const lessonsWithType = lessons.map(lesson => ({
-//         ...lesson.dataValues,
-//         type: 'Lesson'
-//       }))
+//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
 
 //       return res.json({
 //         data: lessonsWithType,
@@ -290,10 +303,7 @@ const getLessonByChapterId = async (req, res, next) => {
 //         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
 //       })
 
-//       const examsWithType = exams.map(exam => ({
-//         ...exam.dataValues,
-//         type: 'Exam'
-//       }))
+//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
 
 //       return res.json({
 //         data: examsWithType,
@@ -330,10 +340,7 @@ const getLessonByChapterId = async (req, res, next) => {
 //         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
 //       })
 
-//       const lessonsWithType = lessons.map(lesson => ({
-//         ...lesson.dataValues,
-//         type: 'Lesson'
-//       }))
+//       const lessonsWithType = mapResultsWithSubject(lessons, 'lesson')
 
 //       combinedResults = [...lessonsWithType]
 //     }
@@ -349,10 +356,7 @@ const getLessonByChapterId = async (req, res, next) => {
 //         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
 //       })
 
-//       const examsWithType = exams.map(exam => ({
-//         ...exam.dataValues,
-//         type: 'Exam'
-//       }))
+//       const examsWithType = mapResultsWithSubject(exams, 'exam')
 
 //       combinedResults = [...combinedResults, ...examsWithType]
 //     }
@@ -389,6 +393,7 @@ const getLessonsandExams = async (req, res, next) => {
       include: [{
         model: models.Chapter,
         where: {},
+        required: false, // Cho phép các Exam không có Chapter
         include: [{
           model: models.Subject,
           attributes: ['id', 'name']
@@ -411,12 +416,31 @@ const getLessonsandExams = async (req, res, next) => {
 
     const mapResultsWithSubject = (results, type) => {
       return results.map(result => {
-        const { id, name } = result.Chapter.Subject
+        let subjectId = null
+        let subjectName = null
+
+        if (result.Chapter && result.Chapter.Subject) {
+          subjectId = result.Chapter.Subject.id
+          subjectName = result.Chapter.Subject.name
+        }
+
+        let entryType = type
+        // Phân loại 'Exam' thành 'Exam' hoặc 'Exercise' dựa trên lessonId và chapterId
+        if (type === 'Exam') {
+          if (result.lessonId && !result.chapterId) {
+            entryType = 'Exercise'
+          } else if (result.chapterId && !result.lessonId) {
+            entryType = 'Exam'
+          } else {
+            entryType = 'Exam' // Mặc định là 'Exam' nếu cả hai đều có hoặc không có
+          }
+        }
+
         return {
           ...result.dataValues,
-          subjectId: id,
-          subjectName: name,
-          type // Thêm type vào kết quả
+          subjectId,
+          subjectName,
+          type: entryType // Cập nhật type sau khi phân loại
         }
       })
     }
@@ -448,7 +472,7 @@ const getLessonsandExams = async (req, res, next) => {
         ...searchConditions,
         limit,
         offset,
-        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+        attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
       const examsWithType = mapResultsWithSubject(exams, 'Exam')
@@ -488,7 +512,7 @@ const getLessonsandExams = async (req, res, next) => {
         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
-      const lessonsWithType = mapResultsWithSubject(lessons, 'lesson')
+      const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
 
       combinedResults = [...lessonsWithType]
     }
@@ -501,10 +525,10 @@ const getLessonsandExams = async (req, res, next) => {
         ...searchConditions,
         limit: remainingLimit,
         offset: examOffset,
-        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+        attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
-      const examsWithType = mapResultsWithSubject(exams, 'exam')
+      const examsWithType = mapResultsWithSubject(exams, 'Exam')
 
       combinedResults = [...combinedResults, ...examsWithType]
     }
@@ -569,25 +593,90 @@ const getSuggestions = async (req, res, next) => {
       limit: 10,
       attributes: ['id', 'name']
     }
+
+    // Fetch lessons
     const lessons = await models.Lesson.findAll(searchConditions)
-    const exams = await models.Exam.findAll(searchConditions)
+
+    // Fetch exams with additional attributes to determine type
+    const exams = await models.Exam.findAll({
+      ...searchConditions,
+      attributes: ['id', 'name', 'lessonId', 'chapterId']
+    })
+
+    // Map lessons to suggestions
+    const lessonSuggestions = lessons.map((lesson) => ({
+      id: lesson.id,
+      name: lesson.name,
+      type: 'Lesson'
+    }))
+
+    // Map exams to suggestions with type 'Exam' or 'Exercise'
+    const examSuggestions = exams.map((exam) => {
+      let examType = 'Exam'
+
+      if (exam.lessonId && !exam.chapterId) {
+        examType = 'Exercise'
+      } else if (exam.chapterId && !exam.lessonId) {
+        examType = 'Exam'
+      }
+
+      return {
+        id: exam.id,
+        name: exam.name,
+        type: examType
+      }
+    })
+
     const suggestions = [
-      ...lessons.map((lesson) => ({ id: lesson.id, name: lesson.name, type: 'Lesson' })),
-      ...exams.map((exam) => ({ id: exam.id, name: exam.name, type: 'Exam' }))
+      ...lessonSuggestions,
+      ...examSuggestions
     ]
+
     res.json({ suggestions })
   } catch (error) {
     console.error('Error getting suggestions:', error)
     res.status(500).json({ message: 'Error getting suggestions' })
   }
 }
+// const getSuggestions = async (req, res, next) => {
+//   try {
+//     console.log('RUNNING getSuggestions')
+//     const { search } = req.query
+//     console.log('req.query:', req.query)
+//     console.log('search:', search)
+//     if (!search) {
+//       return res.json({ suggestions: [] })
+//     }
+
+//     const searchConditions = {
+//       where: {
+//         name: {
+//           [Op.like]: `%${search}%`
+//         }
+//       },
+//       limit: 10,
+//       attributes: ['id', 'name']
+//     }
+//     const lessons = await models.Lesson.findAll(searchConditions)
+//     const exams = await models.Exam.findAll(searchConditions)
+//     const suggestions = [
+//       ...lessons.map((lesson) => ({ id: lesson.id, name: lesson.name, type: 'Lesson' })),
+//       ...exams.map((exam) => ({ id: exam.id, name: exam.name, type: 'Exam' }))
+//     ]
+//     res.json({ suggestions })
+//   } catch (error) {
+//     console.error('Error getting suggestions:', error)
+//     res.status(500).json({ message: 'Error getting suggestions' })
+//   }
+// }
 
 const getListLessonByChapterId = async (req, res, next) => {
   try {
     const { chapterId } = req.params
     const lessons = await models.Lesson.findAll({
       where: {
-        chapterId
+        chapterId,
+        status: 1
       },
       attributes: [
         'id',

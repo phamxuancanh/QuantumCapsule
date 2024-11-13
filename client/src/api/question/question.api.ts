@@ -29,3 +29,6 @@ export const getListQuesionByExamId = async (examId: string): Promise<AxiosRespo
 export const getListQuestionByChapterId = async (examId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>('/questions/getListQuestionByChapterId/'+ examId,  { withCredentials: true });
 }
+export const getListQuestionByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>('/questions/getListQuestionByLessonId/'+ lessonId,  { withCredentials: true });
+}

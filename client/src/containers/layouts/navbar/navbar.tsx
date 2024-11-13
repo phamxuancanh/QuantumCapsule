@@ -81,7 +81,7 @@ const Navbar = () => {
   const handleSearchClick = async () => {
     const response = await getLessonsandExams({ params: { search: searchTerm } });
     console.log(response.data);
-    setSuggestions([]);
+    setSuggestions([])
     const encodedSearchTerm = encodeURIComponent(searchTerm);
     navigate(`${ROUTES.search_result}?name=${encodedSearchTerm}`);
   };
@@ -141,7 +141,15 @@ const Navbar = () => {
                           >
                             <div>{suggestion.name}</div>
                             <div className="tw-text-base">
-                              ({suggestion.type === 'Lesson' ? 'bài học' : suggestion.type === 'Exam' ? 'bài tập' : suggestion.type})
+                              ({
+                                suggestion.type === 'Lesson'
+                                  ? 'bài học'
+                                  : suggestion.type === 'Exam'
+                                    ? 'bài kiểm tra'
+                                    : suggestion.type === 'Exercise'
+                                      ? 'bài tập'
+                                      : suggestion.type
+                              })
                             </div>
                           </li>
                         ))}

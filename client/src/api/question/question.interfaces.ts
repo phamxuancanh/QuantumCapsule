@@ -13,6 +13,7 @@ export interface IQuestion {
     explainAnswer?: string
     // score?: number
     lessonId?: string
+    chapterId?: string
     status?: boolean
     examQuestionId?: string // for display
     flat?: boolean
