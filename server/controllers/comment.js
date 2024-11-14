@@ -11,7 +11,8 @@ const getAllCommentsByTheoryId = async (req, res, next) => {
 
     const comments = await models.Comment.findAll({
       where: {
-        theoryId
+        theoryId,
+        status: 1 // Chỉ lấy những comment có status là 1
       },
       attributes: [
         'id',
@@ -51,7 +52,8 @@ const getListActiveCommentByTheoryId = async (req, res, next) => {
     const comments = await models.Comment.findAll({
       where: {
         theoryId,
-        isView: true
+        isView: true,
+        status: 1 // Chỉ lấy những comment có status là 1
       },
       attributes: [
         'id',

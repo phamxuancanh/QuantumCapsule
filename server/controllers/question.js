@@ -53,7 +53,9 @@ const getListQuestion = async (req, res, next) => {
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {
-      where: {},
+      where: {
+        status: 1 // Chỉ lấy những question có status là 1
+      },
       include: []
     }
 

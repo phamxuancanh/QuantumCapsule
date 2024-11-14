@@ -23,7 +23,9 @@ const getListChapterNoPaging = async (req, res, next) => {
     const { search: nameCondition, subjectId, grade } = req.query
 
     const searchConditions = {
-      where: {}
+      where: {
+        status: 1 // Chỉ lấy những chapter có status là 1
+      }
     }
 
     if (nameCondition) {
@@ -119,7 +121,9 @@ const getListChapter = async (req, res, next) => {
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {
-      where: {}
+      where: {
+        status: 1 // Chỉ lấy những chapter có status là 1
+      }
     }
 
     if (nameCondition) {
@@ -135,6 +139,7 @@ const getListChapter = async (req, res, next) => {
     if (grade) {
       searchConditions.where.grade = grade
     }
+
     const totalRecords = await models.Chapter.count(searchConditions)
     const chapters = await models.Chapter.findAll({
       ...searchConditions,
@@ -245,12 +250,14 @@ const getListChapterBySubjectId = async (req, res, next) => {
     const { subjectId } = req.params
     const chapters = await models.Chapter.findAll({
       where: {
-        subjectId
+        subjectId,
+        status: 1
       }
     })
     res.json({ data: chapters })
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    console.error('Error fetching chapters:', error)
+    res.status(500).json({ message: 'Error fetching chapters' })
   }
 }
 
@@ -260,6 +267,9 @@ const getChapterById = async (req, res, next) => {
     const { id } = req.params
 
     const chapter = await models.Chapter.findByPk(id, {
+      where: {
+        status: 1 // Chỉ lấy những chapter có status là 1
+      },
       include: [
         {
           model: models.Lesson,
@@ -269,7 +279,7 @@ const getChapterById = async (req, res, next) => {
     })
 
     if (!chapter) {
-      return res.json({ data: null, message: error.message })
+      return res.status(404).json({ data: null, message: 'Chapter not found or inactive.' })
     }
 
     const lessonIds = chapter.Lessons.map(lesson => lesson.id)

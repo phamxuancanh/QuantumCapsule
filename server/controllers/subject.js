@@ -3,6 +3,9 @@ const { models } = require('../models')
 const getListSubject = async (req, res, next) => {
   try {
     const subjects = await models.Subject.findAll({
+      where: {
+        status: 1 // Chỉ lấy những subject có status là 1
+      },
       attributes: [
         'id',
         'name',
@@ -28,6 +31,9 @@ const getSubjectById = async (req, res, next) => {
   try {
     const { id } = req.params
     const subject = await models.Subject.findByPk(id, {
+      where: {
+        status: 1 // Chỉ lấy những subject có status là 1
+      },
       attributes: [
         'id',
         'name',
@@ -40,7 +46,7 @@ const getSubjectById = async (req, res, next) => {
     })
 
     if (!subject) {
-      return res.status(404).json({ message: 'Subject not found' })
+      return res.status(404).json({ message: 'Subject not found or inactive' })
     }
 
     res.json({ data: subject })

@@ -55,7 +55,9 @@ const getListExam = async (req, res, next) => {
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {
-      where: {}
+      where: {
+        status: 1 // Chỉ lấy những exam có status là 1
+      }
     }
 
     if (nameCondition) {
@@ -83,7 +85,6 @@ const getListExam = async (req, res, next) => {
         'order',
         'lessonId',
         'chapterId',
-        'name',
         'status',
         'createdAt',
         'updatedAt'
@@ -160,7 +161,8 @@ const getExamsByLessonId = async (req, res, next) => {
 
     const exams = await models.Exam.findAll({
       where: {
-        lessonId
+        lessonId,
+        status: 1 // Chỉ lấy những exam có status là 1
       },
       attributes: [
         'id',
@@ -168,7 +170,6 @@ const getExamsByLessonId = async (req, res, next) => {
         'order',
         'lessonId',
         'chapterId',
-        'name',
         'status',
         'createdAt',
         'updatedAt'
@@ -188,7 +189,8 @@ const getExamsByChapterId = async (req, res, next) => {
 
     const exams = await models.Exam.findAll({
       where: {
-        chapterId
+        chapterId,
+        status: 1 // Chỉ lấy những exam có status là 1
       },
       attributes: [
         'id',
@@ -196,7 +198,6 @@ const getExamsByChapterId = async (req, res, next) => {
         'order',
         'lessonId',
         'chapterId',
-        'name',
         'status',
         'createdAt',
         'updatedAt'
@@ -312,7 +313,7 @@ const insertExamQuestion = async (req, res, next) => {
   try {
     const { examId, questionId } = req.body
     const eq = await models.ExamQuestion.findOne({ where: { examId, questionId } })
-    if(eq) {
+    if (eq) {
       return res.status(400).json({ message: 'Bài tập đã tồn tại trong bài kiểm tra' })
     }
     const examQuestion = await models.ExamQuestion.create({ examId, questionId })
@@ -341,11 +342,13 @@ const updateExamQuestion = async (req, res, next) => {
   try {
     const { id } = req.params
     const updateData = req.body
-    const eq = await models.ExamQuestion.findOne({ where: { 
-      examId: updateData.examId, 
-      questionId:  updateData.questionId,
-    } })
-    if(eq) {
+    const eq = await models.ExamQuestion.findOne({
+      where: {
+        examId: updateData.examId,
+        questionId: updateData.questionId
+      }
+    })
+    if (eq) {
       return res.status(400).json({ message: 'Bài tập đã tồn tại trong bài kiểm tra' })
     }
     const examQuestion = await models.ExamQuestion.findOne({ where: { id } })
@@ -375,7 +378,7 @@ const getExercisesByChapterId = async (req, res, next) => {
       FROM exams e
       JOIN lessons l ON e.lessonId = l.id
       JOIN chapters c ON l.chapterId = c.id
-      WHERE c.id = :chapterId
+      WHERE c.id = :chapterId AND e.status = 1
     `
     const listExams = await sequelize.query(query, {
       replacements: { chapterId },
