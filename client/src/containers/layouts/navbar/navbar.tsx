@@ -81,7 +81,7 @@ const Navbar = () => {
   const handleSearchClick = async () => {
     const response = await getLessonsandExams({ params: { search: searchTerm } });
     console.log(response.data);
-    setSuggestions([]);
+    setSuggestions([])
     const encodedSearchTerm = encodeURIComponent(searchTerm);
     navigate(`${ROUTES.search_result}?name=${encodedSearchTerm}`);
   };
@@ -131,7 +131,6 @@ const Navbar = () => {
                       <SearchIcon className="tw-absolute tw-left-3 tw-top-1/2 tw-transform -tw-translate-y-1/2 tw-text-gray-400" />
                     </div>
 
-                    {/* Gợi ý tìm kiếm */}
                     {suggestions?.length > 0 && (
                       <ul className="tw-absolute tw-bg-white tw-border tw-border-gray-300 tw-mt-1 tw-w-full tw-max-h-96 tw-overflow-y-auto tw-z-50 tw-shadow-2xl tw-rounded-b-lg">
                         {suggestions?.map((suggestion) => (
@@ -141,18 +140,23 @@ const Navbar = () => {
                             onClick={() => setSearchTerm(suggestion.name)}
                           >
                             <div>{suggestion.name}</div>
-                            {/* <div className="tw-text-sm">({suggestion.type})</div> */}
-                            <div className="tw-text-sm">
-                              ({suggestion.type === 'Lesson' ? 'bài học' : suggestion.type === 'Exam' ? 'bài tập' : suggestion.type})
+                            <div className="tw-text-base">
+                              ({
+                                suggestion.type === 'Lesson'
+                                  ? 'bài học'
+                                  : suggestion.type === 'Exam'
+                                    ? 'bài kiểm tra'
+                                    : suggestion.type === 'Exercise'
+                                      ? 'bài tập'
+                                      : suggestion.type
+                              })
                             </div>
-                            {/* <div>{suggestion?.Chapter?.grade}</div> */}
                           </li>
                         ))}
                       </ul>
                     )}
                   </div>
 
-                  {/* Nút tìm */}
                   <button
                     onClick={handleSearchClick}
                     className="tw-font-bold tw-ml-4 tw-px-4 tw-py-2 tw-bg-green-500 tw-text-white tw-rounded-full hover:tw-bg-green-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-green-500 tw-flex-shrink-0"

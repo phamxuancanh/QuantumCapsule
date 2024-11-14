@@ -87,7 +87,6 @@ const Chart: React.FC = () => {
     };
     const fetchChapters = async (params?: ListChapterParams) => {
         setIsLoading(true);
-        console.log('canhcanhcnah')
         try {
             const res = await getListChapterNoPaging({ params });
             const chaptersData = res.data.data.map((chapter: any) => ({
@@ -117,11 +116,11 @@ const Chart: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (selectedChapter) {
-                console.log('fetch lai select')
                 const responseExcercises = await getExercisesByChapterId(selectedChapter?.value);
                 setListExercises(responseExcercises.data.data);
                 const responseExams = await getExamsByChapterId(selectedChapter?.value);
                 setListExams(responseExams.data.exams);
+                await fetchExamResultProgress();
             }
         };
         fetchData();
@@ -210,7 +209,7 @@ const Chart: React.FC = () => {
             console.log(updatedChapters);
             setChapters(updatedChapters);
             setChaptersForSelect(updatedChapters);
-            setSelectedChapter(updatedChapters[0]);
+            // setSelectedChapter(updatedChapters[0]);
             console.log(mockData);
         } catch (err) {
             console.error(err);
@@ -226,7 +225,7 @@ const Chart: React.FC = () => {
     }, [exerciseResults]);
     useEffect(() => {
         if (activeTab !== "theory") return;
-
+    
         const ctx = document.getElementById("theoryChart") as HTMLCanvasElement;
         if (ctx) {
             const chart = new ChartJS(ctx, {
@@ -244,6 +243,20 @@ const Chart: React.FC = () => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1, // Ensures only integer values are shown
+                                callback: function(value) {
+                                    if (Number.isInteger(value)) {
+                                        return value;
+                                    }
+                                    return null;
+                                },
+                            },
+                        },
+                    },
                     plugins: {
                         legend: {
                             position: "top",
@@ -264,6 +277,46 @@ const Chart: React.FC = () => {
             return () => chart.destroy();
         }
     }, [mockData, activeTab]);
+    // useEffect(() => {
+    //     if (activeTab !== "theory") return;
+
+    //     const ctx = document.getElementById("theoryChart") as HTMLCanvasElement;
+    //     if (ctx) {
+    //         const chart = new ChartJS(ctx, {
+    //             type: "bar",
+    //             data: {
+    //                 labels: mockData.chapter.map(item => item.label),
+    //                 datasets: [{
+    //                     label: "Tiến trình bài học",
+    //                     data: mockData.chapter.map(item => item.count),
+    //                     backgroundColor: "rgba(54, 162, 235, 0.5)",
+    //                     borderColor: "rgba(54, 162, 235, 1)",
+    //                     borderWidth: 1,
+    //                 }],
+    //             },
+    //             options: {
+    //                 responsive: true,
+    //                 maintainAspectRatio: false,
+    //                 plugins: {
+    //                     legend: {
+    //                         position: "top",
+    //                     },
+    //                     tooltip: {
+    //                         callbacks: {
+    //                             label: function (context) {
+    //                                 const index = context.dataIndex;
+    //                                 const theories = mockData.chapter[index].theories;
+    //                                 const theoryNames = theories.map((theory) => `• ${theory.name}`);
+    //                                 return ['Bài học:'].concat(theoryNames);
+    //                             },
+    //                         },
+    //                     },
+    //                 },
+    //             },
+    //         });
+    //         return () => chart.destroy();
+    //     }
+    // }, [mockData, activeTab]);
 
     useEffect(() => {
         console.log('Active Tab:', activeTab);

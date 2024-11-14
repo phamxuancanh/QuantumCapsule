@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react"
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import Select from 'react-select'
 import { toast } from 'react-toastify'
 import { Link, useNavigate } from "react-router-dom"
 import { signUp, googleSignIn } from "api/user/user.api"
@@ -14,10 +13,6 @@ import loginImage from 'assets/bb.jpg'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined'
 import { ClockLoader } from "react-spinners"
-import ReCAPTCHA from "react-google-recaptcha"
-import PeopleIcon from '@mui/icons-material/People'
-import ChildCareIcon from '@mui/icons-material/ChildCare'
-import SchoolIcon from '@mui/icons-material/School'
 import { fetchLocations, City, District, Ward } from './locationData'
 const theme = createTheme()
 
@@ -40,7 +35,7 @@ const SignUp = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('en')
     const [loading, setLoading] = useState(false)
     const [captchaValue, setCaptchaValue] = useState<string | null>(null);
-    const [showCaptcha, setShowCaptcha] = useState(false);
+    // const [showCaptcha, setShowCaptcha] = useState(false);
     const keySite = process.env.REACT_APP_SITE_KEY
     const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
     const [typeAccount, setTypeAccount] = useState('student')
@@ -51,20 +46,6 @@ const SignUp = () => {
     const [wards, setWards] = useState<Ward[]>([])
     const [selectedWard, setSelectedWard] = useState<string>('')
     const [selectedClass, setSelectedClass] = useState('');
-    const [classes] = useState([
-        { Id: '1', Name: 'Khối 1' },
-        { Id: '2', Name: 'Khối 2' },
-        { Id: '3', Name: 'Khối 3' },
-        { Id: '4', Name: 'Khối 4' },
-        { Id: '5', Name: 'Khối 5' },
-        { Id: '6', Name: 'Khối 6' },
-        { Id: '7', Name: 'Khối 7' },
-        { Id: '8', Name: 'Khối 8' },
-        { Id: '9', Name: 'Khối 9' },
-        { Id: '10', Name: 'Khối 10' },
-        { Id: '11', Name: 'Khối 11' },
-        { Id: '12', Name: 'Khối 12' }
-    ])
     useEffect(() => {
         const loadData = async () => {
             const data = await fetchLocations();
@@ -121,16 +102,12 @@ const SignUp = () => {
         },
         [i18n]
     )
-    const handleCaptchaChange = (value: React.SetStateAction<string | null>) => {
-        setErrorMessageCaptcha('');
-        setCaptchaValue(value);
-    };
     async function handleRegister(e: { preventDefault: () => void; }) {
         e.preventDefault();
-        if (!showCaptcha) {
-            setShowCaptcha(true);
-            return;
-        }
+        // if (!showCaptcha) {
+        //     setShowCaptcha(true);
+        //     return;
+        // }
         setErrorMessageFirstName('')
         setErrorMessageLastName('')
         setErrorMessageEmail('')
@@ -145,7 +122,6 @@ const SignUp = () => {
         const messPassword = t('signUp.password_required');
         const messConfirm = t('signUp.confirm_password_required');
         const messTermCheckBox = t('signUp.term_required');
-        const messPhone = t('signUp.phone_required');
         const schema = yup.object({
             firstName: yup
                 .string()
@@ -159,10 +135,6 @@ const SignUp = () => {
                 .string()
                 .email(t('signUp.email_invalid'))
                 .required(messEmail),
-            phone: yup
-                .string()
-                .required(messPhone)
-                .matches(/^[0-9]{10}$/, t('signUp.phone_invalid')),
             password: yup
                 .string()
                 .required(messPassword)
@@ -180,9 +152,9 @@ const SignUp = () => {
         }).required();
 
         try {
-            await schema.validate({ firstName, lastName, email, phone, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
+            await schema.validate({ firstName, lastName, email, password, confirm_password: confirmPassword, termCheck }, { abortEarly: false })
             setLoading(true);
-            const result = await signUp({ firstName, lastName, email, phone, password, city: selectedCity, district: selectedDistrict, ward: selectedWard, grade: selectedClass, captchaValue })
+            const result = await signUp({ firstName, lastName, email, password })
             console.log('result')
             console.log(result)
             console.log('result.data:', result?.data)
@@ -392,7 +364,7 @@ const SignUp = () => {
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
                                 </div>
-                                <div>
+                                {/* <div>
                                     <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
                                         <input
                                             id="phone"
@@ -401,14 +373,14 @@ const SignUp = () => {
                                             autoComplete="phone"
                                             required
                                             className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                                            placeholder={t('signUp.phone')}
+                                            placeholder='Số điện thoại'
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                         />
                                         <LocalPhoneOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
-                                </div>
+                                </div> */}
                                 <div>
                                     <div className="tw-relative tw-border-2 tw-border-sky-500 tw-rounded-2xl">
                                         <input
@@ -444,12 +416,11 @@ const SignUp = () => {
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageConfirmPassword}</div>
                                 </div>
-                                {typeAccount === 'student' && (
+                                {/* {typeAccount === 'student' && (
                                     <div>
                                         <div className="tw-space-y-3 tw-font-bold">Noi hoc tap</div>
                                         <div className="tw-space-y-4 tw-mt-2">
                                             <div className="tw-grid tw-grid-cols-2 tw-gap-4">
-                                                {/* Selector for City */}
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="city"
@@ -461,7 +432,6 @@ const SignUp = () => {
                                                     />
                                                 </div>
 
-                                                {/* Selector for District */}
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="district"
@@ -476,7 +446,6 @@ const SignUp = () => {
                                             </div>
 
                                             <div className="tw-grid tw-grid-cols-2 tw-gap-4">
-                                                {/* Selector for Ward */}
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="ward"
@@ -488,7 +457,6 @@ const SignUp = () => {
                                                         placeholder="Chọn phường/xã"
                                                     />
                                                 </div>
-                                                {/* Selector for Class */}
                                                 <div className="tw-flex tw-flex-col">
                                                     <Select
                                                         id="class"
@@ -503,7 +471,7 @@ const SignUp = () => {
                                             </div>
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                             <div>
                                 <div className="tw-flex tw-items-center tw-justify-between">
@@ -525,18 +493,6 @@ const SignUp = () => {
                                 <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageTermCheck}</div>
                             </div>
                             <div>
-                                {showCaptcha && (
-                                    <ReCAPTCHA
-                                        sitekey={keySite ?? ''}
-                                        // sitekey='6LdynQEqAAAAAEj_i6vqYyZUNA54yn-oRIdC00Vy'
-                                        onChange={handleCaptchaChange}
-                                    />
-                                )}
-                                {(errorMessageCaptcha && showCaptcha) && (
-                                    <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
-                                )}
-                            </div>
-                            <div>
                                 <button
                                     onClick={handleRegister}
                                     type="submit"
@@ -554,11 +510,6 @@ const SignUp = () => {
                                 <div className="tw-bg-white tw-rounded-full tw-p-1 tw-cursor-pointer">
                                     {/* <GoogleIcon className="tw-cursor-pointer tw-text-2xl tw-text-red-500" fontSize="large" /> */}
                                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48"> <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path> </svg>
-                                </div>
-                                <div className="tw-bg-white tw-rounded-full tw-p-1 tw-cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 64 64">
-                                        <path d="M32 6C17.641 6 6 17.641 6 32c0 12.277 8.512 22.56 19.955 25.286-.592-.141-1.179-.299-1.755-.479V50.85c0 0-.975.325-2.275.325-3.637 0-5.148-3.245-5.525-4.875-.229-.993-.827-1.934-1.469-2.509-.767-.684-1.126-.686-1.131-.92-.01-.491.658-.471.975-.471 1.625 0 2.857 1.729 3.429 2.623 1.417 2.207 2.938 2.577 3.721 2.577.975 0 1.817-.146 2.397-.426.268-1.888 1.108-3.57 2.478-4.774-6.097-1.219-10.4-4.716-10.4-10.4 0-2.928 1.175-5.619 3.133-7.792C19.333 23.641 19 22.494 19 20.625c0-1.235.086-2.751.65-4.225 0 0 3.708.026 7.205 3.338C28.469 19.268 30.196 19 32 19s3.531.268 5.145.738c3.497-3.312 7.205-3.338 7.205-3.338.567 1.474.65 2.99.65 4.225 0 2.015-.268 3.19-.432 3.697C46.466 26.475 47.6 29.124 47.6 32c0 5.684-4.303 9.181-10.4 10.4 1.628 1.43 2.6 3.513 2.6 5.85v8.557c-.576.181-1.162.338-1.755.479C49.488 54.56 58 44.277 58 32 58 17.641 46.359 6 32 6zM33.813 57.93C33.214 57.972 32.61 58 32 58 32.61 58 33.213 57.971 33.813 57.93zM37.786 57.346c-1.164.265-2.357.451-3.575.554C35.429 57.797 36.622 57.61 37.786 57.346zM32 58c-.61 0-1.214-.028-1.813-.07C30.787 57.971 31.39 58 32 58zM29.788 57.9c-1.217-.103-2.411-.289-3.574-.554C27.378 57.61 28.571 57.797 29.788 57.9z"></path>
-                                    </svg>
                                 </div>
                             </div>
                             <div className="tw-flex tw-justify-center tw-items-center">
