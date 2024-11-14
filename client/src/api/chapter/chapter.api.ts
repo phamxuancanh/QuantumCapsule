@@ -13,7 +13,7 @@ export const getListChapterNoPaging = async ({params}: {params?: ListChapterPara
     return await requestWithJwt.get<DataListChapter>('/chapters/getListChapterNoPaging', { params })
 }
 export const getChapterById = async (chapterId: string): Promise<AxiosResponse<any>> => {
-    return await requestWithJwt.get<any>(`/chapters/${chapterId}`);
+    return await requestWithJwt.get<any>(`/chapters/getChapterById/${chapterId}`);
 }
 
 export const getListAllChapter = async (): Promise<AxiosResponse<DataListChapter>> => {
