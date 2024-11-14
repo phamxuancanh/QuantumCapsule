@@ -222,158 +222,6 @@ const getLessonByChapterId = async (req, res, next) => {
 //   }
 // }
 // get lessons and exams
-// const getLessonsandExams = async (req, res, next) => {
-//   try {
-//     const {
-//       page = '1',
-//       size = '10',
-//       search: nameCondition,
-//       type,
-//       subjectId,
-//       grade
-//     } = req.query
-
-//     const offset = (Number(page) - 1) * Number(size)
-//     const limit = Number(size)
-
-//     const searchConditions = {
-//       where: {},
-//       include: [{
-//         model: models.Chapter,
-//         where: {},
-//         include: [{
-//           model: models.Subject,
-//           attributes: ['id', 'name']
-//         }]
-//       }]
-//     }
-
-//     if (nameCondition) {
-//       searchConditions.where.name = {
-//         [Op.like]: `%${nameCondition}%`
-//       }
-//     }
-
-//     if (subjectId) {
-//       searchConditions.include[0].where.subjectId = subjectId
-//     }
-//     if (grade) {
-//       searchConditions.include[0].where.grade = grade
-//     }
-
-//     const mapResultsWithSubject = (results, type) => {
-//       return results.map(result => {
-//         const { id, name } = result.Chapter.Subject
-//         return {
-//           ...result.dataValues,
-//           subjectId: id,
-//           subjectName: name,
-//           type // Thêm type vào kết quả
-//         }
-//       })
-//     }
-
-//     if (type === 'lesson') {
-//       const totalLessons = await models.Lesson.count(searchConditions)
-
-//       const lessons = await models.Lesson.findAll({
-//         ...searchConditions,
-//         limit,
-//         offset,
-//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
-
-//       return res.json({
-//         data: lessonsWithType,
-//         totalLessons,
-//         totalExams: 0,
-//         totalRecords: totalLessons,
-//         currentPage: Number(page),
-//         size: limit
-//       })
-//     } else if (type === 'exam') {
-//       const totalExams = await models.Exam.count(searchConditions)
-
-//       const exams = await models.Exam.findAll({
-//         ...searchConditions,
-//         limit,
-//         offset,
-//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
-
-//       return res.json({
-//         data: examsWithType,
-//         totalLessons: 0,
-//         totalExams,
-//         totalRecords: totalExams,
-//         currentPage: Number(page),
-//         size: limit
-//       })
-//     }
-
-//     const totalLessons = await models.Lesson.count(searchConditions)
-//     const totalExams = await models.Exam.count(searchConditions)
-//     const totalRecords = totalLessons + totalExams
-
-//     if (offset >= totalRecords) {
-//       return res.json({
-//         data: [],
-//         totalLessons,
-//         totalExams,
-//         totalRecords,
-//         currentPage: Number(page),
-//         size: limit
-//       })
-//     }
-
-//     let combinedResults = []
-
-//     if (offset < totalLessons) {
-//       const lessons = await models.Lesson.findAll({
-//         ...searchConditions,
-//         limit,
-//         offset,
-//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const lessonsWithType = mapResultsWithSubject(lessons, 'lesson')
-
-//       combinedResults = [...lessonsWithType]
-//     }
-
-//     if (combinedResults.length < limit) {
-//       const remainingLimit = limit - combinedResults.length
-//       const examOffset = Math.max(0, offset - totalLessons)
-
-//       const exams = await models.Exam.findAll({
-//         ...searchConditions,
-//         limit: remainingLimit,
-//         offset: examOffset,
-//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const examsWithType = mapResultsWithSubject(exams, 'exam')
-
-//       combinedResults = [...combinedResults, ...examsWithType]
-//     }
-
-//     res.json({
-//       data: combinedResults,
-//       totalLessons,
-//       totalExams,
-//       totalRecords,
-//       currentPage: Number(page),
-//       size: limit
-//     })
-//   } catch (error) {
-//     console.error('Error searching lessons and exams:', error)
-//     res.status(500).json({ message: 'Error searching lessons and exams' })
-//   }
-// }
 const getLessonsandExams = async (req, res, next) => {
   try {
     const {
@@ -390,15 +238,17 @@ const getLessonsandExams = async (req, res, next) => {
 
     const searchConditions = {
       where: {},
-      include: [{
-        model: models.Chapter,
-        where: {},
-        required: false, // Cho phép các Exam không có Chapter
-        include: [{
-          model: models.Subject,
-          attributes: ['id', 'name']
-        }]
-      }]
+      include: [
+        {
+          model: models.Chapter,
+          where: {},
+          required: false,
+          include: [{
+            model: models.Subject,
+            attributes: ['id', 'name']
+          }]
+        }
+      ]
     }
 
     if (nameCondition) {
@@ -419,20 +269,33 @@ const getLessonsandExams = async (req, res, next) => {
         let subjectId = null
         let subjectName = null
 
+        // Lấy subjectId và subjectName từ Chapter của Exam
         if (result.Chapter && result.Chapter.Subject) {
           subjectId = result.Chapter.Subject.id
           subjectName = result.Chapter.Subject.name
         }
 
         let entryType = type
-        // Phân loại 'Exam' thành 'Exam' hoặc 'Exercise' dựa trên lessonId và chapterId
+
+        // Nếu Exam là Exercise, lấy Chapter và Subject qua Lesson
         if (type === 'Exam') {
           if (result.lessonId && !result.chapterId) {
             entryType = 'Exercise'
+
+            // Kiểm tra Lesson và lấy Chapter, Subject từ Lesson nếu có
+            if (result.Lesson) {
+              if (result.Lesson.Chapter) {
+                result.chapterId = result.Lesson.chapterId // Lấy chapterId từ Lesson
+                if (result.Lesson.Chapter.Subject) {
+                  subjectId = result.Lesson.Chapter.Subject.id
+                  subjectName = result.Lesson.Chapter.Subject.name
+                }
+              }
+            }
           } else if (result.chapterId && !result.lessonId) {
             entryType = 'Exam'
           } else {
-            entryType = 'Exam' // Mặc định là 'Exam' nếu cả hai đều có hoặc không có
+            entryType = 'Exam'
           }
         }
 
@@ -440,7 +303,7 @@ const getLessonsandExams = async (req, res, next) => {
           ...result.dataValues,
           subjectId,
           subjectName,
-          type: entryType // Cập nhật type sau khi phân loại
+          type: entryType
         }
       })
     }
@@ -470,6 +333,24 @@ const getLessonsandExams = async (req, res, next) => {
 
       const exams = await models.Exam.findAll({
         ...searchConditions,
+        include: [
+          ...searchConditions.include,
+          {
+            model: models.Lesson,
+            required: false,
+            attributes: ['id', 'chapterId'],
+            include: [
+              {
+                model: models.Chapter,
+                required: false,
+                include: [{
+                  model: models.Subject,
+                  attributes: ['id', 'name']
+                }]
+              }
+            ]
+          }
+        ],
         limit,
         offset,
         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
@@ -523,6 +404,24 @@ const getLessonsandExams = async (req, res, next) => {
 
       const exams = await models.Exam.findAll({
         ...searchConditions,
+        include: [
+          ...searchConditions.include,
+          {
+            model: models.Lesson,
+            required: false,
+            attributes: ['id', 'chapterId'],
+            include: [
+              {
+                model: models.Chapter,
+                required: false,
+                include: [{
+                  model: models.Subject,
+                  attributes: ['id', 'name']
+                }]
+              }
+            ]
+          }
+        ],
         limit: remainingLimit,
         offset: examOffset,
         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
@@ -546,6 +445,180 @@ const getLessonsandExams = async (req, res, next) => {
     res.status(500).json({ message: 'Error searching lessons and exams' })
   }
 }
+
+// const getLessonsandExams = async (req, res, next) => {
+//   try {
+//     const {
+//       page = '1',
+//       size = '10',
+//       search: nameCondition,
+//       type,
+//       subjectId,
+//       grade
+//     } = req.query
+
+//     const offset = (Number(page) - 1) * Number(size)
+//     const limit = Number(size)
+
+//     const searchConditions = {
+//       where: {},
+//       include: [{
+//         model: models.Chapter,
+//         where: {},
+//         required: false, // Cho phép các Exam không có Chapter
+//         include: [{
+//           model: models.Subject,
+//           attributes: ['id', 'name']
+//         }]
+//       }]
+//     }
+
+//     if (nameCondition) {
+//       searchConditions.where.name = {
+//         [Op.like]: `%${nameCondition}%`
+//       }
+//     }
+
+//     if (subjectId) {
+//       searchConditions.include[0].where.subjectId = subjectId
+//     }
+//     if (grade) {
+//       searchConditions.include[0].where.grade = grade
+//     }
+
+//     const mapResultsWithSubject = (results, type) => {
+//       return results.map(result => {
+//         let subjectId = null
+//         let subjectName = null
+
+//         if (result.Chapter && result.Chapter.Subject) {
+//           subjectId = result.Chapter.Subject.id
+//           subjectName = result.Chapter.Subject.name
+//         }
+
+//         let entryType = type
+//         // Phân loại 'Exam' thành 'Exam' hoặc 'Exercise' dựa trên lessonId và chapterId
+//         if (type === 'Exam') {
+//           if (result.lessonId && !result.chapterId) {
+//             entryType = 'Exercise'
+//           } else if (result.chapterId && !result.lessonId) {
+//             entryType = 'Exam'
+//           } else {
+//             entryType = 'Exam' // Mặc định là 'Exam' nếu cả hai đều có hoặc không có
+//           }
+//         }
+
+//         return {
+//           ...result.dataValues,
+//           subjectId,
+//           subjectName,
+//           type: entryType // Cập nhật type sau khi phân loại
+//         }
+//       })
+//     }
+
+//     if (type === 'lesson') {
+//       const totalLessons = await models.Lesson.count(searchConditions)
+
+//       const lessons = await models.Lesson.findAll({
+//         ...searchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
+
+//       return res.json({
+//         data: lessonsWithType,
+//         totalLessons,
+//         totalExams: 0,
+//         totalRecords: totalLessons,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     } else if (type === 'exam') {
+//       const totalExams = await models.Exam.count(searchConditions)
+
+//       const exams = await models.Exam.findAll({
+//         ...searchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
+
+//       return res.json({
+//         data: examsWithType,
+//         totalLessons: 0,
+//         totalExams,
+//         totalRecords: totalExams,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     }
+
+//     const totalLessons = await models.Lesson.count(searchConditions)
+//     const totalExams = await models.Exam.count(searchConditions)
+//     const totalRecords = totalLessons + totalExams
+
+//     if (offset >= totalRecords) {
+//       return res.json({
+//         data: [],
+//         totalLessons,
+//         totalExams,
+//         totalRecords,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     }
+
+//     let combinedResults = []
+
+//     if (offset < totalLessons) {
+//       const lessons = await models.Lesson.findAll({
+//         ...searchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
+
+//       combinedResults = [...lessonsWithType]
+//     }
+
+//     if (combinedResults.length < limit) {
+//       const remainingLimit = limit - combinedResults.length
+//       const examOffset = Math.max(0, offset - totalLessons)
+
+//       const exams = await models.Exam.findAll({
+//         ...searchConditions,
+//         limit: remainingLimit,
+//         offset: examOffset,
+//         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
+
+//       combinedResults = [...combinedResults, ...examsWithType]
+//     }
+
+//     res.json({
+//       data: combinedResults,
+//       totalLessons,
+//       totalExams,
+//       totalRecords,
+//       currentPage: Number(page),
+//       size: limit
+//     })
+//   } catch (error) {
+//     console.error('Error searching lessons and exams:', error)
+//     res.status(500).json({ message: 'Error searching lessons and exams' })
+//   }
+// }
+
 const getFirstLessonByChapterId = async (req, res, next) => {
   try {
     const { chapterId } = req.params

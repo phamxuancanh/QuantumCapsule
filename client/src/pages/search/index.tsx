@@ -123,7 +123,7 @@ function SearchResultPage() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await getListSubject(); 
+        const response = await getListSubject();
         console.log(response.data.data);
         const subjects = response?.data?.data.map((subject: { id: any; name: any; }) => ({
           value: subject.id,
@@ -161,7 +161,7 @@ function SearchResultPage() {
     queryParams.set('subject', option.value);
     navigate(`?${queryParams.toString()}`);
   };
-  
+
   const handleTypeChange = (option: any) => {
     setSelectedType(option.value);
     const queryParams = new URLSearchParams(location.search);
@@ -169,7 +169,7 @@ function SearchResultPage() {
     queryParams.set('type', option.value);
     navigate(`?${queryParams.toString()}`);
   };
-  
+
   const handleClassChange = (option: any) => {
     setSelectedGrade(option.value);
     const queryParams = new URLSearchParams(location.search);
@@ -202,22 +202,22 @@ function SearchResultPage() {
     }
   };
   const formatOptionLabelSubject = ({ label }: { label: string }) => {
-      switch (label) {
-          case 'Toán':
-              return t('search.math');
-          case 'Tiếng Việt':
-              return t('search.literature');
-          default:
-              return label;
-      }
+    switch (label) {
+      case 'Toán':
+        return t('search.math');
+      case 'Tiếng Việt':
+        return t('search.literature');
+      default:
+        return label;
+    }
   };
   const formatOptionLabelType = ({ label }: { label: string }) => {
     switch (label) {
-        case 'Exam':
-            return t('search.exam');
-        case 'Lesson':
-            return t('search.lesson');
-        default:
+      case 'Exam':
+        return t('search.exam');
+      case 'Lesson':
+        return t('search.lesson');
+      default:
         return label;
     }
   };
@@ -280,51 +280,58 @@ function SearchResultPage() {
       <div className='tw-w-4/5 tw-p-2'>
         <h2 className="tw-text-lg tw-font-bold">{t('search.search_result')}:</h2>
         <div className='tw-flex tw-flex-col tw-space-y-3'>
-        {results?.data?.length > 0 ? (
-        results?.data.map((result: any) => (
-          <div key={result.id}>
-            <div
-              className="tw-py-2 tw-border-b tw-rounded-md tw-cursor-pointer tw-bg-slate-200 tw-p-2"
-              onClick={() => handleLessonExamExerciseClick(result.type, result.id)}
-            >
-              <div className="tw-flex tw-space-x-2">
-                <img
-                  src={
-                    result.type?.toLowerCase() === 'lesson'
-                      ? thumnail
-                      : result.type?.toLowerCase() === 'exercise'
-                        ? thumnail_exercise
-                        : result.type?.toLowerCase() === 'exam'
-                          ? thumnail_exam
-                          : thumnail
-                  }
-                  alt={`${result.type} thumbnail`}
-                  className="tw-w-36 tw-h-36 tw-border tw-border-zinc-950"
-                />
-                <div className='tw-flex tw-flex-col tw-space-y-4'>
-                  <div>
-                    {result.Chapter?.Subject?.name} {result.Chapter?.grade}
-                  </div>
-                  <div className="tw-font-bold">
-                    {result.name}
-                  </div>
-                  <div>
-                    {result.type?.toLowerCase() === 'lesson'
-                      ? 'Bài học'
-                      : result.type?.toLowerCase() === 'exam'
-                        ? 'Bài kiểm tra'
-                        : result.type?.toLowerCase() === 'exercise'
-                          ? 'Bài tập'
-                          : capitalizeFirstLetter(result.type)}
+          {results?.data?.length > 0 ? (
+            results?.data.map((result: any) => (
+              <div key={result.id}>
+                <div
+                  className="tw-py-2 tw-border-b tw-rounded-md tw-cursor-pointer tw-bg-slate-200 tw-p-2"
+                  onClick={() => handleLessonExamExerciseClick(result.type, result.id)}
+                >
+                  <div className="tw-flex tw-space-x-2">
+                    <img
+                      src={
+                        result.type?.toLowerCase() === 'lesson'
+                          ? thumnail
+                          : result.type?.toLowerCase() === 'exercise'
+                            ? thumnail_exercise
+                            : result.type?.toLowerCase() === 'exam'
+                              ? thumnail_exam
+                              : thumnail
+                      }
+                      alt={`${result.type} thumbnail`}
+                      className="tw-w-36 tw-h-36 tw-border tw-border-zinc-950"
+                    />
+                    <div className='tw-flex tw-flex-col tw-space-y-4'>
+                      <div>
+                        {result.type?.toLowerCase() === 'exercise' ? (
+                          <div>
+                            <div>{result.subjectName} {result.Lesson.Chapter?.grade}</div>
+                            <div>{result.Lesson?.Chapter?.name}</div>
+                          </div>
+                        ) : (
+                          <>
+                            <div>{result.Chapter?.Subject?.name} {result.Chapter?.grade}</div>
+                            <div>{result.Chapter?.name}</div>
+                          </>
+                        )}
+                      </div>
+                      <div className="tw-font-bold">
+                        {result.type?.toLowerCase() === 'lesson'
+                          ? 'Bài học'
+                          : result.type?.toLowerCase() === 'exam'
+                            ? 'Bài kiểm tra'
+                            : result.type?.toLowerCase() === 'exercise'
+                              ? 'Bài tập'
+                              : capitalizeFirstLetter(result.type)}: {result.name}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p>Không có kết quả nào.</p>
-      )}
+            ))
+          ) : (
+            <p>Không có kết quả nào.</p>
+          )}
         </div>
       </div>
       <div className='tw-flex tw-justify-center tw-mt-10 md:tw-mt-5 lg:tw-mt-3'>

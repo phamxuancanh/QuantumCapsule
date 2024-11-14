@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-template-curly-in-string */
 const axios = require('axios')
 const bcrypt = require('bcrypt')
@@ -18,7 +19,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'canhmail292@gmail.com',
-    pass: 'hajcwelbzkljvsgp'
+    pass: 'tzgrtkohlaydvmzx'
   }
 })
 const signIn = async (req, res, next) => {
@@ -107,18 +108,18 @@ const signIn = async (req, res, next) => {
 
 const signUp = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, phone, password, city, district, ward, grade, captchaValue } = req.body.data
-    const captchaVerificationUrl = 'https://www.google.com/recaptcha/api/siteverify'
-    const captchaResponse = await axios.post(captchaVerificationUrl, null, {
-      params: {
-        secret: process.env.SECRET_KEY_CAPTCHA,
-        response: captchaValue
-      }
-    })
+    const { firstName, lastName, email, password } = req.body.data
+    // const captchaVerificationUrl = 'https://www.google.com/recaptcha/api/siteverify'
+    // const captchaResponse = await axios.post(captchaVerificationUrl, null, {
+    //   params: {
+    //     secret: process.env.SECRET_KEY_CAPTCHA,
+    //     response: captchaValue
+    //   }
+    // })
 
-    if (!captchaResponse.data.success) {
-      return res.status(401).json({ code: 401, message: 'Captcha verification failed.' })
-    }
+    // if (!captchaResponse.data.success) {
+    //   return res.status(401).json({ code: 401, message: 'Captcha verification failed.' })
+    // }
 
     const userByEmail = await models.User.findOne({ where: { email } })
     if (userByEmail) {
@@ -132,13 +133,9 @@ const signUp = async (req, res, next) => {
       lastName,
       password: hashedPassword,
       email,
-      phone,
-      city,
-      district,
-      ward,
       type: 'local',
       emailVerified: false,
-      grade,
+      // grade,
       roleId: 3
     })
 
@@ -265,33 +262,21 @@ const checkEmail = async (req, res, next) => {
 }
 const sendOTP = async (req, res, next) => {
   try {
-    const { email, captchaValue, type } = req.body.data
+    const { email } = req.body.data
     console.log(req.body.data, 'req.body.data')
 
     if (!email) {
       return res.status(400).json({ message: 'Missing email.' })
     }
 
-    if (type === 'forgot_password') {
-      if (!captchaValue) {
-        return res.status(400).json({ message: 'Missing captcha token.' })
-      }
-
-      const captchaVerifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-        params: {
-          secret: process.env.SECRET_KEY_CAPTCHA,
-          response: captchaValue
-        }
-      })
-
-      if (!captchaVerifyResponse.data.success) {
-        return res.status(400).json({ message: 'Invalid CAPTCHA. Please try again.' })
-      }
-    }
-
     const user = await models.User.findOne({ where: { email } })
     if (!user) {
       return res.status(400).json({ message: 'User not found.' })
+    }
+
+    // Kiểm tra loại tài khoản
+    if (user.accountType !== 'local') {
+      return res.status(400).json({ message: 'Please use Google to change your password.' })
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000)

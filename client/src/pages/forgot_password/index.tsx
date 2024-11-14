@@ -8,18 +8,17 @@ import OTPModal from 'components/modals/OTPModal'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import { sendOTP, checkEmail } from "api/user/user.api"
-import ReCAPTCHA from 'react-google-recaptcha'
 const ForgotPassword = () => {
     const { t, i18n } = useTranslation()
     const [selectedLanguage, setSelectedLanguage] = useState('en')
     const [captchaValue, setCaptchaValue] = useState<string | null>(null);
-    const [showCaptcha, setShowCaptcha] = useState(false);
-    const keySite = process.env.REACT_APP_SITE_KEY
+    // const [showCaptcha, setShowCaptcha] = useState(false);
+    // const keySite = process.env.REACT_APP_SITE_KEY
     const [email, setEmail] = useState('')
     // const [password, setPassword] = useState('')
     // const [confirmPassword, setConfirmPassword] = useState('')
     const [errorMessageEmail, setErrorMessageEmail] = useState('')
-    const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
+    // const [errorMessageCaptcha, setErrorMessageCaptcha] = useState('')
     // const [errorMessagePassword, setErrorMessagePassword] = useState('')
     // const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState('')
     const [loading, setLoading] = useState(false)
@@ -41,50 +40,48 @@ const ForgotPassword = () => {
         },
         [i18n]
     )
+
     async function handleSendOTP(e: { preventDefault: () => void; }) {
-        setShowCaptcha(true)
-        console.log('handleSendOTP')
+        console.log('handleSendOTP');
         e.preventDefault();
-        setErrorMessageEmail('')
-        setErrorMessageCaptcha('')
-        const messEmail = t('forgot_password.email_required')
+        setErrorMessageEmail('');
+        const messEmail = t('forgot_password.email_required');
         const schema = yup.object({
             email: yup
                 .string()
                 .required(messEmail)
-        }).required()
+        }).required();
 
-        setLoading(true)
+        setLoading(true);
         try {
-            await schema.validate({ email }, { abortEarly: false })
-            const result = await sendOTP({ email, captchaValue, type: 'forgot_password' })
-            console.log('result:', result)
+            await schema.validate({ email }, { abortEarly: false });
+            const result = await sendOTP({ email, type: 'forgot_password' });
+            console.log('result:', result);
             if (result?.data) {
-                console.log('go')
+                console.log('go');
                 setTimeout(() => {
-                    setLoading(false)
+                    setLoading(false);
                     setIsModalOpen(true);
                     toast.success(t('forgot_password.successfully_sended'));
-                }, 1000)
+                }, 1000);
             } else {
-                setLoading(false)
+                setLoading(false);
                 alert('Unexpected response from server');
             }
         } catch (error) {
-            setLoading(false)
+            setLoading(false);
             console.log('error:', error);
             if (error instanceof yup.ValidationError) {
-                const errorOrder = ['email']
-                setErrorMessageEmail('')
-                setErrorMessageCaptcha('')
+                const errorOrder = ['email'];
+                setErrorMessageEmail('');
                 errorOrder.forEach(field => {
                     if (error instanceof yup.ValidationError) {
                         const err = error.inner.find(e => e.path === field);
                         if (err) {
                             switch (field) {
                                 case 'email':
-                                    setErrorMessageEmail(err.message)
-                                    break
+                                    setErrorMessageEmail(err.message);
+                                    break;
                                 default:
                                     break;
                             }
@@ -93,36 +90,32 @@ const ForgotPassword = () => {
                 });
             } else {
                 if (typeof error === 'object' && error !== null && 'message' in error) {
-                    if (typeof error === 'object' && error !== null && 'message' in error) {
-                        console.log('error.code:', error.message)
-                        const message = String(error.message)
-                        if (message.includes('User')) {
-                            setErrorMessageEmail(message)
-                        }
-                        if (message.includes('captcha token')) {
-                            setErrorMessageCaptcha(t('forgot_password.captcha_error'))
-                        }
+                    const message = String(error.message);
+                    if (message.includes('User')) {
+                        setErrorMessageEmail(message);
+                    } else if (message.includes('Please use Google to change your password.')) {
+                        toast.error(message);
                     }
-
                 }
             }
         }
     }
+
     const handleCloseModal = () => {
         setCaptchaValue(null)
         setEmail('')
-        setErrorMessageCaptcha('')
+        // setErrorMessageCaptcha('')
         setErrorMessageEmail('')
-        setShowCaptcha(false)
+        // setShowCaptcha(false)
         setIsModalOpen(false)
     };
     const handleCaptchaChange = (value: React.SetStateAction<string | null>) => {
-        setErrorMessageCaptcha('');
+        // setErrorMessageCaptcha('');
         setCaptchaValue(value);
     };
     const handleEmailBlur = () => {
         if (email) {
-            setShowCaptcha(true);
+            // setShowCaptcha(true);
         }
     };
     return (
@@ -184,7 +177,7 @@ const ForgotPassword = () => {
                                     </div>
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageEmail}</div>
                                 </div>
-                                {showCaptcha && (
+                                {/* {showCaptcha && (
                                     <ReCAPTCHA
                                         sitekey={keySite ?? ''}
                                         onChange={handleCaptchaChange}
@@ -192,7 +185,7 @@ const ForgotPassword = () => {
                                 )}
                                 {(errorMessageCaptcha && showCaptcha) && (
                                     <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessageCaptcha}</div>
-                                )}
+                                )} */}
                             </div>
                             <div>
                                 <button
