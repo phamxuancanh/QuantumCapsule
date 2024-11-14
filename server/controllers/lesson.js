@@ -42,7 +42,9 @@ const getListLesson = async (req, res, next) => {
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {
-      where: {}
+      where: {
+        status: 1 // Chỉ lấy những lesson có status là 1
+      }
     }
 
     if (nameCondition) {
@@ -136,9 +138,14 @@ const deleteLesson = async (req, res, next) => {
 const getLessonById = async (req, res, next) => {
   try {
     const { id } = req.params
-    const lesson = await models.Lesson.findByPk(id)
+    const lesson = await models.Lesson.findOne({
+      where: {
+        id,
+        status: 1 // Chỉ lấy những lesson có status là 1
+      }
+    })
     if (!lesson) {
-      return res.status(200).json({ message: 'Lesson not found' })
+      return res.status(404).json({ message: 'Lesson not found or inactive' })
     }
     res.json(lesson)
   } catch (error) {
@@ -153,7 +160,8 @@ const getLessonByChapterId = async (req, res, next) => {
 
     const lessons = await models.Lesson.findAll({
       where: {
-        chapterId
+        chapterId,
+        status: 1 // Chỉ lấy những lesson có status là 1
       },
       attributes: [
         'id',
@@ -172,55 +180,6 @@ const getLessonByChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Error fetching lessons by chapterId' })
   }
 }
-// const getLessonByChapterId = async (req, res, next) => {
-//   try {
-//     const { chapterId } = req.params
-
-//     const lessons = await models.Lesson.findAll({
-//       where: {
-//         chapterId
-//       },
-//       attributes: [
-//         'id',
-//         'chapterId',
-//         'name',
-//         'order',
-//         'status',
-//         'createdAt',
-//         'updatedAt'
-//       ],
-//       include: [
-//         {
-//           model: models.Theory,
-//           attributes: ['id', 'lessonId'],
-//           separate: true
-//         },
-//         {
-//           model: models.Exam,
-//           attributes: ['id', 'lessonId'],
-//           separate: true
-//         }
-//       ]
-//     })
-
-//     const lessonsWithCounts = lessons.map((lesson) => {
-//       const theoryCount = lesson.Theories ? lesson.Theories.length : 0
-//       const examCount = lesson.Exams ? lesson.Exams.length : 0
-//       return {
-//         ...lesson.toJSON(),
-//         theoryCount,
-//         examCount,
-//         theories: lesson.theories,
-//         exams: lesson.exams
-//       }
-//     })
-
-//     res.json({ data: lessonsWithCounts })
-//   } catch (error) {
-//     console.error('Error fetching lessons by chapterId:', error)
-//     res.status(500).json({ message: 'Error fetching lessons by chapterId' })
-//   }
-// }
 // get lessons and exams
 const getLessonsandExams = async (req, res, next) => {
   try {
@@ -237,7 +196,9 @@ const getLessonsandExams = async (req, res, next) => {
     const limit = Number(size)
 
     const searchConditions = {
-      where: {},
+      where: {
+        status: 1 // Chỉ lấy những lesson và exam có status là 1
+      },
       include: [
         {
           model: models.Chapter,
@@ -446,186 +407,14 @@ const getLessonsandExams = async (req, res, next) => {
   }
 }
 
-// const getLessonsandExams = async (req, res, next) => {
-//   try {
-//     const {
-//       page = '1',
-//       size = '10',
-//       search: nameCondition,
-//       type,
-//       subjectId,
-//       grade
-//     } = req.query
-
-//     const offset = (Number(page) - 1) * Number(size)
-//     const limit = Number(size)
-
-//     const searchConditions = {
-//       where: {},
-//       include: [{
-//         model: models.Chapter,
-//         where: {},
-//         required: false, // Cho phép các Exam không có Chapter
-//         include: [{
-//           model: models.Subject,
-//           attributes: ['id', 'name']
-//         }]
-//       }]
-//     }
-
-//     if (nameCondition) {
-//       searchConditions.where.name = {
-//         [Op.like]: `%${nameCondition}%`
-//       }
-//     }
-
-//     if (subjectId) {
-//       searchConditions.include[0].where.subjectId = subjectId
-//     }
-//     if (grade) {
-//       searchConditions.include[0].where.grade = grade
-//     }
-
-//     const mapResultsWithSubject = (results, type) => {
-//       return results.map(result => {
-//         let subjectId = null
-//         let subjectName = null
-
-//         if (result.Chapter && result.Chapter.Subject) {
-//           subjectId = result.Chapter.Subject.id
-//           subjectName = result.Chapter.Subject.name
-//         }
-
-//         let entryType = type
-//         // Phân loại 'Exam' thành 'Exam' hoặc 'Exercise' dựa trên lessonId và chapterId
-//         if (type === 'Exam') {
-//           if (result.lessonId && !result.chapterId) {
-//             entryType = 'Exercise'
-//           } else if (result.chapterId && !result.lessonId) {
-//             entryType = 'Exam'
-//           } else {
-//             entryType = 'Exam' // Mặc định là 'Exam' nếu cả hai đều có hoặc không có
-//           }
-//         }
-
-//         return {
-//           ...result.dataValues,
-//           subjectId,
-//           subjectName,
-//           type: entryType // Cập nhật type sau khi phân loại
-//         }
-//       })
-//     }
-
-//     if (type === 'lesson') {
-//       const totalLessons = await models.Lesson.count(searchConditions)
-
-//       const lessons = await models.Lesson.findAll({
-//         ...searchConditions,
-//         limit,
-//         offset,
-//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
-
-//       return res.json({
-//         data: lessonsWithType,
-//         totalLessons,
-//         totalExams: 0,
-//         totalRecords: totalLessons,
-//         currentPage: Number(page),
-//         size: limit
-//       })
-//     } else if (type === 'exam') {
-//       const totalExams = await models.Exam.count(searchConditions)
-
-//       const exams = await models.Exam.findAll({
-//         ...searchConditions,
-//         limit,
-//         offset,
-//         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
-
-//       return res.json({
-//         data: examsWithType,
-//         totalLessons: 0,
-//         totalExams,
-//         totalRecords: totalExams,
-//         currentPage: Number(page),
-//         size: limit
-//       })
-//     }
-
-//     const totalLessons = await models.Lesson.count(searchConditions)
-//     const totalExams = await models.Exam.count(searchConditions)
-//     const totalRecords = totalLessons + totalExams
-
-//     if (offset >= totalRecords) {
-//       return res.json({
-//         data: [],
-//         totalLessons,
-//         totalExams,
-//         totalRecords,
-//         currentPage: Number(page),
-//         size: limit
-//       })
-//     }
-
-//     let combinedResults = []
-
-//     if (offset < totalLessons) {
-//       const lessons = await models.Lesson.findAll({
-//         ...searchConditions,
-//         limit,
-//         offset,
-//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
-
-//       combinedResults = [...lessonsWithType]
-//     }
-
-//     if (combinedResults.length < limit) {
-//       const remainingLimit = limit - combinedResults.length
-//       const examOffset = Math.max(0, offset - totalLessons)
-
-//       const exams = await models.Exam.findAll({
-//         ...searchConditions,
-//         limit: remainingLimit,
-//         offset: examOffset,
-//         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
-//       })
-
-//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
-
-//       combinedResults = [...combinedResults, ...examsWithType]
-//     }
-
-//     res.json({
-//       data: combinedResults,
-//       totalLessons,
-//       totalExams,
-//       totalRecords,
-//       currentPage: Number(page),
-//       size: limit
-//     })
-//   } catch (error) {
-//     console.error('Error searching lessons and exams:', error)
-//     res.status(500).json({ message: 'Error searching lessons and exams' })
-//   }
-// }
-
 const getFirstLessonByChapterId = async (req, res, next) => {
   try {
     const { chapterId } = req.params
 
     const lesson = await models.Lesson.findOne({
       where: {
-        chapterId
+        chapterId,
+        status: 1 // Chỉ lấy những lesson có status là 1
       },
       attributes: [
         'id',
@@ -661,7 +450,8 @@ const getSuggestions = async (req, res, next) => {
       where: {
         name: {
           [Op.like]: `%${search}%`
-        }
+        },
+        status: 1 // Chỉ lấy những lesson và exam có status là 1
       },
       limit: 10,
       attributes: ['id', 'name']
@@ -711,37 +501,6 @@ const getSuggestions = async (req, res, next) => {
     res.status(500).json({ message: 'Error getting suggestions' })
   }
 }
-// const getSuggestions = async (req, res, next) => {
-//   try {
-//     console.log('RUNNING getSuggestions')
-//     const { search } = req.query
-//     console.log('req.query:', req.query)
-//     console.log('search:', search)
-//     if (!search) {
-//       return res.json({ suggestions: [] })
-//     }
-
-//     const searchConditions = {
-//       where: {
-//         name: {
-//           [Op.like]: `%${search}%`
-//         }
-//       },
-//       limit: 10,
-//       attributes: ['id', 'name']
-//     }
-//     const lessons = await models.Lesson.findAll(searchConditions)
-//     const exams = await models.Exam.findAll(searchConditions)
-//     const suggestions = [
-//       ...lessons.map((lesson) => ({ id: lesson.id, name: lesson.name, type: 'Lesson' })),
-//       ...exams.map((exam) => ({ id: exam.id, name: exam.name, type: 'Exam' }))
-//     ]
-//     res.json({ suggestions })
-//   } catch (error) {
-//     console.error('Error getting suggestions:', error)
-//     res.status(500).json({ message: 'Error getting suggestions' })
-//   }
-// }
 
 const getListLessonByChapterId = async (req, res, next) => {
   try {
@@ -749,7 +508,7 @@ const getListLessonByChapterId = async (req, res, next) => {
     const lessons = await models.Lesson.findAll({
       where: {
         chapterId,
-        status: 1
+        status: 1 // Chỉ lấy những lesson có status là 1
       },
       attributes: [
         'id',
