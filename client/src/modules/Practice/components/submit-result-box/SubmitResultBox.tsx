@@ -31,11 +31,17 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     const {setActStarModal}  = useActStarModal()
     const [actComfirmModal, setActComfirmModal] = React.useState<IAction>(defaultAction)
     const handleSubmit = async (comfirm: boolean) => {
-        const listQuestionNotAnswer = listQuestion.filter(question => {
-            return !listAnswer.find(ans => ans.questionId === question.id)?.yourAnswer
+        let textComfirm = ''
+        const listQuestionNotAnswer = listQuestion.filter((question, index) => {
+            const answerNotAnswer = !listAnswer.find(ans => ans.questionId === question.id)?.yourAnswer
+            if(answerNotAnswer){
+                textComfirm = textComfirm.concat(`${index + 1}, `)
+            }
+            return answerNotAnswer
         })
         if (listQuestionNotAnswer.length > 0 && !comfirm) {
-            setActComfirmModal({open: true, payload: listQuestionNotAnswer.map(q => q.title).join(", ")} as IAction)
+            textComfirm = textComfirm.slice(0, textComfirm.length - 2)
+            setActComfirmModal({open: true, payload: textComfirm} as IAction)
             return
         }
         
@@ -113,9 +119,8 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
                 Nộp bài
             </Button>
             <ComfirmModal 
-                children={<Typography>
-                    Bạn chưa trả lời các câu hỏi sau: <br/>
-                    {actComfirmModal.payload ?? ""}
+                children={<Typography fontSize={30}>
+                    Các câu chưa làm: {actComfirmModal.payload ?? ""}
                 </Typography>}
                 title="Xác nhận nộp bài"
                 open={actComfirmModal.open}
