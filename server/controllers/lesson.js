@@ -29,7 +29,6 @@ const importLessons = async (req, res, next) => {
     res.status(500).json({ message: 'Error adding lessons' })
   }
 }
-// get list lessons by many conditions
 const getListLesson = async (req, res, next) => {
   try {
     const {
@@ -43,7 +42,7 @@ const getListLesson = async (req, res, next) => {
 
     const searchConditions = {
       where: {
-        status: 1 // Chỉ lấy những lesson có status là 1
+        status: 1
       }
     }
 
@@ -60,6 +59,7 @@ const getListLesson = async (req, res, next) => {
     const totalRecords = await models.Lesson.count(searchConditions)
     const lessons = await models.Lesson.findAll({
       ...searchConditions,
+      order: [['order', 'ASC']],
       limit: Number(size),
       offset,
       attributes: [
@@ -163,6 +163,7 @@ const getLessonByChapterId = async (req, res, next) => {
         chapterId,
         status: 1 // Chỉ lấy những lesson có status là 1
       },
+      order: [['order', 'ASC']], // Sắp xếp tăng dần theo trường 'order'
       attributes: [
         'id',
         'chapterId',
@@ -510,6 +511,7 @@ const getListLessonByChapterId = async (req, res, next) => {
         chapterId,
         status: 1 // Chỉ lấy những lesson có status là 1
       },
+      order: [['order', 'ASC']], // Sắp xếp tăng dần theo trường 'order'
       attributes: [
         'id',
         'chapterId',
@@ -518,8 +520,7 @@ const getListLessonByChapterId = async (req, res, next) => {
         'status',
         'createdAt',
         'updatedAt'
-      ],
-      order: [['updatedAt', 'DESC']]
+      ]
     })
     res.json({ data: lessons })
   } catch (error) {

@@ -258,7 +258,7 @@ const Home = () => {
     
             // Always fetch and set the first lesson in the chapter
             const firstLessonInChapter = await getFirstLessonByChapterId(chapterId);
-            const firstLessonId = firstLessonInChapter?.data.data.id ?? null;
+            const firstLessonId = firstLessonInChapter?.data?.data?.id ?? null;
             setSelectedLessonId(firstLessonId);
     
             setSelectedLessonsByChapter(prev => ({

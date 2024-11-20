@@ -24,7 +24,7 @@ const getListChapterNoPaging = async (req, res, next) => {
 
     const searchConditions = {
       where: {
-        status: 1 // Chỉ lấy những chapter có status là 1
+        status: 1
       }
     }
 
@@ -44,6 +44,7 @@ const getListChapterNoPaging = async (req, res, next) => {
 
     const chapters = await models.Chapter.findAll({
       ...searchConditions,
+      order: [['order', 'ASC']], // Sắp xếp tăng dần theo trường 'order'
       attributes: [
         'id',
         'subjectId',
@@ -252,7 +253,8 @@ const getListChapterBySubjectId = async (req, res, next) => {
       where: {
         subjectId,
         status: 1
-      }
+      },
+      order: [['order', 'ASC']] // Sắp xếp tăng dần theo trường 'order'
     })
     res.json({ data: chapters })
   } catch (error) {
