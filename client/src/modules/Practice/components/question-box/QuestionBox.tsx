@@ -77,21 +77,23 @@ const QuestionBox: React.FC<IProps> = (props) => {
         }
     }
     const renderQuestion = (question: IQuestion) => {
+        const yourAnswer = listAnswer.find((ans) => ans.questionId === question.id)
+
         if (question?.questionType === 1) {
-            return <QuestionV1 question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer} />
+            return <QuestionV1 question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer} sort={yourAnswer?.orderAnswer}/>
         }
         if (question?.questionType === 2) {
-            return <QuestionV2  question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer}/>
+            return <QuestionV2  question={question} yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer} />
         }
         if (question?.questionType === 3) {
-            return <QuestionV3  question={question}  yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer}/>
+            return <QuestionV3  question={question}  yourAnswer={listAnswer.find(ans => ans.questionId===question.id)} onAnswer={handleAnswer} sort={yourAnswer?.orderAnswer}/>
         }
         return <></>
     }
     return (
         <Box display={props.isOpen ? "block" : "none"} >
-            <Box>
-                <SpeakerV1 text={currentQuestion?.content!} label="Đọc câu hỏi" autoSpeak />
+            <Box >
+                <SpeakerV1 text={currentQuestion?.content!} label="Đọc câu hỏi" autoSpeak/>
                 <Button onClick={
                     () => {
                         const newListAnswer = listAnswer.map((answer: IAnswer) => {
@@ -112,9 +114,9 @@ const QuestionBox: React.FC<IProps> = (props) => {
                     </Typography>
                 </Button>
             </Box>
-            <Box>
+            <Box sx={{boxShadow: 2}}>
+                {renderQuestion(currentQuestion)}
             </Box>
-            {renderQuestion(currentQuestion)}
             <Box display={"flex"} justifyContent={"space-between"} gap={2} p={2}>
                 <Button
                     variant="contained"

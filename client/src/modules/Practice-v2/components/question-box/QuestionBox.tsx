@@ -117,13 +117,13 @@ const QuestionBox: React.FC<IProps> = (props) => {
         const yourAnswer = listAnswer.find((ans) => ans.questionId === question.id)
         const mode = isNextQuestion ? "result" : "practice"
         if (question?.questionType === 1) {
-            return <QuestionV1 question={question} yourAnswer={yourAnswer} onAnswer={handleAnswer} mode={mode}/>
+            return <QuestionV1 question={question} yourAnswer={yourAnswer} onAnswer={handleAnswer} mode={mode} sort={yourAnswer?.orderAnswer}/>
         }
         if (question?.questionType === 2) {
             return <QuestionV2  question={question} yourAnswer={yourAnswer} onAnswer={handleAnswer} mode={mode}/>
         }
         if (question?.questionType === 3) {
-            return <QuestionV3  question={question}  yourAnswer={yourAnswer} onAnswer={handleAnswer} mode={mode}/>
+            return <QuestionV3  question={question}  yourAnswer={yourAnswer} onAnswer={handleAnswer} mode={mode} sort={yourAnswer?.orderAnswer}/>
         }
         return <></>
     }

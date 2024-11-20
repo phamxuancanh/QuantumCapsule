@@ -56,7 +56,6 @@ const Practice: React.FC = () => {
                 const resListQuestion = response.data.data
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
-                console.log(initListAnswer);
                 
                 setExamInfo(resExamInfo.data.data)
                 setExamId(EXAM_ID)
@@ -96,27 +95,36 @@ const Practice: React.FC = () => {
             <Grid container spacing={2}>
                 {!isSumited && 
                     <Grid item xs={12} display={"flex"} gap={2}>
-                        <TimeCountdown initialSeconds={60} // 60 *40: 40 minutes 
-                            onCountdownEnd={() => {
-                                handleSubmit()
-                            }}
-                            sx={{width: "500px", height:"40px", fontSize: "1.5rem", fontWeight: "bold", color: "#1976D2"}}
-                        />
-                        {!openResult &&
-                            <Button
-                                onClick={() => {
-                                    setOpenResult(true)
-                                }}
-                                variant={"contained"}
-                                color="success"
-                                sx={{
-                                    width: "100px",
-                                    height: "40px",
-                                }}
-                            >
-                                Nộp bài
-                            </Button>
-                        }
+                        <Grid container spacing={1}>
+                            <Grid item xs={6}>
+                                <TimeCountdown initialSeconds={60* 40} // 60 *40: 40 minutes 
+                                    onCountdownEnd={() => {
+                                        handleSubmit()
+                                    }}
+                                    sx={{width: "100%", height:"40px", fontSize: "25px", color: "#1976D2"}}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                {!openResult &&
+                                    <Button
+                                        onClick={() => {
+                                            setOpenResult(true)
+                                        }}
+                                        variant={"contained"}
+                                        color="success"
+                                        sx={{
+                                            // width: "100px",
+                                            height: "40px",
+                                        }}
+                                    >
+                                        <Typography>
+                                        Nộp bài
+                                        </Typography>
+                                    </Button>
+                                }
+                            </Grid>
+                               
+                        </Grid>
                     </Grid>
                 }
                 <Grid item xs={9}>

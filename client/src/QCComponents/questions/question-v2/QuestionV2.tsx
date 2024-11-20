@@ -63,10 +63,10 @@ const QuestionV2: React.FC<IProps> = (props) => {
                         {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
                     </Typography>
                     <Typography color={"#4caf50"} fontWeight={600} fontSize={"30px"}>
-                        Đáp án đúng là: {props.question.correctAnswer}
+                        Đáp án đúng: {props.question.correctAnswer}
                     </Typography>
-                    <Typography color={"#1E201E"} fontWeight={600} fontSize={"30px"}>
-                        {props.question.explainAnswer}
+                    <Typography color={"#1E201E"} fontSize={"30px"}>
+                        Giải thích: {props.question.explainAnswer}
                     </Typography>
 
                 </Box>

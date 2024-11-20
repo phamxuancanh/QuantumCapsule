@@ -519,7 +519,7 @@ const getListLessonByChapterId = async (req, res, next) => {
         'createdAt',
         'updatedAt'
       ],
-      order: [['updatedAt', 'ASC']]
+      order: [['updatedAt', 'DESC']]
     })
     res.json({ data: lessons })
   } catch (error) {

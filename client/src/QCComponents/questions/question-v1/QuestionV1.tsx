@@ -20,6 +20,7 @@ interface IProps {
     yourAnswer?: IAnswer
     onAnswer?: (answer: string) => void
     mode?: "practice" | "submit" | "result"
+    sort?: string // 'abcded', 'aebdc', ...
 }
 
 const QuestionV1: React.FC<IProps> = (props) => {
@@ -54,10 +55,11 @@ const QuestionV1: React.FC<IProps> = (props) => {
             { value: "e", label: question.E },
         ]
         answers = answers.filter(answer => answer.label);
-        // for (let i = answers.length - 1; i > 0; i--) {
-        //     const j = Math.floor(Math.random() * (i + 1));
-        //     [answers[i], answers[j]] = [answers[j], answers[i]];
-        // }
+        if(props.sort){
+            answers.sort((a, b) => {
+                return props.sort?.indexOf(a.value)! - props.sort?.indexOf(b.value)!;
+            });
+        }
         return answers.map((answer, index) => {
             return (
                 <FormControlLabel
@@ -100,8 +102,8 @@ const QuestionV1: React.FC<IProps> = (props) => {
                     <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontSize={"30px"}>
                         {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
                     </Typography>
-                    <Typography color={"#1E201E"} fontWeight={600} fontSize={"30px"}>
-                        {question.explainAnswer}
+                    <Typography color={"#1E201E"} fontSize={"30px"}>
+                        Giải thích: {question.explainAnswer}
                     </Typography>
 
                 </Box>

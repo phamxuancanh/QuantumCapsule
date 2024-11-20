@@ -31,6 +31,6 @@ export interface IDTOResponse <T> {
 }
 
 export interface IGetResultByUserIdFilterParams {
-    from: Date,
-    to: Date
+    from?: Date,
+    to?: Date
 }
