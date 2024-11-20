@@ -11,7 +11,7 @@ const signAccessToken = async (userId) => {
   }
   const secret = process.env.ACCESS_TOKEN_SECRET
   const options = {
-    expiresIn: '2h'
+    expiresIn: '1m' // Thời gian hết hạn của access token là 1 phút
   }
 
   try {
@@ -22,12 +22,35 @@ const signAccessToken = async (userId) => {
       })
     })
 
-    await client.set(userId.toString(), token, 'EX', 2 * 60 * 60)
+    await client.set(userId.toString(), token, 'EX', 60) // Thời gian hết hạn của token trong Redis là 1 phút (60 giây)
     return token
   } catch (error) {
     throw new Error('Error signing access token')
   }
 }
+// const signAccessToken = async (userId) => {
+//   const payload = {
+//     userId
+//   }
+//   const secret = process.env.ACCESS_TOKEN_SECRET
+//   const options = {
+//     expiresIn: '2h'
+//   }
+
+//   try {
+//     const token = await new Promise((resolve, reject) => {
+//       JWT.sign(payload, secret, options, (err, token) => {
+//         if (err) return reject(err)
+//         resolve(token)
+//       })
+//     })
+
+//     await client.set(userId.toString(), token, 'EX', 2 * 60 * 60)
+//     return token
+//   } catch (error) {
+//     throw new Error('Error signing access token')
+//   }
+// }
 
 // const verifyAccessToken = (req, res, next) => {
 //   const [, Authorization] = req.headers.authorization.split(' ')
@@ -141,9 +164,11 @@ const verifyRefreshToken = (refreshToken) => {
       if (!user) {
         return reject({ status: 403, message: 'Token not found' })
       }
-      console.log(user)
+      console.log(user.dataValues)
       const now = new Date()
       if (user.expire < now) {
+        console.log(user.expire)
+        console.log(now)
         console.log('Token has expired')
         user.expire = null
         await user.save()

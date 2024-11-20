@@ -22,53 +22,7 @@ const addProgress = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
-// const findProgressByGradeAndSubject = async (req, res, next) => {
-//   try {
-//     const { grade, subjectId } = req.query
-//     console.log('grade:', grade)
-//     console.log('subjectId:', subjectId)
-//     if (!grade || !subjectId) {
-//       return res.status(400).json({ message: 'Missing grade or subjectId' })
-//     }
 
-//     const parsedGrade = parseInt(grade, 10)
-//     if (isNaN(parsedGrade)) {
-//       return res.status(400).json({ message: 'Invalid grade value' })
-//     }
-//     const progressList = await models.Progress.findAll({
-//       include: [
-//         {
-//           model: models.Theory,
-//           required: true,
-//           include: [
-//             {
-//               model: models.Lesson,
-//               required: true,
-//               include: [
-//                 {
-//                   model: models.Chapter,
-//                   required: true,
-//                   where: {
-//                     grade: parsedGrade,
-//                     subjectId
-//                   }
-//                 }
-//               ]
-//             }
-//           ]
-//         }
-//       ]
-//     })
-
-//     return res.status(200).json({
-//       message: 'Progress retrieved successfully',
-//       data: progressList
-//     })
-//   } catch (error) {
-//     console.error('Error finding Progress:', error.message)
-//     return res.status(500).json({ message: 'An error occurred while retrieving progress', error: error.message })
-//   }
-// }
 const findProgressByGradeAndSubject = async (req, res, next) => {
   try {
     const loginedUserId = req.userId

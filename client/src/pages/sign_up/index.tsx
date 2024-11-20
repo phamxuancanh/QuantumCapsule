@@ -124,13 +124,13 @@ const SignUp = () => {
         const messTermCheckBox = t('signUp.term_required');
         const schema = yup.object({
             firstName: yup
-                .string()
-                .required(messFirstName)
-                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.first_name_invalid')),
-            lastName: yup
-                .string()
-                .required(messLastName)
-                .matches(/^[A-Z][a-zA-Z]*$/, t('signUp.last_name_invalid')),
+            .string()
+            .required(messFirstName)
+            .matches(/^[\p{L}\s]+$/u, t('signUp.first_name_invalid')),
+        lastName: yup
+            .string()
+            .required(messLastName)
+            .matches(/^[\p{L}\s]+$/u, t('signUp.last_name_invalid')),
             email: yup
                 .string()
                 .email(t('signUp.email_invalid'))

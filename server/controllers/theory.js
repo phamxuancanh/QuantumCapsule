@@ -44,7 +44,9 @@ const getListTheory = async (req, res, next) => {
     const offset = (Number(page) - 1) * Number(size)
 
     const searchConditions = {
-      where: {}
+      where: {
+        status: 1 // Chỉ lấy những theory có status là 1
+      }
     }
 
     if (nameCondition) {
@@ -110,8 +112,8 @@ const addTheory = async (req, res, next) => {
 // update a theory by id
 const updateTheory = async (req, res, next) => {
   try {
-    console.log('---------------------', req.body);
-    
+    console.log('---------------------', req.body)
+
     const { id } = req.params
     const updateData = req.body
 
@@ -145,38 +147,15 @@ const deleteTheory = async (req, res, next) => {
   }
 }
 // get a theory by id
-// const getTheoryById = async (req, res, next) => {
-//   try {
-//     const { id } = req.params
-
-//     const theory = await models.Theory.findByPk(id, {
-//       attributes: [
-//         'id',
-//         'lessonId',
-//         'name',
-//         'summary',
-//         'url',
-//         'type',
-//         'order',
-//         'status'
-//       ]
-//     })
-
-//     if (!theory) {
-//       return res.json({ data: null, message: 'Theory not found' })
-//     }
-//     res.json({ theory })
-//   } catch (error) {
-//     console.error('Error fetching theory:', error)
-//     res.status(500).json({ message: 'Error fetching theory' })
-//   }
-// }
 const getTheoryById = async (req, res, next) => {
   try {
     const { id } = req.params
     console.log('id', id)
     // Tìm kiếm thông tin của Theory
     const theory = await models.Theory.findByPk(id, {
+      where: {
+        status: 1 // Chỉ lấy những theory có status là 1
+      },
       attributes: [
         'id',
         'lessonId',

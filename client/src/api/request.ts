@@ -49,10 +49,12 @@ const handleTokenRefresh = async () => {
     const persistAuthData = localStorage.getItem(persistAuthKey);
 
     if (persistAuthData) {
+      console.log('Persist auth data:', persistAuthData);
       const parsedData = JSON.parse(persistAuthData);
       parsedData.accessToken = newAccessToken;
       localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
     } else {
+      console.log('Persist auth data not found');
       const newData = { accessToken: newAccessToken };
       localStorage.setItem(persistAuthKey, JSON.stringify(newData));
     }
@@ -71,7 +73,6 @@ const handleTokenRefresh = async () => {
         reload();
       }
     });
-    return null;
   }
 };
 // const handleTokenRefresh = async () => {

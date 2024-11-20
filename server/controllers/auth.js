@@ -480,7 +480,7 @@ const signInOrRegisterWithGoogle = async (req, res) => {
     })
 
     const expire = new Date()
-    expire.setDate(expire.getDate() + 5)
+    expire.setMonth(expire.getMonth() + 1)
     await models.User.update({ expire }, { where: { id: existingUser.id } })
 
     res.setHeader('authorization', accessToken)
