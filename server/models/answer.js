@@ -27,7 +27,7 @@ const Answer = sequelize.define(
       type: DataTypes.STRING
     },
     orderAnswer: {
-      type: DataTypes.INTEGER
+      type: DataTypes.STRING
     },
     status: {
       type: DataTypes.BOOLEAN,

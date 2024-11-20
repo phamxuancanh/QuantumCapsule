@@ -35,13 +35,11 @@ const ComfirmModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => 
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
+                <Typography id="modal-modal-title" fontSize={30} fontWeight={700}>
                     {props.title}
                 </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    {props.children}
-                </Typography>
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                {props.children}
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 1}}>
                     <Button variant="outlined" color='success' onClick={() => {
                         props.onComfirm && props.onComfirm()
                         props.setOpenModal(false)

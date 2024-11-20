@@ -7,7 +7,7 @@ import { getFromLocalStorage } from "utils/functions";
 
 const randomOrderAnswer = (): string =>{
     // random abcde, adbed, edcba, ...
-    const order = ['A', 'B', 'C', 'D', 'E']
+    const order = ['a', 'b', 'c', 'd', 'e']
     const randomOrder = order.sort(() => Math.random() - 0.5)
     return randomOrder.join('')
 }
@@ -19,7 +19,7 @@ export const  InitAnswerFromQuestion = (question: IQuestion, resultId?: string):
         resultId: resultId,
         yourAnswer: '',
         isCorrect: false,
-        // orderAnswer: randomOrderAnswer(),
+        orderAnswer: randomOrderAnswer(),
         status: true,
     }
 }

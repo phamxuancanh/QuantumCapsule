@@ -47,19 +47,19 @@ const Practice: React.FC = () => {
     const [examInfo, setExamInfo] = React.useState<any>({})
     const {isNextQuestion} = useIsNextQuestion()
     // const[]
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            handleSubmit()
-        };
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    //         handleSubmit()
+    //     };
     
-        // Đăng ký sự kiện
-        window.addEventListener('beforeunload', handleBeforeUnload);
+    //     // Đăng ký sự kiện
+    //     window.addEventListener('beforeunload', handleBeforeUnload);
     
-        // Cleanup khi component bị unmount
-        return () => {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, []);
+    //     // Cleanup khi component bị unmount
+    //     return () => {
+    //       window.removeEventListener('beforeunload', handleBeforeUnload);
+    //     };
+    // }, []);
     
     useEffect(() => {
         const fetchData = async () => {

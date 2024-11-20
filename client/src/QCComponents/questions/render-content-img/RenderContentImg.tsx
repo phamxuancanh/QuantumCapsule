@@ -9,8 +9,8 @@ const RenderContentImg: React.FC<IProps> = (props) => {
     
     const renderContentImg = () => {
         if(!props.imageContent) return <></>;
-        if(props.imageContent.startsWith('http')) return <img src={props.imageContent} alt="ảnh" />;
-        if(props.imageContent.startsWith('text_')) {
+        if(props.imageContent.startsWith('http')) return <img src={props.imageContent} alt="ảnh" style={{ height: "250px", objectFit: "cover" }}/>;
+        if(props.imageContent.toLowerCase().startsWith('text_')) {
             const content = props.imageContent.substring(5);
             return (
                 <Box>
