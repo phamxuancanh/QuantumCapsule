@@ -148,7 +148,9 @@ const QuestionBox: React.FC<IProps> = (props) => {
                 sx={{textTransform: "none !important"}}
             >
                 <Typography fontSize={"25px"} >
-                    {isNextQuestion ?  'Câu tiếp theo' : 'Trả lời'}
+                    {!isNextQuestion ?  'Trả lời' : 
+                        ( listQuestion.findIndex((question: IQuestion) => question.id === currentQuestion.id) === listQuestion.length -1? 'Hoàn thành' : "Câu tiếp theo")
+                    }
                 </Typography>
             </Button>
             {/* <ReactCanvasConfetti refConfetti={makeConfetti} /> */}
