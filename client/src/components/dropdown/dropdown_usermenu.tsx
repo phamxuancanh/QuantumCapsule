@@ -226,6 +226,7 @@ const handleChange = useCallback(
 
           </div>
           <ul>
+          {(data !== 'R1' && data !== 'R2') && (
             <li>
               <Link
                 className="tw-font-medium tw-text-sm tw-text-gray-500 hover:tw-text-teal-600 tw-flex tw-items-center tw-py-1 tw-px-6"
@@ -236,8 +237,8 @@ const handleChange = useCallback(
                 {t('dropdown.profile')}
               </Link>
             </li>
-
-            {(data === 'R1' || data === 'R2') && (
+            )}
+            {/* {(data === 'R1' || data === 'R2') && (
 
               <li>
                 <Link
@@ -249,8 +250,8 @@ const handleChange = useCallback(
                   {t('dropdown.userDashboard')}
                 </Link>
               </li>
-            )}
-            <li>
+            )} */}
+            {/* <li>
               <Link
                 className="tw-font-medium tw-text-sm tw-text-gray-500 hover:tw-text-teal-600 tw-flex tw-items-center tw-py-1 tw-px-6"
                 to="/mycourses"
@@ -269,7 +270,7 @@ const handleChange = useCallback(
                 <SettingsIcon className="tw-mr-2" />
                 {t('dropdown.setting')}
               </Link>
-            </li>
+            </li> */}
             {/* {renderThemeSwitcher} */}
             <li>
               <button

@@ -370,69 +370,69 @@ const Home = () => {
     const [lessonLoading, setLessonLoading] = useState<boolean>(false)
     useEffect(() => {
         const fetchAllLessons = async () => {
-            setLessonLoading(true);
+            setLessonLoading(true)
             if ((chaptersData?.data?.length ?? 0) > 0) {
-                const chapters = chaptersData?.data ?? [];
-                let allLessons: ILesson[] = [];
+                const chapters = chaptersData?.data ?? []
+                let allLessons: ILesson[] = []
                 for (const chapter of chapters) {
                     if (chapter.id) {
-                        const lessons = await fetchLessonByChapterId(chapter.id);
+                        const lessons = await fetchLessonByChapterId(chapter.id)
 
                         if (Array.isArray(lessons.data)) {
-                            allLessons.push(...lessons.data);
+                            allLessons.push(...lessons.data)
                         }
                     }
                 }
-                setLessonsData(allLessons);
+                setLessonsData(allLessons)
             }
-            setLessonLoading(false);
+            setLessonLoading(false)
         };
-        fetchAllLessons();
-    }, [chaptersData]);
+        fetchAllLessons()
+    }, [chaptersData])
 
     const handleTheoryExamClick = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
-            navigate(`${ROUTES.learning}?theoryId=${id}`);
+            navigate(`${ROUTES.learning}?theoryId=${id}`)
         } else if (type === 'exam') {
-            navigate(`${ROUTES.skill_practice2}?examId=${id}`);
+            navigate(`${ROUTES.skill_practice2}?examId=${id}`)
         }
-    };
+    }
     const handleExam2Click = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
-            navigate(`${ROUTES.learning}?theoryId=${id}`);
+            navigate(`${ROUTES.learning}?theoryId=${id}`)
         } else if (type === 'exam') {
-            navigate(`${ROUTES.skill_practice}?examId=${id}`);
+            navigate(`${ROUTES.skill_practice}?examId=${id}`)
         }
-    };
+    }
     useEffect(() => {
         const fetchChapterProgress = async () => {
             if (selectedChapterId) {
-                const progress = await findProgressByChapter(selectedChapterId);
-                setNumberTheoryDone(progress?.data.data.length ?? 0);
+                const progress = await findProgressByChapter(selectedChapterId)
+                setNumberTheoryDone(progress?.data.data.length ?? 0)
             }
         };
-        fetchChapterProgress();
+        fetchChapterProgress()
     }, [selectedChapterId])
 
-    const [progress, setProgress] = useState<any>(null);
+    const [progress, setProgress] = useState<any>(null)
     useEffect(() => {
         const fetchResultProgress = async () => {
             if (userRedux?.grade && selectedSubject) {
                 if (selectedChapterId) {
-                    const progress = await getListUniqueDoneResultByChapterId(selectedChapterId);
-                    console.log('Progress:', progress);
-                    setProgress(progress.data.data);
-                    setNumberExamDone(progress?.data.data.exams.length ?? 0);
-                    setNumberExcersiceDone(progress?.data.data.exercises.length ?? 0);
+                    const progress = await getListUniqueDoneResultByChapterId(selectedChapterId)
+                    console.log('Progress:', progress)
+                    setProgress(progress.data.data)
+                    setNumberExamDone(progress?.data.data.exams.length ?? 0)
+                    setNumberExcersiceDone(progress?.data.data.exercises.length ?? 0)
                 }
             }
-        };
-        fetchResultProgress();
-    }, [selectedChapterId]);
+        }
+        fetchResultProgress()
+    }, [selectedChapterId])
 
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
-            <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3'>
+            <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3 tw-mb-3'>
                 {lessonLoading && (
                     <div className='tw-absolute tw-inset-0 tw-flex tw-justify-center tw-items-center tw-bg-white tw-bg-opacity-75'>
                         <ClockLoader
