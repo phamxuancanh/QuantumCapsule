@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 const Footer = () => {
   const { t } = useTranslation()
   return (
-    <div className='tw-text-lg tw-bg-neutral-800 tw-text-white tw-mt-10'>
+    <div className='tw-text-lg tw-bg-neutral-800 tw-text-white'>
       <div className="tw-container tw-mx-auto tw-px-4 sm:tw-grid tw-flex tw-flex-col sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-8 tw-pt-10">
 
         <div className="tw-col-span-1 tw-flex tw-items-center tw-justify-center">

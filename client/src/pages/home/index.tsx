@@ -432,7 +432,7 @@ const Home = () => {
 
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
-            <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3'>
+            <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3 tw-mb-3'>
                 {lessonLoading && (
                     <div className='tw-absolute tw-inset-0 tw-flex tw-justify-center tw-items-center tw-bg-white tw-bg-opacity-75'>
                         <ClockLoader
