@@ -31,8 +31,14 @@ const importExams = async (req, res, next) => {
     const existingChapterIds = new Set(existingChapters.map(chapter => chapter.id))
     const allLessonIdsExist = lessonIds.every(lessonId => existingLessonIds.has(lessonId))
     const allChapterIdsExist = chapterIds.every(chapterId => existingChapterIds.has(chapterId))
+    const missingLessonIds = lessonIds.filter(lessonId => !existingLessonIds.has(lessonId));
+    const missingChapterIds = chapterIds.filter(chapterId => !existingChapterIds.has(chapterId));
     if (!allLessonIdsExist || !allChapterIdsExist) {
-      return res.status(400).json({ message: 'One or more lessonId or chapterId do not exist in lessons or chapters table' })
+      return res.status(400).json({ 
+        message: 'One or more lessonId or chapterId do not exist in lessons or chapters table', 
+        missingLessonIds: missingLessonIds,
+        missingChapterIds: missingChapterIds
+      })
     }
     const newExams = await models.Exam.bulkCreate(exams)
     res.status(201).json({ message: 'Exams added successfully', data: newExams })

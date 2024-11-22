@@ -2,7 +2,7 @@ import SimpleTable from 'components/tables/simpleTable/SimpleTable';
 import React, { useEffect } from 'react';
 import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
 import { generateChapterUID, generateExamId, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
@@ -25,27 +25,30 @@ const ChapterManager: React.FC<IProps> = () => {
     const {setOpenForm} = useOpenForm();
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
-    const [subjectParams, setSubjectParams] = React.useState<ISubject[]>([])
+    // const [subjectParams, setSubjectParams] = React.useState<ISubject[]>([])
 
     const [filter, setFilter] = React.useState<IChapterFilter>({} as IChapterFilter)
 
     const handleFilter = async (data: IChapterFilter) => {
         setFilter(data)
         try {
+            if(data.grade === null || !data.subjectId) {
+                return 
+            }
             const response = await getListAllChapter()
             setDataTable(response.data.data.filter((item) => {
                 return (data.grade === 0 || item.grade === data.grade) && (data.subjectId === '' || item.subjectId === data.subjectId)
             }))
-            setSubjectParams([
-                {
-                    id: 'subject1',
-                    name: 'Toán'
-                },
-                {
-                    id: 'subject2',
-                    name: 'Tiếng việt'
-                }
-            ]);
+            // setSubjectParams([
+            //     {
+            //         id: 'subject1',
+            //         name: 'Toán'
+            //     },
+            //     {
+            //         id: 'subject2',
+            //         name: 'Tiếng việt'
+            //     }
+            // ]);
         }catch (error: any) {
             // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
@@ -59,7 +62,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 return false
             }
             if (data.order === null || !data.name || !data.description) {
-                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                toast.error("Vui lòng nhập đủ thông tin")
                 return false
             }
             console.log("CREATE", data);
@@ -78,7 +81,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 return false
             }
             if (data.order === null  || !data.name || !data.description) {
-                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                toast.error("Vui lòng nhập đủ thông tin")
                 return false
             }
             console.log("UPDATE", data);
@@ -107,6 +110,7 @@ const ChapterManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={2}>
+                <Typography fontSize={"20px"}>Hãy chọn lớp và môn</Typography>
                 <QCChapterFilter 
                     onChange={handleFilter}
                     mode={1}

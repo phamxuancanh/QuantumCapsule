@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { initTableData, listChapterParams } from "./data/ExamManagerData"
 import { GridColDef, GridSingleSelectColDef } from "@mui/x-data-grid"
 import { generateExamId } from "helpers/Nam-helper/GenerateUID"
-import { Box, Card, FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material"
+import { Box, Card, FormControl, Grid, InputLabel, MenuItem, Select, Typography } from "@mui/material"
 import { ACTIONS } from "utils/enums"
 import ToolbarComponent from "./components/toolbar/ToolbarComponent"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
@@ -124,6 +124,8 @@ const ExamManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={1}>
+                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương, bài học (nếu là bài ôn tập)</Typography>
+
                 <Grid container alignItems={"center"}>
                     <Grid item xs={12} md={1.5}>
                         <Card sx={{
@@ -182,7 +184,7 @@ const ExamManager: React.FC<IProps> = () => {
                         [
                             {
                                 field: "order",
-                                headerName: "Sắp xếp",
+                                headerName: "Thứ tự",
                                 maxWidth: 150,
                                 editable: true,
                                 type: "number",

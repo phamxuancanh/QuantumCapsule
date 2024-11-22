@@ -106,7 +106,7 @@ const Practice: React.FC = () => {
         >
             <StarModal />
             <Box >
-                <Typography fontSize={"25px"} color={"#EB8317"}>
+                <Typography fontSize={"25px"} color={"#EB8317"} fontWeight={"bold"}>
                     {examInfo.subjectName} {examInfo.grade}  &gt; {examInfo.chapterName} &gt; {examInfo.lessonName} &gt; {examInfo.examName}
                 </Typography>
             </Box>

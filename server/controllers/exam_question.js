@@ -34,9 +34,10 @@ const importExamQuestions = async (req, res, next) => {
 
     const allExamIdsExist = examIds.every(examId => existingExamIds.has(examId))
     const allQuestionIdsExist = questionIds.every(questionId => existingQuestionIds.has(questionId))
-
+    const missingExamIds = examIds.filter(examId => !existingExamIds.has(examId));
+    const missingQuestionIds = questionIds.filter(questionId => !existingQuestionIds.has(questionId));
     if (!allExamIdsExist || !allQuestionIdsExist) {
-      return res.status(400).json({ message: 'One or more examId or questionId do not exist in exams or questions table' })
+      return res.status(400).json({ message: 'One or more examId or questionId do not exist in exams or questions table', missingExamIds, missingQuestionIds })
     }
 
     const newExamQuestions = await models.ExamQuestion.bulkCreate(examQuestions)

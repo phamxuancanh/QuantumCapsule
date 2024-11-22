@@ -5,7 +5,7 @@ import {
     generateExamId,
     generateTheoryUID,
 } from "helpers/Nam-helper/GenerateUID"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { ACTIONS } from "utils/enums"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
 import { ILesson } from "api/lesson/lesson.interface"
@@ -47,7 +47,11 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             if(!data.name || !data.lessonId || !data.description || !data.summary
                 || !data.url || !data.type  || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                toast.error("Vui lòng nhập đủ thông tin")
+                return false
+            }
+            if(!filter.chapterId){
+                toast.error("Vui lòng chọn môn và chương")
                 return false
             }
             console.log("CREATE", data)
@@ -62,7 +66,11 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.UPDATE) {
             if(!data.name || !data.lessonId || !data.description || !data.summary
                 || !data.url || !data.type  || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                toast.error("Vui lòng nhập đủ thông tin")
+                return false
+            }
+            if(!filter.chapterId){
+                toast.error("Vui lòng chọn môn và chương")
                 return false
             }
             console.log("UPDATE", data)
@@ -88,7 +96,9 @@ const ExamManager: React.FC<IProps> = () => {
     }
     return (
         <Box>
-            <Box p={5}>
+            <Box p={1}>
+                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương</Typography>
+
                 <QCChapterFilter 
                     onChange={handleFilter}
                 />

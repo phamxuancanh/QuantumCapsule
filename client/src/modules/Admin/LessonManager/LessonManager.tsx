@@ -2,7 +2,7 @@ import SimpleTable from 'components/tables/simpleTable/SimpleTable';
 import React from 'react';
 import { GridColDef,  } from '@mui/x-data-grid';
 import { generateExamQuestionUID, generateLessonUID,  } from 'helpers/Nam-helper/GenerateUID';
-import { Autocomplete, Box, TextField } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import { ILesson } from 'api/lesson/lesson.interface';
@@ -44,7 +44,11 @@ const LessonManager: React.FC<IProps> = () => {
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             if(!data.name || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin, dữ liệu sẽ không được lưu lại")
+                toast.error("Vui lòng nhập đủ thông tin")
+                return false
+            }
+            if(!filter.chapterId) {
+                toast.error("Vui lòng chọn môn và chương")
                 return false
             }
             console.log("CREATE", data);
@@ -58,6 +62,14 @@ const LessonManager: React.FC<IProps> = () => {
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
+            if(!data.name || data.order === null) {
+                toast.error("Vui lòng nhập đủ thông tin")
+                return false
+            }
+            if(!filter.chapterId) {
+                toast.error("Vui lòng chọn môn và chương")
+                return false
+            }
             try {
                 const response = await updateLesson(data.id, data)
                 toast.success(response.data.message)
@@ -81,6 +93,8 @@ const LessonManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={2}>
+                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương</Typography>
+
                 <QCChapterFilter 
                     onChange={handleFilter}
                 />
