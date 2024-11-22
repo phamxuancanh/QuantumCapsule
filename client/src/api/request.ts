@@ -101,14 +101,26 @@ const handleTokenRefresh = async () => {
 // }
 
 
-requestWithJwt.interceptors.request.use(async (config) => {
-  const { accessToken } = getFromLocalStorage<any>('persist:auth');
-  if (accessToken != null) {
-    config.headers['Authorization'] = `Bearer ${accessToken}`
-  }
+// requestWithJwt.interceptors.request.use(async (config) => {
+//   const { accessToken } = getFromLocalStorage<any>('persist:auth');
+//   if (accessToken != null) {
+//     config.headers['Authorization'] = `Bearer ${accessToken}`
+//   }
   
-  return config
-})
+//   return config
+// })
+requestWithJwt.interceptors.request.use(async (config) => {
+  const persistAuthData = getFromLocalStorage<{ accessToken: string }>('persist:auth');
+  // console.log('persistAuthData:', persistAuthData);
+  if (persistAuthData) {
+    const accessToken = persistAuthData.accessToken;
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+  }
+  return config;
+});
+
 requestWithJwt.interceptors.response.use(
   (response) => {
     return response

@@ -44,7 +44,9 @@ const Pet = () => {
             dispatch(fetchUser());
         }
     }, [dispatch, userRedux?.id]);
-
+    useEffect(() => {
+        dispatch(fetchUser());
+    }, [dispatch]);
     const handleMouseEnter = () => {
         setIsMenuVisible(true);
     };
@@ -90,16 +92,12 @@ const Pet = () => {
     useEffect(() => {
         fetchPetList();
     }, []);
-
     const handlePetSelection = async (petId: string) => {
         const payload = {
             petId,
         };
-        const updatedUser = { ...userRedux, petId };
-        localStorage.setItem('persist:auth', JSON.stringify(updatedUser));
         if (userRedux?.id) {
             const result = await updateUser(userRedux.id, payload);
-            console.log(result);
             if (result) {
                 dispatch(updateStateInfo({
                     ...userRedux,
@@ -111,6 +109,26 @@ const Pet = () => {
             }
         }
     };
+    // const handlePetSelection = async (petId: string) => {
+    //     const payload = {
+    //         petId,
+    //     };
+    //     const updatedUser = { ...userRedux, petId };
+    //     localStorage.setItem('persist:auth', JSON.stringify(updatedUser));
+    //     if (userRedux?.id) {
+    //         const result = await updateUser(userRedux.id, payload);
+    //         console.log(result);
+    //         if (result) {
+    //             dispatch(updateStateInfo({
+    //                 ...userRedux,
+    //                 ...payload,
+    //             }));
+    //             toast.success('Chọn pet thành công');
+    //         } else {
+    //             toast.warning('Chọn pet thất bại');
+    //         }
+    //     }
+    // };
     return (
             data !== 'R1' && data !== 'R2' ? (
                 <Draggable>
