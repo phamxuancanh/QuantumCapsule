@@ -2,7 +2,7 @@ import SimpleTable from 'components/tables/simpleTable/SimpleTable';
 import React, { useEffect } from 'react';
 import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
 import { generateExamId, generateExamQuestionUID, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
-import { Autocomplete, Box, Card, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Autocomplete, Box, Card, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
@@ -112,6 +112,8 @@ const ExamQuestionManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={2}>
+                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương, bài học (nếu là bài ôn tập) và chọn bài tập</Typography>
+
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={1.5}>
                         <Card sx={{p: 2}}>

@@ -228,6 +228,14 @@ export default function SimpleTable(props: ISimpleTableProps) {
             }}
         >
             <DataGrid
+                // sx={{
+                //     "& .MuiDataGrid-cell": {
+                //         fontSize: "20px", // Kích thước chữ trong ô
+                //     },
+                //     "& .MuiDataGrid-columnHeaderTitle": {
+                //         fontSize: "22px", // Kích thước chữ trong header
+                //     },
+                // }}
                 apiRef={props.apiRef}
                 rows={rows}
                 columns={columns}

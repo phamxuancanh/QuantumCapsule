@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { initTableData, listChapterParams } from './data/TheoryData';
 import { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
 import { generateExamId, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
-import { Box, Card, FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
+import { Box, Card, FormControl, Grid, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import Loading from 'containers/loadable-fallback/loading';
@@ -119,6 +119,8 @@ const ExamManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={2}>
+                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương, bài học (nếu là bài ôn tập)</Typography>
+
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={1.5}>
                         <Card sx={{p: 2}}>
