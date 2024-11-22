@@ -34,12 +34,37 @@ const generateUsers = async () => {
     updatedAt: faker.date.recent()
   })))
 }
+// const seedAdminUser = async () => {
+//   const adminUser = {
+//     firstName: 'Admin',
+//     lastName: 'User',
+//     avatar: faker.image.avatar(),
+//     description: 'Administrator',
+//     email: 'phxuancanh@gmail.com',
+//     gender: true,
+//     age: 30,
+//     password: 'Ronaldo123@', // Ensure this is hashed in a real application
+//     username: 'admin123',
+//     refreshToken: null,
+//     expire: faker.date.future(),
+//     emailVerified: true,
+//     otp: null,
+//     otpExpire: null,
+//     roleId: 1,
+//     createdAt: new Date(),
+//     updatedAt: new Date()
+//   }
 
+//   return adminUser
+// }
 const seedUsers = async () => {
   try {
     const count = await User.count()
     if (count === 0) {
       const users = await generateUsers()
+      // const adminUser = await seedAdminUser()
+      // await User.bulkCreate([adminUser, ...users], { validate: true })
+
       await User.bulkCreate(users, { validate: true })
     } else {
       console.log('Users table is not empty.')
