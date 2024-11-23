@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import { addExam, deleteExamQuestion, getExamsByChapterId, getListExam, getListExamByChapterId, getListExamByLessonId, getListExamQuestionByChapterId, getListExamQuestionByExamId, insertExamQuestion, updateExamQuestion } from 'api/exam/exam.api';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { IExam, IExamQuestion } from 'api/exam/exam.interface';
-import { update } from 'lodash';
+import { set, update } from 'lodash';
 import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
 import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 
@@ -53,6 +53,15 @@ const ExamQuestionManager: React.FC<IProps> = () => {
                 const resQuestions = await getListQuestionByLessonId(data.lessonId)
                 setQuestionParams(resQuestions.data.data)
             }
+            if(typeExamSelected === 0 && !data.chapterId) {
+                setListExamFiltered([])
+                setQuestionParams([])
+            }
+            if(typeExamSelected === 2 && !data.lessonId) {
+                setListExamFiltered([])
+                setQuestionParams([])
+            }
+
             setDataTable([])
             setExamIdSelected('')
             // setQuestionParams([])
