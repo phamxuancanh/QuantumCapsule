@@ -19,7 +19,7 @@ const importTheories = async (req, res, next) => {
     })
     const existingLessonIds = new Set(existingLessons.map(lesson => lesson.id))
     const allLessonIdsExist = lessonIds.every(lessonId => existingLessonIds.has(lessonId))
-    const missingLessonIds = lessonIds.filter(lessonId => !existingLessonIds.has(lessonId));
+    const missingLessonIds = lessonIds.filter(lessonId => !existingLessonIds.has(lessonId))
     if (!allLessonIdsExist) {
       return res.status(400).json({ message: 'One or more lessonId do not exist in lessons table', missingLessonIds })
     }

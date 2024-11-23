@@ -40,26 +40,28 @@ const checkTokenValidity = (token: string) => {
 
 
 const handleTokenRefresh = async () => {
+  console.log('Refreshing token');
+  const tokens = getFromLocalStorage<any>('persist:auth')
+  const currentUser = tokens?.currentUser
+  console.log(tokens)
+  if (tokens?.accessToken && checkTokenValidity(tokens.accessToken)) {
+    return tokens.accessToken
+  }
+  if (!tokens) {
+    return null
+  }
   try {
-    console.log('Refreshing token');
-    const response = await refresh();
-    const newAccessToken = response.data.accessToken;
-    console.log('New access token:', newAccessToken);
-    const persistAuthKey = 'persist:auth';
-    const persistAuthData = localStorage.getItem(persistAuthKey);
-
-    if (persistAuthData) {
-      console.log('Persist auth data:', persistAuthData);
-      const parsedData = JSON.parse(persistAuthData);
-      parsedData.accessToken = newAccessToken;
-      localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
-    } else {
-      console.log('Persist auth data not found');
-      const newData = { accessToken: newAccessToken };
-      localStorage.setItem(persistAuthKey, JSON.stringify(newData));
-    }
-
-    return newAccessToken;
+    console.log('Refreshing token2');
+    const response = await refresh()
+    const newAccessToken = response.data.accessToken
+    const updatedTokens = {
+      currentUser: currentUser,
+      accessToken: newAccessToken
+    };
+    
+    setToLocalStorage('persist:auth', JSON.stringify(updatedTokens));
+    // setToLocalStorage('persist:auth', JSON.stringify(response.data.accessToken))
+    return newAccessToken
   } catch (error) {
     Swal.fire({
       title: 'Warning',
@@ -69,20 +71,34 @@ const handleTokenRefresh = async () => {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        removeAllLocalStorage();
-        reload();
+        removeAllLocalStorage()
+        reload()
       }
-    });
+    })
+    return null
   }
-};
+}
 // const handleTokenRefresh = async () => {
 //   try {
-//     console.log('Refreshing token')
-//     const response = await refresh()
-//     const newAccessToken = response.data.accessToken
-//     console.log('New access token:', newAccessToken)
-//     setToLocalStorage('persist:auth', JSON.stringify(response.data))
-//     return newAccessToken
+//     console.log('Refreshing token');
+//     const response = await refresh();
+//     const newAccessToken = response.data.accessToken;
+//     console.log('New access token:', newAccessToken);
+//     const persistAuthKey = 'persist:auth';
+//     const persistAuthData = localStorage.getItem(persistAuthKey);
+
+//     if (persistAuthData) {
+//       console.log('Persist auth data:', persistAuthData);
+//       const parsedData = JSON.parse(persistAuthData);
+//       parsedData.accessToken = newAccessToken;
+//       localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
+//     } else {
+//       console.log('Persist auth data not found');
+//       const newData = { accessToken: newAccessToken };
+//       localStorage.setItem(persistAuthKey, JSON.stringify(newData));
+//     }
+
+//     return newAccessToken;
 //   } catch (error) {
 //     Swal.fire({
 //       title: 'Warning',
@@ -92,23 +108,14 @@ const handleTokenRefresh = async () => {
 //       allowOutsideClick: false
 //     }).then((result) => {
 //       if (result.isConfirmed) {
-//         removeAllLocalStorage()
-//         reload()
+//         removeAllLocalStorage();
+//         reload();
 //       }
-//     })
-//     return null
+//     });
 //   }
-// }
+// };
 
 
-// requestWithJwt.interceptors.request.use(async (config) => {
-//   const { accessToken } = getFromLocalStorage<any>('persist:auth');
-//   if (accessToken != null) {
-//     config.headers['Authorization'] = `Bearer ${accessToken}`
-//   }
-  
-//   return config
-// })
 requestWithJwt.interceptors.request.use(async (config) => {
   const persistAuthData = getFromLocalStorage<{ accessToken: string }>('persist:auth');
   // console.log('persistAuthData:', persistAuthData);
@@ -165,6 +172,7 @@ requestWithoutJwt.interceptors.response.use(
     return response
   },
   async (error: AxiosError<IBaseErrorResponse>) => {
+    alert('requestWithoutJwt.interceptors.response.use')    
     return await Promise.reject({
       ...error.response?.data
     })

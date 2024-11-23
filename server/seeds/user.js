@@ -1,6 +1,7 @@
 const { fakerEN: faker } = require('@faker-js/faker')
 const User = require('../models/user')
 const Role = require('../models/role')
+const bcrypt = require('bcrypt')
 
 const generateRoleId = async () => {
   const roles = await Role.findAll() // Assuming Role.findAll() returns a Promise
@@ -34,38 +35,42 @@ const generateUsers = async () => {
     updatedAt: faker.date.recent()
   })))
 }
-// const seedAdminUser = async () => {
-//   const adminUser = {
-//     firstName: 'Admin',
-//     lastName: 'User',
-//     avatar: faker.image.avatar(),
-//     description: 'Administrator',
-//     email: 'phxuancanh@gmail.com',
-//     gender: true,
-//     age: 30,
-//     password: 'Ronaldo123@', // Ensure this is hashed in a real application
-//     username: 'admin123',
-//     refreshToken: null,
-//     expire: faker.date.future(),
-//     emailVerified: true,
-//     otp: null,
-//     otpExpire: null,
-//     roleId: 1,
-//     createdAt: new Date(),
-//     updatedAt: new Date()
-//   }
+const seedAdminUser = async () => {
+  const saltRounds = 10
+  const plainPassword = 'Ronaldo123@'
+  const hashedPassword = bcrypt.hashSync(plainPassword, saltRounds)
 
-//   return adminUser
-// }
+  const adminUser = {
+    firstName: 'Admin',
+    lastName: 'User',
+    avatar: '',
+    description: 'Administrator',
+    email: 'phxuancanh@gmail.com',
+    gender: true,
+    age: 30,
+    password: hashedPassword,
+    username: 'admin123',
+    refreshToken: null,
+    expire: faker.date.future(),
+    emailVerified: true,
+    otp: null,
+    otpExpire: null,
+    roleId: 1,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+  console.log(adminUser)
+  return adminUser
+}
 const seedUsers = async () => {
   try {
     const count = await User.count()
     if (count === 0) {
       const users = await generateUsers()
-      // const adminUser = await seedAdminUser()
-      // await User.bulkCreate([adminUser, ...users], { validate: true })
+      const adminUser = await seedAdminUser()
+      await User.bulkCreate([adminUser, ...users], { validate: true })
 
-      await User.bulkCreate(users, { validate: true })
+      // await User.bulkCreate(users, { validate: true })
     } else {
       console.log('Users table is not empty.')
     }

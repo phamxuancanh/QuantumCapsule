@@ -2,7 +2,7 @@
 // const seedPermissions = require('./permission')
 const seedRoles = require('./role')
 // const seedRoleToPermissions = require('./role_to_permission')
-// const seedUsers = require('./user')
+const seedUsers = require('./user')
 const seedSubjects = require('./subject')
 const seedPets = require('./pet')
 // const seedSkill = require('./skill')
@@ -18,7 +18,7 @@ const seedDatabase = async () => {
   try {
     // await seedPermissions()
     await seedRoles()
-    // await seedUsers()
+    await seedUsers()
     // await seedRoleToPermissions()
     // await seedGrids()
     await seedSubjects()
