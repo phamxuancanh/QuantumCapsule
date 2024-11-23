@@ -50,6 +50,7 @@ const ChapterManager: React.FC<IProps> = () => {
             //     }
             // ]);
         }catch (error: any) {
+            setDataTable([])
             // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }

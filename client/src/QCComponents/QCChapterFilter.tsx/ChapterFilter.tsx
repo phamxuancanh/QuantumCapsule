@@ -14,6 +14,12 @@ export interface IChapterFilter {
     subjectId?: string;
     lessonId?: string;
 }
+const defaultFilter: IChapterFilter = {
+    grade: 1,
+    subjectId: '',
+    chapterId: '',
+    lessonId: '',
+}
 
 interface IProps {
     onChange?: (filter: IChapterFilter) => void;
@@ -32,6 +38,21 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
     const [selectedLessonId, setSelectedLessonId] = useState('');
     const [filteredChapter, setFilteredChapter] = useState<IChapter[]>([]);
     const [filteredLesson, setFilteredLesson] = useState<ILesson[]>([]);
+
+    const resetFilter = () => {
+        setSelectedGrade(1);
+        setSelectedChapterId('');
+        setSelectedSubjectId('');
+        setSelectedLessonId('');
+        setFilteredChapter([]);
+        setFilteredLesson([]);
+        props.onChange && props.onChange({
+            grade: 1,
+            subjectId: '',
+            chapterId: '',
+            lessonId: '',
+        } as IChapterFilter);
+    }
 
     useEffect(() => {
         (
@@ -72,9 +93,11 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
         // if(!selectedGrade || !selectedSubjectId) return;
 
         if (name === 'grade') {
+            resetFilter();
             setSelectedGrade(value);
         }
         if (name === 'subjectId') {
+            resetFilter();
             setSelectedSubjectId(value);
         }
 
