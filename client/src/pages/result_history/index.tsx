@@ -31,6 +31,7 @@ const ResultHistory: React.FC = () => {
     }, []);
     const handleClick = async (result : IResult) => {
         const resultDetail = await getResultDetailByResultId(result.id!);
+        console.log(resultDetail);
         setResultDetail(resultDetail.data.data);
     }
     const handleFilter = async (filter: IDateFilter) => {

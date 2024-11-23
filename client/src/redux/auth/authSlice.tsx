@@ -57,9 +57,8 @@ export const fetchUser = createAsyncThunk('auth/fetchUser', async () => {
     ...JSON.parse(currentUser),
     currentUser: response.data,
   };
-
   localStorage.setItem('persist:auth', JSON.stringify(updatedAuthData));
-  
+
   return response.data;
 });
 

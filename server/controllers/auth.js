@@ -76,7 +76,7 @@ const signIn = async (req, res, next) => {
       })
     }
     const expire = new Date()
-    expire.setDate(expire.getDate() + 5)
+    expire.setMonth(expire.getMonth() + 5)
     await models.User.update({ expire }, { where: { id: user.id } })
     res.setHeader('authorization', accessToken)
     const role = await models.Role.findOne({

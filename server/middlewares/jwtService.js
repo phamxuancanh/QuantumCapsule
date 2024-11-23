@@ -11,7 +11,7 @@ const signAccessToken = async (userId) => {
   }
   const secret = process.env.ACCESS_TOKEN_SECRET
   const options = {
-    expiresIn: '1m' // Thời gian hết hạn của access token là 1 phút
+    expiresIn: '5h'
   }
 
   try {
@@ -22,12 +22,13 @@ const signAccessToken = async (userId) => {
       })
     })
 
-    await client.set(userId.toString(), token, 'EX', 60) // Thời gian hết hạn của token trong Redis là 1 phút (60 giây)
+    await client.set(userId.toString(), token, 'EX', 18000)
     return token
   } catch (error) {
     throw new Error('Error signing access token')
   }
 }
+
 // const signAccessToken = async (userId) => {
 //   const payload = {
 //     userId

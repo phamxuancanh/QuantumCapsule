@@ -21,34 +21,36 @@
     const tokens = getFromLocalStorage<any>('persist:auth');
     const accessToken = tokens?.accessToken;
   
+    // const isAuthenticated = useMemo(() => {
+    //   if (!accessToken) return false;
+    //   try {
+    //     const decodedToken: any = jwtDecode(accessToken);
+    //     const currentTime = Date.now() / 1000;
+  
+    //     if (decodedToken.exp < currentTime) {
+    //       alert('Token expired');
+    //       removeAllLocalStorage();
+    //       return false;
+    //     }
+  
+    //     if (allowedRoles && !allowedRoles.includes(decodedToken.role)) {
+    //       alert('Unauthorized');
+    //       removeAllLocalStorage();
+    //       return false;
+    //     }
+  
+    //     return true;
+    //   } catch (error) {
+    //     console.error('Invalid token:', error);
+    //     alert('Invalid token');
+    //     removeAllLocalStorage();
+    //     return false;
+    //   }
+    // }, [accessToken, allowedRoles]);
     const isAuthenticated = useMemo(() => {
-      if (!accessToken) return false;
-  
-      try {
-        const decodedToken: any = jwtDecode(accessToken);
-        const currentTime = Date.now() / 1000;
-  
-        if (decodedToken.exp < currentTime) {
-          alert('Token expired');
-          removeAllLocalStorage();
-          return false;
-        }
-  
-        if (allowedRoles && !allowedRoles.includes(decodedToken.role)) {
-          alert('Unauthorized');
-          removeAllLocalStorage();
-          return false;
-        }
-  
-        return true;
-      } catch (error) {
-        console.error('Invalid token:', error);
-        alert('Invalid token');
-        removeAllLocalStorage();
-        return false;
-      }
-    }, [accessToken, allowedRoles]);
-
+      return !!tokens?.accessToken
+    }, [tokens?.accessToken])
+    
     const publicRoutes = [
       ROUTES.sign_in,
       ROUTES.sign_up,
