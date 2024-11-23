@@ -33,22 +33,14 @@ const ChapterManager: React.FC<IProps> = () => {
         setFilter(data)
         try {
             if(data.grade === null || !data.subjectId) {
+                setDataTable([])
                 return 
             }
             const response = await getListAllChapter()
             setDataTable(response.data.data.filter((item) => {
                 return (data.grade === 0 || item.grade === data.grade) && (data.subjectId === '' || item.subjectId === data.subjectId)
             }))
-            // setSubjectParams([
-            //     {
-            //         id: 'subject1',
-            //         name: 'Toán'
-            //     },
-            //     {
-            //         id: 'subject2',
-            //         name: 'Tiếng việt'
-            //     }
-            // ]);
+
         }catch (error: any) {
             setDataTable([])
             // toast.error("Dữ liệu chưa được lấy: " + error.message)

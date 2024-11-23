@@ -46,12 +46,6 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
         setSelectedLessonId('');
         setFilteredChapter([]);
         setFilteredLesson([]);
-        props.onChange && props.onChange({
-            grade: 1,
-            subjectId: '',
-            chapterId: '',
-            lessonId: '',
-        } as IChapterFilter);
     }
 
     useEffect(() => {
@@ -95,32 +89,38 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
         if (name === 'grade') {
             resetFilter();
             setSelectedGrade(value);
-        }
-        if (name === 'subjectId') {
-            resetFilter();
-            setSelectedSubjectId(value);
+            props.onChange && props.onChange({
+                grade: value,
+                subjectId: '',
+                chapterId: '',
+                lessonId: '',
+            } as IChapterFilter);
         }
 
-        if (name === 'grade' || name === 'subjectId') {
-            const grade = name === 'grade' ? value : selectedGrade;
+        if (name === 'subjectId') {
+            resetFilter();
             const subjectId = name === 'subjectId' ? value : selectedSubjectId;
             const filtered = chapters?.filter(item => 
-                (!grade || item.grade === grade) &&
-                (!subjectId || item.subjectId === subjectId)
+                (item.grade === selectedGrade) &&
+                (item.subjectId === subjectId)
             );
-            // console.log(filtered);
-            
+            setSelectedSubjectId(subjectId);
             setFilteredChapter(filtered);
             setSelectedChapterId('');
-            if(props.mode === 1) {
-                if (props.onChange) {
-                    props.onChange({
-                        grade: grade,
-                        subjectId: subjectId,
-                    } as IChapterFilter);
-                }
-                return
-            }
+            props.onChange && props.onChange({
+                grade: selectedGrade,
+                subjectId: subjectId,
+            } as IChapterFilter);
+            // if(props.mode === 1) {
+            //     if (props.onChange) {
+            //         props.onChange({
+            //             grade: selectedGrade,
+            //             subjectId: subjectId,
+                        
+            //         } as IChapterFilter);
+            //     }
+            //     return
+            // }
 
         } else if (name === 'chapterId') {
             setSelectedChapterId(value);
