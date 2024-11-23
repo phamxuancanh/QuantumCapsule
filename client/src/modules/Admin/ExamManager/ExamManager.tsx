@@ -43,7 +43,10 @@ const ExamManager: React.FC<IProps> = () => {
     })
 
     const handleFilter = async (data: IChapterFilter) => {
+        console.log(data);
+        
         setFilter(data)
+        // setDataTable([])
         try {
             if(typeExamSelected === 0){ // bai kiem tra
                 const response = await getListExamByChapterId(data.chapterId ?? '')

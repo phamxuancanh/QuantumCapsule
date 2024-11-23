@@ -39,13 +39,14 @@ const ExamManager: React.FC<IProps> = () => {
             const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
             setLessonParams(resLessons.data.data)
         }catch (error: any) {
+            setDataTable([])
             // toast.error("Dữ liệu chưa được lấy: " + error.message)
         }
     }
 
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
-            if(!data.name || !data.lessonId || !data.description || !data.summary
+            if(!data.name || !data.lessonId 
                 || !data.url || !data.type  || data.order === null) {
                 toast.error("Vui lòng nhập đủ thông tin")
                 return false
@@ -64,7 +65,7 @@ const ExamManager: React.FC<IProps> = () => {
             }
         }
         if (action === ACTIONS.UPDATE) {
-            if(!data.name || !data.lessonId || !data.description || !data.summary
+            if(!data.name || !data.lessonId 
                 || !data.url || !data.type  || data.order === null) {
                 toast.error("Vui lòng nhập đủ thông tin")
                 return false
@@ -166,7 +167,7 @@ const ExamManager: React.FC<IProps> = () => {
                             },
                             {
                                 field: "lessonId",
-                                headerName: "bài học",
+                                headerName: "Bài học",
                                 width: 130,
                                 editable: true,
                                 valueFormatter: (value: string) => {

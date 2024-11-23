@@ -53,6 +53,9 @@ const ExamQuestionManager: React.FC<IProps> = () => {
                 const resQuestions = await getListQuestionByLessonId(data.lessonId)
                 setQuestionParams(resQuestions.data.data)
             }
+            setDataTable([])
+            setExamIdSelected('')
+            // setQuestionParams([])
         }catch (error: any) {
             setDataTable([])
         }
