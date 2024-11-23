@@ -54,7 +54,7 @@ const ResultHistory: React.FC = () => {
         <div className='tw-min-h-screen'>
         <Box p={3}>
             <Grid container spacing={2}>
-                <Grid item xs={12}>
+                <Grid item xs={12} marginBottom={"10px"}>
                     <QCDateFilter 
                         onChange={(filter) => {
                             console.log(filter);
@@ -62,6 +62,7 @@ const ResultHistory: React.FC = () => {
                         }}
                     />
                 </Grid>
+                
                 <Grid item md={4} xs={12}>
                     <Box p={2}>
                         <Typography variant="h4" style={{ textAlign: 'center', marginBottom: '20px', color: '#4caf50' }}>
@@ -134,10 +135,17 @@ const ResultHistory: React.FC = () => {
 
                     </Box>
                 </Grid>
-                <Grid item md={8} xs={12}>
+                
+                <Grid item md={8} xs={12} borderLeft={"3px solid #E5E3D4"}>
                     <Box p={2}>
-                        <Typography variant="h4" color="#4caf50" textAlign={"center"}>Kết quả: {resultDetail?.result.yourScore} / {resultDetail?.result.totalScore}</Typography>
-                        <ListResults 
+                        {
+                            resultDetail ?
+                            <Typography variant="h4" color="#4caf50" textAlign={"center"}>Trả lời đúng: {resultDetail?.result.yourScore} / {resultDetail?.result.totalScore} câu</Typography>
+                            :
+                            <Typography variant="h4" color="#4caf50" textAlign={"center"}>Kết quả</Typography>
+
+                        }
+                        {resultDetail?  <ListResults 
                             result={resultDetail?.result ?? {}}
                             listQuestion={resultDetail?.listQuestion ?? []}
                             listAnswer={resultDetail?.listAnswer ?? []}
@@ -145,7 +153,14 @@ const ResultHistory: React.FC = () => {
                                 height: '100vh',
                                 overflowY: 'auto',
                             }}
-                        />
+                        />: 
+                        <Typography sx={{
+                            textAlign: 'center',
+                            marginTop: '20px',
+                            fontSize: '30px',
+                            color: "#6B727E"
+                        }}>Chọn bài làm để xem kết quả</Typography>
+                        }
                     </Box>
                 </Grid>
             </Grid>
