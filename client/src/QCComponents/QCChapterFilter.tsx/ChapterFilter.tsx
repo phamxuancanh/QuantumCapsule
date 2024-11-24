@@ -40,7 +40,7 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
     const [filteredLesson, setFilteredLesson] = useState<ILesson[]>([]);
 
     const resetFilter = () => {
-        setSelectedGrade(1);
+        // setSelectedGrade(1);
         setSelectedChapterId('');
         setSelectedSubjectId('');
         setSelectedLessonId('');

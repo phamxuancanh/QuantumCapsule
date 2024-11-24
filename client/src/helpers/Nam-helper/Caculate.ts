@@ -5,5 +5,5 @@ export const calculateScore = (totalScore?: number, yourScore?: number) => {
     // Làm tròn lên đến 0.5 gần nhất
     const roundedScore = Math.round(rawScore * 2) / 2;
   
-    return roundedScore;
+    return rawScore;
   };
