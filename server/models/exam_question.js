@@ -14,12 +14,12 @@ const ExamQuestion = sequelize.define(
     examId: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true
+      // primaryKey: true
     },
     questionId: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true
+      // primaryKey: true
     },
     status: {
       type: DataTypes.BOOLEAN,
@@ -28,12 +28,6 @@ const ExamQuestion = sequelize.define(
   },
   {
     tableName: 'exam_questions',
-    indexes: [
-      {
-        unique: true,
-        fields: ['examId', 'questionId']
-      }
-    ],
     timestamps: true
   }
 )

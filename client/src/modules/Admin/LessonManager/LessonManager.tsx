@@ -46,7 +46,7 @@ const LessonManager: React.FC<IProps> = () => {
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             if(!data.name || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự và tên bài học")
                 return false
             }
             if(!filter.chapterId) {
@@ -65,7 +65,7 @@ const LessonManager: React.FC<IProps> = () => {
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
             if(!data.name || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự và tên bài học")
                 return false
             }
             if(!filter.chapterId) {

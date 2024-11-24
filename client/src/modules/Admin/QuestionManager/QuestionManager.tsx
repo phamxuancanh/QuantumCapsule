@@ -61,8 +61,9 @@ const ExamManager: React.FC<IProps> = () => {
     const handleUpdateRow = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
-            if(!data.title || !data.content || !data.correctAnswer) {
-                toast.error("Vui lòng nhập các trường tiêu đề, nội dung và đáp án đúng")
+            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+
                 return false
             }
             if(typeExamSelected === 0 && !filter.chapterId){
@@ -83,8 +84,8 @@ const ExamManager: React.FC<IProps> = () => {
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
-            if(!data.title || !data.content || !data.correctAnswer) {
-                toast.error("Vui lòng nhập các trường tiêu đề, nội dung và đáp án đúng")
+            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
                 return false
             }
             if(typeExamSelected === 0 && !filter.chapterId){
@@ -165,8 +166,8 @@ const ExamManager: React.FC<IProps> = () => {
                     initNewRow={{
                         id: generateQuestionUID(),
                         questionType: 1,
-                        title: "",
-                        content: "",
+                        title: "Câu 0",
+                        content: "Nội dung",
                         contentImg: "",
                         A: "",
                         B: "",

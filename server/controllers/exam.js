@@ -317,12 +317,15 @@ const getExamInfoForExam = async (req, res, next) => {
 }
 const insertExamQuestion = async (req, res, next) => {
   try {
+    const examQuestionData = req.body
     const { examId, questionId } = req.body
-    const eq = await models.ExamQuestion.findOne({ where: { examId, questionId } })
+    const eq = await models.ExamQuestion.findOne({ where: { examId, questionId, status: 1} })
     if (eq) {
       return res.status(400).json({ message: 'Bài tập đã tồn tại trong bài kiểm tra' })
     }
-    const examQuestion = await models.ExamQuestion.create({ examId, questionId })
+    console.log('--------------exam_question', examId, questionId);
+    
+    const examQuestion = await models.ExamQuestion.create(examQuestionData)
     res.status(201).json({ message: 'Thêm thành công', data: examQuestion })
   } catch (error) {
     console.error('Error adding exam question:', error)
@@ -351,7 +354,8 @@ const updateExamQuestion = async (req, res, next) => {
     const eq = await models.ExamQuestion.findOne({
       where: {
         examId: updateData.examId,
-        questionId: updateData.questionId
+        questionId: updateData.questionId,
+        status: true
       }
     })
     if (eq) {

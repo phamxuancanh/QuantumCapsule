@@ -55,7 +55,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 return false
             }
             if (data.order === null || !data.name) {
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự và tên chương")
                 return false
             }
             console.log("CREATE", data);
@@ -74,7 +74,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 return false
             }
             if (data.order === null  || !data.name) {
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự và tên chương")
                 return false
             }
             console.log("UPDATE", data);
