@@ -33,27 +33,27 @@ const Admin: React.FC = () => {
         try {
             if (chapterData) {
                 const response = await importChapters(chapterData);
-                toast.success('Chapters imported successfully');
+                toast.success('Nhập dữ liệu các chương thành công');
             }
             if (lessonData) {
                 const response = await importLessons(lessonData);
-                toast.success('Lessons imported successfully');
+                toast.success('Nhập dữ liệu các bài học thành công');
             }
             if (examData) {
                 const response = await importExams(examData);
-                toast.success('Exams imported successfully');
+                toast.success('Nhập dữ liệu các bài tập thành công');
             }
             if (theoryData) {
                 const response = await importTheories(theoryData);
-                toast.success('Theories imported successfully');
+                toast.success('Nhập dữ liệu các bài lý thuyết thành công');
             }
             if (questionData) {
                 const response = await importQuestions(questionData);
-                toast.success('Questions imported successfully');
+                toast.success('Nhập dữ liệu các câu hỏi thành công');
             }
             if (examQuestionData) {
                 const response = await importExamQuestions(examQuestionData);
-                toast.success('Exam - Question imported successfully');
+                toast.success('Nhập dữ liệu các bài tập - câu hỏi thành công');
             }
         } catch (error) {
             toast.error(`Error importing data: ${(error as Error).message || error}`);
@@ -64,7 +64,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importChapters(listData);
-            toast.success('Chapters imported successfully');
+            toast.success('Nhập dữ liệu các chương thành công');
         } catch (error) {
             toast.error(`Error importing chapters: ${(error as Error).message || error}`);
         }
@@ -74,7 +74,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importLessons(listData);
-            toast.success('Lessons imported successfully');
+            toast.success('Nhập dữ liệu các bài học thành công');
         } catch (error) {
             toast.error(`Error importing lessons: ${(error as Error).message || error}`);
         }
@@ -84,7 +84,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importTheories(listData);
-            toast.success('Theories imported successfully');
+            toast.success('Nhập dữ liệu các bài lý thuyết thành công');
         } catch (error) {
             toast.error(`Error importing theories: ${(error as Error).message || error}`);
         }
@@ -94,7 +94,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importExams(listData);
-            toast.success('Exams imported successfully');
+            toast.success('Nhập dữ liệu các bài tập thành công');
         } catch (error) {
             toast.error(`Error importing exams: ${(error as Error).message || error}`);
         }
@@ -104,7 +104,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importQuestions(listData);
-            toast.success('Questions imported successfully');
+            toast.success('Nhập dữ liệu các câu hỏi thành công');
         } catch (error) {
             toast.error(`Error importing questions: ${(error as Error).message || error}`);
         }
@@ -114,7 +114,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importExamQuestions(listData);
-            toast.success('Exam - Question imported successfully');
+            toast.success('Nhập dữ liệu các bài tập - câu hỏi thành công');
         } catch (error) {
             toast.error(`Error importing exam questions: ${(error as Error).message || error}`);
         }
@@ -138,7 +138,7 @@ const Admin: React.FC = () => {
                         { index: 2, label: 'Quản lý bài giảng (lý thuyết)', item: <TheoryManager /> },
                         { index: 3, label: 'Quản lý bài bài tập', item: <ExamManager /> },
                         { index: 4, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
-                        { index: 5, label: 'Quản lý bài kiểm tra và câu hỏi', item: <ExamQuestionManager /> }
+                        { index: 5, label: 'Quản lý bài tập - câu hỏi', item: <ExamQuestionManager /> }
                     ]}
                     defaultIndex={0}
                 />

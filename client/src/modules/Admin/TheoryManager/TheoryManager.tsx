@@ -48,7 +48,7 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             if(!data.name || !data.lessonId 
                 || !data.url || !data.type  || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự, tên, URL, kiểu, bài học")
                 return false
             }
             if(!filter.chapterId){
@@ -67,7 +67,7 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.UPDATE) {
             if(!data.name || !data.lessonId 
                 || !data.url || !data.type  || data.order === null) {
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự, tên, URL, kiểu, bài học")
                 return false
             }
             if(!filter.chapterId){
@@ -108,7 +108,7 @@ const ExamManager: React.FC<IProps> = () => {
                     toolbarComponent={<Box>
                         <ExcelExportBtn 
                             data={dataTable ? dataTable : [] as ITheory[]}
-                            headers={['id', 'lessonId', 'name', 'description', 'summary', 'url', 'type', 'order', 'status', 'lessonName']}
+                            headers={['id', 'lessonId', 'name', 'description', 'summary', 'url', 'type', 'order', 'status',]}
                             variant='outlined'
                             fileName="theory" 
                         />

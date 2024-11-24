@@ -71,7 +71,7 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data)
             if(data.order === null || !data.name ){
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự, tên bài tập")
                 return false
             }
             if(typeExamSelected === 0 && !filter.chapterId){
@@ -93,7 +93,7 @@ const ExamManager: React.FC<IProps> = () => {
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data)
             if(data.order === null || !data.name ){
-                toast.error("Vui lòng nhập đủ thông tin")
+                toast.error("Vui lòng nhập đủ thông tin: thứ tự, tên bài tập")
                 return false
             }
             if(typeExamSelected === 0 && !filter.chapterId){
