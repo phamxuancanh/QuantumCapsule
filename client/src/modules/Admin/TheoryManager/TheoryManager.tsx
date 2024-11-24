@@ -108,7 +108,7 @@ const ExamManager: React.FC<IProps> = () => {
                     toolbarComponent={<Box>
                         <ExcelExportBtn 
                             data={dataTable ? dataTable : [] as ITheory[]}
-                            headers={['id', 'lessonId', 'name', 'description', 'summary', 'url', 'type', 'order', 'status', 'lessonName']}
+                            headers={['id', 'lessonId', 'name', 'description', 'summary', 'url', 'type', 'order', 'status',]}
                             variant='outlined'
                             fileName="theory" 
                         />

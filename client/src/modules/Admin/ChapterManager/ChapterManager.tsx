@@ -54,7 +54,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 toast.error("Vui lòng chọn lớp và môn học")
                 return false
             }
-            if (data.order === null || !data.name || !data.description) {
+            if (data.order === null || !data.name) {
                 toast.error("Vui lòng nhập đủ thông tin")
                 return false
             }
@@ -73,7 +73,7 @@ const ChapterManager: React.FC<IProps> = () => {
                 toast.error("Vui lòng chọn lớp và môn học")
                 return false
             }
-            if (data.order === null  || !data.name || !data.description) {
+            if (data.order === null  || !data.name) {
                 toast.error("Vui lòng nhập đủ thông tin")
                 return false
             }
