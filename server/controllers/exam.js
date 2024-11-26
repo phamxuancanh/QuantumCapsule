@@ -290,8 +290,8 @@ const getListExamByFilterParams = async (req, res, next) => {
         LEFT JOIN chapters lc ON l.chapterId = lc.id AND lc.status = 1
         WHERE 
           e.status = 1 and
-          (c.grade = :grade AND c.subjectId = :subjectId) 
-          OR (lc.grade = :grade AND lc.subjectId = :subjectId)
+          ((c.grade = :grade AND c.subjectId = :subjectId) 
+          OR (lc.grade = :grade AND lc.subjectId = :subjectId))
       `
       replacements.subjectId = subjectId
       replacements.grade = grade
@@ -462,6 +462,21 @@ const getExercisesByChapterId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const deleteExamQuestionByExamAndQuestionId = async (req, res, next) => {
+  try {
+    const { examId, questionId } = req.body
+    console.log('--------------exam_question', examId, questionId);
+    
+    const examQuestion = await models.ExamQuestion.findOne({ where: { examId, questionId, status: 1 } })
+    if (!examQuestion) {
+      return res.status(404).json({ message: 'Không tìm thấy' })
+    }
+    await examQuestion.update({ status: 0 })
+    res.json({ message: 'xóa thành công' })
+  } catch (error) {
+    res.status(500).json({ message: 'lỗi khi xóa: ' + error.message })
+  }
+}
 // #endregion
 
 module.exports = {
@@ -483,5 +498,6 @@ module.exports = {
   getListExamQuestionByExamId,
   getExamInfo,
   getExamInfoForExam,
-  getListExamByFilterParams
+  getListExamByFilterParams,
+  deleteExamQuestionByExamAndQuestionId
 }

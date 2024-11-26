@@ -28,7 +28,7 @@ const ExcelExportBtn: React.FC<ExcelExportBtnProps> = (props) => {
             startIcon={<DownloadIcon />} 
             onClick={handleDowload}
         >
-            Tải xuống Excel
+            Tải Excel
         </Button>
     );
 };

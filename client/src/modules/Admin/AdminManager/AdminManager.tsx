@@ -12,17 +12,21 @@ import { ACTIONS } from 'utils/enums';
 import { IAction } from 'utils/interfaces';
 import SaveIcon from '@mui/icons-material/Save';
 import { toast } from 'react-toastify';
-import { generateChapterUID, generateExamId, generateExamQuestionUID, generateLessonUID, generateQuestionUID } from 'helpers/Nam-helper/GenerateUID';
+import { generateChapterUID, generateExamId, generateExamQuestionUID, generateLessonUID, generateQuestionUID, generateTheoryUID } from 'helpers/Nam-helper/GenerateUID';
 import { deleteLesson, getListLessonByFilterParams, insertLesson, updateLesson } from 'api/lesson/lesson.api';
 import { ILesson } from 'api/lesson/lesson.interface';
-import { addExam, deleteExam, getListExamByFilterParams, updateExam } from 'api/exam/exam.api';
+import { addExam, deleteExam, deleteExamQuestion, deleteExamQuestionByExamAndQuestionId, getListExamByFilterParams, importExamQuestions, insertExamQuestion, updateExam } from 'api/exam/exam.api';
 import { IExam, IExamQuestion } from 'api/exam/exam.interface';
 import SimpleTable from 'components/tables/simpleTable/SimpleTable';
 import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { IQuestion } from 'api/question/question.interfaces';
 import { GridColDef } from '@mui/x-data-grid';
-import { getListQuesionByExamId, updateQuestion } from 'api/question/question.api';
+import { addQuestion, deleteQuestion, getListQuesionByExamId, getListQuestionByChapterId, getListQuestionByLessonId, importQuestions, updateQuestion } from 'api/question/question.api';
+import ExcelReaderBtn from 'components/buttons/excel/ExcelReaderBtn';
+import CustomModal from 'components/modals/customModal/CustomModal';
+import { ITheory } from 'api/theory/theory.interface';
+import { addTheory, deleteTheory, getTheoriesByLessonId, importTheories, updateTheory } from 'api/theory/theory.api';
 
 
 const typeQuestions = [
@@ -40,6 +44,9 @@ const AdminManager: React.FC = () => {
     const [listLesson, setListLesson] = React.useState<ILesson[]>([])
     const [listExam, setListExam] = React.useState<IExam[]>([])
     const [listQuestion, setListQuestion] = React.useState<IQuestion[]>([])
+    const [listQuestionBank, setListQuestionBank] = React.useState<IQuestion[]>([])
+    const [modalQuestionBank, setModalQuestionBank] = React.useState<boolean>(false)
+    const [listTheory, setListTheory] = React.useState<ITheory[]>([])
     const [actThemChuong, setActThemChuong] = React.useState<IAction>({
         open: false,
         type: ACTIONS.CREATE
@@ -92,7 +99,30 @@ const AdminManager: React.FC = () => {
                 }catch (error: any) {
                     toast.error("Lỗi: " + error.message)
                 }
-                setListQuestion(actQuanLy.payload.data.questions)
+            }
+            if(actQuanLy.payload?.type === 'chapter' && actQuanLy.payload?.data) {
+                try {
+                    const resQuestions = await getListQuestionByChapterId(actQuanLy.payload.data.id)
+                    setListQuestion(resQuestions.data.data)
+                }catch (error: any) {
+                    toast.error("Lỗi: " + error.message)
+                }
+            }
+            if(actQuanLy.payload?.type === 'lesson' && actQuanLy.payload?.data) {
+                try {
+                    const resQuestions = await getListQuestionByLessonId(actQuanLy.payload.data.id)
+                    setListQuestion(resQuestions.data.data)
+                }catch (error: any) {
+                    toast.error("Lỗi: " + error.message)
+                }
+            }
+            if(actQuanLy.payload?.type === 'theory' && actQuanLy.payload?.data) {
+                try {
+                    const resTheory = await getTheoriesByLessonId(actQuanLy.payload.data.id)
+                    setListTheory(resTheory.data.theories)
+                }catch (error: any) {
+                    toast.error("Lỗi: " + error.message)
+                }
             }
         })()
     }, [actQuanLy.payload?.data, actQuanLy.payload?.type]);
@@ -121,15 +151,20 @@ const AdminManager: React.FC = () => {
         }catch (error: any) {
         }
     }
-    const handleUpdateRow = async (data: any, action: ACTIONS) => {
+    const handleUpdateRowExamQuestion = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
             if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
                 toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
-
                 return false
             }
             try {
+                const response = await addQuestion(data)
+                const resExamQuestion = await insertExamQuestion({
+                    examId: actQuanLy.payload.data.id,
+                    questionId: response.data.data.id
+                } as IExamQuestion)
+                setListQuestion([response.data.data, ...listQuestion])
                 toast.success("Thêm thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -144,6 +179,9 @@ const AdminManager: React.FC = () => {
             }
             try {
                 const response = await updateQuestion(data.id, data)
+                setListQuestion(listQuestion.map((item) => {
+                    return item.id === data.id ? response.data.data : item
+                }))
                 toast.success("Cập nhập thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -153,6 +191,102 @@ const AdminManager: React.FC = () => {
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
             try {
+                const res = await deleteExamQuestionByExamAndQuestionId(actQuanLy.payload?.data?.id, data)
+                setListQuestion(listQuestion.filter((item) => item.id !== data))
+                toast.success("Xóa thành công")
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+
+            }
+        }
+        return true
+    }
+    const handleUpdateRowQuestionBank = async (data: any, action: ACTIONS) => {
+        if (action === ACTIONS.CREATE) {
+            console.log("CREATE", data);
+            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+                return false
+            }
+            try {
+                const response = await addQuestion(data)
+                setListQuestion([response.data.data, ...listQuestion])
+                toast.success("Thêm thành công")
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+            }
+        }
+        if (action === ACTIONS.UPDATE) {
+            console.log("UPDATE", data);
+            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+                return false
+            }
+            try {
+                const response = await updateQuestion(data.id, data)
+                setListQuestion(listQuestion.map((item) => {
+                    return item.id === data.id ? response.data.data : item
+                }))
+                toast.success("Cập nhập thành công")
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+            }
+        }
+        if (action === ACTIONS.DELETE) {
+            console.log("DELETE", data);
+            try {
+                const res = await deleteQuestion(actQuanLy.payload?.data?.id)
+                setListQuestion(listQuestion.filter((item) => item.id !== data))
+                toast.success("Xóa thành công")
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+
+            }
+        }
+        return true
+    }
+    const handleUpdateRowTheory = async (data: any, action: ACTIONS) => {
+        if (action === ACTIONS.CREATE) {
+            console.log("CREATE", data);
+            if(!data.name || !data.url || !data.type) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: tên, url, tiêu đề")
+                return false
+            }
+            try {
+                const response = await addTheory(data)
+                setListTheory([response.data.data, ...listTheory])
+                toast.success("Thêm thành công")
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+            }
+        }
+        if (action === ACTIONS.UPDATE) {
+            console.log("UPDATE", data);
+            if(!data.name || !data.url  || !data.type) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: tên, url, tiêu đề")
+                return false
+            }
+            try {
+                const response = await updateTheory(data.id, data)
+                setListTheory(listTheory.map((item) => {
+                    return item.id === data.id ? response.data.data : item
+                }))
+                toast.success("Cập nhập thành công")
+            }catch (error: any) {
+                toast.error("Dữ liệu chưa được lưu: " + error.message)
+                return false
+            }
+        }
+        if (action === ACTIONS.DELETE) {
+            console.log("DELETE", data);
+            try {
+                const res = await deleteTheory(data)
+                setListQuestion(listTheory.filter((item) => item.id !== data))
                 toast.success("Xóa thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
@@ -171,7 +305,12 @@ const AdminManager: React.FC = () => {
                     mode={1}
             /> */}
             <Grid container spacing={2} mt={1}>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={4} 
+                    sx={{
+                        maxHeight: '100vh',
+                        overflow: 'auto'
+                    }}
+                >
                     <QCChapterFilter 
                         onChange={handleFilter}
                         mode={1}
@@ -333,6 +472,16 @@ const AdminManager: React.FC = () => {
                                             </Box>
                                         </Box>
                                     }
+                                    onClick={(event) => {
+                                        setActQuanLy({
+                                            open: true,
+                                            payload: {
+                                                type: "chapter",
+                                                data: chapterItem
+                                            },
+                                            type: ACTIONS.UPDATE
+                                        } as IAction)
+                                    }}
                                 >
                                     <TreeItem itemId={chapterItem.id+"_baihoc"} 
                                          label={
@@ -501,7 +650,17 @@ const AdminManager: React.FC = () => {
                                                                 </Tooltip>
                                                             </Box>
                                                         </Box>
-                                                    } 
+                                                    }
+                                                    onClick={(event) => {
+                                                        setActQuanLy({
+                                                            open: true,
+                                                            payload: {
+                                                                type: "lesson",
+                                                                data: lessonItem
+                                                            },
+                                                            type: ACTIONS.UPDATE
+                                                        } as IAction)
+                                                    }}
                                                 >
                                                     <TreeItem itemId={lessonItem.id+"_baiOnTap"} 
                                                         label={
@@ -688,10 +847,17 @@ const AdminManager: React.FC = () => {
                                                     </TreeItem>
                                                     <TreeItem itemId={lessonItem.id+"_baiGiang"} 
                                                         label={<Typography fontSize={20}>Danh sách bài giảng</Typography>}
-                                                        // onClick={() => {
-                                                        //     console.log(event);
+                                                        onClick={() => {
+                                                            setActQuanLy({
+                                                                open: true,
+                                                                payload: {
+                                                                    type: "theory",
+                                                                    data: lessonItem
+                                                                },
+                                                                type: ACTIONS.UPDATE
+                                                            } as IAction)
                                                             
-                                                        // }}
+                                                        }}
                                                     />
                                                 </TreeItem>
                                             })
@@ -886,16 +1052,59 @@ const AdminManager: React.FC = () => {
                 </Grid>
                 <Grid item xs={12} md={8}>
                     {
-                        actQuanLy.open && actQuanLy.payload?.type === 'exam' && (
+                        actQuanLy.open && actQuanLy.payload?.type === 'exam' &&(
                             <Box>
+                                <Typography fontSize={25} fontWeight={"bold"} color={"#4ADE80"}>Quản lý câu hỏi của bài tập: {actQuanLy.payload?.data?.name}</Typography>
                                 <SimpleTable 
                                     initData={listQuestion ? listQuestion : [] as IQuestion[]}
-                                    toolbarComponent={<Box>
+                                    toolbarComponent={<Box display={"flex"} gap={1}>
+                                        <ExcelReaderBtn variant='outlined' sheetIndex={0} name='Thêm từ excel' onUpload={async (data)=>{
+                                            try {
+                                                const payload = data.map((item) => ({
+                                                    id: generateChapterUID(),
+                                                    questionType: item.questionType ?? "",
+                                                    title: item.title ?? "",
+                                                    content: item.content ?? "",
+                                                    contentImg: item.contentImg ?? "",
+                                                    A: item.A ?? "",
+                                                    B: item.B ?? "",
+                                                    C: item.C ?? "",
+                                                    D: item.D ?? "",
+                                                    E: item.E ?? "",
+                                                    correctAnswer: item.correctAnswer,
+                                                    explainAnswer: item.explainAnswer,
+                                                    lessonId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data?.lessonId : '',
+                                                    chapterId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data.lessonId : '',
+                                                    status: true,
+                                                } as IQuestion))
+                                                const response = await importQuestions(payload)
+                                                const payloadExamQuestion = response.data.data.map((item : IQuestion) => {
+                                                    return {
+                                                        examId: actQuanLy.payload.data.id,
+                                                        questionId: item.id
+                                                    } as IExamQuestion
+                                                })
+                                                await importExamQuestions(payloadExamQuestion)
+                                                toast.success("Nhập dữ liệu thành công")
+                                                console.log([...response.data.data, ...listQuestion ?? []]);
+                                                
+                                                setListQuestion(pre => [...response.data.data, ...pre ?? []])
+                                            }catch (error: any) {
+                                                toast.error("Nhập dữ liệu thất bại: " + error.message)
+                                            }
+                                        }} />
+                                        <Button variant='outlined'
+                                            onClick={() => {
+                                                setModalQuestionBank(true)
+                                            }}
+                                        >
+                                            Thêm từ ngân hàng câu hỏi
+                                        </Button>
                                         <ExcelExportBtn 
                                             data={listQuestion ? listQuestion : [] as IQuestion[]}
-                                            headers={['questionType', 'title', 'content', 'contentImg', 'A', 'B', 'C', 'D', 'E', 'correctAnswer', 'explainAnswer', 'lessonId', 'chapterId']}
+                                            headers={['questionType', 'title', 'content', 'contentImg', 'A', 'B', 'C', 'D', 'E', 'correctAnswer', 'explainAnswer']}
                                             variant='outlined'
-                                            fileName="exam" 
+                                            fileName="questions" 
                                         />
                                     </Box>}
                                     initNewRow={{
@@ -911,8 +1120,8 @@ const AdminManager: React.FC = () => {
                                         E: "",
                                         correctAnswer: "",
                                         explainAnswer: "",
-                                        lessonId: filter.lessonId ?? "",
-                                        chapterId: filter.chapterId ?? '',
+                                        lessonId: actQuanLy.payload.data.lessonId,
+                                        chapterId: actQuanLy.payload.data.chapterId,
                                         status: true,
                                     }as IQuestion}
                                     columns={[
@@ -938,29 +1147,197 @@ const AdminManager: React.FC = () => {
                                         { field: 'E', headerName: 'E', width: 130, editable: true },
                                         { field: 'correctAnswer', headerName: 'Đáp án đúng', width: 130, editable: true },
                                         { field: 'explainAnswer', headerName: 'Giải thích đáp án', width: 130, editable: true },
-                                        // { field: 'lessonId', headerName: 'Bài học', width: 180, 
-                                        //     editable: true,
-                                        //     valueFormatter: (value: string) => {
-                                        //         const temp = lessonParams?.find((item) => item.id === value)
-                                        //         return temp?.name
-                                        //     },
-                                        //     renderEditCell(params) {
-                                        //         return <RenderEditCell params={params} dataParams={lessonParams} label='name' editCellField='lessonId'/>
-                                        //     },
-                                        // },
-                                        // { field: 'status', headerName: 'Trạng thái', width: 130 }
                                     ] as GridColDef[]}
                                     onRowClick={(row) => {
                                         setDataSelected(row.row)
-                                        // setOpenForm(true);
                                     }}
-                                    onUpdateRow={(data, action) => handleUpdateRow(data, action)}
+                                    onUpdateRow={(data, action) => handleUpdateRowExamQuestion  (data, action)}
+                                />
+                            </Box>
+                        )
+                    }
+                    {
+                        actQuanLy.open && (
+                            actQuanLy.payload?.type === 'chapter' || 
+                            actQuanLy.payload?.type === 'lesson'
+                        ) && (
+                            <Box>
+                                <Typography fontSize={25} fontWeight={"bold"} color={"#4ADE80"}>Quản lý ngân hàng câu hỏi: {actQuanLy.payload?.data?.name}</Typography>
+                                <SimpleTable 
+                                    initData={listQuestion ? listQuestion : [] as IQuestion[]}
+                                    toolbarComponent={<Box display={"flex"} gap={1}>
+                                        <ExcelReaderBtn variant='outlined' sheetIndex={0} name='Thêm từ excel' onUpload={async (data)=>{
+                                            try {
+                                                const payload = data.map((item) => ({
+                                                    id: generateChapterUID(),
+                                                    questionType: item.questionType ?? "",
+                                                    title: item.title ?? "",
+                                                    content: item.content ?? "",
+                                                    contentImg: item.contentImg ?? "",
+                                                    A: item.A ?? "",
+                                                    B: item.B ?? "",
+                                                    C: item.C ?? "",
+                                                    D: item.D ?? "",
+                                                    E: item.E ?? "",
+                                                    correctAnswer: item.correctAnswer,
+                                                    explainAnswer: item.explainAnswer,
+                                                    lessonId: actQuanLy.payload?.type === 'lesson' ? actQuanLy.payload.data.id : '',
+                                                    chapterId: actQuanLy.payload?.type === 'chapter' ? actQuanLy.payload.data.id : '',
+                                                    status: true,
+                                                } as IQuestion))
+                                                const response = await importQuestions(payload)
+                                                toast.success("Nhập dữ liệu thành công")
+                                                console.log([...response.data.data, ...listQuestion ?? []]);
+                                                
+                                                setListQuestion(pre => [...response.data.data, ...pre ?? []])
+                                            }catch (error: any) {
+                                                toast.error("Nhập dữ liệu thất bại: " + error.message)
+                                            }
+                                        }} />
+                                        <ExcelExportBtn 
+                                            data={listQuestion ? listQuestion : [] as IQuestion[]}
+                                            headers={['questionType', 'title', 'content', 'contentImg', 'A', 'B', 'C', 'D', 'E', 'correctAnswer', 'explainAnswer']}
+                                            variant='outlined'
+                                            fileName="questions" 
+                                        />
+                                    </Box>}
+                                    initNewRow={{
+                                        id: generateQuestionUID(),
+                                        questionType: 1,
+                                        title: "Câu 0",
+                                        content: "Nội dung",
+                                        contentImg: "",
+                                        A: "",
+                                        B: "",
+                                        C: "",
+                                        D: "",
+                                        E: "",
+                                        correctAnswer: "",
+                                        explainAnswer: "",
+                                        lessonId: actQuanLy.payload?.type === 'lesson' ? actQuanLy.payload.data.id : '',
+                                        chapterId: actQuanLy.payload?.type === 'chapter' ? actQuanLy.payload.data.id : '',
+                                        status: true,
+                                    }as IQuestion}
+                                    columns={[
+                                        // { field: 'id', headerName: 'ID', width: 70 },
+                                        { field: 'questionType', headerName: 'Loại câu hỏi', width: 180, 
+                                            editable: true,
+                                            valueFormatter: (value: number) => {
+                                                const temp = typeQuestions?.find((item) => item.id === value)
+                                                return temp?.name
+                                            },
+                                            renderEditCell(params) {
+                                                return <RenderEditCell params={params} dataParams={typeQuestions} label='name' editCellField='questionType'/>
+                                            },
+                                        },
+                                        // { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
+                                        { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
+                                        { field: 'content', headerName: 'Nội dung', width: 130, editable: true },
+                                        { field: 'contentImg', headerName: 'Ảnh', width: 130, editable: true },
+                                        { field: 'A', headerName: 'A', width: 130, editable: true },
+                                        { field: 'B', headerName: 'B', width: 130, editable: true },
+                                        { field: 'C', headerName: 'C', width: 130, editable: true },
+                                        { field: 'D', headerName: 'D', width: 130, editable: true },
+                                        { field: 'E', headerName: 'E', width: 130, editable: true },
+                                        { field: 'correctAnswer', headerName: 'Đáp án đúng', width: 130, editable: true },
+                                        { field: 'explainAnswer', headerName: 'Giải thích đáp án', width: 130, editable: true },
+                                    ] as GridColDef[]}
+                                    onRowClick={(row) => {
+                                        setDataSelected(row.row)
+                                    }}
+                                    onUpdateRow={(data, action) => handleUpdateRowQuestionBank (data, action)}
+                                />
+                            </Box>
+                        )
+                    }
+                    {
+                        actQuanLy.open && (
+                            actQuanLy.payload?.type === 'theory'
+                        ) && (
+                            <Box>
+                                <Typography fontSize={25} fontWeight={"bold"} color={"#4ADE80"}>Quản lý danh sách bài giảng: {actQuanLy.payload?.data?.name}</Typography>
+                                <SimpleTable 
+                                    initData={listTheory ? listTheory : [] as IQuestion[]}
+                                    toolbarComponent={
+                                        <Box display={"flex"} gap={1}>
+                                            <ExcelReaderBtn variant='outlined' sheetIndex={0} name='Thêm từ excel' onUpload={async (data)=>{
+                                                try {
+                                                    const payload = data.map((item) => ({
+                                                        id: generateChapterUID(),
+                                                        lessonId: actQuanLy.payload.data.id,
+                                                        name: item.name ?? "",
+                                                        url: item.url ?? "",
+                                                        type: item.type ?? "",
+                                                        status: true,
+                                                    } as ITheory))
+                                                    const response = await importTheories(payload)
+                                                    toast.success("Nhập dữ liệu thành công")
+                                                    console.log([...response.data.data, ...listTheory ?? []]);
+                                                    
+                                                    setListTheory(pre => [...response.data.data, ...pre ?? []])
+                                                }catch (error: any) {
+                                                    toast.error("Nhập dữ liệu thất bại: " + error.message)
+                                                }
+                                            }} />
+                                            <ExcelExportBtn 
+                                                data={listTheory ? listTheory : [] as ITheory[]}
+                                                headers={[ 'name', 'url', 'type']}
+                                                variant='outlined'
+                                                fileName="theory" 
+                                            />
+                                        </Box>
+                                    }
+                                    initNewRow={{
+                                        id: generateTheoryUID(),
+                                        lessonId: actQuanLy.payload.data.id,
+                                        name: "Tên bài lý thuyết",
+                                        description: "Mô tả",
+                                        summary: "Tóm tắt",
+                                        url: "Link",
+                                        type: "MP4",
+                                        order: 0,
+                                        status: true,
+                                    } as ITheory}
+                                    columns={[
+                                        {
+                                            field: "name",
+                                            headerName: "Tên",
+                                            width: 130,
+                                            editable: true,
+                                        },
+                                        {
+                                            field: "url",
+                                            headerName: "URL",
+                                            width: 130,
+                                            editable: true,
+                                        },
+                                        {
+                                            field: "type",
+                                            headerName: "Kiểu",
+                                            width: 130,
+                                            editable: true,
+                                        },
+                                    ] as GridColDef[]}
+                                    onRowClick={(row) => {
+                                        setDataSelected(row.row)
+                                    }}
+                                    onUpdateRow={(data, action) => handleUpdateRowTheory(data, action)}
                                 />
                             </Box>
                         )
                     }
                 </Grid>
             </Grid>
+
+            <CustomModal
+                open={modalQuestionBank}
+                setOpenModal={setModalQuestionBank}
+                title='Danh sách các câu hỏi'
+            >
+                <Box>
+                    Danh sách câu hỏi
+                </Box>
+            </CustomModal>
         </Box>
     );
 };

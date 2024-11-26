@@ -68,3 +68,7 @@ export const getExamInfoForExam = async (examId: string): Promise<AxiosResponse<
 export const getListExamByFilterParams = async (params: IChapterFilter): Promise<AxiosResponse<DataListExam>> => {
     return await requestWithJwt.get<DataListExam>('/exams/getListExamByFilterParams', { params: params });
 }
+
+export const deleteExamQuestionByExamAndQuestionId = async (examId: string, questionId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.post<any>('/exams/deleteExamQuestionByExamAndQuestionId', { examId, questionId }, { withCredentials: true });
+}
