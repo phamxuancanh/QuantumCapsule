@@ -28,6 +28,7 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
     const handleExcelFile = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         const fileExtension = file?.name?.split('.').pop()?.toLowerCase();
+        console.log("tessssssssssssssssssssst");
         
         if(!file) {
             alert('No file selected');
@@ -43,10 +44,10 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
         reader.onload = (e) => {
             const arrayBuffer = e.target?.result;
             const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const sheetName = workbook.SheetNames[props.sheetIndex? props.sheetIndex : 0];
+            const sheetName = workbook.SheetNames[props.sheetIndex !== undefined? props.sheetIndex : 0];
             const worksheet = workbook.Sheets[sheetName];
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
+            
             const keys = jsonData[0] as string[];
 
             const rows = jsonData.slice(1).map((row: any) => {
@@ -119,7 +120,6 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
     const handleExcelFileMulti = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         const fileExtension = file?.name?.split('.').pop()?.toLowerCase();
-        console.log("importing multi sheet1");
     
         if (!file) {
             alert('No file selected');
@@ -154,9 +154,11 @@ const ExcelReaderBtn: React.FC<IExcelReaderBtnProps> = (props: IExcelReaderBtnPr
                 type="file"
                 accept=".xlsx, .xls, .xlsm"
                 onChange={(e) => {
+                    console.log("importing sheet");
+                    
                     if(props.listSheetIndex && props.onUploadMulti) {
                         handleExcelFileMulti(e);
-                    }else if(props.sheetIndex && props.onUpload) {
+                    }else{
                         handleExcelFile(e) 
                     }
                 }}

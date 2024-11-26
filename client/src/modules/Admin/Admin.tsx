@@ -21,6 +21,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ExamQuestionManager from './ExamQuestionManager/ExamQuestionManagerProvider';
 import LessonManager from './LessonManager/LessonManagerProvider';
 import ChapterManagerProvider from './ChapterManager/ChapterManagerProvider';
+import AdminManager from './AdminManager/AdminManager';
 const Admin: React.FC = () => {
 
     const handleImportMulti = async (listData: { index: number, data: any[] }[]) => {
@@ -131,7 +132,8 @@ const Admin: React.FC = () => {
     return (
         <div>
             <Box p={2}>
-                <TabMenu
+                <AdminManager />
+                {/* <TabMenu
                     listItems={[
                         { index: 0, label: 'Quản lý chương', item: <ChapterManagerProvider /> },
                         { index: 1, label: 'Quản lý bài học', item: <LessonManager /> },
@@ -141,7 +143,7 @@ const Admin: React.FC = () => {
                         { index: 5, label: 'Quản lý bài tập - câu hỏi', item: <ExamQuestionManager /> }
                     ]}
                     defaultIndex={0}
-                />
+                /> */}
             </Box>
             <div className='tw-flex tw-justify-center'>
                 <div className='tw-w-11/12'>

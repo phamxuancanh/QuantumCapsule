@@ -1,6 +1,9 @@
 /* eslint-disable brace-style */
-const { models } = require('../models')
+const { queries } = require('../helpers/QueryHelper')
+const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
+const { Sequelize } = require('sequelize')
+
 
 // import lessons data
 const importLessons = async (req, res, next) => {
@@ -529,6 +532,44 @@ const getListLessonByChapterId = async (req, res, next) => {
   }
 }
 
+const getListLessonByFilterParams = async (req, res, next) => {
+    try {
+      const { chapterId, grade, subjectId } = req.query
+      console.log('------------------:', chapterId, grade, subjectId );
+      if(!((subjectId && grade) || chapterId)) {
+        return res.status(400).json({ message: 'Thiếu điều kiện lọc' })
+      }
+      const query = `
+          select l.* from lessons l
+          join chapters c on l.chapterId = c.id
+          where 
+            ${subjectId ? 'c.subjectId = :subjectId and' : ''} 
+            ${grade ? 'c.grade = :grade and': ''} 
+            ${chapterId ? 'l.chapterId = :chapterId and': ''} 
+            l.status = 1 and
+            c.status = 1
+          order by l.updatedAt desc
+        `
+      const replacements = {}
+      if(subjectId) replacements.subjectId = subjectId
+      if(grade) replacements.grade = grade
+      if(chapterId) replacements.chapterId = chapterId
+      console.log(replacements);
+      console.log(query);
+      
+      const listLesson = await sequelize.query(query, {
+        replacements,
+        type: sequelize.QueryTypes.SELECT
+      })
+      console.log(listLesson);
+      
+
+      return res.status(200).json({ message: 'Lấy dữ liệu thành công', data: listLesson })
+    } catch (error) {
+      res.status(500).json({ message: 'Lỗi khi lấy dữ liệu' })
+    }
+}
+
 module.exports = {
   importLessons,
   getListLesson,
@@ -540,5 +581,6 @@ module.exports = {
   getLessonsandExams,
   getSuggestions,
   getFirstLessonByChapterId,
-  getListLessonByChapterId
+  getListLessonByChapterId,
+  getListLessonByFilterParams
 }

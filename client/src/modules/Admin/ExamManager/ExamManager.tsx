@@ -7,7 +7,7 @@ import { ACTIONS } from "utils/enums"
 import ToolbarComponent from "./components/toolbar/ToolbarComponent"
 import { useDataSelected, useDataTable, useOpenForm } from "./context/context"
 import AddQuestionBox from "./components/add-questions/AddQuestionBox"
-import { addExam, deleteExam, getListExam, getListExamByChapterId, getListExamByLessonId, importExamQuestions, importExams, updateExam } from "api/exam/exam.api"
+import { addExam, deleteExam, getListExam, getListExamByChapterId, getListExamByFilterParams, getListExamByLessonId, importExamQuestions, importExams, updateExam } from "api/exam/exam.api"
 import { IExam, ListExamParams } from "api/exam/exam.interface"
 import Loading from "containers/loadable-fallback/loading"
 import loadable from "@loadable/component"
@@ -22,25 +22,29 @@ import RenderEditCell from "../components/RenderEditCell/RenderEditCell"
 import ExcelExportBtn from "components/buttons/excel/ExcelExportBtn"
 const SimpleTable = loadable(() => import("components/tables/simpleTable/SimpleTable"), { fallback: <Loading /> });
 
-const typeExams = [
-    {id: 0, name: "Bài kiểm tra"},
-    {id: 2, name: "Bài ôn tập"}
-]
+
 interface IProps {
     // Define the props for the ExamManager component here
+    lesson?: ILesson;
+
 }
 
-const ExamManager: React.FC<IProps> = () => {
+const ExamManager: React.FC<IProps> = (props) => {
     const { setDataSelected } = useDataSelected()
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
     const [chapterParams, setChapterParams] = React.useState<IChapter[]>([])
     const [lessonParams, setLessonParams] = React.useState<ILesson[]>([])
-    const [typeExamSelected, setTypeExamSelected] = React.useState<number>(0)
     const [filter, setFilter] = React.useState<IChapterFilter>({
         chapterId: "",
         lessonId: "",
     })
+
+    useEffect(() => {
+        if(props.lesson){
+            handleFilter({lessonId: props.lesson.id})
+        }
+    }, [])
 
     const handleFilter = async (data: IChapterFilter) => {
         console.log(data);
@@ -48,19 +52,9 @@ const ExamManager: React.FC<IProps> = () => {
         setFilter(data)
         // setDataTable([])
         try {
-            if(typeExamSelected === 0){ // bai kiem tra
-                const response = await getListExamByChapterId(data.chapterId ?? '')
-                setDataTable(response.data.data)
-            }
-            if(typeExamSelected === 2){ // bai on tap
-                const response = await getListExamByLessonId(data.lessonId ?? '')
-                setDataTable(response.data.data)
-            }
+            const response = await getListExamByFilterParams(data)
+            setDataTable(response.data.data)
 
-            // const resLessons = await getListLessonByChapterId(data.chapterId ?? '')
-            // setLessonParams(resLessons.data.data)
-            // const resChapters = await getListAllChapter()
-            // setChapterParams(resChapters.data.data)
         }catch (error: any) {
             setDataTable([])
             // toast.error("Dữ liệu chưa được lấy: " + error.message)
@@ -74,17 +68,14 @@ const ExamManager: React.FC<IProps> = () => {
                 toast.error("Vui lòng nhập đủ thông tin: thứ tự, tên bài tập")
                 return false
             }
-            if(typeExamSelected === 0 && !filter.chapterId){
-                toast.error("Vui lòng chọn chương")
-                return false
-            }
-            if(typeExamSelected === 2 && !filter.lessonId){
-                toast.error("Vui lòng chọn bài học")
+            if(!filter.chapterId && !filter.lessonId){
+                toast.error("Vui lòng chọn chương hoặc bài học")
                 return false
             }
             try{
                 await addExam(data)
-                toast.success("Exam added successfully")
+                setDataTable(pre => [data, ...pre ?? []])
+                toast.success("Thêm mới thành công")
             }catch(e: any){
                 toast.error("Error: " + e.message )
                 return false
@@ -96,17 +87,10 @@ const ExamManager: React.FC<IProps> = () => {
                 toast.error("Vui lòng nhập đủ thông tin: thứ tự, tên bài tập")
                 return false
             }
-            if(typeExamSelected === 0 && !filter.chapterId){
-                toast.error("Vui lòng chọn chương")
-                return false
-            }
-            if(typeExamSelected === 2 && !filter.lessonId){
-                toast.error("Vui lòng chọn bài học")
-                return false
-            }
             try{
                 const resUpdate = await updateExam(data.id, data)
-                toast.success(resUpdate.data.message)
+                setDataTable(pre => pre?.map((item) => item.id === data.id ? data : item))
+                toast.success("Cập nhập thành công")
             }catch(e: any){
                 toast.error("Error: " + e.message)
                 return false
@@ -116,7 +100,8 @@ const ExamManager: React.FC<IProps> = () => {
             console.log("DELETE", data)
             try{
                 const resDelete = await deleteExam(data)
-                toast.success(resDelete.data.message)
+                setDataTable(pre => pre?.filter((item) => item.id !== data))
+                toast.success("Xoá thành công")
             }catch(e: any){
                 toast.error("Error: " + e.message)
                 return false
@@ -127,41 +112,17 @@ const ExamManager: React.FC<IProps> = () => {
     return (
         <Box>
             <Box p={1}>
-                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương, bài học (nếu là bài ôn tập)</Typography>
-
-                <Grid container alignItems={"center"}>
-                    <Grid item xs={12} md={1.5}>
-                        <Card sx={{
-                            p: 2,
-                        }}>
-                            <FormControl fullWidth>
-                                <InputLabel>Chọn</InputLabel>
-                                <Select
-                                    name="lessonId"
-                                    value={typeExamSelected}
-                                    label="Bài học"
-                                    onChange={(e)=>setTypeExamSelected(e.target.value as number)}
-                                    // disabled={selectedChapterId === ''} // Disable nếu chưa chọn lesson
-                                >
-                                {typeExams?.map((item) => (
-                                    <MenuItem key={item.id} value={item.id}>
-                                        {item.name}
-                                    </MenuItem>
-                                ))}
-                                </Select>
-                            </FormControl>
-
-                        </Card>
-                    </Grid>
+                {!props.lesson && 
+                    <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương, bài học (nếu là bài ôn tập)</Typography>
+                }
+                {!props.lesson &&
                     <Grid item xs={12} md={10.5}>
                         <QCChapterFilter 
                             onChange={handleFilter}
-                            mode={typeExamSelected}
+                            mode={3}
                         />
-
                     </Grid>
-
-                </Grid>
+                }
                 <SimpleTable
                     initData={dataTable as unknown as IExam[]}
                     toolbarComponent={<Box>

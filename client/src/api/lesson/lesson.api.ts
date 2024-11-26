@@ -1,6 +1,7 @@
 import { requestWithJwt } from '../request'
 import { AxiosResponse } from 'axios'
 import { DataListLessonandExam, DataListLesson, ILesson, ListLessonandExamParams, ListLessonParams } from './lesson.interface';
+import { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
 
 export const importLessons = async (lessons: any[]): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.post<any>('/lessons/importLessons', { lessons }, { withCredentials: true });
@@ -35,4 +36,8 @@ export const updateLesson = async (lessonId: string, lesson: ILesson): Promise<A
 }
 export const deleteLesson = async (lessonId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.delete<any>(`/lessons/${lessonId}`);
+}
+
+export const getListLessonByFilterParams= async (params: IChapterFilter): Promise<AxiosResponse<DataListLesson>> => {
+    return await requestWithJwt.get<DataListLesson>('/lessons/getListLessonByFilterParams', { params: params })
 }

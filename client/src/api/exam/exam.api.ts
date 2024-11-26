@@ -1,6 +1,7 @@
 import { requestWithJwt, requestWithoutJwt } from '../request'
 import { AxiosResponse } from 'axios'
 import { DataListExam, DataListExamQuestion, IExam, IExamQuestion, ListExamParams } from './exam.interface';
+import { IChapterFilter } from 'QCComponents/QCChapterFilter.tsx/ChapterFilter';
 
 export const importExams = async (exams: IExam[]): Promise<AxiosResponse<any>> => {
     console.log(exams);
@@ -63,4 +64,7 @@ export const getExamInfo = async (examId: string): Promise<AxiosResponse<any>> =
 }
 export const getExamInfoForExam = async (examId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>('/exams/getExamInfoForExam/'+ examId,  { withCredentials: true });
+}
+export const getListExamByFilterParams = async (params: IChapterFilter): Promise<AxiosResponse<DataListExam>> => {
+    return await requestWithJwt.get<DataListExam>('/exams/getListExamByFilterParams', { params: params });
 }

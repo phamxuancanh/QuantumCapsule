@@ -13,5 +13,6 @@ router.get('/getLessonById/:id', verifyAccessToken, lessonController.getLessonBy
 router.get('/chapter/:chapterId', verifyAccessToken, lessonController.getLessonByChapterId)
 router.get('/getFirstLessonByChapterId/:chapterId', verifyAccessToken, lessonController.getFirstLessonByChapterId)
 router.get('/getListLessonByChapterId/:chapterId', verifyAccessToken, lessonController.getListLessonByChapterId)
+router.get('/getListLessonByFilterParams', verifyAccessToken, lessonController.getListLessonByFilterParams)
 
 module.exports = router
