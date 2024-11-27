@@ -22,11 +22,12 @@ import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { IQuestion } from 'api/question/question.interfaces';
 import { GridColDef } from '@mui/x-data-grid';
-import { addQuestion, deleteQuestion, getListQuesionByExamId, getListQuestionByChapterId, getListQuestionByLessonId, importQuestions, updateQuestion } from 'api/question/question.api';
+import { addQuestion, deleteQuestion, getListQuesionByExamId, getListQuestionBank, getListQuestionByChapterId, getListQuestionByLessonId, importQuestions, updateQuestion } from 'api/question/question.api';
 import ExcelReaderBtn from 'components/buttons/excel/ExcelReaderBtn';
 import CustomModal from 'components/modals/customModal/CustomModal';
 import { ITheory } from 'api/theory/theory.interface';
 import { addTheory, deleteTheory, getTheoriesByLessonId, importTheories, updateTheory } from 'api/theory/theory.api';
+import ComfirmModal from 'components/modals/comfirmModal/ComfirmModal';
 
 
 const typeQuestions = [
@@ -40,6 +41,7 @@ const AdminManager: React.FC = () => {
 
     const [filter, setFilter] = React.useState<IChapterFilter>({} as IChapterFilter)
     const [dataSelected, setDataSelected] = React.useState<any>()
+    const [listIdAddFromQuestionBank, setListIdAddFromQuestionBank] = React.useState<string[]>([])
     const [listChapter, setListChapter] = React.useState<IChapter[]>([])
     const [listLesson, setListLesson] = React.useState<ILesson[]>([])
     const [listExam, setListExam] = React.useState<IExam[]>([])
@@ -472,16 +474,6 @@ const AdminManager: React.FC = () => {
                                             </Box>
                                         </Box>
                                     }
-                                    onClick={(event) => {
-                                        setActQuanLy({
-                                            open: true,
-                                            payload: {
-                                                type: "chapter",
-                                                data: chapterItem
-                                            },
-                                            type: ACTIONS.UPDATE
-                                        } as IAction)
-                                    }}
                                 >
                                     <TreeItem itemId={chapterItem.id+"_baihoc"} 
                                          label={
@@ -846,7 +838,7 @@ const AdminManager: React.FC = () => {
                                                         }
                                                     </TreeItem>
                                                     <TreeItem itemId={lessonItem.id+"_baiGiang"} 
-                                                        label={<Typography fontSize={20}>Danh sách bài giảng</Typography>}
+                                                        label={<Typography fontSize={20}>Quản lý bài giảng</Typography>}
                                                         onClick={() => {
                                                             setActQuanLy({
                                                                 open: true,
@@ -865,7 +857,7 @@ const AdminManager: React.FC = () => {
 
                                     </TreeItem>
                                     <TreeItem itemId={chapterItem.id+"_baikiemtra"} 
-                                         label={
+                                        label={
                                             <Box display={"flex"} justifyContent={"space-between"}>
                                                 <Typography fontSize={20}>
                                                     Danh sách bài kiểm tra <Typography color={"blue"} component={'span'} fontSize={20}>
@@ -888,7 +880,17 @@ const AdminManager: React.FC = () => {
                                                     </IconButton>
                                                 </Tooltip>
                                             </Box>
-                                        } 
+                                        }
+                                        onClick={(event) => {
+                                            setActQuanLy({
+                                                open: true,
+                                                payload: {
+                                                    type: "chapter",
+                                                    data: chapterItem
+                                                },
+                                                type: ACTIONS.UPDATE
+                                            } as IAction)
+                                        }}
                                     >
                                         {
                                             actThemBaiKiemTra.open && actThemBaiKiemTra.payload.chapterId === chapterItem.id && (
@@ -1077,7 +1079,7 @@ const AdminManager: React.FC = () => {
                                                     chapterId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data.lessonId : '',
                                                     status: true,
                                                 } as IQuestion))
-                                                const response = await importQuestions(payload)
+                                                const response = await importQuestions(payload, actQuanLy.payload.data.lessonId, actQuanLy.payload.data.chapterId)
                                                 const payloadExamQuestion = response.data.data.map((item : IQuestion) => {
                                                     return {
                                                         examId: actQuanLy.payload.data.id,
@@ -1094,8 +1096,15 @@ const AdminManager: React.FC = () => {
                                             }
                                         }} />
                                         <Button variant='outlined'
-                                            onClick={() => {
+                                            onClick={async () => {
                                                 setModalQuestionBank(true)
+                                                try {
+                                                    const response = await getListQuestionBank(actQuanLy.payload.data.id)
+                                                    setListQuestionBank(response.data.data)
+                                                    setListIdAddFromQuestionBank([])
+                                                }catch (error: any) {
+                                                    toast.error(error.message)
+                                                }
                                             }}
                                         >
                                             Thêm từ ngân hàng câu hỏi
@@ -1185,7 +1194,11 @@ const AdminManager: React.FC = () => {
                                                     chapterId: actQuanLy.payload?.type === 'chapter' ? actQuanLy.payload.data.id : '',
                                                     status: true,
                                                 } as IQuestion))
-                                                const response = await importQuestions(payload)
+                                                const response = await importQuestions(
+                                                    payload, 
+                                                    actQuanLy.payload?.type === 'lesson' ? actQuanLy.payload.data.id : '', 
+                                                    actQuanLy.payload?.type === 'chapter' ? actQuanLy.payload.data.id : ''
+                                                )
                                                 toast.success("Nhập dữ liệu thành công")
                                                 console.log([...response.data.data, ...listQuestion ?? []]);
                                                 
@@ -1329,15 +1342,61 @@ const AdminManager: React.FC = () => {
                 </Grid>
             </Grid>
 
-            <CustomModal
+            <ComfirmModal
                 open={modalQuestionBank}
                 setOpenModal={setModalQuestionBank}
+                onComfirm={async () => {
+                    try {
+                        const payload = listIdAddFromQuestionBank.map((item) => ({
+                            examId: actQuanLy.payload.data.id,
+                            questionId: item
+                        } as IExamQuestion))
+                        const res = await importExamQuestions(payload)
+                        const questions = listQuestionBank?.filter((item) => listIdAddFromQuestionBank.includes(item.id!))
+                        setListQuestion([...questions,...listQuestion])
+                        toast.success("Thêm câu hỏi thành công")
+                    }catch (error: any) {
+                        toast.error("Thêm câu hỏi thất bại")
+                    }
+                }}
                 title='Danh sách các câu hỏi'
             >
                 <Box>
-                    Danh sách câu hỏi
+                    <SimpleTable
+                        initData={listQuestionBank ? listQuestionBank : [] as IQuestion[]}
+                        initNewRow={{}}
+                        checkboxSelection
+                        onSelectionModelChange={(newSelection) => {
+                            setListIdAddFromQuestionBank(newSelection as string[])
+                        }}
+                        hideActions
+                        columns={[
+                            {
+                                field: 'questionType', headerName: 'Loại câu hỏi', width: 180,
+                                editable: true,
+                                valueFormatter: (value: number) => {
+                                    const temp = typeQuestions?.find((item) => item.id === value)
+                                    return temp?.name
+                                },
+                                renderEditCell(params) {
+                                    return <RenderEditCell params={params} dataParams={typeQuestions} label='name' editCellField='questionType' />
+                                },
+                            },
+                            // { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
+                            { field: 'title', headerName: 'Tiêu đề', width: 130},
+                            { field: 'content', headerName: 'Nội dung', width: 130},
+                            { field: 'contentImg', headerName: 'Ảnh', width: 130 },
+                            { field: 'A', headerName: 'A', width: 130 },
+                            { field: 'B', headerName: 'B', width: 130},
+                            { field: 'C', headerName: 'C', width: 130 },
+                            { field: 'D', headerName: 'D', width: 130 },
+                            { field: 'E', headerName: 'E', width: 130 },
+                            { field: 'correctAnswer', headerName: 'Đáp án đúng', width: 130},
+                            { field: 'explainAnswer', headerName: 'Giải thích đáp án', width: 130},
+                        ] as GridColDef[]}
+                    />
                 </Box>
-            </CustomModal>
+            </ComfirmModal>
         </Box>
     );
 };
