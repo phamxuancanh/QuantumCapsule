@@ -20,6 +20,8 @@ const checkQuestionsExist = async (questions, lessonId, chapterId) => {
   
   return questions.map(question => {
       const found = listQuestionBank.some(bankQuestion => 
+          question.questionType === bankQuestion.questionType &&
+          question.title === bankQuestion.title &&
           question.content === bankQuestion.content &&
           question.contentImg === bankQuestion.contentImg &&
           question.A === bankQuestion.A &&
@@ -27,7 +29,7 @@ const checkQuestionsExist = async (questions, lessonId, chapterId) => {
           question.C === bankQuestion.C &&
           question.D === bankQuestion.D &&
           question.E === bankQuestion.E &&
-          question.answer === bankQuestion.answer
+          question.correctAnswer === bankQuestion.correctAnswer
       );
       return { question, exists: found };
   });
@@ -163,7 +165,7 @@ const addQuestion = async (req, res, next) => {
       return res.status(400).json({ message: 'Không tìm thấy bài học hoặc chương' })
     }
     if(lessonId || chapterId){
-      const questionExists = checkQuestionsExist(questions, lessonId, chapterId)
+      const questionExists = await checkQuestionsExist([questionData], lessonId, chapterId)
       const exists = questionExists.filter(q => q.exists)
       if(exists.length > 0){
           return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
