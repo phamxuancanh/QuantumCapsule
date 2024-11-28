@@ -1079,6 +1079,11 @@ const AdminManager: React.FC = () => {
                                                     chapterId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data.lessonId : '',
                                                     status: true,
                                                 } as IQuestion))
+                                                const checkNull = payload.find((item) => !item.questionType || !item.title || !item.content || !item.correctAnswer)
+                                                if(checkNull) {
+                                                    toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+                                                    return
+                                                }
                                                 const response = await importQuestions(payload, actQuanLy.payload.data.lessonId, actQuanLy.payload.data.chapterId)
                                                 const payloadExamQuestion = response.data.data.map((item : IQuestion) => {
                                                     return {
@@ -1194,6 +1199,11 @@ const AdminManager: React.FC = () => {
                                                     chapterId: actQuanLy.payload?.type === 'chapter' ? actQuanLy.payload.data.id : '',
                                                     status: true,
                                                 } as IQuestion))
+                                                const checkNull = payload.find((item) => !item.questionType || !item.title || !item.content || !item.correctAnswer)
+                                                if(checkNull) {
+                                                    toast.error("Vui lòng nhập đẩy đủ thông tin: loại câu hỏi, tiêu đề, nội dung, đáp án")
+                                                    return
+                                                }
                                                 const response = await importQuestions(
                                                     payload, 
                                                     actQuanLy.payload?.type === 'lesson' ? actQuanLy.payload.data.id : '', 
@@ -1283,6 +1293,11 @@ const AdminManager: React.FC = () => {
                                                         type: item.type ?? "",
                                                         status: true,
                                                     } as ITheory))
+                                                    const checkNull = payload.find((item) => !item.name || !item.url || !item.type)
+                                                    if(checkNull) {
+                                                        toast.error("Vui lòng nhập đẩy đủ thông tin: tên, url, kiểu")
+                                                        return
+                                                    }
                                                     const response = await importTheories(payload)
                                                     toast.success("Nhập dữ liệu thành công")
                                                     console.log([...response.data.data, ...listTheory ?? []]);
