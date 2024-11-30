@@ -25,6 +25,7 @@ import {
     GridToolbarExport,
     GridToolbarQuickFilter,
     GridRowParams,
+    GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { ACTIONS } from 'utils/enums';
@@ -37,6 +38,7 @@ interface EditToolbarProps {
     ) => void;
     initNewRow: any;
     toolbarComponent?: React.ReactNode;
+    hideActions?: boolean;
 }
 
 function EditToolbar(props: EditToolbarProps) {
@@ -52,13 +54,13 @@ function EditToolbar(props: EditToolbarProps) {
 
     return (
         <GridToolbarContainer>
-            <Button color="primary" startIcon={<AddIcon />} onClick={handleClick} variant='outlined'>
-                Thêm mới
-            </Button>
+            {
+                !props.hideActions &&
+                <Button color="primary" startIcon={<AddIcon />} onClick={handleClick} variant='outlined'>
+                    Thêm mới
+                </Button>
+            }
             {props.toolbarComponent}
-            {/* <GridToolbarColumnsButton /> */}
-            {/* <GridToolbarDensitySelector/> */}
-            {/* <GridToolbarExport/> */}
             <Box sx={{ flexGrow: 1 }} />
             <GridToolbarQuickFilter placeholder='Tìm kiếm'/>
         </GridToolbarContainer>
@@ -83,6 +85,8 @@ export interface ISimpleTableProps {
     toolbarComponent?: React.ReactNode;
     loading?: boolean;
     getRowId?: (row: any) => string;
+    onSelectionModelChange?: (newSelection: GridRowSelectionModel) => void;
+    hideActions?: boolean;
 }
 
 export default function SimpleTable(props: ISimpleTableProps) {
@@ -163,7 +167,9 @@ export default function SimpleTable(props: ISimpleTableProps) {
     }, [props.columns, props.minWidth])
 
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef[] = props.hideActions ? 
+    [...convertColumns()] :
+    [
         ...convertColumns(),
         {
             field: 'actions',
@@ -253,7 +259,7 @@ export default function SimpleTable(props: ISimpleTableProps) {
                     pagination: {
                         labelRowsPerPage: "Số dòng mỗi trang",
                     },
-                    toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent },
+                    toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent, hideActions: props.hideActions},
                 }}
                 columnVisibilityModel={props.columnVisibilityModel}
                 initialState={{
@@ -264,7 +270,7 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 getRowId={props.getRowId}
                 rowHeight={props.rowHeight || 60}
                 checkboxSelection={props.checkboxSelection}
-                
+                onRowSelectionModelChange={props.onSelectionModelChange}
             />
         </Box>
     );

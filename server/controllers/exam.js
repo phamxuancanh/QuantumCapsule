@@ -249,6 +249,69 @@ const getListExamByLessonId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getListExamByFilterParams = async (req, res, next) => {
+  try {
+    const { subjectId, grade, chapterId, lessonId } = req.query
+    // if(!((subjectId && grade) || chapterId)) {
+    //   return res.status(400).json({ message: 'Thiếu điều kiện lọc' })
+    // }
+    let query = ``
+    const replacements = {}
+    if(lessonId){
+      query = `
+        select e.* from exams e
+        join lessons l on e.lessonId = l.id
+        where
+          e.lessonId = :lessonId and
+          l.status = 1 and
+          e.status = 1
+        order by e.updatedAt desc
+      `
+      replacements.lessonId = lessonId
+    }
+    if(chapterId){
+      query = `
+        select e.* from exams e
+        join chapters c on l.chapterId = c.id
+        where
+          c.id = :chapterId and
+          c.status = 1 and
+          e.status = 1
+        order by e.updatedAt desc
+      `
+      replacements.chapterId = chapterId
+    }
+    if(subjectId && grade && !chapterId && !lessonId){
+      query = `
+        SELECT e.*
+        FROM exams e
+        LEFT JOIN chapters c ON e.chapterId = c.id AND c.status = 1
+        LEFT JOIN lessons l ON e.lessonId = l.id AND l.status = 1
+        LEFT JOIN chapters lc ON l.chapterId = lc.id AND lc.status = 1
+        WHERE 
+          e.status = 1 and
+          ((c.grade = :grade AND c.subjectId = :subjectId) 
+          OR (lc.grade = :grade AND lc.subjectId = :subjectId))
+      `
+      replacements.subjectId = subjectId
+      replacements.grade = grade
+
+    }
+    
+    console.log(replacements);
+    console.log(query);
+    
+    const listAnswer = await sequelize.query(query, {
+      replacements,
+      type: sequelize.QueryTypes.SELECT
+    })
+    
+
+    return res.status(200).json({ message: 'Lấy dữ liệu thành công', data: listAnswer })
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khi lấy dữ liệu' })
+  }
+}
 
 // #region exam_question
 const getListExamQuestionByChapterId = async (req, res, next) => {
@@ -399,6 +462,21 @@ const getExercisesByChapterId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const deleteExamQuestionByExamAndQuestionId = async (req, res, next) => {
+  try {
+    const { examId, questionId } = req.body
+    console.log('--------------exam_question', examId, questionId);
+    
+    const examQuestion = await models.ExamQuestion.findOne({ where: { examId, questionId, status: 1 } })
+    if (!examQuestion) {
+      return res.status(404).json({ message: 'Không tìm thấy' })
+    }
+    await examQuestion.update({ status: 0 })
+    res.json({ message: 'xóa thành công' })
+  } catch (error) {
+    res.status(500).json({ message: 'lỗi khi xóa: ' + error.message })
+  }
+}
 // #endregion
 
 module.exports = {
@@ -419,5 +497,7 @@ module.exports = {
   updateExamQuestion,
   getListExamQuestionByExamId,
   getExamInfo,
-  getExamInfoForExam
+  getExamInfoForExam,
+  getListExamByFilterParams,
+  deleteExamQuestionByExamAndQuestionId
 }

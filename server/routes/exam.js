@@ -20,4 +20,6 @@ router.get('/getListExamByLessonId/:lessonId', verifyAccessToken, examController
 router.get('/getListExamQuestionByExamId/:examId', verifyAccessToken, examController.getListExamQuestionByExamId)
 router.get('/getExamInfo/:examId', verifyAccessToken, examController.getExamInfo)
 router.get('/getExamInfoForExam/:examId', verifyAccessToken, examController.getExamInfoForExam)
+router.get('/getListExamByFilterParams', verifyAccessToken, examController.getListExamByFilterParams)
+router.post('/deleteExamQuestionByExamAndQuestionId', verifyAccessToken, examController.deleteExamQuestionByExamAndQuestionId)
 module.exports = router

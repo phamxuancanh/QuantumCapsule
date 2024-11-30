@@ -2,8 +2,8 @@ import { requestWithJwt } from '../request'
 import { AxiosResponse } from 'axios'
 import { DataListQuesion, ListQuesionParams } from './question.interfaces';
 
-export const importQuestions = async (questions: any[]): Promise<AxiosResponse<any>> => {
-    return await requestWithJwt.post<any>('/questions/importQuestions', { questions }, { withCredentials: true });
+export const importQuestions = async (questions: any[], lessonId?: string, chapterId?: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.post<any>('/questions/importQuestions', { questions, lessonId, chapterId }, { withCredentials: true });
 }
 
 export const getListQuesion = async ({params}: {params?: ListQuesionParams}): Promise<AxiosResponse<DataListQuesion>> => {
@@ -31,4 +31,8 @@ export const getListQuestionByChapterId = async (examId: string): Promise<AxiosR
 }
 export const getListQuestionByLessonId = async (lessonId: string): Promise<AxiosResponse<any>> => {
     return await requestWithJwt.get<any>('/questions/getListQuestionByLessonId/'+ lessonId,  { withCredentials: true });
+}
+
+export const getListQuestionBank = async (examId: string): Promise<AxiosResponse<any>> => {
+    return await requestWithJwt.get<any>('/questions/getListQuestionBank/'+ examId,  { withCredentials: true });
 }

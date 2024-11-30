@@ -23,24 +23,33 @@ const defaultFilter: IChapterFilter = {
 
 interface IProps {
     onChange?: (filter: IChapterFilter) => void;
-    mode?: number; // 1: grade and subject, 2: 1 + chapter + lesson, default is 1 + chapter
+    mode: number; // 1: grade and subject, 2: ... + chapter, 3: ... + lesson, 4: ... + exam
 }
 
 const QCChapterFilter: React.FC<IProps> = (props) => {
 
     const [grades, setGrades] = useState<number[]>([1, 2, 3, 4, 5]);
     const [chapters, setChapters] = useState<IChapter[]>([]);
-    const [subjects, setSubjects] = useState<ISubject[]>([]);
+    const [subjects, setSubjects] = useState<ISubject[]>([
+        {
+            id: 'subject1',
+            name: 'Toán'
+        },
+        {
+            id: 'subject2',
+            name: 'Tiếng việt'
+        }
+    ]);
 
     const [selectedGrade, setSelectedGrade] = useState<number>(1);
     const [selectedChapterId, setSelectedChapterId] = useState('');
-    const [selectedSubjectId, setSelectedSubjectId] = useState('');
+    const [selectedSubjectId, setSelectedSubjectId] = useState('subject1');
     const [selectedLessonId, setSelectedLessonId] = useState('');
     const [filteredChapter, setFilteredChapter] = useState<IChapter[]>([]);
     const [filteredLesson, setFilteredLesson] = useState<ILesson[]>([]);
 
     const resetFilter = () => {
-        // setSelectedGrade(1);
+        // setSelectedGrade(undefined);
         setSelectedChapterId('');
         setSelectedSubjectId('');
         setSelectedLessonId('');
@@ -53,90 +62,73 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
             async () => {
                 const response = await getListAllChapter();
                 setChapters(response.data.data);
-
-                setSubjects([
-                    {
-                        id: 'subject1',
-                        name: 'Toán'
-                    },
-                    {
-                        id: 'subject2',
-                        name: 'Tiếng việt'
-                    }
-                ]);
             }
         )()
     }, []);
-    useEffect(() => {
-        props.onChange && props.onChange({
-            grade: 1,
-            subjectId: '',
-            chapterId: '',
-            lessonId: '',
-        } as IChapterFilter);
-        // setFilteredChapter([])
-        setFilteredLesson([])
-        setSelectedChapterId('')
-        setSelectedLessonId('')
-    }, [props.mode]);
+    // useEffect(() => {
+    //     props.onChange && props.onChange({
+    //         grade: 1,
+    //         subjectId: '',
+    //         chapterId: '',
+    //         lessonId: '',
+    //     } as IChapterFilter);
+    //     // setFilteredChapter([])
+    //     setFilteredLesson([])
+    //     setSelectedChapterId('')
+    //     setSelectedLessonId('')
+    // }, [props.mode]);
 
 
     const handleChange = async (event : SelectChangeEvent<any>) => {
         const { name, value } = event.target;
-        console.log(name, value);
-        // if(!selectedGrade || !selectedSubjectId) return;
+        if (name === 'subjectId') {
+            // resetFilter();
+            const filtered = chapters?.filter(item => 
+                (selectedGrade && item.grade === selectedGrade) &&
+                (item.subjectId === value)
+            );
+            setFilteredChapter(filtered);
+            setSelectedSubjectId(value);
+            setSelectedChapterId('');
+            setSelectedLessonId('');
+            props.onChange && props.onChange({
+                grade: selectedGrade,
+                subjectId: value,
+            } as IChapterFilter);
+        } 
 
         if (name === 'grade') {
-            resetFilter();
+            // resetFilter();
             setSelectedGrade(value);
+            const filtered = chapters?.filter(item => 
+                (item.grade === value) &&
+                (selectedSubjectId && item.subjectId === selectedSubjectId)
+            );
+            
+            setFilteredChapter(filtered);
             props.onChange && props.onChange({
                 grade: value,
-                subjectId: '',
-                chapterId: '',
-                lessonId: '',
+                subjectId: selectedSubjectId,
             } as IChapterFilter);
         }
 
-        if (name === 'subjectId') {
-            resetFilter();
-            const subjectId = name === 'subjectId' ? value : selectedSubjectId;
-            const filtered = chapters?.filter(item => 
-                (item.grade === selectedGrade) &&
-                (item.subjectId === subjectId)
-            );
-            setSelectedSubjectId(subjectId);
-            setFilteredChapter(filtered);
-            setSelectedChapterId('');
+        if (name === 'chapterId') {
+            setSelectedChapterId(value);
+            const listLesson = await getListLessonByChapterId(value);
+            setFilteredLesson(listLesson.data.data);
             props.onChange && props.onChange({
                 grade: selectedGrade,
-                subjectId: subjectId,
+                subjectId: selectedSubjectId,
+                chapterId: value,
             } as IChapterFilter);
-            // if(props.mode === 1) {
-            //     if (props.onChange) {
-            //         props.onChange({
-            //             grade: selectedGrade,
-            //             subjectId: subjectId,
-                        
-            //         } as IChapterFilter);
-            //     }
-            //     return
-            // }
-
-        } else if (name === 'chapterId') {
-            setSelectedChapterId(value);
-            if (props.mode === 2 && props.onChange) {
-                const listLesson = await getListLessonByChapterId(value);
-                setFilteredLesson(listLesson.data.data);
-            }
-            else if (props.onChange) {
-                props.onChange({
-                    chapterId: value,
-                } as IChapterFilter);
-            }
-        } else if (name === 'lessonId') {
+        }
+        if (name === 'lessonId') {
             setSelectedLessonId(value);
             if (props.onChange) {
-                props.onChange({
+                props.onChange && props.onChange({
+                    grade: selectedGrade,
+                    subjectId: selectedSubjectId,
+                    chapterId: selectedChapterId,
                     lessonId: value,
                 } as IChapterFilter);
             }
@@ -144,26 +136,9 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
     };
 
     return (
-        <Card sx={{p: 2}}>
+        <Card sx={{p: 1}}>
             <Grid container spacing={2} p={0}>
-                <Grid item xs={12} md={2}>
-                    <FormControl fullWidth>
-                        <InputLabel>Lớp</InputLabel>
-                        <Select
-                            name="grade"
-                            value={selectedGrade}
-                            label="Môn"
-                            onChange={e =>handleChange(e)}
-                        >
-                        {grades?.map((grade) => (
-                            <MenuItem key={grade} value={grade}>
-                                {grade}
-                            </MenuItem>
-                        ))}
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12} md={2}>
+                <Grid item xs={12} md={6}>
                     <FormControl fullWidth>
                         <InputLabel>Môn</InputLabel>
                         <Select
@@ -180,7 +155,24 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
                         </Select>
                     </FormControl>
                 </Grid>
-                {props.mode !== 1 &&
+                <Grid item xs={12} md={6}>
+                    <FormControl fullWidth>
+                        <InputLabel>Lớp</InputLabel>
+                        <Select
+                            name="grade"
+                            value={selectedGrade}
+                            label="Môn"
+                            onChange={e =>handleChange(e)}
+                        >
+                        {grades?.map((grade) => (
+                            <MenuItem key={grade} value={grade}>
+                                {grade}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                {props.mode >=2 &&
                     <Grid item xs={12} md={5}>
                         <FormControl fullWidth>
                             <InputLabel>Chương</InputLabel>
@@ -202,7 +194,7 @@ const QCChapterFilter: React.FC<IProps> = (props) => {
                     </Grid>
 
                 }
-                {props.mode === 2 &&
+                {props.mode >=3 &&
                     <Grid item xs={12} md={3}>
                         <FormControl fullWidth >
                             <InputLabel>Bài học</InputLabel>

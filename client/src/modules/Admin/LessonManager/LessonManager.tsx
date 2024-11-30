@@ -1,12 +1,12 @@
 import SimpleTable from 'components/tables/simpleTable/SimpleTable';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GridColDef,  } from '@mui/x-data-grid';
 import { generateExamQuestionUID, generateLessonUID,  } from 'helpers/Nam-helper/GenerateUID';
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, TextField, Typography } from '@mui/material';
 import { ACTIONS } from 'utils/enums';
 import { useDataSelected, useDataTable, useOpenForm } from './context/context';
 import { ILesson } from 'api/lesson/lesson.interface';
-import { deleteLesson, getListLessonByChapterId, insertLesson, updateLesson } from 'api/lesson/lesson.api';
+import { deleteLesson, getListLessonByChapterId, getListLessonByFilterParams, importLessons, insertLesson, updateLesson } from 'api/lesson/lesson.api';
 import { toast } from 'react-toastify';
 import RenderEditCell from '../components/RenderEditCell/RenderEditCell';
 import { IExam, IExamQuestion } from 'api/exam/exam.interface';
@@ -14,27 +14,40 @@ import QCChapterFilter, { IChapterFilter } from 'QCComponents/QCChapterFilter.ts
 import { getListAllChapter } from 'api/chapter/chapter.api';
 import { IChapter } from 'api/chapter/chapter.interface';
 import ExcelExportBtn from 'components/buttons/excel/ExcelExportBtn';
+import ExcelReaderBtn from 'components/buttons/excel/ExcelReaderBtn';
+import CustomModal from 'components/modals/customModal/CustomModal';
+import ExamManager from '../ExamManager/ExamManager';
+import ExamManagerProvider from '../ExamManager/ExamManagerProvider';
 
 interface IProps {
     // Define the props for the ExamManager component here
+    chapter?: IChapter; 
 }
 
-const LessonManager: React.FC<IProps> = () => {
+const LessonManager: React.FC<IProps> = (props) => {
 
-    const {setDataSelected} = useDataSelected(); 
-    const {setOpenForm} = useOpenForm();
+    const {dataSelected, setDataSelected} = useDataSelected(); 
+    // const {setOpenForm} = useOpenForm();
     const { dataTable, setDataTable } = useDataTable()
     const [loading, setLoading] = React.useState(false)
-    const [chapterParams, setChapterParams] = React.useState<IChapter[]>([])
+    // const [chapterParams, setChapterParams] = React.useState<IChapter[]>([])
     const [filter, setFilter] = React.useState<IChapterFilter>({} as IChapterFilter)
+    const [openBaiTap, setOpenBaiTap] = React.useState(false)
+
+
+    useEffect(() => {
+        if(props.chapter){
+            handleFilter({chapterId: props.chapter.id})
+        }
+    }, [])
 
     const handleFilter = async (data: IChapterFilter) => {
         setFilter(data)
         try {
-            const response = await getListLessonByChapterId(data.chapterId ?? '')
+            const response = await getListLessonByFilterParams({subjectId: data.subjectId, grade: data.grade, chapterId: data.chapterId ?? ''})
             setDataTable(response.data.data)
-            const responseChapter = await getListAllChapter()
-            setChapterParams(responseChapter.data.data)
+            // const responseChapter = await getListAllChapter()
+            // setChapterParams(responseChapter.data.data)
         }catch (error: any) {
             setDataTable([])
 
@@ -50,13 +63,14 @@ const LessonManager: React.FC<IProps> = () => {
                 return false
             }
             if(!filter.chapterId) {
-                toast.error("Vui lòng chọn môn và chương")
+                toast.error("Vui lòng chọn chương")
                 return false
             }
             console.log("CREATE", data);
             try {
                 const response = await insertLesson(data)
-                toast.success(response.data.message)
+                setDataTable(pre => [response.data.data, ...pre ?? []])
+                toast.success("Thêm mới thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
                 return false
@@ -68,13 +82,10 @@ const LessonManager: React.FC<IProps> = () => {
                 toast.error("Vui lòng nhập đủ thông tin: thứ tự và tên bài học")
                 return false
             }
-            if(!filter.chapterId) {
-                toast.error("Vui lòng chọn môn và chương")
-                return false
-            }
             try {
                 const response = await updateLesson(data.id, data)
-                toast.success(response.data.message)
+                setDataTable(pre => pre?.map((item) => item.id === data.id ? data : item))
+                toast.success("Cập nhập thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
                 return false
@@ -84,7 +95,8 @@ const LessonManager: React.FC<IProps> = () => {
             console.log("DELETE", data);
             try {
                 const response = await deleteLesson(data)
-                toast.success(response.data.message)
+                setDataTable(pre => pre?.filter((item) => item.id !== data))
+                toast.success("Xóa thành công")
             }catch (error: any) {
                 toast.error("Dữ liệu chưa được lưu: " + error.message)
                 return false
@@ -94,23 +106,73 @@ const LessonManager: React.FC<IProps> = () => {
     }
     return (
         <Box>
-            <Box p={2}>
-                <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương</Typography>
+            <CustomModal 
+                title='Quản lý bài tập'
+                open={openBaiTap}
+                setOpenModal={setOpenBaiTap}
+                children={<Box>
+                    <ExamManagerProvider
+                        lesson={dataSelected as ILesson}
+                    />
+                </Box>}
+                width='80%'
+                sx={{height: '95vh'}}
+            />
+            <Box p={1}>
+                {!props.chapter && 
+                    <Typography fontSize={"20px"}>Hãy chọn lớp, môn, chương</Typography>
+                }
 
-                <QCChapterFilter 
-                    onChange={handleFilter}
-                />
+                {!props.chapter && 
+                    <QCChapterFilter 
+                        onChange={handleFilter}
+                        mode={2}
+                    />
+                }
             {/* {!dataTable?.length ? <>Không có dữ liệu</>: */}
 
                 <SimpleTable 
                     initData={dataTable ? dataTable : [] as ILesson[]}
-                    toolbarComponent={<Box>
+                    toolbarComponent={<Box display={"flex"} gap={1}>
+                        <ExcelReaderBtn variant='outlined' sheetIndex={0} name='Thêm bài học từ excel' onUpload={async (data)=>{
+                            if(!filter.chapterId) {
+                                toast.warning("Hãy chọn chương trước")
+                                return
+                            }
+                            try {
+                                const payload = data.map((item) => ({
+                                    id: generateLessonUID(),
+                                    chapterId: filter.chapterId ?? "",
+                                    name: item.name ?? '',
+                                    order: item.order ?? 0,
+                                    status: true,
+                                } as ILesson))
+                                const response = await importLessons(payload)
+                                toast.success("Nhập dữ liệu thành công")
+                                console.log([...response.data.data, ...dataTable ?? []]);
+                                
+                                setDataTable(pre => [...response.data.data, ...pre ?? []])
+                            }catch (error: any) {
+                                toast.error("Nhập dữ liệu thất bại: " + error.message)
+                            }
+                        }} />
                         <ExcelExportBtn 
                             data={dataTable ? dataTable : [] as ILesson[]}
-                            headers={["id", "chapterId", "name", "order", "status"]}
+                            headers={[ "name", "order"]}
                             variant='outlined'
                             fileName="lesson" 
                         />
+                         <Button variant='outlined'
+                            onClick={() => {
+                                if(!dataSelected) {
+                                    toast.warning("Hãy chọn chương muốn quản lý bài học")
+                                    return
+                                }
+                                setOpenBaiTap(true)
+                            }}
+                        >
+                            Quản lý Bài tập
+                        </Button>
                     </Box>}
                     initNewRow={{
                         id: generateLessonUID(),

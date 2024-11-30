@@ -1,19 +1,23 @@
 import React from 'react';
 import Provider from './context/provider';
 import ExamManager from './ExamManager';
+import { ILesson } from 'api/lesson/lesson.interface';
 
 interface PracticeProviderProps {
     // Define the props for your component here
+    lesson?: ILesson;
 }
 
-const PracticeProvider: React.FC<PracticeProviderProps> = () => {
+const ExamManagerProvider: React.FC<PracticeProviderProps> = (props) => {
     // Implement your component logic here
 
     return (
         <Provider>
-            <ExamManager />
+            <ExamManager 
+                lesson={props.lesson}
+            />
         </Provider>
     );
 };
 
-export default PracticeProvider;
+export default ExamManagerProvider;

@@ -82,7 +82,7 @@ const QuestionV3: React.FC<IProps> = (props) => {
                         />
                     }
                     label={ 
-                        <Typography style={{color: renderColor(answer.value)}} sx={{fontSize: "30px"}}>
+                        <Typography style={{color: renderColor(answer.value)}} sx={{fontSize: "25px"}}>
                             {answer.label}
                         </Typography>
                     }
@@ -93,10 +93,10 @@ const QuestionV3: React.FC<IProps> = (props) => {
 
     return (
         <Card sx={{ p: 5, minHeight: "350px" }}>
-            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "30px"}}>
+            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "25px"}}>
                 {props.question.title}
             </Typography>
-            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "30px"}}>
+            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "25px"}}>
                 {props.question.content}
             </Typography>
             {/* <img src={props.question.contentImg} alt="question" /> */}
@@ -104,10 +104,10 @@ const QuestionV3: React.FC<IProps> = (props) => {
             <FormGroup>{renderAllAnswerNotNull(props.question)}</FormGroup>
             {props.mode === "result" && (
                 <Box>
-                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontSize={"30px"}>
+                    <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontSize={"25px"}>
                         {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
                     </Typography>
-                    <Typography color={"#1E201E"} fontSize={"30px"}>
+                    <Typography color={"#1E201E"} fontSize={"25px"}>
                         Giải thích: {props.question.explainAnswer}
                     </Typography>
 

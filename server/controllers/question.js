@@ -2,9 +2,48 @@ const { queries } = require('../helpers/QueryHelper')
 const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 
+const checkQuestionsExist = async (questions, lessonId, chapterId) => {
+  const query = `
+    select * from questions
+    where 
+      status = 1 and
+      ${lessonId? 'lessonId = :lessonId': ''}
+      ${chapterId? 'chapterId = :chapterId': ''}
+  `
+  let replacements = {}
+  if(lessonId) replacements.lessonId = lessonId
+  if(chapterId) replacements.chapterId = chapterId
+  const listQuestionBank = await sequelize.query(query, {
+    replacements, 
+    type: sequelize.QueryTypes.SELECT 
+  })
+  
+  return questions.map(question => {
+      const found = listQuestionBank.some(bankQuestion => 
+          question.questionType === bankQuestion.questionType &&
+          question.title === bankQuestion.title &&
+          question.content === bankQuestion.content &&
+          question.contentImg === bankQuestion.contentImg &&
+          question.A === bankQuestion.A &&
+          question.B === bankQuestion.B &&
+          question.C === bankQuestion.C &&
+          question.D === bankQuestion.D &&
+          question.E === bankQuestion.E &&
+          question.correctAnswer === bankQuestion.correctAnswer
+      );
+      return { question, exists: found };
+  });
+}
 const importQuestions = async (req, res, next) => {
   try {
-    const { questions } = req.body
+    const { questions, lessonId, chapterId } = req.body
+    if(lessonId || chapterId){
+      const questionExists =await checkQuestionsExist(questions, lessonId, chapterId)
+      const exists = questionExists?.filter(q => q.exists)
+      if(exists.length > 0){
+          return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
+      }
+    }
     console.log('questions', questions)
     if (!Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({ message: 'Invalid data format or empty array' })
@@ -125,6 +164,13 @@ const addQuestion = async (req, res, next) => {
     if (!lesson && !chapter) {
       return res.status(400).json({ message: 'Không tìm thấy bài học hoặc chương' })
     }
+    if(lessonId || chapterId){
+      const questionExists = await checkQuestionsExist([questionData], lessonId, chapterId)
+      const exists = questionExists.filter(q => q.exists)
+      if(exists.length > 0){
+          return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
+      }
+    }
 
     const newQuestion = await models.Question.create(questionData)
     res.status(201).json({ message: 'Question added successfully', data: newQuestion })
@@ -217,6 +263,58 @@ const getListQuestionByLessonId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getListQuestionBank = async (req, res, next) => {
+  try {
+    const { examId } = req.params
+
+    let  query = ''
+    let replacements = ''
+
+    const exam = await models.Exam.findByPk(examId)
+    if (!exam) {
+      return res.status(404).json({ message: 'Exam not found' })
+    }
+    if(exam.lessonId){
+      query = `
+        SELECT q.*
+        FROM questions q
+        WHERE q.lessonId = :lessonId and q.status =1 
+          AND q.id NOT IN (
+            SELECT eq.questionId
+            FROM exam_questions eq
+            WHERE eq.examId = :examId
+              and eq.status =1
+          )
+          order by q.updatedAt desc
+      `
+      replacements = { lessonId: exam.lessonId, examId }
+    }
+    if(exam.chapterId){
+      query = `
+        SELECT q.*
+        FROM questions q
+        WHERE q.chapterId = :chapterId and q.status =1 
+          AND q.id NOT IN (
+            SELECT eq.questionId
+            FROM exam_questions eq
+            WHERE eq.examId = :examId
+              and eq.status =1
+          )
+          order by q.updatedAt desc
+      `
+      replacements = { chapterId: exam.chapterId, examId }
+    }
+
+    // Thực hiện truy vấn
+    const listQuestions = await sequelize.query(query, {
+      replacements, 
+      type: sequelize.QueryTypes.SELECT 
+    })
+    res.json({ data: listQuestions })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 
 module.exports = {
   importQuestions,
@@ -226,5 +324,6 @@ module.exports = {
   deleteQuestion,
   getListQuestionByExamId,
   getListQuestionByChapterId,
-  getListQuestionByLessonId
+  getListQuestionByLessonId,
+  getListQuestionBank
 }

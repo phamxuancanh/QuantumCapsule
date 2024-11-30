@@ -1,12 +1,13 @@
 import React from 'react';
-import { Modal, Box, Typography, useMediaQuery, useTheme, Button } from '@mui/material';
-
+import { Modal, Box, Typography, useMediaQuery, useTheme, Button, SxProps, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 interface ICustomModalProps {
     title: string;
     open: boolean;
     children: React.ReactNode;
     setOpenModal: (open: boolean) => void;
     width?: string;
+    sx?: SxProps
 }
 
 const CustomModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
@@ -25,6 +26,7 @@ const CustomModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
         border: '2px solid #000',
         boxShadow: 24,
         p: 4,
+        ...props.sx
     };
     return (
         <Modal
@@ -34,13 +36,18 @@ const CustomModal: React.FC<ICustomModalProps> = (props: ICustomModalProps) => {
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
+                <Typography id="modal-modal-title"  fontSize={"25px"} textAlign={"center"}>
                     {props.title}
+                    {/* <IconButton 
+                        onClick={() => props.setOpenModal(false)}
+                    >
+                        <CloseIcon />
+                    </IconButton> */}
                 </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                <Typography id="modal-modal-description" sx={{ mt: 1 }}>
                     {props.children}
                 </Typography>
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
                     <Button variant="outlined" onClick={() => props.setOpenModal(false)}>
                         Đóng
                     </Button>

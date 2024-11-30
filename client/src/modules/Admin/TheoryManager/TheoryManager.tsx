@@ -102,6 +102,7 @@ const ExamManager: React.FC<IProps> = () => {
 
                 <QCChapterFilter 
                     onChange={handleFilter}
+                    mode={3}
                 />
                 <SimpleTable
                     initData={dataTable ? dataTable : ([] as ITheory[])}
