@@ -12,3 +12,7 @@ export const findProgressByChapter = async (chapterId: string, filter?: IGetResu
     const params = filter ? { ...filter, chapterId } : { chapterId };
     return await requestWithJwt.get<any>('/progress/findProgressByChapter', { params, withCredentials: true });
 };
+export const findProgressByLesson = async (lessonId: string, filter?: IGetResultByUserIdFilterParams): Promise<AxiosResponse<any>> => {
+    const params = filter ? { ...filter, lessonId } : { lessonId };
+    return await requestWithJwt.get<any>('/progress/findProgressByLesson', { params, withCredentials: true });
+};

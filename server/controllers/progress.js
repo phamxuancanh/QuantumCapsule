@@ -138,6 +138,60 @@ const findProgressByChapter = async (req, res, next) => {
     return res.status(500).json({ message: 'An error occurred while retrieving progress', error: error.message })
   }
 }
+const findProgressByLesson = async (req, res, next) => {
+  try {
+    const loginedUserId = req.userId
+    const { lessonId, from, to } = req.query
+    console.log('lessonId:', lessonId)
+
+    if (!lessonId) {
+      return res.status(400).json({ message: 'Missing lessonId' })
+    }
+
+    const whereClause = {
+      userId: loginedUserId
+    }
+
+    if (from && to) {
+      whereClause.createdAt = {
+        [Op.between]: [new Date(from), new Date(to)]
+      }
+    }
+
+    const progressList = await models.Progress.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: models.Theory,
+          required: true,
+          attributes: ['id', 'name'], // Include 'name' attribute
+          include: [
+            {
+              model: models.Lesson,
+              required: true,
+              where: {
+                id: lessonId
+              }
+            }
+          ]
+        }
+      ]
+    })
+
+    const theoryData = progressList.map(progress => ({
+      id: progress.Theory.id,
+      name: progress.Theory.name
+    }))
+
+    return res.status(200).json({
+      message: 'Progress retrieved successfully',
+      data: theoryData
+    })
+  } catch (error) {
+    console.error('Error finding Progress:', error.message)
+    return res.status(500).json({ message: 'An error occurred while retrieving progress', error: error.message })
+  }
+}
 // const findProgressByChapter = async (req, res, next) => {
 //   try {
 //     const loginedUserId = req.userId
@@ -198,5 +252,6 @@ const findProgressByChapter = async (req, res, next) => {
 module.exports = {
   addProgress,
   findProgressByGradeAndSubject,
-  findProgressByChapter
+  findProgressByChapter,
+  findProgressByLesson
 }
