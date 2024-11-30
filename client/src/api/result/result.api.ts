@@ -19,3 +19,11 @@ export const getListUniqueDoneResultByChapterId = async (chapterId: string, filt
     const params = filter ? { ...filter, chapterId } : { chapterId };
     return await requestWithJwt.get<IDTOResponse<IResult[]>>('/results/getListUniqueDoneResultByUserIdandChapterId', { params, withCredentials: true });
 };
+export const getListAllDoneResultByUserIdandChapterId = async (chapterId: string, filter?: IGetResultByUserIdFilterParams): Promise<AxiosResponse<any>> => {
+    const params = filter ? { ...filter, chapterId } : { chapterId };
+    return await requestWithJwt.get<IDTOResponse<IResult[]>>('/results/getListAllDoneResultByUserIdandChapterId', { params, withCredentials: true });
+};
+export const getListAllDoneResultByUserIdandExamId = async (examId: string, filter?: IGetResultByUserIdFilterParams): Promise<AxiosResponse<any>> => {
+    const params = filter ? { ...filter, examId } : { examId };
+    return await requestWithJwt.get<IDTOResponse<IResult[]>>('/results/getListAllDoneResultByUserIdandExamId', { params, withCredentials: true });
+};
