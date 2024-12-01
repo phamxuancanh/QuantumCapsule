@@ -3,7 +3,7 @@ let io
 function init (server) {
   io = require('socket.io')(server, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: 'https://quantum-capsule.vercel.app',
       methods: ['GET', 'POST'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true
