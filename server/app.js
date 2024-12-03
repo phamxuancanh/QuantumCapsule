@@ -16,38 +16,11 @@ const server = http.createServer(app)
 
 app.set('trust proxy', true)
 
-// app.use(session({
-//   secret: 'your_secret_key',
-//   resave: false,
-//   saveUninitialized: true
-// }))
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*') // Cho phép tất cả các nguồn
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE') // Các phương thức được phép
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization') // Các header được phép
-  res.setHeader('Access-Control-Allow-Credentials', true) // Cho phép gửi cookie/credentials
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
-  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200)
-  }
-  next()
-})
-
 // app.use(function (req, res, next) {
-//   const allowedOrigins = ['https://quantum-capsule.vercel.app', 'http://localhost:3000', 'http://3.27.217.226:3000'] // Thêm localhost
-//   const origin = req.headers.origin
-
-//   if (allowedOrigins.includes(origin)) {
-//     res.setHeader('Access-Control-Allow-Origin', origin)
-//   }
-
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-//   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization')
-//   res.setHeader('Access-Control-Allow-Credentials', true)
+//   res.setHeader('Access-Control-Allow-Origin', '*') // Cho phép tất cả các nguồn
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE') // Các phương thức được phép
+//   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization') // Các header được phép
+//   res.setHeader('Access-Control-Allow-Credentials', true) // Cho phép gửi cookie/credentials
 //   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
 //   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
 //   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
@@ -59,9 +32,31 @@ app.use(function (req, res, next) {
 //   next()
 // })
 
+app.use(function (req, res, next) {
+  const allowedOrigins = ['https://quantum-capsule.vercel.app', 'http://localhost:3000', 'http://3.27.217.226:3000']
+  const origin = req.headers.origin
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization')
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200)
+  }
+  next()
+})
+
 app.use(cors({
-  // origin: ['https://quantum-capsule.vercel.app', 'http://localhost:3000', 'http://3.27.217.226:3000'], // Thêm localhost
-  origin: '*',
+  origin: ['https://quantum-capsule.vercel.app', 'http://localhost:3000', 'http://3.27.217.226:3000'], // Thêm localhost
+  // origin: '*',
   methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
   allowedHeaders: 'X-Requested-With,Content-Type,Authorization'
   // credentials: true
