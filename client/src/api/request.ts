@@ -163,7 +163,8 @@ requestWithJwt.interceptors.response.use(
   }
 )
 export const requestWithoutJwt = axios.create({
-  baseURL: `${process.env.REACT_APP_API}api/v1`,
+  // baseURL: `${process.env.REACT_APP_API}api/v1`,
+  baseURL: process.env.REACT_APP_API,
   timeout: 10000,
   withCredentials: false
 })
