@@ -106,7 +106,7 @@ export const googleSignIn = async () => {
 
     console.log('Token:', token);
 
-    const response = await fetch('http://54.79.181.117:8000/api/v1/auths/google', {
+    const response = await fetch('http://localhost:8000/api/v1/auths/google', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

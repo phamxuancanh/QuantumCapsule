@@ -127,7 +127,7 @@ const signUp = async (req, res, next) => {
     const emailToken = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
 
     // Định nghĩa URL xác thực
-    const confirmationUrl = `https://quantum-capsule.vercel.app/verify/email?token=${emailToken}`
+    const confirmationUrl = `https://localhost:3000/verify/email?token=${emailToken}`
     // Đọc template HTML
     const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
     const htmlContent = fs.readFileSync(templatePath, 'utf8')
