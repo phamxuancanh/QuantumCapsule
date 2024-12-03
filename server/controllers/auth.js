@@ -123,17 +123,11 @@ const signUp = async (req, res, next) => {
       emailVerified: false,
       roleId: 3
     })
-    // Tạo token xác thực email
     const emailToken = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
-
-    // Định nghĩa URL xác thực
-    const confirmationUrl = `https://localhost:3000/verify/email?token=${emailToken}`
-    // Đọc template HTML
+    const confirmationUrl = `http://localhost:3000/verify/email?token=${emailToken}`
     const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
     const htmlContent = fs.readFileSync(templatePath, 'utf8')
     const htmlWithLink = htmlContent.replace('${VERIFY_URL}', confirmationUrl)
-
-    // Gửi email xác thực
     const mailOptions = {
       from: 'canhmail292@gmail.com',
       to: email,
@@ -255,8 +249,7 @@ const sendOTP = async (req, res, next) => {
       return res.status(400).json({ message: 'User not found.' })
     }
 
-    // Kiểm tra loại tài khoản
-    if (user.accountType !== 'local') {
+    if (user.type !== 'local') {
       return res.status(400).json({ message: 'Please use Google to change your password.' })
     }
 

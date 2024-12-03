@@ -172,7 +172,6 @@ requestWithoutJwt.interceptors.response.use(
     return response
   },
   async (error: AxiosError<IBaseErrorResponse>) => {
-    alert('requestWithoutJwt.interceptors.response.use')    
     return await Promise.reject({
       ...error.response?.data
     })
