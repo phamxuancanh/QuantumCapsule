@@ -50,7 +50,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
         if (isFireworksRunning) {
           const timer = setTimeout(() => {
             setIsFireworksRunning(false); // Dừng pháo hoa sau 3 giây
-          }, 2000);
+          }, 1000);
           return () => clearTimeout(timer); // Xóa bộ đếm thời gian khi component unmount
         }
     }, [isFireworksRunning]);

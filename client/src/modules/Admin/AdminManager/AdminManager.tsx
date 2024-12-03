@@ -240,7 +240,7 @@ const AdminManager: React.FC = () => {
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
             try {
-                const res = await deleteQuestion(actQuanLy.payload?.data?.id)
+                const res = await deleteQuestion(data)
                 setListQuestion(listQuestion.filter((item) => item.id !== data))
                 toast.success("Xóa thành công")
             }catch (error: any) {
@@ -1076,7 +1076,7 @@ const AdminManager: React.FC = () => {
                                                     correctAnswer: item.correctAnswer,
                                                     explainAnswer: item.explainAnswer,
                                                     lessonId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data?.lessonId : '',
-                                                    chapterId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data.lessonId : '',
+                                                    chapterId: actQuanLy.payload?.data?.chapterId ? actQuanLy.payload?.data?.chapterId : '',
                                                     status: true,
                                                 } as IQuestion))
                                                 const checkNull = payload.find((item) => !item.questionType || !item.title || !item.content || !item.correctAnswer)
@@ -1183,7 +1183,7 @@ const AdminManager: React.FC = () => {
                                         <ExcelReaderBtn variant='outlined' sheetIndex={0} name='Thêm từ excel' onUpload={async (data)=>{
                                             try {
                                                 const payload = data.map((item) => ({
-                                                    id: generateChapterUID(),
+                                                    id: generateQuestionUID(),
                                                     questionType: item.questionType ?? "",
                                                     title: item.title ?? "",
                                                     content: item.content ?? "",
@@ -1318,7 +1318,7 @@ const AdminManager: React.FC = () => {
                                     initNewRow={{
                                         id: generateTheoryUID(),
                                         lessonId: actQuanLy.payload.data.id,
-                                        name: "Tên bài lý thuyết",
+                                        name: "Tên bài giảng",
                                         description: "Mô tả",
                                         summary: "Tóm tắt",
                                         url: "Link",

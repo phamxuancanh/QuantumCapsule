@@ -19,6 +19,7 @@ interface IBaseErrorResponse {
 }
 export const requestWithJwt = axios.create({
   baseURL: process.env.REACT_APP_API,
+  // baseURL: `${process.env.REACT_APP_API}api/v1`,
   timeout: 10000,
   withCredentials: true
 })
@@ -162,7 +163,7 @@ requestWithJwt.interceptors.response.use(
   }
 )
 export const requestWithoutJwt = axios.create({
-  baseURL: process.env.REACT_APP_API,
+  baseURL: `${process.env.REACT_APP_API}api/v1`,
   timeout: 10000,
   withCredentials: false
 })
@@ -172,7 +173,6 @@ requestWithoutJwt.interceptors.response.use(
     return response
   },
   async (error: AxiosError<IBaseErrorResponse>) => {
-    alert('requestWithoutJwt.interceptors.response.use')    
     return await Promise.reject({
       ...error.response?.data
     })

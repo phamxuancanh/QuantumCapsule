@@ -118,7 +118,7 @@ const ExamManager: React.FC<IProps> = () => {
                         {
                             id: generateTheoryUID(),
                             lessonId: "",
-                            name: "Tên bài lý thuyết",
+                            name: "Tên bài giảng",
                             description: "Mô tả",
                             summary: "Tóm tắt",
                             url: "Link",

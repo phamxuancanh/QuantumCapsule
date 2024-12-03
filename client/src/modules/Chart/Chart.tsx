@@ -853,7 +853,7 @@ const Chart: React.FC = () => {
                 <nav className="tw-mt-4">
                     {[
                         // { icon: <ChromeReaderModeIcon />, label: "Số liệu chung", id: "general" },
-                        { icon: <AutoStoriesIcon />, label: "Bài lý thuyết", id: "theory" },
+                        { icon: <AutoStoriesIcon />, label: "Bài giảng", id: "theory" },
                         { icon: <AssignmentIcon />, label: "Bài tập", id: "exercise" },
                         { icon: <BorderColorIcon />, label: "Bài kiểm tra", id: "exam" },
                     ].map((item) => (
