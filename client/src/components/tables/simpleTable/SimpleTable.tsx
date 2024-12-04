@@ -262,10 +262,11 @@ export default function SimpleTable(props: ISimpleTableProps) {
                     toolbar: { setRows, setRowModesModel, initNewRow: props.initNewRow, toolbarComponent: props.toolbarComponent, hideActions: props.hideActions},
                 }}
                 columnVisibilityModel={props.columnVisibilityModel}
-                initialState={{
-                    pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 0,}},
-                }}
-                pageSizeOptions={props.pageSizeOptions || [10, 20]}
+                // initialState={{
+                //     pagination: { paginationModel: { pageSize: props.pageSizeOptions?.[0] || 10, page: 0,}},
+                // }}
+                // pageSizeOptions={props.pageSizeOptions || [10, 20]}
+                hideFooter={true}
                 onRowClick={ e => {props.onRowClick && props.onRowClick(e)}}
                 getRowId={props.getRowId}
                 rowHeight={props.rowHeight || 60}

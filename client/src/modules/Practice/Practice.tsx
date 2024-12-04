@@ -56,6 +56,8 @@ const Practice: React.FC = () => {
                 const resListQuestion = response.data.data
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
+
+                
                 
                 setExamInfo(resExamInfo.data.data)
                 setExamId(EXAM_ID)
@@ -69,6 +71,9 @@ const Practice: React.FC = () => {
         }
         fetchData()
     }, [])
+    useEffect(() => {
+        setCurrentQuestion(listQuestion[0])
+    }, [listQuestion])
     const handleSubmit = async () => {
         try {
             const res2 = await insertResult({

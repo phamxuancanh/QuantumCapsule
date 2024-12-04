@@ -46,20 +46,6 @@ const Practice: React.FC = () => {
     const {actStarModal, setActStarModal} = useActStarModal()
     const [examInfo, setExamInfo] = React.useState<any>({})
     const {isNextQuestion} = useIsNextQuestion()
-    // const[]
-    // useEffect(() => {
-    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-    //         handleSubmit()
-    //     };
-    
-    //     // Đăng ký sự kiện
-    //     window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    //     // Cleanup khi component bị unmount
-    //     return () => {
-    //       window.removeEventListener('beforeunload', handleBeforeUnload);
-    //     };
-    // }, []);
     
     useEffect(() => {
         const fetchData = async () => {
@@ -69,10 +55,9 @@ const Practice: React.FC = () => {
                 const response = await getListQuesionByExamId(EXAM_ID)
                 const resExamInfo = await getExamInfo(EXAM_ID)
                 
-                const resListQuestion = response.data.data
+                const resListQuestion = [...response.data.data]
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
-                console.log(initListAnswer);
                 
                 setExamInfo(resExamInfo.data.data)
                 setExamId(EXAM_ID)
@@ -86,6 +71,9 @@ const Practice: React.FC = () => {
         }
         fetchData()
     }, [])
+    useEffect(() => {
+        setCurrentQuestion(listQuestion[0])
+    }, [listQuestion])
     const handleSubmit = async () => {
         try {
             const res2 = await insertResult({

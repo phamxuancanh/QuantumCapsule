@@ -91,7 +91,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
         }
     }
     const handleClickNextQuestion = () => {
-        if(!isNextQuestion) {
+        if(!isNextQuestion) { // nút trả lời
             const yourAnswer = listAnswer.find((ans) => ans.questionId === currentQuestion.id)
             if(!yourAnswer?.yourAnswer) {
                 toast.error("Bạn chưa trả lời")

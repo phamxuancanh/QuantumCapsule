@@ -18,7 +18,7 @@ const queries = {
     select q.*, eq.id as examQuestionId
     from questions q
     join exam_questions eq on q.id = eq.questionId
-    where examId = :examId and eq.status = 1 
+    where examId = :examId and eq.status = 1 and q.status = 1
   `,
   // bỏ
   getListExamQuestionByChapterId: `
