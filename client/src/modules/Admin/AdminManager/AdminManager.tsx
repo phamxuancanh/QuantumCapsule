@@ -1143,10 +1143,10 @@ const AdminManager: React.FC = () => {
                                         </Button>
                                         <Button variant='outlined'
                                             onClick={async () => {
-                                                const url = `${process.env.PUBLIC_URL}/questions.xlsm`; 
+                                                const url = `${process.env.PUBLIC_URL}/questions.xlsx`; 
                                                 const link = document.createElement('a');
                                                 link.href = url;
-                                                link.setAttribute('download', 'questions.xlsm'); 
+                                                link.setAttribute('download', 'questions.xlsx'); 
                                                 document.body.appendChild(link);
                                                 link.click();
                                                 document.body.removeChild(link);
@@ -1262,10 +1262,10 @@ const AdminManager: React.FC = () => {
                                         }} />
                                         <Button variant='outlined'
                                             onClick={async () => {
-                                                const url = `${process.env.PUBLIC_URL}/questions.xlsm`; 
+                                                const url = `${process.env.PUBLIC_URL}/questions.xlsx`; 
                                                 const link = document.createElement('a');
                                                 link.href = url;
-                                                link.setAttribute('download', 'questions.xlsm'); 
+                                                link.setAttribute('download', 'questions.xlsx'); 
                                                 document.body.appendChild(link);
                                                 link.click();
                                                 document.body.removeChild(link);
@@ -1368,10 +1368,10 @@ const AdminManager: React.FC = () => {
                                             }} />
                                             <Button variant='outlined'
                                                 onClick={async () => {
-                                                    const url = `${process.env.PUBLIC_URL}/theories.xlsm`; 
+                                                    const url = `${process.env.PUBLIC_URL}/theories.xlsx`; 
                                                     const link = document.createElement('a');
                                                     link.href = url;
-                                                    link.setAttribute('download', 'theories.xlsm'); 
+                                                    link.setAttribute('download', 'theories.xlsx'); 
                                                     document.body.appendChild(link);
                                                     link.click();
                                                     document.body.removeChild(link);

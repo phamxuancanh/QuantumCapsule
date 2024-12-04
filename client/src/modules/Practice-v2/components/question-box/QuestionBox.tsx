@@ -76,10 +76,13 @@ const QuestionBox: React.FC<IProps> = (props) => {
     }
     const handleSubmit = async () => {
         try {
-            const res2 = await insertResult({
+            const newResult = {
                 ...result,
                 star: caculateStar(result),
-            } as IResult)        
+                timeEnd: new Date()
+            }
+            const res2 = await insertResult(newResult)
+            setResult(newResult)      
             const res1 = await insertListAnswer(listAnswer)
             toast.success("Nộp bài thành công")
             setIsSumited(true)

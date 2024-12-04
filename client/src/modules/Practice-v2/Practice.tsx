@@ -30,6 +30,7 @@ import { insertListAnswer } from "api/answer/answer.api"
 import { ACTIONS } from "utils/enums"
 import { getExamInfo } from "api/exam/exam.api"
 import GameProgress from "./components/game-progress/GameProgress"
+import { shuffleArray } from "helpers/Nam-helper/shufflerHelper"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -52,10 +53,12 @@ const Practice: React.FC = () => {
             try {
                 const params = new URLSearchParams(window.location.search)
                 const EXAM_ID = params.get('examId') || "exam00001"
-                const response = await getListQuesionByExamId(EXAM_ID)
                 const resExamInfo = await getExamInfo(EXAM_ID)
+                let response = await getListQuesionByExamId(EXAM_ID)
                 
-                const resListQuestion = [...response.data.data]
+                const resListQuestion = shuffleArray([...response.data.data])
+                console.log(resListQuestion);
+                
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
                 
@@ -72,6 +75,7 @@ const Practice: React.FC = () => {
         fetchData()
     }, [])
     useEffect(() => {
+        
         setCurrentQuestion(listQuestion[0])
     }, [listQuestion])
     const handleSubmit = async () => {
@@ -101,11 +105,16 @@ const Practice: React.FC = () => {
             <Box >
                 <ListQuestionButton isOpen={isSumited === false}/>
             </Box>
-            <Box mb={1}>
-                <GameProgress 
-                    totalQuestions={listAnswer.length}
-                    completedQuestions={isNextQuestion ?  listAnswer.filter(ans => ans.yourAnswer).length : listAnswer.filter(ans => ans.yourAnswer && ans.questionId !== currentQuestion.id).length}
-                />
+            <Box mb={1} display={isSumited === false? "flex": "none"} gap={2}>
+                <Typography fontSize={"25px"} color={"#EB8317"} fontWeight={"bold"}>
+                    Tiến trình trả lời: 
+                </Typography>
+                <Box width={"75%"}>
+                    <GameProgress 
+                        totalQuestions={listAnswer.length}
+                        completedQuestions={isNextQuestion ?  listAnswer.filter(ans => ans.yourAnswer).length : listAnswer.filter(ans => ans.yourAnswer && ans.questionId !== currentQuestion.id).length}
+                    />
+                </Box>
             </Box>
             <Box >
                 <QuestionBox
