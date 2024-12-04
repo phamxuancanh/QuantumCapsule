@@ -27,7 +27,7 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     const { listAnswer } = useListAnswer()
     const { listQuestion } = useListQuestion()
     const {setIsSumited} = useIsSumited()
-    const {result} = useResult()
+    const {result, setResult} = useResult()
     const {setActStarModal}  = useActStarModal()
     const [actComfirmModal, setActComfirmModal] = React.useState<IAction>(defaultAction)
     const handleSubmit = async (comfirm: boolean) => {
@@ -46,10 +46,13 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
         }
         
         try {
-            const res2 = await insertResult({
+            const newResult = {
                 ...result,
                 star: caculateStar(result),
-            } as IResult)        
+                timeEnd: new Date()
+            } as IResult
+            const res2 = await insertResult(newResult)
+            setResult(newResult)     
             const res1 = await insertListAnswer(listAnswer)
             toast.success("Nộp bài thành công")
             setIsSumited(true)
@@ -104,12 +107,13 @@ const SubmitResultBox: React.FC<IProps> = (props) => {
     return (
         <Box display={props.isOpen ? "block" : "none"}>
             <Box  sx={{
-                height: '60vh',
+                height: '50vh',
                 overflowY: 'auto',
             }}>
                 {renderYourAnswer()}
 
             </Box>
+            <Typography color={"red"} fontSize={"25px"}>*Làm lại bằng cách nhấn câu hỏi ở khung bên phải</Typography>
             <Button
                 variant="contained"
                 fullWidth

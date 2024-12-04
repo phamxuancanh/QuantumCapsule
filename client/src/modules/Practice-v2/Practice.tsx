@@ -56,7 +56,12 @@ const Practice: React.FC = () => {
                 const resExamInfo = await getExamInfo(EXAM_ID)
                 let response = await getListQuesionByExamId(EXAM_ID)
                 
-                const resListQuestion = shuffleArray([...response.data.data])
+                const resListQuestion = [...response.data.data].map((question: IQuestion, index) => {
+                    return {
+                        ...question,
+                        title: "Câu " + (index + 1) + ' / ' + response.data.data.length,
+                    }
+                })
                 console.log(resListQuestion);
                 
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
