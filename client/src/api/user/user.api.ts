@@ -50,52 +50,52 @@ export const verifyEmail = async (token: string): Promise<AxiosResponse<any>> =>
 export const verifyOTP = async (payload: any): Promise<AxiosResponse<any>> => {
   return await requestWithoutJwt.post<any>('/auths/verifyOTP', { data: payload }, { withCredentials: true })
 }
-export const facebookSignIn = async () => {
-  const auth = getAuth(app);
-  const provider = new FacebookAuthProvider();
+// export const facebookSignIn = async () => {
+//   const auth = getAuth(app);
+//   const provider = new FacebookAuthProvider();
 
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const token = await result.user.getIdToken();
+//   try {
+//     const result = await signInWithPopup(auth, provider);
+//     const token = await result.user.getIdToken();
 
-    console.log('Token:', token);
+//     console.log('Token:', token);
 
-    const response = await fetch('http://localhost:8000/api/v1/auths/facebook', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ idToken: token }),
-      credentials: 'include',
-    });
+//     const response = await fetch('http://localhost:8000/api/v1/auths/facebook', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ idToken: token }),
+//       credentials: 'include',
+//     });
 
-    const data = await response.json();
-    if (response.ok) {
-      console.log('Đăng nhập thành công:', data);
+//     const data = await response.json();
+//     if (response.ok) {
+//       console.log('Đăng nhập thành công:', data);
 
-      const currentUser = {
-        accessToken: data.accessToken, // Sử dụng accessToken từ response
-        currentUser: data.user,
-      };
+//       const currentUser = {
+//         accessToken: data.accessToken, // Sử dụng accessToken từ response
+//         currentUser: data.user,
+//       };
 
-      return currentUser;
-    } else {
-      console.error('Đăng nhập thất bại:', data);
-      toast.error('Đăng nhập Facebook thất bại!');
-      return null;
-    }
-  } catch (error) {
-    console.error('Lỗi khi đăng nhập với Facebook:', error);
+//       return currentUser;
+//     } else {
+//       console.error('Đăng nhập thất bại:', data);
+//       toast.error('Đăng nhập Facebook thất bại!');
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Lỗi khi đăng nhập với Facebook:', error);
 
-    if ((error as any).code === 'auth/account-exists-with-different-credential') {
-      toast.error('Email này đã được đăng ký bằng phương thức khác. Vui lòng thử đăng nhập bằng phương thức đó.');
-    } else {
-      toast.error('Đã xảy ra lỗi khi đăng nhập với Facebook.');
-    }
+//     if ((error as any).code === 'auth/account-exists-with-different-credential') {
+//       toast.error('Email này đã được đăng ký bằng phương thức khác. Vui lòng thử đăng nhập bằng phương thức đó.');
+//     } else {
+//       toast.error('Đã xảy ra lỗi khi đăng nhập với Facebook.');
+//     }
 
-    return null;
-  }
-};
+//     return null;
+//   }
+// };
 export const googleSignIn = async () => {
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
@@ -144,68 +144,68 @@ export const googleSignIn = async () => {
   }
 };
 
-export const githubSignIn = async () => {
-  const auth = getAuth(app);
-  const provider = new GithubAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const credential = GithubAuthProvider.credentialFromResult(result);
-    const githubToken = credential?.accessToken;
-    console.log("GitHub Token:", githubToken);
+// export const githubSignIn = async () => {
+//   const auth = getAuth(app);
+//   const provider = new GithubAuthProvider();
+//   try {
+//     const result = await signInWithPopup(auth, provider);
+//     const credential = GithubAuthProvider.credentialFromResult(result);
+//     const githubToken = credential?.accessToken;
+//     console.log("GitHub Token:", githubToken);
 
-    const response = await fetch('http://localhost:8000/api/v1/auths/github', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ githubToken }),
-      credentials: 'include',
-    });
+//     const response = await fetch('http://localhost:8000/api/v1/auths/github', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ githubToken }),
+//       credentials: 'include',
+//     });
 
-    const data = await response.json();
-    if (response.ok) {
-      console.log('Đăng nhập GitHub thành công:', data);
+//     const data = await response.json();
+//     if (response.ok) {
+//       console.log('Đăng nhập GitHub thành công:', data);
 
-      // Lấy dữ liệu hiện tại từ localStorage
-      const persistAuthKey = 'persist:auth';
-      const persistAuthData = localStorage.getItem(persistAuthKey);
+//       // Lấy dữ liệu hiện tại từ localStorage
+//       const persistAuthKey = 'persist:auth';
+//       const persistAuthData = localStorage.getItem(persistAuthKey);
 
-      if (persistAuthData) {
-        // Parse dữ liệu JSON hiện tại
-        const parsedData = JSON.parse(persistAuthData);
+//       if (persistAuthData) {
+//         // Parse dữ liệu JSON hiện tại
+//         const parsedData = JSON.parse(persistAuthData);
 
-        // Cập nhật trường accessToken
-        parsedData.accessToken = data.accessToken;
+//         // Cập nhật trường accessToken
+//         parsedData.accessToken = data.accessToken;
 
-        // Lưu lại dữ liệu đã cập nhật vào localStorage
-        localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
-      } else {
-        // Nếu persist:auth chưa tồn tại, tạo mới với accessToken
-        const newData = { accessToken: data.accessToken };
-        localStorage.setItem(persistAuthKey, JSON.stringify(newData));
-      }
+//         // Lưu lại dữ liệu đã cập nhật vào localStorage
+//         localStorage.setItem(persistAuthKey, JSON.stringify(parsedData));
+//       } else {
+//         // Nếu persist:auth chưa tồn tại, tạo mới với accessToken
+//         const newData = { accessToken: data.accessToken };
+//         localStorage.setItem(persistAuthKey, JSON.stringify(newData));
+//       }
 
-      const currentUser = {
-        accessToken: data.accessToken, // Sử dụng accessToken từ response
-        currentUser: data.user,
-      };
+//       const currentUser = {
+//         accessToken: data.accessToken, // Sử dụng accessToken từ response
+//         currentUser: data.user,
+//       };
 
-      return currentUser;
-    } else {
-      console.error('Đăng nhập GitHub thất bại:', data);
-      toast.error('Đăng nhập GitHub thất bại!');
-      return null;
-    }
-  } catch (error) {
-    console.error("Lỗi khi đăng nhập với GitHub:", error);
-    if ((error as any).code === 'auth/account-exists-with-different-credential') {
-      toast.error('Email này đã được đăng ký bằng phương thức khác. Vui lòng thử đăng nhập bằng phương thức đó.');
-    } else {
-      toast.error('Đã xảy ra lỗi khi đăng nhập với GitHub.');
-    }
-    return null;
-  }
-};
+//       return currentUser;
+//     } else {
+//       console.error('Đăng nhập GitHub thất bại:', data);
+//       toast.error('Đăng nhập GitHub thất bại!');
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error("Lỗi khi đăng nhập với GitHub:", error);
+//     if ((error as any).code === 'auth/account-exists-with-different-credential') {
+//       toast.error('Email này đã được đăng ký bằng phương thức khác. Vui lòng thử đăng nhập bằng phương thức đó.');
+//     } else {
+//       toast.error('Đã xảy ra lỗi khi đăng nhập với GitHub.');
+//     }
+//     return null;
+//   }
+// };
 
 export const findUserById = async (id: string): Promise<AxiosResponse<any>> => {
   console.log(id, 'id');

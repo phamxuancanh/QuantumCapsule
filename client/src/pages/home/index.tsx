@@ -273,38 +273,6 @@ const Home = () => {
             navigate({ search: searchParams.toString() });
         }
     };
-    // const handleChapterClick = async (chapterId: string) => {
-    //     setExpandedChapters(prevState => ({
-    //         ...prevState,
-    //         [chapterId]: !prevState[chapterId]
-    //     }));
-
-    //     if (!expandedChapters[chapterId]) {
-    //         setSelectedChapterId(chapterId);
-    //         setSelectedChapter(chaptersData?.data.find(chapter => chapter.id === chapterId) ?? null);
-
-    //         const selectedLessonForChapter = selectedLessonsByChapter[chapterId];
-    //         let firstLessonId = selectedLessonForChapter;
-    //         if (selectedLessonForChapter) {
-    //             setSelectedLessonId(selectedLessonForChapter);
-    //         } else {
-    //             const firstLessonInChapter = await getFirstLessonByChapterId(chapterId);
-    //             firstLessonId = firstLessonInChapter?.data.data.id ?? null;
-    //             setSelectedLessonId(firstLessonId);
-
-    //             setSelectedLessonsByChapter(prev => ({
-    //                 ...prev,
-    //                 [chapterId]: firstLessonId,
-    //             }));
-    //         }
-
-    //         // Update URL parameters
-    //         const searchParams = new URLSearchParams(location.search);
-    //         searchParams.set('chapterId', chapterId);
-    //         searchParams.set('lessonId', firstLessonId ?? '');
-    //         navigate({ search: searchParams.toString() });
-    //     }
-    // };
     const handleLessonClick = (lessonId: string) => {
         setSelectedLessonId(lessonId);
 

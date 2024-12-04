@@ -2,7 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const http = require('http')
 const socket = require('./socket')
-const session = require('express-session')
+// const session = require('express-session')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const { sequelize } = require('./models')
@@ -16,11 +16,21 @@ const server = http.createServer(app)
 
 app.set('trust proxy', true)
 
-app.use(session({
-  secret: 'your_secret_key',
-  resave: false,
-  saveUninitialized: true
-}))
+// app.use(function (req, res, next) {
+//   res.setHeader('Access-Control-Allow-Origin', '*') // Cho phép tất cả các nguồn
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE') // Các phương thức được phép
+//   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization') // Các header được phép
+//   res.setHeader('Access-Control-Allow-Credentials', true) // Cho phép gửi cookie/credentials
+//   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+//   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+//   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
+//   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+
+//   if (req.method === 'OPTIONS') {
+//     return res.sendStatus(200)
+//   }
+//   next()
+// })
 
 // app.use(function (req, res, next) {
 //   res.setHeader('Access-Control-Allow-Origin', `http://localhost:${process.env.CLIENT_PORT}`)
@@ -41,8 +51,8 @@ app.use(cors({
   // origin: `*`,
   origin: `http://localhost:${process.env.CLIENT_PORT}`,
   methods: 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-  allowedHeaders: 'X-Requested-With,Content-Type,Authorization',
-  credentials: true
+  allowedHeaders: 'X-Requested-With,Content-Type,Authorization'
+  // credentials: true
 }))
 
 app.use(cookieParser())
@@ -62,7 +72,7 @@ async function startServer () {
     await seedDatabase()
     console.log('Data seeded successfully')
 
-    server.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT || 443, () => {
       console.log('Server is running on port', process.env.PORT)
     })
   } catch (error) {
