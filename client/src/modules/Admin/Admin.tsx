@@ -46,7 +46,7 @@ const Admin: React.FC = () => {
             }
             if (theoryData) {
                 const response = await importTheories(theoryData);
-                toast.success('Nhập dữ liệu các bài lý thuyết thành công');
+                toast.success('Nhập dữ liệu các bài giảng thành công');
             }
             if (questionData) {
                 const response = await importQuestions(questionData);
@@ -85,7 +85,7 @@ const Admin: React.FC = () => {
         try {
             console.log(listData);
             const response = await importTheories(listData);
-            toast.success('Nhập dữ liệu các bài lý thuyết thành công');
+            toast.success('Nhập dữ liệu các bài giảng thành công');
         } catch (error) {
             toast.error(`Error importing theories: ${(error as Error).message || error}`);
         }
@@ -171,8 +171,8 @@ const Admin: React.FC = () => {
                         <ExcelReaderBtn sheetIndex={2} name='Nhập dữ liệu bài tập' onUpload={handleImportExam} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
-                        <h1 className='tw-font-bold'>Lý thuyết</h1>
-                        <ExcelReaderBtn sheetIndex={3} name='Nhập dữ liệu lý thuyết' onUpload={handleImportTheory} />
+                        <h1 className='tw-font-bold'>Bài giảng</h1>
+                        <ExcelReaderBtn sheetIndex={3} name='Nhập dữ liệu bài giảng' onUpload={handleImportTheory} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Câu hỏi</h1>

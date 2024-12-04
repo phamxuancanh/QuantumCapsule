@@ -194,15 +194,15 @@
             "exam": "Bài kiểm tra"
         },
         "lessonDetail": {
-            "theory": "Lý thuyết",
+            "theory": "Bài giảng",
             "practice": "Luyện tập",
-            "not_have_theory": "Bài học này không có lý thuyết",
+            "not_have_theory": "Bài học này không có bài giảng",
             "not_have_practice": "Bài học này không có bài luyện tập"
         },
         "chapterDetail": {
-            "theory": "Lý thuyết",
+            "theory": "Bài giảng",
             "practice": "Luyện tập",
-            "not_have_theory": "Bài học này không có lý thuyết",
+            "not_have_theory": "Bài học này không có bài giảng",
             "not_have_practice": "Bài học này không có bài luyện tập"
         },
         "learning": {

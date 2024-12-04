@@ -84,10 +84,13 @@ const QuestionV1: React.FC<IProps> = (props) => {
     }
     return (
         <Card sx={{ p: 5, minHeight: "350px"}}>
-            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "25px"}}>
+            {props.mode === "submit" && !props.yourAnswer?.yourAnswer &&
+                <Typography color={"red"} fontWeight={600} sx={{fontSize: "25px"}}>Chưa trả lời</Typography>
+            }
+            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "25px"}} mb={1}>
                 {question.title}
             </Typography>
-            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "25px"}}>
+            <Typography color={"#1E201E"} sx={{fontSize: "25px"}}>
                 {question.content}
             </Typography>
             <RenderContentImg imageContent={question.contentImg!}/>

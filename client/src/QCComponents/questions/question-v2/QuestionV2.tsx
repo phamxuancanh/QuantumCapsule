@@ -33,10 +33,13 @@ const QuestionV2: React.FC<IProps> = (props) => {
     }
     return (
         <Card sx={{ p: 5, minHeight: "350px"}}>
-            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "25px"}}>
-                {props.question.title}
+            {props.mode === "submit" && !props.yourAnswer?.yourAnswer &&
+                <Typography color={"red"} fontWeight={600} sx={{fontSize: "25px"}}>Chưa trả lời</Typography>
+            }
+            <Typography color={"#257180"} fontWeight={600} sx={{fontSize: "25px"}} mb={1}>
+                {props.question.title} 
             </Typography>
-            <Typography color={"#1E201E"} fontWeight={600} sx={{fontSize: "25px"}}>
+            <Typography color={"#1E201E"} sx={{fontSize: "25px"}}>
                 {props.question.content}
             </Typography>
             <RenderContentImg imageContent={props.question.contentImg!}/>
@@ -62,7 +65,7 @@ const QuestionV2: React.FC<IProps> = (props) => {
                     <Typography color={props.yourAnswer?.isCorrect ? "#4caf50" : "#f44336"} fontWeight={600} fontSize={"25px"}>
                         {props.yourAnswer?.isCorrect ? "Bạn trả lời đúng rồi" : "Bạn trả lời sai rồi"}
                     </Typography>
-                    <Typography color={"#4caf50"} fontWeight={600} fontSize={"25px"}>
+                    <Typography color={"#4caf50"} fontSize={"25px"}>
                         Đáp án đúng: {props.question.correctAnswer}
                     </Typography>
                     <Typography color={"#1E201E"} fontSize={"25px"}>

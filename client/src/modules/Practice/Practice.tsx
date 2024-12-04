@@ -53,9 +53,16 @@ const Practice: React.FC = () => {
                 const resExamInfo = await getExamInfoForExam(EXAM_ID)
 
                 
-                const resListQuestion = response.data.data
+                const resListQuestion = [...response.data.data].map((question: IQuestion, index) => {
+                    return {
+                        ...question,
+                        title: "Câu " + (index + 1) + ' / ' + response.data.data.length,
+                    }
+                })
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)
+
+                
                 
                 setExamInfo(resExamInfo.data.data)
                 setExamId(EXAM_ID)
@@ -69,12 +76,18 @@ const Practice: React.FC = () => {
         }
         fetchData()
     }, [])
+    useEffect(() => {
+        setCurrentQuestion(listQuestion[0])
+    }, [listQuestion])
     const handleSubmit = async () => {
         try {
-            const res2 = await insertResult({
+            const newResult = {
                 ...result,
                 star: caculateStar(result),
-            } as IResult)        
+                timeEnd: new Date()
+            } as IResult
+            const res2 = await insertResult(newResult)
+            setResult(newResult)     
             const res1 = await insertListAnswer(listAnswer)
             toast.success("Nộp bài thành công")
             setIsSumited(true)
@@ -96,14 +109,14 @@ const Practice: React.FC = () => {
                 {!isSumited && 
                     <Grid item xs={12} display={"flex"} gap={2}>
                         <Grid container spacing={1}>
-                            <Grid item xs={6}>
-                                <TimeCountdown initialSeconds={60* 40} // 60 *40: 40 minutes 
+                            {listQuestion.length > 0 &&<Grid item xs={6}>
+                                <TimeCountdown initialSeconds={listQuestion.length * 2 * 60} // 60 *40: 40 minutes 
                                     onCountdownEnd={() => {
                                         handleSubmit()
                                     }}
                                     sx={{width: "100%", height:"40px", fontSize: "25px", color: "#1976D2"}}
                                 />
-                            </Grid>
+                            </Grid>}
                             <Grid item xs={6}>
                                 {!openResult &&
                                     <Button

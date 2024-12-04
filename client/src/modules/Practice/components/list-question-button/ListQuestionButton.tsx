@@ -23,7 +23,7 @@ const ListQuestionButton: React.FC<IProps> = (props) => {
                 <Grid container spacing={1} p={2}>
                     {listQuestion.map((question, index) => {
                         const answer = listAnswer.find(answer => answer.questionId === question.id)
-                        return <Grid item xs={12} md={4} xl={3} key={question.id}>
+                        return <Grid item xs={12} md={3} xl={3} key={question.id}>
                             <Badge 
                                 badgeContent={
                                     answer?.flat && 

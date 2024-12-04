@@ -29,7 +29,6 @@ import { ITheory } from 'api/theory/theory.interface';
 import { addTheory, deleteTheory, getTheoriesByLessonId, importTheories, updateTheory } from 'api/theory/theory.api';
 import ComfirmModal from 'components/modals/comfirmModal/ComfirmModal';
 
-
 const typeQuestions = [
     {id: 1, name: "Trắc nghiệm 1 đáp án"},
     {id: 2, name: "Điền đáp án đúng"},
@@ -156,8 +155,8 @@ const AdminManager: React.FC = () => {
     const handleUpdateRowExamQuestion = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
-            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
-                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+            if(!data.questionType || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, nội dung và đáp án đúng")
                 return false
             }
             try {
@@ -175,8 +174,8 @@ const AdminManager: React.FC = () => {
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
-            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
-                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+            if(!data.questionType  || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, nội dung và đáp án đúng")
                 return false
             }
             try {
@@ -207,8 +206,8 @@ const AdminManager: React.FC = () => {
     const handleUpdateRowQuestionBank = async (data: any, action: ACTIONS) => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
-            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
-                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+            if(!data.questionType  || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, nội dung và đáp án đúng")
                 return false
             }
             try {
@@ -222,8 +221,8 @@ const AdminManager: React.FC = () => {
         }
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
-            if(!data.questionType || !data.title || !data.content || !data.correctAnswer) {
-                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+            if(!data.questionType  || !data.content || !data.correctAnswer) {
+                toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, nội dung và đáp án đúng")
                 return false
             }
             try {
@@ -240,7 +239,7 @@ const AdminManager: React.FC = () => {
         if (action === ACTIONS.DELETE) {
             console.log("DELETE", data);
             try {
-                const res = await deleteQuestion(actQuanLy.payload?.data?.id)
+                const res = await deleteQuestion(data)
                 setListQuestion(listQuestion.filter((item) => item.id !== data))
                 toast.success("Xóa thành công")
             }catch (error: any) {
@@ -255,7 +254,7 @@ const AdminManager: React.FC = () => {
         if (action === ACTIONS.CREATE) {
             console.log("CREATE", data);
             if(!data.name || !data.url || !data.type) {
-                toast.error("Vui lòng nhập đầy đủ thông tin: tên, url, tiêu đề")
+                toast.error("Vui lòng nhập đầy đủ thông tin: tên, url, kiểu")
                 return false
             }
             try {
@@ -270,7 +269,7 @@ const AdminManager: React.FC = () => {
         if (action === ACTIONS.UPDATE) {
             console.log("UPDATE", data);
             if(!data.name || !data.url  || !data.type) {
-                toast.error("Vui lòng nhập đầy đủ thông tin: tên, url, tiêu đề")
+                toast.error("Vui lòng nhập đầy đủ thông tin: tên, url, kiểu")
                 return false
             }
             try {
@@ -382,12 +381,27 @@ const AdminManager: React.FC = () => {
                         }}
                     >
                         {
-                            listChapter.map((chapterItem) => {
+                            listChapter.sort((a,b)=>{
+                                
+                                const hasChuongA = a.name!.includes('Chương');
+                                const hasChuongB = b.name!.includes('Chương');
+                                const hasChuDeA = a.name!.includes('Chủ đề');
+                                const hasChuDeB = b.name!.includes('Chủ đề');
+                            
+                                if ((hasChuongA || hasChuDeA) && !(hasChuongB || hasChuDeB)) return -1; // A có "Chương" hoặc "Chủ đề", B không có -> A đứng trước
+                                if (!(hasChuongA || hasChuDeA) && (hasChuongB || hasChuDeB)) return 1;  // B có "Chương" hoặc "Chủ đề", A không có -> B đứng trước
+                            
+                                // Nếu cả hai đều có "Chương" hoặc "Chủ đề", so sánh theo số
+                                const chapterNumberA = (hasChuongA || hasChuDeA) ? parseInt(a.name!.replace(/(Chương|Chủ đề)/, '').trim()) : Infinity;
+                                const chapterNumberB = (hasChuongB || hasChuDeB) ? parseInt(b.name!.replace(/(Chương|Chủ đề)/, '').trim()) : Infinity;
+                            
+                                return chapterNumberA - chapterNumberB;
+                            }).map((chapterItem) => {
                                 return <TreeItem  key={chapterItem.id}  itemId={chapterItem.id!} 
                                     label={
                                         <Box display={"flex"} justifyContent={"space-between"}>
                                             {actSuaChuong.open && actSuaChuong.payload.id === chapterItem.id  || 
-                                                <Typography fontSize={20} fontWeight={"bold"}>{chapterItem.name}</Typography>
+                                                <Typography fontSize={20} fontWeight={"bold"}> {chapterItem.name}</Typography>
                                             }
                                             {
                                                 actSuaChuong.open && actSuaChuong.payload.id === chapterItem.id && (
@@ -478,7 +492,7 @@ const AdminManager: React.FC = () => {
                                     <TreeItem itemId={chapterItem.id+"_baihoc"} 
                                          label={
                                             <Box display={"flex"} justifyContent={"space-between"} alignItems={'center'}>
-                                                <Typography fontSize={20}>
+                                                <Typography fontSize={20} color={"#685752"} fontWeight={"500"}>
                                                     Danh sách bài học <Typography color={"blue"} component={'span'} fontSize={20}>
                                                         ({listLesson.filter((lesson) => lesson.chapterId === chapterItem.id).length})
                                                     </Typography>
@@ -554,12 +568,25 @@ const AdminManager: React.FC = () => {
                                             )
                                         }
                                         {
-                                            listLesson.filter((lesson) => lesson.chapterId === chapterItem.id).map((lessonItem) => {
+                                            listLesson.sort((a,b)=>{
+                                                const hasBaiA = a.name!.includes('Bài');
+                                                const hasBaiB = b.name!.includes('Bài');
+
+                                                // Nếu một tên có "Bài" và tên kia không có, tên có "Bài" sẽ đứng trước
+                                                if (hasBaiA && !hasBaiB) return -1;
+                                                if (!hasBaiA && hasBaiB) return 1;
+
+                                                // Nếu cả hai đều có "Bài" hoặc đều không có "Bài", so sánh theo số
+                                                const chapterNumberA = hasBaiA ? parseInt(a.name!.replace('Bài', '').trim()) : Infinity;
+                                                const chapterNumberB = hasBaiB ? parseInt(b.name!.replace('Bài', '').trim()) : Infinity;
+
+                                                return chapterNumberA - chapterNumberB;
+                                            }).filter((lesson) => lesson.chapterId === chapterItem.id).map((lessonItem) => {
                                                 return <TreeItem key={lessonItem.id} itemId={lessonItem.id!} 
                                                     label={
                                                         <Box display={"flex"} justifyContent={"space-between"}>
                                                             {actSuaBaiHoc.open && actSuaBaiHoc.payload.id ===lessonItem.id ||  
-                                                                <Typography fontSize={20}>{lessonItem.name}</Typography>
+                                                                <Typography fontSize={20} color={"#E38E49"}>{lessonItem.name}</Typography>
                                                             }
                                                             {actSuaBaiHoc.open && actSuaBaiHoc.payload.id ===lessonItem.id && (
                                                                 <Box display={"flex"} width={"80%"}>
@@ -737,7 +764,7 @@ const AdminManager: React.FC = () => {
                                                                     label={
                                                                         <Box display={"flex"} justifyContent={"space-between"}>
                                                                             {actSuaBaiOnTap.open && actSuaBaiOnTap.payload.id ===examItem.id ||  
-                                                                                <Typography fontSize={20}>{examItem.name}</Typography>
+                                                                                <Typography fontSize={20} color={"#997C70"}>{examItem.name}</Typography>
                                                                             }
                                                                             {actSuaBaiOnTap.open && actSuaBaiOnTap.payload.id ===examItem.id && (
                                                                                 <Box display={"flex"} width={"80%"}>
@@ -838,7 +865,7 @@ const AdminManager: React.FC = () => {
                                                         }
                                                     </TreeItem>
                                                     <TreeItem itemId={lessonItem.id+"_baiGiang"} 
-                                                        label={<Typography fontSize={20}>Quản lý bài giảng</Typography>}
+                                                        label={<Typography fontSize={20} >Danh sách bài giảng</Typography>}
                                                         onClick={() => {
                                                             setActQuanLy({
                                                                 open: true,
@@ -859,7 +886,7 @@ const AdminManager: React.FC = () => {
                                     <TreeItem itemId={chapterItem.id+"_baikiemtra"} 
                                         label={
                                             <Box display={"flex"} justifyContent={"space-between"}>
-                                                <Typography fontSize={20}>
+                                                <Typography fontSize={20} color={"#685752"} fontWeight={"500"}>
                                                     Danh sách bài kiểm tra <Typography color={"blue"} component={'span'} fontSize={20}>
                                                         ({listExam.filter((exam) => exam.chapterId === chapterItem.id).length})
                                                     </Typography>
@@ -949,7 +976,7 @@ const AdminManager: React.FC = () => {
                                                     label={
                                                         <Box display={"flex"} justifyContent={"space-between"}>
                                                             {actSuaBaiKiemTra.open && actSuaBaiKiemTra.payload.id ===examItem.id ||  
-                                                                <Typography fontSize={20}>{examItem.name}</Typography>
+                                                                <Typography fontSize={20} color={"#E38E49"}>{examItem.name}</Typography>
                                                             }
                                                             {actSuaBaiKiemTra.open && actSuaBaiKiemTra.payload.id ===examItem.id && (
                                                                 <Box display={"flex"} width={"80%"}>
@@ -1076,12 +1103,12 @@ const AdminManager: React.FC = () => {
                                                     correctAnswer: item.correctAnswer,
                                                     explainAnswer: item.explainAnswer,
                                                     lessonId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data?.lessonId : '',
-                                                    chapterId: actQuanLy.payload?.data?.lessonId ? actQuanLy.payload?.data.lessonId : '',
+                                                    chapterId: actQuanLy.payload?.data?.chapterId ? actQuanLy.payload?.data?.chapterId : '',
                                                     status: true,
                                                 } as IQuestion))
-                                                const checkNull = payload.find((item) => !item.questionType || !item.title || !item.content || !item.correctAnswer)
+                                                const checkNull = payload.find((item) => !item.questionType  || !item.content || !item.correctAnswer)
                                                 if(checkNull) {
-                                                    toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, tiêu đề, nội dung và đáp án đúng")
+                                                    toast.error("Vui lòng nhập đầy đủ thông tin: loại câu hỏi, nội dung và đáp án đúng")
                                                     return
                                                 }
                                                 const response = await importQuestions(payload, actQuanLy.payload.data.lessonId, actQuanLy.payload.data.chapterId)
@@ -1114,12 +1141,19 @@ const AdminManager: React.FC = () => {
                                         >
                                             Thêm từ ngân hàng câu hỏi
                                         </Button>
-                                        <ExcelExportBtn 
-                                            data={listQuestion ? listQuestion : [] as IQuestion[]}
-                                            headers={['questionType', 'title', 'content', 'contentImg', 'A', 'B', 'C', 'D', 'E', 'correctAnswer', 'explainAnswer']}
-                                            variant='outlined'
-                                            fileName="questions" 
-                                        />
+                                        <Button variant='outlined'
+                                            onClick={async () => {
+                                                const url = `${process.env.PUBLIC_URL}/questions.xlsx`; 
+                                                const link = document.createElement('a');
+                                                link.href = url;
+                                                link.setAttribute('download', 'questions.xlsx'); 
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }}
+                                        >
+                                            Tải Excel
+                                        </Button>
                                     </Box>}
                                     initNewRow={{
                                         id: generateQuestionUID(),
@@ -1139,7 +1173,16 @@ const AdminManager: React.FC = () => {
                                         status: true,
                                     }as IQuestion}
                                     columns={[
-                                        // { field: 'id', headerName: 'ID', width: 70 },
+                                        { 
+                                            field: 'STT', 
+                                            headerName: 'STT', 
+                                            width: 50, 
+                                            type: 'number',
+                                            renderCell: (params) => {
+                                                const rowIndex = params.api.getAllRowIds().indexOf(params.id) + 1
+                                                return rowIndex
+                                            }
+                                        },
                                         { field: 'questionType', headerName: 'Loại câu hỏi', width: 180, 
                                             editable: true,
                                             valueFormatter: (value: number) => {
@@ -1151,7 +1194,7 @@ const AdminManager: React.FC = () => {
                                             },
                                         },
                                         // { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
-                                        { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
+                                        // { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
                                         { field: 'content', headerName: 'Nội dung', width: 130, editable: true },
                                         { field: 'contentImg', headerName: 'Ảnh', width: 130, editable: true },
                                         { field: 'A', headerName: 'A', width: 130, editable: true },
@@ -1183,7 +1226,7 @@ const AdminManager: React.FC = () => {
                                         <ExcelReaderBtn variant='outlined' sheetIndex={0} name='Thêm từ excel' onUpload={async (data)=>{
                                             try {
                                                 const payload = data.map((item) => ({
-                                                    id: generateChapterUID(),
+                                                    id: generateQuestionUID(),
                                                     questionType: item.questionType ?? "",
                                                     title: item.title ?? "",
                                                     content: item.content ?? "",
@@ -1199,9 +1242,9 @@ const AdminManager: React.FC = () => {
                                                     chapterId: actQuanLy.payload?.type === 'chapter' ? actQuanLy.payload.data.id : '',
                                                     status: true,
                                                 } as IQuestion))
-                                                const checkNull = payload.find((item) => !item.questionType || !item.title || !item.content || !item.correctAnswer)
+                                                const checkNull = payload.find((item) => !item.questionType  || !item.content || !item.correctAnswer)
                                                 if(checkNull) {
-                                                    toast.error("Vui lòng nhập đẩy đủ thông tin: loại câu hỏi, tiêu đề, nội dung, đáp án")
+                                                    toast.error("Vui lòng nhập đẩy đủ thông tin: loại câu hỏi, nội dung, đáp án")
                                                     return
                                                 }
                                                 const response = await importQuestions(
@@ -1217,12 +1260,19 @@ const AdminManager: React.FC = () => {
                                                 toast.error("Nhập dữ liệu thất bại: " + error.message)
                                             }
                                         }} />
-                                        <ExcelExportBtn 
-                                            data={listQuestion ? listQuestion : [] as IQuestion[]}
-                                            headers={['questionType', 'title', 'content', 'contentImg', 'A', 'B', 'C', 'D', 'E', 'correctAnswer', 'explainAnswer']}
-                                            variant='outlined'
-                                            fileName="questions" 
-                                        />
+                                        <Button variant='outlined'
+                                            onClick={async () => {
+                                                const url = `${process.env.PUBLIC_URL}/questions.xlsx`; 
+                                                const link = document.createElement('a');
+                                                link.href = url;
+                                                link.setAttribute('download', 'questions.xlsx'); 
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }}
+                                        >
+                                            Tải Excel
+                                        </Button>
                                     </Box>}
                                     initNewRow={{
                                         id: generateQuestionUID(),
@@ -1242,7 +1292,16 @@ const AdminManager: React.FC = () => {
                                         status: true,
                                     }as IQuestion}
                                     columns={[
-                                        // { field: 'id', headerName: 'ID', width: 70 },
+                                        { 
+                                            field: 'STT', 
+                                            headerName: 'STT', 
+                                            width: 50, 
+                                            type: 'number',
+                                            renderCell: (params) => {
+                                                const rowIndex = params.api.getAllRowIds().indexOf(params.id) + 1
+                                                return rowIndex
+                                            }
+                                        },
                                         { field: 'questionType', headerName: 'Loại câu hỏi', width: 180, 
                                             editable: true,
                                             valueFormatter: (value: number) => {
@@ -1254,7 +1313,7 @@ const AdminManager: React.FC = () => {
                                             },
                                         },
                                         // { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
-                                        { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
+                                        // { field: 'title', headerName: 'Tiêu đề', width: 130, editable: true },
                                         { field: 'content', headerName: 'Nội dung', width: 130, editable: true },
                                         { field: 'contentImg', headerName: 'Ảnh', width: 130, editable: true },
                                         { field: 'A', headerName: 'A', width: 130, editable: true },
@@ -1307,18 +1366,25 @@ const AdminManager: React.FC = () => {
                                                     toast.error("Nhập dữ liệu thất bại: " + error.message)
                                                 }
                                             }} />
-                                            <ExcelExportBtn 
-                                                data={listTheory ? listTheory : [] as ITheory[]}
-                                                headers={[ 'name', 'url', 'type']}
-                                                variant='outlined'
-                                                fileName="theory" 
-                                            />
+                                            <Button variant='outlined'
+                                                onClick={async () => {
+                                                    const url = `${process.env.PUBLIC_URL}/theories.xlsx`; 
+                                                    const link = document.createElement('a');
+                                                    link.href = url;
+                                                    link.setAttribute('download', 'theories.xlsx'); 
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }}
+                                            >
+                                                Tải Excel
+                                            </Button>
                                         </Box>
                                     }
                                     initNewRow={{
                                         id: generateTheoryUID(),
                                         lessonId: actQuanLy.payload.data.id,
-                                        name: "Tên bài lý thuyết",
+                                        name: "Tên bài giảng",
                                         description: "Mô tả",
                                         summary: "Tóm tắt",
                                         url: "Link",
@@ -1327,6 +1393,16 @@ const AdminManager: React.FC = () => {
                                         status: true,
                                     } as ITheory}
                                     columns={[
+                                        { 
+                                            field: 'STT', 
+                                            headerName: 'STT', 
+                                            width: 50, 
+                                            type: 'number',
+                                            renderCell: (params) => {
+                                                const rowIndex = params.api.getAllRowIds().indexOf(params.id) + 1
+                                                return rowIndex
+                                            }
+                                        },
                                         {
                                             field: "name",
                                             headerName: "Tên",
@@ -1386,6 +1462,16 @@ const AdminManager: React.FC = () => {
                         }}
                         hideActions
                         columns={[
+                            { 
+                                field: 'STT', 
+                                headerName: 'STT', 
+                                width: 50, 
+                                type: 'number',
+                                renderCell: (params) => {
+                                    const rowIndex = params.api.getAllRowIds().indexOf(params.id) + 1
+                                    return rowIndex
+                                }
+                            },
                             {
                                 field: 'questionType', headerName: 'Loại câu hỏi', width: 180,
                                 editable: true,
@@ -1398,7 +1484,7 @@ const AdminManager: React.FC = () => {
                                 },
                             },
                             // { field: 'questionType', headerName: 'Loại câu hỏi', width: 130, editable: true, type: "number" },
-                            { field: 'title', headerName: 'Tiêu đề', width: 130},
+                            // { field: 'title', headerName: 'Tiêu đề', width: 130},
                             { field: 'content', headerName: 'Nội dung', width: 130},
                             { field: 'contentImg', headerName: 'Ảnh', width: 130 },
                             { field: 'A', headerName: 'A', width: 130 },

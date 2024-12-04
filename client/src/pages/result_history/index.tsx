@@ -1,9 +1,10 @@
-import { Box, Button, Grid, Rating, Typography } from '@mui/material';
+import { Box, Button, Card, Grid, Rating, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { IAnswer } from 'api/answer/answer.interfaces';
 import { IQuestion } from 'api/question/question.interfaces';
 import { getListResultByUserId, getResultDetailByResultId } from 'api/result/result.api';
 import { IGetResultByUserIdFilterParams, IResult, IResultDetail } from 'api/result/result.interface';
 import { time } from 'console';
+import { calculateScore, calculateTimeSpent } from 'helpers/Nam-helper/Caculate';
 import { formatDisplayData } from 'helpers/Nam-helper/FormatData';
 import { getUserIDLogin } from 'helpers/Nam-helper/InitHelper';
 import QCDateFilter, { IDateFilter } from 'QCComponents/QCDateFilter/QCDateFilter';
@@ -141,7 +142,42 @@ const ResultHistory: React.FC = () => {
                     <Box p={2}>
                         {
                             resultDetail ?
-                            <Typography variant="h4" color="#4caf50" textAlign={"center"}>Trả lời đúng: {resultDetail?.result.yourScore} / {resultDetail?.result.totalScore} câu</Typography>
+                            <Card>
+                                <TableContainer >
+                                    <Table>
+                                        <TableHead>
+                                        <TableRow>
+                                            <TableCell align="center" colSpan={2}>
+                                            <Typography fontSize={"30px"} color="#4caf50">
+                                                Kết quả bài làm
+                                            </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                        <TableRow>
+                                            <TableCell><Typography fontSize={"25px"}>Trả lời đúng:</Typography></TableCell>
+                                            <TableCell align="right">
+                                                <Typography fontSize={"25px"}>{resultDetail.result.yourScore} / {resultDetail.result.totalScore} câu</Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell><Typography fontSize={"25px"}>Điểm:</Typography></TableCell>
+                                            <TableCell align="right">
+                                            <Typography fontSize={"25px"}>{calculateScore(resultDetail.result.totalScore, resultDetail.result.yourScore)}</Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell><Typography fontSize={"25px"}>Thời gian làm bài:</Typography></TableCell>
+                                            <TableCell align="right">
+                                            <Typography fontSize={"25px"}>{calculateTimeSpent(resultDetail.result.timeStart!, resultDetail.result.timeEnd!)}</Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+
+                            </Card>
                             :
                             <Typography variant="h4" color="#4caf50" textAlign={"center"}>Kết quả</Typography>
 

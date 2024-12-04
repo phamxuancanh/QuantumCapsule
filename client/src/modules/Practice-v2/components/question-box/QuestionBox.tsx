@@ -50,7 +50,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
         if (isFireworksRunning) {
           const timer = setTimeout(() => {
             setIsFireworksRunning(false); // Dừng pháo hoa sau 3 giây
-          }, 2000);
+          }, 1000);
           return () => clearTimeout(timer); // Xóa bộ đếm thời gian khi component unmount
         }
     }, [isFireworksRunning]);
@@ -76,10 +76,13 @@ const QuestionBox: React.FC<IProps> = (props) => {
     }
     const handleSubmit = async () => {
         try {
-            const res2 = await insertResult({
+            const newResult = {
                 ...result,
                 star: caculateStar(result),
-            } as IResult)        
+                timeEnd: new Date()
+            }
+            const res2 = await insertResult(newResult)
+            setResult(newResult)      
             const res1 = await insertListAnswer(listAnswer)
             toast.success("Nộp bài thành công")
             setIsSumited(true)
@@ -91,7 +94,7 @@ const QuestionBox: React.FC<IProps> = (props) => {
         }
     }
     const handleClickNextQuestion = () => {
-        if(!isNextQuestion) {
+        if(!isNextQuestion) { // nút trả lời
             const yourAnswer = listAnswer.find((ans) => ans.questionId === currentQuestion.id)
             if(!yourAnswer?.yourAnswer) {
                 toast.error("Bạn chưa trả lời")

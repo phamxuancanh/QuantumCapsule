@@ -397,7 +397,7 @@ const DashboardReport = () => {
                                                 <div className='tw-text-black tw-font-normal tw-text-lg tw-grid tw-grid-cols-2 tw-w-full tw-border-t tw-border-b tw-border-gray-400'>
                                                     <div className='tw-border-r tw-border-gray-400'>
                                                         <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
-                                                            Bài lý thuyết
+                                                            Bài giảng
                                                         </div>
                                                         <div className='tw-bg-white tw-p-2'>
                                                             {/* {Array.isArray(theories[lesson.id]) && theories[lesson.id].map(t => {
