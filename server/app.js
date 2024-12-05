@@ -32,20 +32,20 @@ app.set('trust proxy', true)
 //   next()
 // })
 
-// app.use(function (req, res, next) {
-//   res.setHeader('Access-Control-Allow-Origin', `http://localhost:${process.env.CLIENT_PORT}`)
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-//   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization')
-//   res.setHeader('Access-Control-Allow-Credentials', true)
-//   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
-//   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
-//   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
-//   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
-//   if (req.method === 'OPTIONS') {
-//     return res.sendStatus(200)
-//   }
-//   next()
-// })
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', `http://localhost:${process.env.CLIENT_PORT}`)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization')
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin')
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200)
+  }
+  next()
+})
 
 app.use(cors({
   // origin: `*`,

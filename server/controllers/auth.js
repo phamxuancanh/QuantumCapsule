@@ -127,10 +127,8 @@ const signUp = async (req, res, next) => {
 
     // Định nghĩa URL xác thực
     // const confirmationUrl = `http://localhost:${process.env.CLIENT_PORT}/verify/email?token=${emailToken}`
-    //     const confirmationUrl = `http://149.28.139.119/verify/email?token=${emailToken}`
+    // const confirmationUrl = `http://149.28.139.119/verify/email?token=${emailToken}`
     const confirmationUrl = `http://localhost:${process.env.CLIENT_PORT}/verify/email?token=${emailToken}`
-
-
     // Đọc template HTML
     const templatePath = path.join(__dirname, '..', 'templates', 'verify_email_template.html')
     const htmlContent = fs.readFileSync(templatePath, 'utf8')

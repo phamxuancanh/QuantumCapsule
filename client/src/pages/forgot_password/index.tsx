@@ -150,13 +150,13 @@ const ForgotPassword = () => {
                     <div className="tw-w-4/5 lg:tw-w-3/5 tw-bg-gray-200 tw-bg-opacity-25 tw-rounded-3xl tw-p-5">
                         <div className="tw-text-orange-400 tw-font-bold tw-text-2xl tw-text-center">{t('forgot_password.title')}</div>
                         <form className="tw-mt-8 tw-space-y-6" action="#" method="POST" onSubmit={handleSendOTP}>
-                            <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700  tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
+                            {/* <select className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700  tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow" onChange={handleChange}>
                                 {languageOptions.map((option, index) => (
                                     <option key={index} value={option.value} className='tw-font-bold tw-py-2'>
                                         {option.flag}&nbsp;&nbsp;&nbsp;{option.label}&nbsp;&nbsp;{option.value === selectedLanguage && '✔'}
                                     </option>
                                 ))}
-                            </select>
+                            </select> */}
                             <div className="tw-space-y-7">
                                 <div>
                                     <div className="tw-relative tw-border-2 tw-border-orange-300 tw-rounded-2xl">

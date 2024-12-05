@@ -15,9 +15,9 @@ import QCDateFilter, { IDateFilter } from "QCComponents/QCDateFilter/QCDateFilte
 import { toast } from 'react-toastify';
 import { IGetResultByUserIdFilterParams } from "api/result/result.interface";
 import Select from 'react-select';
-import { getListAllDoneResultByUserIdandChapterId, getListAllDoneResultByUserIdandExamId, getListUniqueDoneResultByChapterId } from "api/result/result.api";
+import { getListAllDoneResultByUserIdandChapterId, getListAllDoneResultByUserIdandExamId, getListAllDoneResultByUserIdandLessonId, getListUniqueDoneResultByChapterId } from "api/result/result.api";
 import { getExamsByChapterId, getExercisesByChapterId } from "api/exam/exam.api";
-import { calculateScore } from "helpers/Nam-helper/Caculate";
+import { calculateScore, calculateTimeSpent } from "helpers/Nam-helper/Caculate";
 import ProgressBar from '@ramonak/react-progress-bar'
 import { IExam } from "api/exam/exam.interface";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +26,7 @@ import { AppDispatch } from "redux/store";
 import { getListLessonByChapterId } from "api/lesson/lesson.api";
 import { getTheoriesByLessonId } from "api/theory/theory.api";
 import { create } from "lodash";
+import { timeEnd } from "console";
 
 interface ExamData {
     name: string;
@@ -44,7 +45,7 @@ const Chart: React.FC = () => {
     const [selectedDay, setSelectedDay] = useState<string>("all");
     // const [selectedChapter, setSelectedChapter] = useState<string>("");
     const [selectedChapter, setSelectedChapter] = useState<{ value: string; label: string } | null>(null);
-
+    const [selectedLesson, setSelectedLesson] = useState<{ value: string; label: string } | null>(null);
     const [selectedSubject, setSelectedSubject] = useState<string>("all");
     const [currentUser, setCurrentUser] = useState(getFromLocalStorage<any>('persist:auth'));
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
@@ -165,8 +166,6 @@ const Chart: React.FC = () => {
                 };
             })
             const progressCounts = await Promise.all(progressLessonsPromises || []);
-            // const progressCounts = await Promise.all(progressPromises);
-
             const chapterDataMap: { [key: string]: { count: number; theories: any[] } } = {};
             (progressCounts as { lessonId: string; count: number; theories: any[] }[]).forEach(({ lessonId, count, theories }) => {
                 chapterDataMap[lessonId] = { count, theories };
@@ -223,6 +222,21 @@ const Chart: React.FC = () => {
         }
     };
     useEffect(() => {
+        console.log(selectedLesson);
+        if (selectedLesson) {
+            const fetchData = async () => {
+                try {
+                    const response = await getListAllDoneResultByUserIdandLessonId(selectedLesson?.value);
+                    console.log(response.data.data);
+                    setResultExercises(response.data.data.exercises);
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
+        }
+    }, [selectedLesson]);
+    useEffect(() => {
         const fetchData = async () => {
             if (selectedChapter) {
                 const responseExcercises = await getExercisesByChapterId(selectedChapter?.value);
@@ -235,6 +249,7 @@ const Chart: React.FC = () => {
                         : null
                 );
                 const responseLesson = await getListLessonByChapterId(selectedChapter?.value);
+                console.log(responseLesson.data.data);
                 setListLessons(responseLesson.data.data);
                 if (responseLesson.data.data.length > 0) {
                     const promises = responseLesson.data.data.map(item => {
@@ -280,6 +295,10 @@ const Chart: React.FC = () => {
     const handleChapterChange = async (selectedChapter: any) => {
         setSelectedChapter(selectedChapter);
         setSelectedChapterId(selectedChapter.value);
+    };
+    const handleLessonChange = async (selectedLesson: any) => {
+        setSelectedLesson(selectedLesson);
+        // setSelectedChapterId(selectedChapter.value);
     };
     const handleExamChange = async (selectedExam: any) => {
         setSelectedExam(selectedExam);
@@ -448,6 +467,8 @@ const Chart: React.FC = () => {
                         totalScore: result.totalScore,
                         score: calculateScore(result.totalScore, result.yourScore),
                         createdAt: result.createdAt,
+                        timeStart: result.timeStart,
+                        timeEnd : result.timeEnd
                     })),
                 };
             }).filter(group => group.scores && group.scores.length > 0);
@@ -509,11 +530,21 @@ const Chart: React.FC = () => {
                                     const dataIndex = context.dataIndex;
                                     const group = groupedData[dataIndex];
                                     const score = group.scores?.[datasetIndex] || null;
+                
                                     if (score) {
-                                        return `${score.yourScore}/${score.totalScore} (${score.score} điểm) - Ngày: ${new Date(score.createdAt).toLocaleDateString()}`;
+                                        const date = new Date(score.createdAt).toLocaleDateString();
+                                        const timeSpent = calculateTimeSpent(score.timeStart, score.timeEnd);
+                                        
+                                        // Sử dụng \n để chia thành các dòng
+                                        return [
+                                            `${score.yourScore}/${score.totalScore} (${score.score} điểm)`,
+                                            `Ngày: ${date}`,
+                                            `Thời gian làm bài: ${timeSpent}`
+                                        ];
                                     }
-                                    return 'Không có dữ liệu';
-                                },
+                
+                                    return ['Không có dữ liệu'];
+                                }
                             },
                         },
                     },
@@ -551,201 +582,6 @@ const Chart: React.FC = () => {
             return () => chart.destroy();
         }
     }, [activeTab, resultExercises]);
-    
-    // useEffect(() => {
-    //     if (activeTab !== "exercise") return;
-    //     if (!listExercises.length) return;
-    
-    //     const ctx = document.getElementById("exerciseChart") as HTMLCanvasElement;
-    //     if (ctx) {
-    //         // Chuẩn bị dữ liệu
-    //         const groupedData = listExercises.map(exercise => {
-    //             const results = resultExercises?.filter(result => result.examId === exercise.id);
-    //             return {
-    //                 name: exercise.name,
-    //                 scores: results?.map(result => ({
-    //                     yourScore: result.yourScore,
-    //                     totalScore: result.totalScore,
-    //                     score: calculateScore(result.totalScore, result.yourScore),
-    //                     createdAt: result.createdAt,
-    //                 })),
-    //             };
-    //         }).filter(group => group.scores && group.scores.length > 0);
-    
-    //         console.log('Grouped Data:', groupedData);
-    
-    //         // Tạo labels (tên bài tập)
-    //         const labels = groupedData.map(group => group.name);
-    
-    //         // Tạo dataset cho mỗi lần kiểm tra
-    //         const maxScoresPerExercise = Math.max(...groupedData.map(group => (group.scores ?? []).length)); // Tìm số lần kiểm tra nhiều nhất
-    //         const datasets = Array.from({ length: maxScoresPerExercise }).map((_, index) => ({
-    //             label: `Lần kiểm tra ${index + 1}`,
-    //             data: groupedData.map(group => group.scores?.[index]?.score || null), // Điểm cho mỗi bài tập ở lần kiểm tra này
-    //             backgroundColor: `rgba(${54 + index * 30}, 162, 235, 0.2)`, // Màu nền thay đổi theo lần kiểm tra
-    //             borderColor: `rgba(${54 + index * 30}, 162, 235, 1)`, // Màu viền thay đổi theo lần kiểm tra
-    //             borderWidth: 2,
-    //         }));
-    
-    //         console.log('Datasets:', datasets);
-    
-    //         // Vẽ biểu đồ
-    //         const chart = new ChartJS(ctx, {
-    //             type: "bar",
-    //             data: {
-    //                 labels: labels, // Nhãn là tên bài tập
-    //                 datasets: datasets, // Các cột trong mỗi nhóm
-    //             },
-    //             options: {
-    //                 responsive: true,
-    //                 maintainAspectRatio: false,
-    //                 scales: {
-    //                     x: {
-    //                         type: 'category', // Trục X dạng danh mục
-    //                         title: {
-    //                             display: true,
-    //                             text: 'Tên bài tập',
-    //                         },
-    //                         ticks: {
-    //                             autoSkip: false,
-    //                             maxRotation: 45,
-    //                             minRotation: 45,
-    //                         },
-    //                     },
-    //                     y: {
-    //                         beginAtZero: true, // Bắt đầu từ 0
-    //                         max: 10, // Điểm tối đa là 10
-    //                         title: {
-    //                             display: true,
-    //                             text: 'Điểm',
-    //                         },
-    //                     },
-    //                 },
-    //                 plugins: {
-    //                     legend: {
-    //                         position: "top",
-    //                         display: false // Vị trí của chú thích
-    //                     },
-    //                     tooltip: {
-    //                         callbacks: {
-    //                             title: function (context) {
-    //                                 return context[0].label; // Hiển thị tên bài tập
-    //                             },
-    //                             label: function (context) {
-    //                                 const datasetIndex = context.datasetIndex;
-    //                                 const dataIndex = context.dataIndex;
-    //                                 const group = groupedData[dataIndex];
-    //                                 const score = group.scores?.[datasetIndex] || null;
-    //                                 if (score) {
-    //                                     return `${score.yourScore}/${score.totalScore} (${score.score} điểm) - Ngày: ${new Date(score.createdAt).toLocaleDateString()}`;
-    //                                 }
-    //                                 return 'Không có dữ liệu';
-    //                             },
-    //                         },
-    //                     },
-    //                 },
-    //             },
-    //         });
-    
-    //         return () => chart.destroy();
-    //     }
-    // }, [activeTab, resultExercises]);
-    
-    
-    // useEffect(() => {
-    //     if (activeTab !== "exercise") return;
-    //     if (!listExercises.length) return;
-    
-    //     const ctx = document.getElementById("exerciseChart") as HTMLCanvasElement;
-    //     if (ctx) {
-    //         // Chuẩn bị dữ liệu
-    //         const dataset = resultExercises?.map(result => {
-    //             const exercise = listExercises.find(ex => ex.id === result.examId); // Tìm bài kiểm tra tương ứng
-    //             if (!exercise) return null; // Nếu không tìm thấy bài kiểm tra tương ứng, bỏ qua kết quả này
-    
-    //             return {
-    //                 examId: result.examId,
-    //                 name: exercise.name,
-    //                 yourScore: result.yourScore,
-    //                 totalScore: result.totalScore,
-    //                 score: calculateScore(result.totalScore, result.yourScore),
-    //                 createdAt: result.createdAt,
-    //             };
-    //         }).filter(Boolean);
-    
-    //         console.log('Dataset:', dataset);
-    
-    //         // Tạo `labels` cho từng cột riêng biệt
-    //         const labels = (dataset ?? []).map(item => `${item?.name} - ${new Date(item?.createdAt).toLocaleDateString()}`);
-    
-    //         // Chuẩn bị `data` tương ứng với `labels`
-    //         const data = dataset?.map(item => item?.score);
-    
-    //         // Vẽ biểu đồ
-    //         const chart = new ChartJS(ctx, {
-    //             type: "bar",
-    //             data: {
-    //                 labels: labels, // Nhãn riêng biệt cho từng cột
-    //                 datasets: [{
-    //                     label: 'Điểm',
-    //                     data: data, // Điểm tương ứng với từng nhãn
-    //                     backgroundColor: "rgba(54, 162, 235, 0.2)",  // Màu nền của cột
-    //                     borderColor: "rgba(54, 162, 235, 1)",  // Màu viền của cột
-    //                     borderWidth: 2,  // Độ dày viền
-    //                 }]
-    //             },
-    //             options: {
-    //                 responsive: true,
-    //                 maintainAspectRatio: false,
-    //                 scales: {
-    //                     x: {
-    //                         type: 'category',  // Trục X là dạng danh mục
-    //                         title: {
-    //                             display: true,
-    //                             text: 'Tên bài tập và ngày', // Tiêu đề trục X
-    //                         },
-    //                         ticks: {
-    //                             autoSkip: false,  // Hiển thị tất cả nhãn
-    //                             maxRotation: 45,
-    //                             minRotation: 45,
-    //                         },
-    //                     },
-    //                     y: {
-    //                         beginAtZero: true,  // Bắt đầu từ 0
-    //                         max: 10,  // Điểm tối đa là 10
-    //                         title: {
-    //                             display: true,
-    //                             text: 'Điểm',  // Tiêu đề trục Y
-    //                         },
-    //                     },
-    //                 },
-    //                 plugins: {
-    //                     legend: {
-    //                         position: "top",  // Vị trí của chú thích (legend)
-    //                     },
-    //                     tooltip: {
-    //                         callbacks: {
-    //                             title: function (context) {
-    //                                 const index = context[0].dataIndex;
-    //                                 const item = dataset ? dataset[index] : null;
-    //                                 return `Bài tập: ${item?.name} - Ngày: ${new Date(item?.createdAt).toLocaleDateString()}`;
-    //                             },
-    //                             label: function (context) {
-    //                                 const index = context.dataIndex;
-    //                                 const item = dataset ? dataset[index] : null;
-    //                                 return item ? `${item?.yourScore}/${item?.totalScore} (${item?.score} điểm)` : 'Không có dữ liệu';
-    //                             },
-    //                         },
-    //                     },
-    //                 },
-    //             },
-    //         });
-    
-    //         return () => chart.destroy();
-    //     }
-    // }, [activeTab, resultExercises]);
-    
-    
 
     useEffect(() => {
         if (activeTab !== "exam") return;
@@ -758,6 +594,9 @@ const Chart: React.FC = () => {
                     examDate: exam?.createdAt ? new Date(exam.createdAt) : null,
                     yourScore: result ? result.yourScore : 0,
                     totalScore: result ? result.totalScore : 0,
+                    createdAt: result.createdAt,
+                    timeStart: result ? result.timeStart : null,
+                    timeEnd: result ? result.timeEnd : null
                 };
             }).filter(item => item.examDate) : [];
     
@@ -816,7 +655,12 @@ const Chart: React.FC = () => {
                                 label: function (context) {
                                     const index = context.dataIndex;
                                     const item = mergedExamData[index];
-                                    return item ? `${item?.yourScore}/${item?.totalScore} (${calculateScore(item?.totalScore, item?.yourScore)} điểm)` : 'Không có dữ liệu';
+                                    const score = calculateScore(item.totalScore, item.yourScore);
+                                    const timeSpent = calculateTimeSpent(item.timeStart, item.timeEnd);
+                                    return [
+                                        `${item.yourScore}/${item.totalScore} (${score} điểm)`,
+                                        `Thời gian làm bài: ${timeSpent}`
+                                    ];
                                 },
                             },
                         },
@@ -933,77 +777,6 @@ const Chart: React.FC = () => {
                                         </div>
                                     </div>
                                 )}
-                                {/* {activeTab === "general" && (
-                                <div>
-                                    <div className='tw-space-y-3 tw-w-3/5'>
-                                        <Select
-                                            value={selectedChapter}
-                                            onChange={handleChapterChange}
-                                            options={chaptersForSelect.map(chapter => ({ value: chapter.value, label: chapter.label })) as any}
-                                            placeholder="Chọn"
-                                            className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-10"
-                                        />
-                                        <div className='tw-flex tw-w-full'>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
-                                                <div>Bài lý thuyết: </div>
-                                            </div>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
-                                                <div className='tw-font-bold tw-text-xl'>
-                                                    {numberTheoryDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0}
-                                                </div>
-                                            </div>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-3/5'>
-                                                <ProgressBar
-                                                    bgColor='orange'
-                                                    className='tw-w-full tw-items-center'
-                                                    maxCompleted={100}
-                                                    isLabelVisible={false}
-                                                    completed={numberTheoryDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.theoryCount || 0) * 100}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='tw-flex tw-w-full'>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
-                                                <div>Bài tập: </div>
-                                            </div>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
-
-                                                <div className='tw-font-bold tw-text-xl'>
-                                                    {numberExcersiceDone}/{chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0}
-                                                </div>
-                                            </div>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-3/5'>
-                                                <ProgressBar
-                                                    bgColor='orange'
-                                                    className='tw-w-full tw-items-center'
-                                                    maxCompleted={100}
-                                                    isLabelVisible={false}
-                                                    completed={numberExcersiceDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0) * 100}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='tw-flex tw-w-full'>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
-                                                <div>Bài kiểm tra: </div>
-                                            </div>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
-                                                <div className='tw-font-bold tw-text-xl'>
-                                                    {numberExamDone}/{exams2?.length}
-                                                </div>
-                                            </div>
-                                            <div className='tw-flex tw-justify-start tw-items-center tw-w-3/5'>
-                                                <ProgressBar
-                                                    bgColor='orange'
-                                                    className='tw-w-full tw-items-center'
-                                                    maxCompleted={100}
-                                                    isLabelVisible={false}
-                                                    completed={numberExamDone / exams2?.length * 100}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    </div>
-                                )} */}
                                 {activeTab === "exercise" && (
                                     <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md">
                                         <div className='tw-flex tw-w-3/5 tw-py-4'>
@@ -1027,15 +800,30 @@ const Chart: React.FC = () => {
                                             </div>
                                         </div>
                                         <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê điểm bài tập</h2>
-                                        <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>
-                                            <div className='tw-font-semibold'>Chọn chương: </div>
-                                            <Select
-                                                value={selectedChapter}
-                                                onChange={handleChapterChange}
-                                                options={chaptersForSelect.map(chapter => ({ value: chapter.value, label: chapter.label })) as any}
-                                                placeholder="Chọn"
-                                                className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-10"
-                                            />
+                                        <div className="tw-flex">
+                                            <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>
+                                                <div className='tw-font-semibold'>Chọn chương: </div>
+                                                <Select
+                                                    value={selectedChapter}
+                                                    onChange={handleChapterChange}
+                                                    options={chaptersForSelect.map(chapter => ({ value: chapter.value, label: chapter.label })) as any}
+                                                    placeholder="Chọn"
+                                                    className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-10"
+                                                />
+                                            </div>
+                                            <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>
+                                                <div className='tw-font-semibold'>Chọn bài học: </div>
+                                                <Select
+                                                    value={selectedLesson}
+                                                    onChange={handleLessonChange}
+                                                    options={[
+                                                        { value: null, label: "Tất cả bài học" },
+                                                        ...(listLessons?.map(lesson => ({ value: lesson.id, label: lesson.name })) || [])
+                                                    ]}
+                                                    placeholder="Chọn"
+                                                    className="tw-w-3/5 tw-rounded-full tw-py-1 tw-px-2 tw-text-sm tw-z-10"
+                                                />
+                                            </div>
                                         </div>
                                         <div className="tw-h-[500px]">
                                             <canvas id="exerciseChart"></canvas>

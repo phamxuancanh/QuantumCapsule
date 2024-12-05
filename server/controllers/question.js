@@ -7,20 +7,20 @@ const checkQuestionsExist = async (questions, lessonId, chapterId) => {
     select * from questions
     where 
       status = 1 and
-      ${lessonId? 'lessonId = :lessonId': ''}
-      ${chapterId? 'chapterId = :chapterId': ''}
+      ${lessonId ? 'lessonId = :lessonId' : ''}
+      ${chapterId ? 'chapterId = :chapterId' : ''}
   `
-  let replacements = {}
-  if(lessonId) replacements.lessonId = lessonId
-  if(chapterId) replacements.chapterId = chapterId
+  const replacements = {}
+  if (lessonId) replacements.lessonId = lessonId
+  if (chapterId) replacements.chapterId = chapterId
   const listQuestionBank = await sequelize.query(query, {
-    replacements, 
-    type: sequelize.QueryTypes.SELECT 
+    replacements,
+    type: sequelize.QueryTypes.SELECT
   })
-  
+
   return questions.map(question => {
-      const found = listQuestionBank.some(bankQuestion => 
-          question.questionType === bankQuestion.questionType &&
+    const found = listQuestionBank.some(bankQuestion =>
+      question.questionType === bankQuestion.questionType &&
           question.title === bankQuestion.title &&
           question.content === bankQuestion.content &&
           question.contentImg === bankQuestion.contentImg &&
@@ -30,18 +30,18 @@ const checkQuestionsExist = async (questions, lessonId, chapterId) => {
           question.D === bankQuestion.D &&
           question.E === bankQuestion.E &&
           question.correctAnswer === bankQuestion.correctAnswer
-      );
-      return { question, exists: found };
-  });
+    )
+    return { question, exists: found }
+  })
 }
 const importQuestions = async (req, res, next) => {
   try {
     const { questions, lessonId, chapterId } = req.body
-    if(lessonId || chapterId){
-      const questionExists =await checkQuestionsExist(questions, lessonId, chapterId)
+    if (lessonId || chapterId) {
+      const questionExists = await checkQuestionsExist(questions, lessonId, chapterId)
       const exists = questionExists?.filter(q => q.exists)
-      if(exists.length > 0){
-          return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
+      if (exists.length > 0) {
+        return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
       }
     }
     console.log('questions', questions)
@@ -164,11 +164,11 @@ const addQuestion = async (req, res, next) => {
     if (!lesson && !chapter) {
       return res.status(400).json({ message: 'Không tìm thấy bài học hoặc chương' })
     }
-    if(lessonId || chapterId){
+    if (lessonId || chapterId) {
       const questionExists = await checkQuestionsExist([questionData], lessonId, chapterId)
       const exists = questionExists.filter(q => q.exists)
-      if(exists.length > 0){
-          return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
+      if (exists.length > 0) {
+        return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
       }
     }
 
@@ -267,14 +267,14 @@ const getListQuestionBank = async (req, res, next) => {
   try {
     const { examId } = req.params
 
-    let  query = ''
+    let query = ''
     let replacements = ''
 
     const exam = await models.Exam.findByPk(examId)
     if (!exam) {
       return res.status(404).json({ message: 'Exam not found' })
     }
-    if(exam.lessonId){
+    if (exam.lessonId) {
       query = `
         SELECT q.*
         FROM questions q
@@ -289,7 +289,7 @@ const getListQuestionBank = async (req, res, next) => {
       `
       replacements = { lessonId: exam.lessonId, examId }
     }
-    if(exam.chapterId){
+    if (exam.chapterId) {
       query = `
         SELECT q.*
         FROM questions q
@@ -307,8 +307,8 @@ const getListQuestionBank = async (req, res, next) => {
 
     // Thực hiện truy vấn
     const listQuestions = await sequelize.query(query, {
-      replacements, 
-      type: sequelize.QueryTypes.SELECT 
+      replacements,
+      type: sequelize.QueryTypes.SELECT
     })
     res.json({ data: listQuestions })
   } catch (error) {

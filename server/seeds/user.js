@@ -43,7 +43,7 @@ const seedAdminUser = async () => {
   const adminUser = {
     firstName: 'Admin',
     lastName: 'User',
-    avatar: '',
+    avatar: 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/defaultAVT.jpg',
     description: 'Administrator',
     email: 'phxuancanh@gmail.com',
     gender: true,

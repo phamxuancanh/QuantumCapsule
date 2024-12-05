@@ -1,9 +1,6 @@
 /* eslint-disable brace-style */
-const { queries } = require('../helpers/QueryHelper')
 const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
-const { Sequelize } = require('sequelize')
-
 
 // import lessons data
 const importLessons = async (req, res, next) => {
@@ -185,8 +182,251 @@ const getLessonByChapterId = async (req, res, next) => {
   }
 }
 // get lessons and exams
+// const getLessonsandExams = async (req, res, next) => {
+//   try {
+//     // Lấy các tham số từ query
+//     const {
+//       page = '1',
+//       size = '10',
+//       search: nameCondition,
+//       type,
+//       subjectId,
+//       grade
+//     } = req.query
+
+//     const offset = (Number(page) - 1) * Number(size)
+//     const limit = Number(size)
+
+//     // Cấu hình các điều kiện tìm kiếm chung
+//     const baseSearchConditions = {
+//       where: {
+//         status: 1 // Chỉ lấy những lesson và exam có status là 1
+//       },
+//       include: [
+//         {
+//           model: models.Chapter,
+//           where: {},
+//           required: false,
+//           include: [{
+//             model: models.Subject,
+//             attributes: ['id', 'name'],
+//             where: {}, // Thêm điều kiện where cho Subject
+//             required: false
+//           }]
+//         }
+//       ]
+//     }
+
+//     // Áp dụng điều kiện tìm kiếm theo tên nếu có
+//     if (nameCondition) {
+//       baseSearchConditions.where.name = {
+//         [Op.like]: `%${nameCondition}%`
+//       }
+//     }
+
+//     // Áp dụng điều kiện tìm kiếm theo subjectId nếu có
+//     if (subjectId) {
+//       baseSearchConditions.include[0].include[0].where.id = subjectId
+//     }
+
+//     // Áp dụng điều kiện tìm kiếm theo grade nếu có
+//     if (grade) {
+//       baseSearchConditions.include[0].where.grade = grade
+//     }
+
+//     // Hàm để ánh xạ kết quả và thêm thông tin Subject và loại
+//     const mapResultsWithSubject = (results, type) => {
+//       return results.map(result => {
+//         let subjectId = null
+//         let subjectName = null
+
+//         // Lấy subjectId và subjectName từ Chapter của Exam hoặc Lesson
+//         if (result.Chapter && result.Chapter.Subject) {
+//           subjectId = result.Chapter.Subject.id
+//           subjectName = result.Chapter.Subject.name
+//         }
+
+//         // Nếu Exam có liên kết đến Lesson, lấy thông tin Subject từ Lesson
+//         if (result.Lesson && result.Lesson.Chapter && result.Lesson.Chapter.Subject) {
+//           subjectId = result.Lesson.Chapter.Subject.id
+//           subjectName = result.Lesson.Chapter.Subject.name
+//         }
+
+//         return {
+//           ...result.dataValues,
+//           subjectId,
+//           subjectName,
+//           type // Đặt loại là 'Lesson' hoặc 'Exam'
+//         }
+//       })
+//     }
+
+//     // Xử lý theo type nếu được cung cấp
+//     if (type === 'lesson') {
+//       // Đếm tổng số Lessons thỏa mãn điều kiện
+//       const totalLessons = await models.Lesson.count(baseSearchConditions)
+
+//       // Lấy danh sách Lessons thỏa mãn điều kiện với phân trang
+//       const lessons = await models.Lesson.findAll({
+//         ...baseSearchConditions,
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       // Ánh xạ kết quả và thêm loại 'Lesson'
+//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
+
+//       return res.json({
+//         data: lessonsWithType,
+//         totalLessons,
+//         totalExams: 0,
+//         totalRecords: totalLessons,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     } else if (type === 'exam') {
+//       // Đếm tổng số Exams thỏa mãn điều kiện
+//       const totalExams = await models.Exam.count(baseSearchConditions)
+
+//       // Lấy danh sách Exams thỏa mãn điều kiện với phân trang
+//       const exams = await models.Exam.findAll({
+//         ...baseSearchConditions,
+//         include: [
+//           ...baseSearchConditions.include,
+//           {
+//             model: models.Lesson,
+//             required: false,
+//             attributes: ['id', 'chapterId'],
+//             include: [
+//               {
+//                 model: models.Chapter,
+//                 required: false,
+//                 include: [{
+//                   model: models.Subject,
+//                   attributes: ['id', 'name'],
+//                   required: false
+//                 }]
+//               }
+//             ]
+//           }
+//         ],
+//         limit,
+//         offset,
+//         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
+//       })
+
+//       // Ánh xạ kết quả và thêm loại 'Exam'
+//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
+
+//       return res.json({
+//         data: examsWithType,
+//         totalLessons: 0,
+//         totalExams,
+//         totalRecords: totalExams,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     }
+
+//     // Khi không có type cụ thể, kết hợp cả Lessons và Exams
+
+//     // Đếm tổng số Lessons và Exams thỏa mãn điều kiện
+//     const [totalLessons, totalExams] = await Promise.all([
+//       models.Lesson.count(baseSearchConditions),
+//       models.Exam.count(baseSearchConditions)
+//     ])
+
+//     const totalRecords = totalLessons + totalExams
+
+//     // Kiểm tra nếu offset vượt quá tổng số bản ghi
+//     if (offset >= totalRecords) {
+//       return res.json({
+//         data: [],
+//         totalLessons,
+//         totalExams,
+//         totalRecords,
+//         currentPage: Number(page),
+//         size: limit
+//       })
+//     }
+
+//     let combinedResults = []
+
+//     // Tính toán các điều kiện riêng cho Lessons và Exams
+//     const lessonConditions = {
+//       ...baseSearchConditions,
+//       limit,
+//       offset,
+//       attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+//     }
+
+//     const examConditions = {
+//       ...baseSearchConditions,
+//       include: [
+//         ...baseSearchConditions.include,
+//         {
+//           model: models.Lesson,
+//           required: false,
+//           attributes: ['id', 'chapterId'],
+//           include: [
+//             {
+//               model: models.Chapter,
+//               required: false,
+//               include: [{
+//                 model: models.Subject,
+//                 attributes: ['id', 'name'],
+//                 required: false
+//               }]
+//             }
+//           ]
+//         }
+//       ],
+//       limit,
+//       offset: Math.max(0, offset - totalLessons),
+//       attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
+//     }
+
+//     // Nếu offset nằm trong phạm vi Lessons
+//     if (offset < totalLessons) {
+//       const lessons = await models.Lesson.findAll({
+//         ...lessonConditions
+//       })
+
+//       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
+//       combinedResults = [...lessonsWithType]
+//     }
+
+//     // Nếu cần lấy thêm Exams để đủ số lượng limit
+//     if (combinedResults.length < limit && totalExams > 0) {
+//       const remainingLimit = limit - combinedResults.length
+
+//       const exams = await models.Exam.findAll({
+//         ...examConditions,
+//         limit: remainingLimit
+//       })
+
+//       const examsWithType = mapResultsWithSubject(exams, 'Exam')
+//       combinedResults = [...combinedResults, ...examsWithType]
+//     }
+
+//     // Trả về kết quả kết hợp
+//     res.json({
+//       data: combinedResults,
+//       totalLessons,
+//       totalExams,
+//       totalRecords,
+//       currentPage: Number(page),
+//       size: limit
+//     })
+//   } catch (error) {
+//     console.error('Error searching lessons and exams:', error)
+//     res.status(500).json({ message: 'Error searching lessons and exams' })
+//   }
+// }
 const getLessonsandExams = async (req, res, next) => {
   try {
+    // Lấy các tham số từ query
     const {
       page = '1',
       size = '10',
@@ -199,7 +439,8 @@ const getLessonsandExams = async (req, res, next) => {
     const offset = (Number(page) - 1) * Number(size)
     const limit = Number(size)
 
-    const searchConditions = {
+    // Cấu hình các điều kiện tìm kiếm chung
+    const baseSearchConditions = {
       where: {
         status: 1 // Chỉ lấy những lesson và exam có status là 1
       },
@@ -207,82 +448,75 @@ const getLessonsandExams = async (req, res, next) => {
         {
           model: models.Chapter,
           where: {},
-          required: false,
+          required: true, // Đặt required: true để đảm bảo chỉ lấy những bản ghi có Chapter
           include: [{
             model: models.Subject,
-            attributes: ['id', 'name']
+            attributes: ['id', 'name'],
+            where: {}, // Thêm điều kiện where cho Subject
+            required: true // Đặt required: true để chỉ lấy những bản ghi có Subject
           }]
         }
       ]
     }
 
+    // Áp dụng điều kiện tìm kiếm theo tên nếu có
     if (nameCondition) {
-      searchConditions.where.name = {
+      baseSearchConditions.where.name = {
         [Op.like]: `%${nameCondition}%`
       }
     }
 
-    if (subjectId) {
-      searchConditions.include[0].where.subjectId = subjectId
-    }
-    if (grade) {
-      searchConditions.include[0].where.grade = grade
+    // Áp dụng điều kiện tìm kiếm theo subjectId nếu có
+    if (subjectId && subjectId !== 'all') {
+      baseSearchConditions.include[0].include[0].where.id = subjectId
     }
 
+    // Áp dụng điều kiện tìm kiếm theo grade nếu có
+    if (grade) {
+      baseSearchConditions.include[0].where.grade = grade
+    }
+
+    // Hàm để ánh xạ kết quả và thêm thông tin Subject và loại
     const mapResultsWithSubject = (results, type) => {
       return results.map(result => {
         let subjectId = null
         let subjectName = null
 
-        // Lấy subjectId và subjectName từ Chapter của Exam
+        // Lấy subjectId và subjectName từ Chapter của Exam hoặc Lesson
         if (result.Chapter && result.Chapter.Subject) {
           subjectId = result.Chapter.Subject.id
           subjectName = result.Chapter.Subject.name
         }
 
-        let entryType = type
-
-        // Nếu Exam là Exercise, lấy Chapter và Subject qua Lesson
-        if (type === 'Exam') {
-          if (result.lessonId && !result.chapterId) {
-            entryType = 'Exercise'
-
-            // Kiểm tra Lesson và lấy Chapter, Subject từ Lesson nếu có
-            if (result.Lesson) {
-              if (result.Lesson.Chapter) {
-                result.chapterId = result.Lesson.chapterId // Lấy chapterId từ Lesson
-                if (result.Lesson.Chapter.Subject) {
-                  subjectId = result.Lesson.Chapter.Subject.id
-                  subjectName = result.Lesson.Chapter.Subject.name
-                }
-              }
-            }
-          } else if (result.chapterId && !result.lessonId) {
-            entryType = 'Exam'
-          } else {
-            entryType = 'Exam'
-          }
+        // Nếu Exam có liên kết đến Lesson, lấy thông tin Subject từ Lesson
+        if (result.Lesson && result.Lesson.Chapter && result.Lesson.Chapter.Subject) {
+          subjectId = result.Lesson.Chapter.Subject.id
+          subjectName = result.Lesson.Chapter.Subject.name
         }
 
         return {
           ...result.dataValues,
           subjectId,
           subjectName,
-          type: entryType
+          type // Đặt loại là 'Lesson' hoặc 'Exam'
         }
       })
     }
 
+    // Xử lý theo type nếu được cung cấp
     if (type === 'lesson') {
-      const totalLessons = await models.Lesson.count(searchConditions)
+      // Đếm tổng số Lessons thỏa mãn điều kiện
+      const totalLessons = await models.Lesson.count(baseSearchConditions)
 
+      // Lấy danh sách Lessons thỏa mãn điều kiện với phân trang
       const lessons = await models.Lesson.findAll({
-        ...searchConditions,
+        ...baseSearchConditions,
         limit,
         offset,
         attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
+      // Ánh xạ kết quả và thêm loại 'Lesson'
       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
 
       return res.json({
@@ -294,12 +528,14 @@ const getLessonsandExams = async (req, res, next) => {
         size: limit
       })
     } else if (type === 'exam') {
-      const totalExams = await models.Exam.count(searchConditions)
+      // Đếm tổng số Exams thỏa mãn điều kiện
+      const totalExams = await models.Exam.count(baseSearchConditions)
 
+      // Lấy danh sách Exams thỏa mãn điều kiện với phân trang
       const exams = await models.Exam.findAll({
-        ...searchConditions,
+        ...baseSearchConditions,
         include: [
-          ...searchConditions.include,
+          ...baseSearchConditions.include,
           {
             model: models.Lesson,
             required: false,
@@ -307,10 +543,11 @@ const getLessonsandExams = async (req, res, next) => {
             include: [
               {
                 model: models.Chapter,
-                required: false,
+                required: true, // Đảm bảo rằng Lesson có Chapter
                 include: [{
                   model: models.Subject,
-                  attributes: ['id', 'name']
+                  attributes: ['id', 'name'],
+                  required: true // Đảm bảo rằng Chapter có Subject
                 }]
               }
             ]
@@ -321,6 +558,7 @@ const getLessonsandExams = async (req, res, next) => {
         attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
       })
 
+      // Ánh xạ kết quả và thêm loại 'Exam'
       const examsWithType = mapResultsWithSubject(exams, 'Exam')
 
       return res.json({
@@ -333,10 +571,17 @@ const getLessonsandExams = async (req, res, next) => {
       })
     }
 
-    const totalLessons = await models.Lesson.count(searchConditions)
-    const totalExams = await models.Exam.count(searchConditions)
+    // Khi không có type cụ thể, kết hợp cả Lessons và Exams
+
+    // Đếm tổng số Lessons và Exams thỏa mãn điều kiện
+    const [totalLessons, totalExams] = await Promise.all([
+      models.Lesson.count(baseSearchConditions),
+      models.Exam.count(baseSearchConditions)
+    ])
+
     const totalRecords = totalLessons + totalExams
 
+    // Kiểm tra nếu offset vượt quá tổng số bản ghi
     if (offset >= totalRecords) {
       return res.json({
         data: [],
@@ -350,53 +595,64 @@ const getLessonsandExams = async (req, res, next) => {
 
     let combinedResults = []
 
+    // Tính toán các điều kiện riêng cho Lessons và Exams
+    const lessonConditions = {
+      ...baseSearchConditions,
+      limit,
+      offset,
+      attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+    }
+
+    const examConditions = {
+      ...baseSearchConditions,
+      include: [
+        ...baseSearchConditions.include,
+        {
+          model: models.Lesson,
+          required: false,
+          attributes: ['id', 'chapterId'],
+          include: [
+            {
+              model: models.Chapter,
+              required: true, // Đảm bảo rằng Lesson có Chapter
+              include: [{
+                model: models.Subject,
+                attributes: ['id', 'name'],
+                required: true // Đảm bảo rằng Chapter có Subject
+              }]
+            }
+          ]
+        }
+      ],
+      limit,
+      offset: Math.max(0, offset - totalLessons),
+      attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
+    }
+
+    // Nếu offset nằm trong phạm vi Lessons
     if (offset < totalLessons) {
       const lessons = await models.Lesson.findAll({
-        ...searchConditions,
-        limit,
-        offset,
-        attributes: ['id', 'name', 'order', 'status', 'createdAt', 'updatedAt']
+        ...lessonConditions
       })
 
       const lessonsWithType = mapResultsWithSubject(lessons, 'Lesson')
-
       combinedResults = [...lessonsWithType]
     }
 
-    if (combinedResults.length < limit) {
+    // Nếu cần lấy thêm Exams để đủ số lượng limit
+    if (combinedResults.length < limit && totalExams > 0) {
       const remainingLimit = limit - combinedResults.length
-      const examOffset = Math.max(0, offset - totalLessons)
 
       const exams = await models.Exam.findAll({
-        ...searchConditions,
-        include: [
-          ...searchConditions.include,
-          {
-            model: models.Lesson,
-            required: false,
-            attributes: ['id', 'chapterId'],
-            include: [
-              {
-                model: models.Chapter,
-                required: false,
-                include: [{
-                  model: models.Subject,
-                  attributes: ['id', 'name']
-                }]
-              }
-            ]
-          }
-        ],
-        limit: remainingLimit,
-        offset: examOffset,
-        attributes: ['id', 'name', 'lessonId', 'chapterId', 'order', 'status', 'createdAt', 'updatedAt']
+        ...examConditions,
+        limit: remainingLimit
       })
 
       const examsWithType = mapResultsWithSubject(exams, 'Exam')
-
       combinedResults = [...combinedResults, ...examsWithType]
     }
 
+    // Trả về kết quả kết hợp
     res.json({
       data: combinedResults,
       totalLessons,
@@ -410,7 +666,6 @@ const getLessonsandExams = async (req, res, next) => {
     res.status(500).json({ message: 'Error searching lessons and exams' })
   }
 }
-
 const getFirstLessonByChapterId = async (req, res, next) => {
   try {
     const { chapterId } = req.params
@@ -533,41 +788,39 @@ const getListLessonByChapterId = async (req, res, next) => {
 }
 
 const getListLessonByFilterParams = async (req, res, next) => {
-    try {
-      const { chapterId, grade, subjectId } = req.query
-      console.log('------------------:', chapterId, grade, subjectId );
-      if(!((subjectId && grade) || chapterId)) {
-        return res.status(400).json({ message: 'Thiếu điều kiện lọc' })
-      }
-      const query = `
+  try {
+    const { chapterId, grade, subjectId } = req.query
+    console.log('------------------:', chapterId, grade, subjectId)
+    if (!((subjectId && grade) || chapterId)) {
+      return res.status(400).json({ message: 'Thiếu điều kiện lọc' })
+    }
+    const query = `
           select l.* from lessons l
           join chapters c on l.chapterId = c.id
           where 
             ${subjectId ? 'c.subjectId = :subjectId and' : ''} 
-            ${grade ? 'c.grade = :grade and': ''} 
-            ${chapterId ? 'l.chapterId = :chapterId and': ''} 
+            ${grade ? 'c.grade = :grade and' : ''} 
+            ${chapterId ? 'l.chapterId = :chapterId and' : ''} 
             l.status = 1 and
             c.status = 1
           order by l.updatedAt desc
         `
-      const replacements = {}
-      if(subjectId) replacements.subjectId = subjectId
-      if(grade) replacements.grade = grade
-      if(chapterId) replacements.chapterId = chapterId
-      console.log(replacements);
-      console.log(query);
-      
-      const listLesson = await sequelize.query(query, {
-        replacements,
-        type: sequelize.QueryTypes.SELECT
-      })
-      console.log(listLesson);
-      
+    const replacements = {}
+    if (subjectId) replacements.subjectId = subjectId
+    if (grade) replacements.grade = grade
+    if (chapterId) replacements.chapterId = chapterId
+    console.log(replacements)
+    console.log(query)
 
-      return res.status(200).json({ message: 'Lấy dữ liệu thành công', data: listLesson })
-    } catch (error) {
-      res.status(500).json({ message: 'Lỗi khi lấy dữ liệu' })
-    }
+    const listLesson = await sequelize.query(query, {
+      replacements,
+      type: sequelize.QueryTypes.SELECT
+    })
+    console.log(listLesson)
+    return res.status(200).json({ message: 'Lấy dữ liệu thành công', data: listLesson })
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khi lấy dữ liệu' })
+  }
 }
 
 module.exports = {

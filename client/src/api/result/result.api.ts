@@ -27,3 +27,7 @@ export const getListAllDoneResultByUserIdandExamId = async (examId: string, filt
     const params = filter ? { ...filter, examId } : { examId };
     return await requestWithJwt.get<IDTOResponse<IResult[]>>('/results/getListAllDoneResultByUserIdandExamId', { params, withCredentials: true });
 };
+export const getListAllDoneResultByUserIdandLessonId = async (lessonId: string, filter?: IGetResultByUserIdFilterParams): Promise<AxiosResponse<any>> => {
+    const params = filter ? { ...filter, lessonId } : { lessonId };
+    return await requestWithJwt.get<IDTOResponse<IResult[]>>('/results/getListAllDoneResultByUserIdandLessonId', { params, withCredentials: true });
+}

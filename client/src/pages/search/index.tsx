@@ -145,7 +145,7 @@ function SearchResultPage() {
   const classOptions = [
     { value: 1, label: '1' },
     { value: 2, label: '2' },
-    { value: 3, label: '3' },
+    { value: 3, label: '3' }
   ];
 
   useEffect(() => {
@@ -195,8 +195,6 @@ function SearchResultPage() {
     if (type === 'lesson') {
       navigate(`${ROUTES.lessonDetail}?lessonId=${id}`);
     } else if (type === 'exam') {
-      // Xử lý khi type là 'exam'
-      // lam tiep di Nam
       navigate(`${ROUTES.skill_practice}?examId=${id}`);
       alert(`Exam ID: ${id}`);
     }
@@ -244,10 +242,19 @@ function SearchResultPage() {
         <h2 className="tw-text-lg tw-font-bold">{t('search.search_filter')}</h2>
         <div className="tw-flex tw-space-x-4 tw-mb-4">
           <div className="tw-w-1/3">
-            <label className="tw-block tw-mb-1">{t('search.choose_subject')}:</label>
+            <label className="tw-block tw-mb-1">
+              {t('search.choose_subject')}:
+            </label>
             <Select
-              options={subjects}
-              value={subjects.find(option => option.value === selectedSubject)}
+              options={[
+                { value: 'all', label: t('search.allSubject') }, // Tùy chọn "Tất cả"
+                ...subjects
+              ]}
+              value={
+                selectedSubject === 'all'
+                  ? { value: 'all', label: t('search.allSubject') }
+                  : subjects.find(option => option.value === selectedSubject)
+              }
               onChange={handleSubjectChange}
               placeholder={t('search.allSubject')}
               formatOptionLabel={formatOptionLabelSubject}
@@ -255,10 +262,19 @@ function SearchResultPage() {
           </div>
 
           <div className="tw-w-1/3">
-            <label className="tw-block tw-mb-1">{t('search.choose_learning_materials')}:</label>
+            <label className="tw-block tw-mb-1">
+              {t('search.choose_learning_materials')}:
+            </label>
             <Select
-              options={typeOptions as any}
-              value={typeOptions.find(option => option.value === selectedType)}
+              options={[
+                { value: 'all', label: t('search.allLearningMaterials') }, // Tùy chọn "Tất cả"
+                ...typeOptions
+              ]}
+              value={
+                selectedType === 'all'
+                  ? { value: 'all', label: t('search.allLearningMaterials') }
+                  : typeOptions.find(option => option.value === selectedType)
+              }
               onChange={handleTypeChange}
               placeholder={t('search.allLearningMaterials')}
               formatOptionLabel={formatOptionLabelType}
@@ -266,10 +282,19 @@ function SearchResultPage() {
           </div>
 
           <div className="tw-w-1/3">
-            <label className="tw-block tw-mb-1">{t('search.choose_grade')}:</label>
+            <label className="tw-block tw-mb-1">
+              {t('search.choose_grade')}:
+            </label>
             <Select
-              options={classOptions as any}
-              value={classOptions.find(option => option.value === Number(selectedGrade))}
+              options={[
+                { value: 'all', label: t('search.allGrade') }, // Tùy chọn "Tất cả"
+                ...classOptions
+              ]}
+              value={
+                selectedGrade === 'all'
+                  ? { value: 'all', label: t('search.allGrade') }
+                  : classOptions.find(option => option.value === Number(selectedGrade))
+              }
               onChange={handleClassChange}
               placeholder={t('search.allGrade')}
               formatOptionLabel={formatOptionLabelGrade}

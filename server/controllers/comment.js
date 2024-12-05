@@ -53,7 +53,7 @@ const getListActiveCommentByTheoryId = async (req, res, next) => {
       where: {
         theoryId,
         isView: true,
-        status: 1 // Chỉ lấy những comment có status là 1
+        status: 1
       },
       attributes: [
         'id',
