@@ -135,22 +135,6 @@ const handleChange = useCallback(
   [i18n]
 );
 
-// const handleChange = useCallback(
-//   async (e: any) => {
-//     try {
-//       const newLanguage = e.target.value
-//       await i18n.changeLanguage(newLanguage)
-//       setSelectedLanguage(newLanguage)
-//       localStorage.setItem('selectedLanguage', newLanguage)
-//     } catch (error) {
-//       console.log(error)
-//     }
-//   },
-//   [i18n]
-// )
-// useEffect(() => {
-//   i18n.changeLanguage(selectedLanguage)
-// }, [selectedLanguage, i18n])
 
   const activateLink = useCallback((isLastItem?: boolean) => {
     return ({ isActive }: { isActive: boolean }) => ({
@@ -159,14 +143,6 @@ const handleChange = useCallback(
     })
   }, [])
 
-  //  const handleThemeSwitch = useCallback(async () => {
-  //    try {
-  //      const newTheme = theme === 'dark' ? 'light' : 'dark'
-  //      setTheme(newTheme)
-  //    } catch (error) {
-  //      console.log(error)
-  //    }
-  //  }, [setTheme, theme])
   const locationPath = 'delete.png'
   return (
     <div className="tw-relative tw-inline-flex">
@@ -211,7 +187,7 @@ const handleChange = useCallback(
               <p className='tw-text-gray-500 tw-text-xs tw-overflow-hidden tw-overflow-ellipsis tw-whitespace-nowrap'>{userEmail}</p>
             </div>
           </div>
-          <div className='tw-px-2 tw-py-1'>
+          {/* <div className='tw-px-2 tw-py-1'>
             <select
               className="tw-w-full tw-px-4 tw-py-2 tw-rounded-lg tw-font-bold tw-text-gray-700 tw-border tw-border-gray-300 tw-focus:border-indigo-500 tw-focus:outline-none tw-shadow"
               value={selectedLanguage}
@@ -223,8 +199,7 @@ const handleChange = useCallback(
                 </option>
               ))}
             </select>
-
-          </div>
+          </div> */}
           <ul>
           {(data !== 'R1' && data !== 'R2') && (
             <li>

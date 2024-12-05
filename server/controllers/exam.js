@@ -31,13 +31,13 @@ const importExams = async (req, res, next) => {
     const existingChapterIds = new Set(existingChapters.map(chapter => chapter.id))
     const allLessonIdsExist = lessonIds.every(lessonId => existingLessonIds.has(lessonId))
     const allChapterIdsExist = chapterIds.every(chapterId => existingChapterIds.has(chapterId))
-    const missingLessonIds = lessonIds.filter(lessonId => !existingLessonIds.has(lessonId));
-    const missingChapterIds = chapterIds.filter(chapterId => !existingChapterIds.has(chapterId));
+    const missingLessonIds = lessonIds.filter(lessonId => !existingLessonIds.has(lessonId))
+    const missingChapterIds = chapterIds.filter(chapterId => !existingChapterIds.has(chapterId))
     if (!allLessonIdsExist || !allChapterIdsExist) {
-      return res.status(400).json({ 
-        message: 'One or more lessonId or chapterId do not exist in lessons or chapters table', 
-        missingLessonIds: missingLessonIds,
-        missingChapterIds: missingChapterIds
+      return res.status(400).json({
+        message: 'One or more lessonId or chapterId do not exist in lessons or chapters table',
+        missingLessonIds,
+        missingChapterIds
       })
     }
     const newExams = await models.Exam.bulkCreate(exams)
@@ -255,9 +255,9 @@ const getListExamByFilterParams = async (req, res, next) => {
     // if(!((subjectId && grade) || chapterId)) {
     //   return res.status(400).json({ message: 'Thiếu điều kiện lọc' })
     // }
-    let query = ``
+    let query = ''
     const replacements = {}
-    if(lessonId){
+    if (lessonId) {
       query = `
         select e.* from exams e
         join lessons l on e.lessonId = l.id
@@ -269,7 +269,7 @@ const getListExamByFilterParams = async (req, res, next) => {
       `
       replacements.lessonId = lessonId
     }
-    if(chapterId){
+    if (chapterId) {
       query = `
         select e.* from exams e
         join chapters c on l.chapterId = c.id
@@ -281,7 +281,7 @@ const getListExamByFilterParams = async (req, res, next) => {
       `
       replacements.chapterId = chapterId
     }
-    if(subjectId && grade && !chapterId && !lessonId){
+    if (subjectId && grade && !chapterId && !lessonId) {
       query = `
         SELECT e.*
         FROM exams e
@@ -295,17 +295,15 @@ const getListExamByFilterParams = async (req, res, next) => {
       `
       replacements.subjectId = subjectId
       replacements.grade = grade
-
     }
-    
-    console.log(replacements);
-    console.log(query);
-    
+
+    console.log(replacements)
+    console.log(query)
+
     const listAnswer = await sequelize.query(query, {
       replacements,
       type: sequelize.QueryTypes.SELECT
     })
-    
 
     return res.status(200).json({ message: 'Lấy dữ liệu thành công', data: listAnswer })
   } catch (error) {
@@ -382,12 +380,12 @@ const insertExamQuestion = async (req, res, next) => {
   try {
     const examQuestionData = req.body
     const { examId, questionId } = req.body
-    const eq = await models.ExamQuestion.findOne({ where: { examId, questionId, status: 1} })
+    const eq = await models.ExamQuestion.findOne({ where: { examId, questionId, status: 1 } })
     if (eq) {
       return res.status(400).json({ message: 'Bài tập đã tồn tại trong bài kiểm tra' })
     }
-    console.log('--------------exam_question', examId, questionId);
-    
+    console.log('--------------exam_question', examId, questionId)
+
     const examQuestion = await models.ExamQuestion.create(examQuestionData)
     res.status(201).json({ message: 'Thêm thành công', data: examQuestion })
   } catch (error) {
@@ -465,8 +463,8 @@ const getExercisesByChapterId = async (req, res, next) => {
 const deleteExamQuestionByExamAndQuestionId = async (req, res, next) => {
   try {
     const { examId, questionId } = req.body
-    console.log('--------------exam_question', examId, questionId);
-    
+    console.log('--------------exam_question', examId, questionId)
+
     const examQuestion = await models.ExamQuestion.findOne({ where: { examId, questionId, status: 1 } })
     if (!examQuestion) {
       return res.status(404).json({ message: 'Không tìm thấy' })

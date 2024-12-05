@@ -98,7 +98,9 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
         r.star,
         r.totalScore,
         r.yourScore,
-        r.type
+        r.type,
+        r.timeStart,
+        r.timeEnd
       FROM (
         SELECT 
           r.id AS resultId, 
@@ -109,17 +111,19 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
           r.star,
           r.totalScore,
           r.yourScore,
+          r.timeStart,
+          r.timeEnd,
           CASE 
             WHEN e.lessonId IS NULL THEN 'exam' 
             ELSE 'exercise' 
           END AS type,
           ROW_NUMBER() OVER (PARTITION BY r.examId ORDER BY r.yourScore / r.totalScore DESC, r.id) AS rn
         FROM 
-          Results r
+          results r
         JOIN 
-          Exams e ON r.examId = e.id
+          exams e ON r.examId = e.id
         LEFT JOIN 
-          Lessons l ON e.lessonId = l.id
+          lessons l ON e.lessonId = l.id
         WHERE 
           r.userId = :userId
           ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''}
@@ -210,7 +214,9 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
         r.totalScore,
         r.yourScore,
         r.type,
-        r.createdAt
+        r.createdAt,
+        r.timeStart,
+        r.timeEnd
       FROM (
         SELECT 
           r.id AS resultId,
@@ -222,16 +228,18 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
           r.totalScore,
           r.yourScore,
           r.createdAt,
+          r.timeStart,
+          r.timeEnd,
           CASE
             WHEN e.lessonId IS NULL THEN 'exam' 
             ELSE 'exercise'
           END AS type
         FROM 
-          Results r
+          results r
         JOIN 
-          Exams e ON r.examId = e.id
+          exams e ON r.examId = e.id
         LEFT JOIN 
-          Lessons l ON e.lessonId = l.id
+          lessons l ON e.lessonId = l.id
         WHERE 
           r.userId = :userId
           ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''} 
@@ -262,6 +270,88 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Internal server error' })
   }
 }
+const getListAllDoneResultByUserIdandLessonId = async (req, res, next) => {
+  try {
+    const loginedUserId = req.userId
+    const { lessonId, from, to } = req.query
+
+    if (!loginedUserId) {
+      return res.status(400).json({ message: 'Invalid data format or empty data' })
+    }
+
+    let dateFilter = ''
+    if (from && to) {
+      dateFilter = 'AND r.createdAt BETWEEN :from AND :to'
+    }
+
+    const query = `
+      SELECT 
+        r.resultId, 
+        r.userId, 
+        r.examId, 
+        r.lessonId, 
+        r.chapterId,
+        r.star,
+        r.totalScore,
+        r.yourScore,
+        r.type,
+        r.createdAt,
+        r.timeStart,
+        r.timeEnd
+      FROM (
+        SELECT 
+          r.id AS resultId,
+          r.userId,
+          r.examId,
+          e.lessonId,
+          l.chapterId,
+          r.star,
+          r.totalScore,
+          r.yourScore,
+          r.createdAt,
+          r.timeStart,
+          r.timeEnd,
+          CASE
+            WHEN e.lessonId IS NULL THEN 'exam' 
+            ELSE 'exercise'
+          END AS type
+        FROM 
+          results r
+        JOIN 
+          exams e ON r.examId = e.id
+        LEFT JOIN 
+          lessons l ON e.lessonId = l.id
+        WHERE 
+          r.userId = :userId
+          ${lessonId ? 'AND e.lessonId = :lessonId' : ''} 
+          ${dateFilter}
+      ) r
+    `
+
+    const replacements = { userId: loginedUserId }
+    if (lessonId) {
+      replacements.lessonId = lessonId
+    }
+    if (from && to) {
+      replacements.from = from
+      replacements.to = to
+    }
+
+    const resultQuery = await sequelize.query(query, {
+      replacements,
+      type: sequelize.QueryTypes.SELECT
+    })
+
+    const exercises = resultQuery.filter(result => result.type === 'exercise')
+    const exams = resultQuery.filter(result => result.type === 'exam')
+
+    res.status(200).json({ message: 'success', data: { exercises, exams } })
+  } catch (error) {
+    console.error('Error fetching results:', error)
+    res.status(500).json({ message: 'Internal server error' })
+  }
+}
+
 const getListAllDoneResultByUserIdandExamId = async (req, res, next) => {
   console.log('GET LIST ALL DONE RESULT BY USER ID AND EXAM ID')
   try {
@@ -292,7 +382,9 @@ const getListAllDoneResultByUserIdandExamId = async (req, res, next) => {
         r.totalScore,
         r.yourScore,
         r.type,
-        r.createdAt
+        r.createdAt,
+        r.timeStart,
+        r.timeEnd
       FROM (
         SELECT 
           r.id AS resultId,
@@ -304,23 +396,24 @@ const getListAllDoneResultByUserIdandExamId = async (req, res, next) => {
           r.totalScore,
           r.yourScore,
           r.createdAt,
+          r.timeStart,
+          r.timeEnd,
           CASE
             WHEN e.lessonId IS NULL THEN 'exam' 
             ELSE 'exercise'
           END AS type
         FROM 
-          Results r
+          results r
         JOIN 
-          Exams e ON r.examId = e.id
+          exams e ON r.examId = e.id
         LEFT JOIN 
-          Lessons l ON e.lessonId = l.id
+          lessons l ON e.lessonId = l.id
         WHERE 
           r.userId = :userId
           AND r.examId = :examId  -- Bắt buộc lọc theo examId
           ${dateFilter}
       ) r
     `
-
     const replacements = {
       userId: loginedUserId,
       examId
@@ -352,5 +445,6 @@ module.exports = {
   getListResultByUserId,
   getListUniqueDoneResultByUserIdandChapterId,
   getListAllDoneResultByUserIdandChapterId,
+  getListAllDoneResultByUserIdandLessonId,
   getListAllDoneResultByUserIdandExamId
 }

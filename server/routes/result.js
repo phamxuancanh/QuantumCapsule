@@ -9,4 +9,5 @@ router.get('/getListResultByUserId/:userId', verifyAccessToken, resultController
 router.get('/getListUniqueDoneResultByUserIdandChapterId', verifyAccessToken, resultController.getListUniqueDoneResultByUserIdandChapterId)
 router.get('/getListAllDoneResultByUserIdandChapterId', verifyAccessToken, resultController.getListAllDoneResultByUserIdandChapterId)
 router.get('/getListAllDoneResultByUserIdandExamId', verifyAccessToken, resultController.getListAllDoneResultByUserIdandExamId)
+router.get('/getListAllDoneResultByUserIdandLessonId', verifyAccessToken, resultController.getListAllDoneResultByUserIdandLessonId)
 module.exports = router

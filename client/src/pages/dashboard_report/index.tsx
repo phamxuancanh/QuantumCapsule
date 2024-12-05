@@ -17,13 +17,14 @@ import { ITheory } from 'api/theory/theory.interface';
 import { getTheoriesByLessonId } from 'api/theory/theory.api';
 import { getListUniqueDoneResultByChapterId } from 'api/result/result.api';
 import { findProgressByChapter } from 'api/progress/progress.api';
-import { calculateScore } from 'helpers/Nam-helper/Caculate';
+import { calculateScore, calculateTimeSpent } from 'helpers/Nam-helper/Caculate';
 import { IGetResultByUserIdFilterParams } from 'api/result/result.interface';
 import { differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ClockLoader } from 'react-spinners';
 import ROUTES from 'routes/constant';
 import Chart from 'modules/Chart/Chart';
+import CloseIcon from '@mui/icons-material/Close';
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
@@ -236,23 +237,38 @@ const DashboardReport = () => {
             console.error(err);
         }
     }
+    const [isExerciseModalOpen, setIsExerciesModalOpen] = useState(false);
+    const [isExamModalOpen, setIsExamModalOpen] = useState(false)
+    const [currentExamId, setCurrentExamId] = useState<string | null>(null);
+    const [currentExerciseId, setCurrentExerciseId] = useState<string | null>(null);
+
     const handleTheoryExercisesClick = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
             navigate(`${ROUTES.learning}?theoryId=${id}`);
         } else if (type === 'exam') {
-            navigate(`${ROUTES.skill_practice2}?examId=${id}`);
+            setCurrentExerciseId(id); // Lưu ID bài tập vào trạng thái
+            setIsExerciesModalOpen(true); // Mở modal
         }
     };
+    const closeExerciseResultModal = () => {
+        setIsExerciesModalOpen(false);
+    };
+    const closeExamResultModal = () => {
+        setIsExamModalOpen(false);
+    }
     const handleExamClick = (type: 'theory' | 'exam', id: string) => {
         if (type === 'theory') {
             navigate(`${ROUTES.learning}?theoryId=${id}`);
         } else if (type === 'exam') {
-            navigate(`${ROUTES.skill_practice}?examId=${id}`);
+            // navigate(`${ROUTES.skill_practice}?examId=${id}`);
+            setCurrentExamId(id);
+            setIsExamModalOpen(true);
         }
     };
     // CHART VIEWING
     return (
-        <div className='tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center'>
+        // <div className='tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center'>
+        <div className={`tw-text-lg tw-bg-slate-50 tw-min-h-screen tw-flex tw-justify-center`}>
             <div className='tw-w-11/12 tw-h-auto tw-flex tw-flex-col tw-items-center tw-py-2 tw-space-y-3'>
                 <div className='tw-flex tw-items-center'>
                     <div className='tw-flex tw-w-full tw-space-x-3 tw-justify-center'>
@@ -310,9 +326,9 @@ const DashboardReport = () => {
                             <div className='tw-flex tw-flex-col'>
                                 <div className='tw-flex tw-justify-between tw-items-center tw-px-10 tw-pt-3'>
                                     {/* <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div> */}
-                                    <div className='tw-text-2xl tw-font-bold'>Tìm theo ngày</div>
+                                    <div className='tw-text-2xl tw-font-bold'>Tìm theo thời gian</div>
 
-                                    <div className='tw-flex tw-items-center'>
+                                    <div className='tw-flex tw-items-center tw-w-1/2'>
                                         <QCDateFilter
                                             onChange={(filter) => {
                                                 handleFilter(filter);
@@ -400,19 +416,6 @@ const DashboardReport = () => {
                                                             Bài giảng
                                                         </div>
                                                         <div className='tw-bg-white tw-p-2'>
-                                                            {/* {Array.isArray(theories[lesson.id]) && theories[lesson.id].map(t => {
-                                                                const isInProgress = theoryProgress.includes(t.id);
-                                                                return (
-                                                                    <div
-                                                                        key={t.id}
-                                                                        className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
-                                                                        onClick={() => t.id && handleTheoryExercisesClick('theory', t.id)}
-                                                                    >
-                                                                        <div className={`tw-w-4 tw-h-4 tw-border-2 tw-rounded-full ${isInProgress ? 'tw-border-blue-500 tw-bg-blue-500 tw-bg-opacity-20' : 'tw-border-gray-300 tw-bg-gray-300 tw-bg-opacity-20'}`}></div>
-                                                                        <span className='tw-font-bold'>{t.name}</span>
-                                                                    </div>
-                                                                );
-                                                            })} */}
                                                             {Array.isArray(theories[lesson.id]) && theories[lesson.id].map(t => {
                                                                 const isInProgress = theoryProgress.some((progress: { id: string | undefined; }) => progress.id === t.id);
                                                                 return (
@@ -430,7 +433,7 @@ const DashboardReport = () => {
                                                     </div>
                                                     <div>
                                                         <div className='tw-font-bold tw-p-2 tw-flex tw-items-center tw-underline tw-text-blue-500 tw-bg-blue-100'>
-                                                            Bài tập
+                                                            Bài tập (lấy kết quả cao nhất)
                                                         </div>
                                                         <div className='tw-bg-white tw-p-2'>
                                                             {Array.isArray(exercises[lesson.id]) && exercises[lesson.id].map(e => {
@@ -461,16 +464,51 @@ const DashboardReport = () => {
                                                                 }
 
                                                                 return (
-                                                                    <div
-                                                                        key={e.id}
-                                                                        className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
-                                                                        onClick={() => handleTheoryExercisesClick('exam', e.id ?? '')}
-                                                                    >
-                                                                        {statusElement}
-                                                                        <span className='tw-font-bold'>{e.name}</span>
+                                                                    <div key={e.id}>
+                                                                        <div
+                                                                            className="tw-flex tw-items-center tw-space-x-2 tw-cursor-pointer"
+                                                                            onClick={() => handleTheoryExercisesClick('exam', e.id ?? '')}
+                                                                        >
+                                                                            {statusElement}
+                                                                            <span className='tw-font-bold'>{e.name}</span>
+                                                                        </div>
+
+                                                                        {isExerciseModalOpen && currentExerciseId === e.id && (
+                                                                            <div className="tw-fixed tw-inset-0 tw-bg-black tw-bg-opacity-50 tw-flex tw-justify-center tw-items-center tw-z-20">
+                                                                                <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-max-w-md tw-w-full tw-border tw-border-neutral-800 tw-flex tw-flex-col tw-space-y-2">
+                                                                                    <div className='tw-flex tw-items-center tw-justify-end'>
+                                                                                        <div className="tw-cursor-pointer" onClick={closeExerciseResultModal}>
+                                                                                            <CloseIcon />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="tw-font-bold tw-text-center tw-text-2xl tw-text-green-600">Kết quả bài tập </div>
+                                                                                    <h3 className='tw-font-bold tw-text-blue-400'>{e.name}</h3>
+                                                                                    <p>
+                                                                                        <span className='tw-font-bold'>Trả lời đúng: </span>
+                                                                                        {progress?.yourScore && progress?.totalScore ?
+                                                                                            `${progress?.yourScore} / ${progress?.totalScore} (${((progress?.yourScore / progress?.totalScore) * 100).toFixed(2)}%)`
+                                                                                            : 'Chưa có'}
+                                                                                    </p>
+
+                                                                                    <p>
+                                                                                        <span className='tw-font-bold'>Điểm: </span>
+                                                                                        {progress?.yourScore && progress?.totalScore
+                                                                                            ? calculateScore(progress?.totalScore, progress?.yourScore)
+                                                                                            : 'Chưa có'}
+                                                                                    </p>
+                                                                                    <p>
+                                                                                        <span className='tw-font-bold'>Thời gian làm bài: </span>
+                                                                                        {progress?.timeStart && progress?.timeEnd
+                                                                                            ? calculateTimeSpent(progress?.timeStart, progress?.timeEnd)
+                                                                                            : 'Chưa có'}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 );
                                                             })}
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -512,13 +550,47 @@ const DashboardReport = () => {
                                                             }
 
                                                             return (
+                                                                <div>
                                                                 <div
                                                                     key={index}
                                                                     className="tw-flex tw-items-center tw-space-x-2 tw-mb-2 tw-cursor-pointer"
                                                                     onClick={() => exam.id && handleExamClick('exam', exam.id)}
                                                                 >
                                                                     {statusElement}
-                                                                    <span className='tw-font-bold'>{exam.name}</span>
+                                                                    <span className='tw-font-bold'>{exam.name} (lấy kết quả cao nhất)</span>
+                                                                </div>
+                                                                {isExamModalOpen && currentExamId === exam.id && (
+                                                                            <div className="tw-fixed tw-inset-0 tw-bg-black tw-bg-opacity-50 tw-flex tw-justify-center tw-items-center tw-z-20">
+                                                                                <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-max-w-md tw-w-full tw-border tw-border-neutral-800 tw-flex tw-flex-col tw-space-y-2">
+                                                                                    <div className='tw-flex tw-items-center tw-justify-end'>
+                                                                                        <div className="tw-cursor-pointer" onClick={closeExamResultModal}>
+                                                                                            <CloseIcon />
+                                                                                        </div>
+                                                                                </div>
+                                                                                <div className="tw-font-bold tw-text-center tw-text-2xl tw-text-green-600">Kết quả bài tập </div>
+                                                                                <h3 className='tw-font-bold tw-text-blue-400'>{exam.name}</h3>
+                                                                                <p>
+                                                                                    <span className='tw-font-bold'>Trả lời đúng: </span>
+                                                                                    {progress?.yourScore && progress?.totalScore ?
+                                                                                        `${progress?.yourScore} / ${progress?.totalScore} (${((progress?.yourScore / progress?.totalScore) * 100).toFixed(2)}%)`
+                                                                                        : 'Chưa có'}
+                                                                                </p>
+
+                                                                                <p>
+                                                                                        <span className='tw-font-bold'>Điểm: </span>
+                                                                                        {progress?.yourScore && progress?.totalScore
+                                                                                            ? calculateScore(progress?.totalScore, progress?.yourScore)
+                                                                                            : 'Chưa có'}
+                                                                                    </p>
+                                                                                    <p>
+                                                                                        <span className='tw-font-bold'>Thời gian làm bài: </span>
+                                                                                        {progress?.timeStart && progress?.timeEnd
+                                                                                            ? calculateTimeSpent(progress?.timeStart, progress?.timeEnd)
+                                                                                            : 'Chưa có'}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
                                                                 </div>
                                                             );
                                                         })}
