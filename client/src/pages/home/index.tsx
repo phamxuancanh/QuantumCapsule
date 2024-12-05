@@ -397,7 +397,19 @@ const Home = () => {
         }
         fetchResultProgress()
     }, [selectedChapterId])
+    const [sortedChapters, setSortedChapters] = useState<DataListChapter | undefined>(undefined)
 
+    useEffect(() => {
+        if (chaptersData) {
+            // if (Array.isArray(chaptersData)) {
+            //     setSortedChapters(chaptersData.sort((a, b) => a.name.localeCompare(b.name)))
+            // }
+            const sorted = chaptersData.data.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+            setSortedChapters({ ...chaptersData, data: sorted })
+        }
+        console.log('Chapters:', chaptersData)
+        console.log('Sorted chapters:', sortedChapters)
+    }, [chaptersData])
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
             <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3 tw-mb-3'>
@@ -460,10 +472,10 @@ const Home = () => {
                             </div>
                             <div className='tw-bg-white tw-border tw-rounded-2xl tw-h-screen tw-overflow-y-auto'>
                                 <div className='tw-p-2'>
-                                    {chaptersData?.data.length ?? 0 > 0 ? (
+                                    {sortedChapters?.data.length ?? 0 > 0 ? (
                                         <div>
                                             <ul className='tw-space-y-2'>
-                                                {chaptersData?.data.map((chapter, index) => (
+                                                {sortedChapters?.data.map((chapter, index) => (
                                                     <div key={chapter.id}>
                                                         <div
                                                             className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${chapter.id && expandedChapters[chapter.id] ? 'tw-bg-slate-100' : 'tw-bg-white'}`}
