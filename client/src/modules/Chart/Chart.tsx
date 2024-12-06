@@ -566,10 +566,18 @@ const Chart: React.FC = () => {
                                         ctx.font = "12px Arial";
                                         ctx.textAlign = "center";
                                         ctx.textBaseline = "middle";
-                                        const dateLabel = `${new Date(score.createdAt).toLocaleDateString()}`;
-                                        ctx.fillText(dateLabel, x, y);
+                
+                                        // const dateLabel = `${new Date(score.createdAt).toLocaleDateString()}`;
                                         const testLabel = `Lần ${datasetIndex + 1}`;
-                                        ctx.fillText(testLabel, x, y + 15);
+                
+                                        // Xoay canvas 45 độ
+                                        ctx.translate(x, y); // Dịch chuyển đến vị trí của nhãn
+                                        ctx.rotate(-45 * Math.PI / 180); // Xoay 45 độ (chuyển đổi từ độ sang radian)
+                
+                                        // Vẽ nhãn xoay
+                                        // ctx.fillText(dateLabel, 0, 0);
+                                        ctx.fillText(testLabel, 0, 15);
+                
                                         ctx.restore();
                                     }
                                 });
