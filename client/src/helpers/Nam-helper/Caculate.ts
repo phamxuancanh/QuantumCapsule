@@ -3,9 +3,9 @@ export const calculateScore = (totalScore?: number, yourScore?: number) => {
   
     const rawScore = yourScore / totalScore * 10; // Tính điểm thô
     // Làm tròn lên đến 0.5 gần nhất
-    const roundedScore = Math.round(rawScore * 2) / 2;
+    const roundedScore = parseFloat(rawScore.toFixed(2));
   
-    return rawScore;
+    return roundedScore;
   };
 
 

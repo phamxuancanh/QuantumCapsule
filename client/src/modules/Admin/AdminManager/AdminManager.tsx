@@ -492,7 +492,7 @@ const AdminManager: React.FC = () => {
                                     <TreeItem itemId={chapterItem.id+"_baihoc"} 
                                          label={
                                             <Box display={"flex"} justifyContent={"space-between"} alignItems={'center'}>
-                                                <Typography fontSize={20} color={"#685752"} fontWeight={"500"}>
+                                                <Typography fontSize={20} color={"#A05019"}>
                                                     Danh sách bài học <Typography color={"blue"} component={'span'} fontSize={20}>
                                                         ({listLesson.filter((lesson) => lesson.chapterId === chapterItem.id).length})
                                                     </Typography>
@@ -586,7 +586,7 @@ const AdminManager: React.FC = () => {
                                                     label={
                                                         <Box display={"flex"} justifyContent={"space-between"}>
                                                             {actSuaBaiHoc.open && actSuaBaiHoc.payload.id ===lessonItem.id ||  
-                                                                <Typography fontSize={20} color={"#E38E49"}>{lessonItem.name}</Typography>
+                                                                <Typography fontSize={20} color={"#0D9488"}>{lessonItem.name}</Typography>
                                                             }
                                                             {actSuaBaiHoc.open && actSuaBaiHoc.payload.id ===lessonItem.id && (
                                                                 <Box display={"flex"} width={"80%"}>
@@ -764,7 +764,7 @@ const AdminManager: React.FC = () => {
                                                                     label={
                                                                         <Box display={"flex"} justifyContent={"space-between"}>
                                                                             {actSuaBaiOnTap.open && actSuaBaiOnTap.payload.id ===examItem.id ||  
-                                                                                <Typography fontSize={20} color={"#997C70"}>{examItem.name}</Typography>
+                                                                                <Typography fontSize={20} color={"#333"} fontStyle={"italic"}>{examItem.name}</Typography>
                                                                             }
                                                                             {actSuaBaiOnTap.open && actSuaBaiOnTap.payload.id ===examItem.id && (
                                                                                 <Box display={"flex"} width={"80%"}>
@@ -886,7 +886,7 @@ const AdminManager: React.FC = () => {
                                     <TreeItem itemId={chapterItem.id+"_baikiemtra"} 
                                         label={
                                             <Box display={"flex"} justifyContent={"space-between"}>
-                                                <Typography fontSize={20} color={"#685752"} fontWeight={"500"}>
+                                                <Typography fontSize={20} color={"#A05019"}>
                                                     Danh sách bài kiểm tra <Typography color={"blue"} component={'span'} fontSize={20}>
                                                         ({listExam.filter((exam) => exam.chapterId === chapterItem.id).length})
                                                     </Typography>
@@ -976,7 +976,7 @@ const AdminManager: React.FC = () => {
                                                     label={
                                                         <Box display={"flex"} justifyContent={"space-between"}>
                                                             {actSuaBaiKiemTra.open && actSuaBaiKiemTra.payload.id ===examItem.id ||  
-                                                                <Typography fontSize={20} color={"#E38E49"}>{examItem.name}</Typography>
+                                                                <Typography fontSize={20} color={"#0D9488"}>{examItem.name}</Typography>
                                                             }
                                                             {actSuaBaiKiemTra.open && actSuaBaiKiemTra.payload.id ===examItem.id && (
                                                                 <Box display={"flex"} width={"80%"}>
