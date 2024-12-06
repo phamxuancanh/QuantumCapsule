@@ -326,9 +326,9 @@ const DashboardReport = () => {
                             <div className='tw-flex tw-flex-col'>
                                 <div className='tw-flex tw-justify-between tw-items-center tw-px-10 tw-pt-3'>
                                     {/* <div className='tw-text-2xl tw-font-bold'>Trong {daysDifference} ngày qua</div> */}
-                                    <div className='tw-text-2xl tw-font-bold'>Tìm theo thời gian</div>
+                                    <div className='tw-text-2xl tw-font-bold tw-w-2/5'>Tìm theo thời gian</div>
 
-                                    <div className='tw-flex tw-items-center tw-w-1/2'>
+                                    <div className='tw-flex tw-items-center tw-w-full'>
                                         <QCDateFilter
                                             onChange={(filter) => {
                                                 handleFilter(filter);
