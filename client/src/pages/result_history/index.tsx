@@ -16,6 +16,7 @@ import { DATA_TYPE } from 'utils/enums';
 const ResultHistory: React.FC = () => {
     const [listResult, setListResult] = React.useState<IResult[]>([]);
     const [resultDetail, setResultDetail] = React.useState<IResultDetail>();
+    const [selectedId, setSelectedId] = React.useState<string>();
     // const [filter, setFilter] = React.useState<IDateFilter>();
     React.useEffect(() => {
         (async() => {
@@ -31,9 +32,20 @@ const ResultHistory: React.FC = () => {
         })();
     }, []);
     const handleClick = async (result : IResult) => {
-        const resultDetail = await getResultDetailByResultId(result.id!);
-        console.log(resultDetail);
-        setResultDetail(resultDetail.data.data);
+        setSelectedId(result.id);
+        const res = await getResultDetailByResultId(result.id!);
+        const resultDetail = {
+            result: res.data.data.result as IResult,
+            listAnswer: res.data.data.listAnswer as IAnswer[],
+            listQuestion: res.data.data.listQuestion.map((item, index)=>{
+                return {
+                    ...item,
+                    title: "Câu " + (index + 1) + ' / ' + res.data.data.listQuestion.length,
+                }
+            }) as IQuestion[],
+        } as IResultDetail;
+    
+        setResultDetail(resultDetail);
     }
     const handleFilter = async (filter: IDateFilter) => {
         try {
@@ -87,20 +99,21 @@ const ResultHistory: React.FC = () => {
                                         padding: '10px',
                                         width: '100%',
                                         borderRadius: '10px',
-                                        color: '#4caf50',
                                         borderColor: '#4caf50',
                                         transition: 'all 0.3s ease-in-out',
+                                        backgroundColor: selectedId === result.id  ? '#4caf50': 'white',
+                                        color: selectedId === result.id  ? 'white': '#4caf50'
                                     }}
-                                    onMouseEnter={(e) => {
-                                        const button = e.currentTarget as HTMLElement;
-                                        button.style.backgroundColor = '#4caf50';
-                                        button.style.color = 'white';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        const button = e.currentTarget as HTMLElement;
-                                        button.style.backgroundColor = 'white';
-                                        button.style.color = '#4caf50';
-                                    }}
+                                    // onMouseEnter={(e) => {
+                                    //     const button = e.currentTarget as HTMLElement;
+                                    //     button.style.backgroundColor = '#4caf50';
+                                    //     button.style.color = 'white';
+                                    // }}
+                                    // onMouseLeave={(e) => {
+                                    //     const button = e.currentTarget as HTMLElement;
+                                    //     button.style.backgroundColor = 'white';
+                                    //     button.style.color = '#4caf50';
+                                    // }}
                                 >
                                     <Grid container spacing={1} sx={{
                                         width: '100%',
