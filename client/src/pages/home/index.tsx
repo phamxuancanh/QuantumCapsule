@@ -397,19 +397,36 @@ const Home = () => {
         }
         fetchResultProgress()
     }, [selectedChapterId])
-    const [sortedChapters, setSortedChapters] = useState<DataListChapter | undefined>(undefined)
+    // const [sortedChapters, setSortedChapters] = useState<DataListChapter | undefined>(undefined)
 
-    useEffect(() => {
-        if (chaptersData) {
-            // if (Array.isArray(chaptersData)) {
-            //     setSortedChapters(chaptersData.sort((a, b) => a.name.localeCompare(b.name)))
-            // }
-            const sorted = chaptersData.data.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
-            setSortedChapters({ ...chaptersData, data: sorted })
-        }
-        console.log('Chapters:', chaptersData)
-        console.log('Sorted chapters:', sortedChapters)
-    }, [chaptersData])
+    // useEffect(() => {
+    //     if (chaptersData) {
+    //         // if (Array.isArray(chaptersData)) {
+    //         //     setSortedChapters(chaptersData.sort((a, b) => a.name.localeCompare(b.name)))
+    //         // }
+    //         const sorted = chaptersData.data.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+    //         setSortedChapters({ ...chaptersData, data: sorted })
+    //     }
+    //     console.log('Chapters:', chaptersData)
+    //     console.log('Sorted chapters:', sortedChapters)
+    // }, [chaptersData])
+    const sortedChapters = chaptersData?.data.sort((a, b) => {
+        const hasChuongA = a.name!.includes('Chương');
+        const hasChuongB = b.name!.includes('Chương');
+        const hasChuDeA = a.name!.includes('Chủ đề');
+        const hasChuDeB = b.name!.includes('Chủ đề');
+    
+        // Nếu A có "Chương" hoặc "Chủ đề", B không có -> A đứng trước
+        if ((hasChuongA || hasChuDeA) && !(hasChuongB || hasChuDeB)) return -1;
+        // Nếu B có "Chương" hoặc "Chủ đề", A không có -> B đứng trước
+        if (!(hasChuongA || hasChuDeA) && (hasChuongB || hasChuDeB)) return 1;
+    
+        // Nếu cả hai đều có "Chương" hoặc "Chủ đề", so sánh theo số
+        const chapterNumberA = (hasChuongA || hasChuDeA) ? parseInt(a.name!.replace(/(Chương|Chủ đề)/, '').trim()) : Infinity;
+        const chapterNumberB = (hasChuongB || hasChuDeB) ? parseInt(b.name!.replace(/(Chương|Chủ đề)/, '').trim()) : Infinity;
+    
+        return chapterNumberA - chapterNumberB;
+    });
     return (
         <div className='tw-text-lg tw-bg-slate-50 tw-flex tw-items-center tw-justify-center'>
             <div className='tw-w-11/12 tw-space-x-5 tw-flex tw-relative tw-mt-3 tw-mb-3'>
@@ -472,10 +489,10 @@ const Home = () => {
                             </div>
                             <div className='tw-bg-white tw-border tw-rounded-2xl tw-h-screen tw-overflow-y-auto'>
                                 <div className='tw-p-2'>
-                                    {sortedChapters?.data.length ?? 0 > 0 ? (
+                                    {sortedChapters?.length ?? 0 > 0 ? (
                                         <div>
                                             <ul className='tw-space-y-2'>
-                                                {sortedChapters?.data.map((chapter, index) => (
+                                                {sortedChapters?.map((chapter, index) => (
                                                     <div key={chapter.id}>
                                                         <div
                                                             className={`tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-p-2 tw-border tw-rounded-md tw-px-5 ${chapter.id && expandedChapters[chapter.id] ? 'tw-bg-slate-100' : 'tw-bg-white'}`}
@@ -492,7 +509,7 @@ const Home = () => {
 
                                                         {chapter.id && expandedChapters[chapter.id] && (
                                                             <ul className='tw-mx-20 tw-mt-2 tw-space-y-2'>
-                                                                {lessonsData.filter(lesson => lesson.chapterId === chapter.id).map((lesson) => (
+                                                                {/* {lessonsData.filter(lesson => lesson.chapterId === chapter.id).map((lesson) => (
                                                                     <li
                                                                         key={lesson.id}
                                                                         className={`tw-pl-4 tw-p-2 tw-cursor-pointer tw-border-b tw-border-b-1 tw-border-gray-300 ${selectedLessonId === lesson.id ? 'tw-font-bold' : ''}`}
@@ -500,7 +517,31 @@ const Home = () => {
                                                                     >
                                                                         {lesson.name}
                                                                     </li>
-                                                                ))}
+                                                                ))} */}
+                                                                {lessonsData.filter(lesson => lesson.chapterId === chapter.id)
+                                                                    .sort((a, b) => {
+                                                                        const hasBaiA = a.name!.includes('Bài');
+                                                                        const hasBaiB = b.name!.includes('Bài');
+
+                                                                        // Nếu một tên có "Bài" và tên kia không có, tên có "Bài" sẽ đứng trước
+                                                                        if (hasBaiA && !hasBaiB) return -1;
+                                                                        if (!hasBaiA && hasBaiB) return 1;
+
+                                                                        // Nếu cả hai đều có "Bài" hoặc đều không có "Bài", so sánh theo số
+                                                                        const chapterNumberA = hasBaiA ? parseInt(a.name!.replace('Bài', '').trim()) : Infinity;
+                                                                        const chapterNumberB = hasBaiB ? parseInt(b.name!.replace('Bài', '').trim()) : Infinity;
+
+                                                                        return chapterNumberA - chapterNumberB;
+                                                                    })
+                                                                    .map((lesson) => (
+                                                                        <li
+                                                                            key={lesson.id}
+                                                                            className={`tw-pl-4 tw-p-2 tw-cursor-pointer tw-border-b tw-border-b-1 tw-border-gray-300 ${selectedLessonId === lesson.id ? 'tw-font-bold' : ''}`}
+                                                                            onClick={() => handleLessonClick(lesson.id ?? '')}
+                                                                        >
+                                                                            {lesson.name}
+                                                                        </li>
+                                                                    ))}
                                                             </ul>
                                                         )}
                                                     </div>
