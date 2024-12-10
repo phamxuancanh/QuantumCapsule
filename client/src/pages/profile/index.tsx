@@ -694,11 +694,11 @@ function Profile() {
                             type="text"
                             required
                             className="tw-appearance-none tw-rounded-2xl tw-relative tw-block tw-w-full tw-px-3 tw-py-2 tw-border-0 tw-placeholder-gray-500 tw-text-gray-900 tw-focus:outline-none tw-focus:ring-indigo-500 tw-focus:border-indigo-500 tw-focus:z-10 tw-sm:text-sm tw-pl-10"
-                            placeholder={t('profile.ward_commune')}
+                            placeholder={t('profile.phone')}
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                           />
-                          <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" />
+                          {/* <LockOutlinedIcon className="tw-absolute tw-top-2 tw-left-2 tw-text-gray-500" /> */}
                         </div>
                         <div className="tw-text-red-500 tw-text-sm tw-p-2">{errorMessagePhone}</div>
 
