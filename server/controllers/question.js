@@ -17,19 +17,21 @@ const checkQuestionsExist = async (questions, lessonId, chapterId) => {
     replacements,
     type: sequelize.QueryTypes.SELECT
   })
-
+  console.log("check question", questions);
+  console.log("check question list", listQuestionBank);
+  
   return questions.map(question => {
     const found = listQuestionBank.some(bankQuestion =>
       question.questionType === bankQuestion.questionType &&
-          question.title === bankQuestion.title &&
+          // question.title === bankQuestion.title &&
           question.content === bankQuestion.content &&
           question.contentImg === bankQuestion.contentImg &&
-          question.A === bankQuestion.A &&
-          question.B === bankQuestion.B &&
-          question.C === bankQuestion.C &&
-          question.D === bankQuestion.D &&
-          question.E === bankQuestion.E &&
-          question.correctAnswer === bankQuestion.correctAnswer
+          question.A == bankQuestion.A &&
+          question.B == bankQuestion.B &&
+          question.C == bankQuestion.C &&
+          question.D == bankQuestion.D &&
+          question.E == bankQuestion.E &&
+          question.correctAnswer == bankQuestion.correctAnswer
     )
     return { question, exists: found }
   })
@@ -40,11 +42,12 @@ const importQuestions = async (req, res, next) => {
     if (lessonId || chapterId) {
       const questionExists = await checkQuestionsExist(questions, lessonId, chapterId)
       const exists = questionExists?.filter(q => q.exists)
+      console.log("exists", questionExists);
+      
       if (exists.length > 0) {
         return res.status(400).json({ message: 'Có câu hỏi đã tồn tại trong ngân hàng câu hỏi' })
       }
     }
-    console.log('questions', questions)
     if (!Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({ message: 'Invalid data format or empty array' })
     }

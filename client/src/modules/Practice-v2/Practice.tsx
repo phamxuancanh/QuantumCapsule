@@ -31,6 +31,7 @@ import { ACTIONS } from "utils/enums"
 import { getExamInfo } from "api/exam/exam.api"
 import GameProgress from "./components/game-progress/GameProgress"
 import { shuffleArray } from "helpers/Nam-helper/shufflerHelper"
+import _ from "lodash"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -55,14 +56,14 @@ const Practice: React.FC = () => {
                 const EXAM_ID = params.get('examId') || "exam00001"
                 const resExamInfo = await getExamInfo(EXAM_ID)
                 let response = await getListQuesionByExamId(EXAM_ID)
+                const listQuestion = _.shuffle(response.data.data)
                 
-                const resListQuestion = [...response.data.data].map((question: IQuestion, index) => {
+                const resListQuestion = [...listQuestion].map((question: IQuestion, index) => {
                     return {
                         ...question,
                         title: "Câu " + (index + 1) + ' / ' + response.data.data.length,
                     }
                 })
-                console.log(resListQuestion);
                 
                 const initResult = InitResult(resListQuestion.length, EXAM_ID, curentUser.currentUser.id)
                 const initListAnswer = InitListAnswerFromListQuestion(resListQuestion, initResult.id)

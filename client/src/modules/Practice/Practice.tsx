@@ -28,6 +28,7 @@ import { insertListAnswer } from "api/answer/answer.api"
 import { ACTIONS } from "utils/enums"
 import { IResult } from "api/result/result.interface"
 import { getExamInfoForExam } from "api/exam/exam.api"
+import _ from "lodash"
 
 const Practice: React.FC = () => {
     // const EXAM_ID = "exam00001"
@@ -51,9 +52,9 @@ const Practice: React.FC = () => {
                 const EXAM_ID = params.get('examId') || "exam00001"
                 const response = await getListQuesionByExamId(EXAM_ID)
                 const resExamInfo = await getExamInfoForExam(EXAM_ID)
-
+                const listQuestion = _.shuffle(response.data.data)
                 
-                const resListQuestion = [...response.data.data].map((question: IQuestion, index) => {
+                const resListQuestion = [...listQuestion].map((question: IQuestion, index) => {
                     return {
                         ...question,
                         title: "Câu " + (index + 1) + ' / ' + response.data.data.length,
