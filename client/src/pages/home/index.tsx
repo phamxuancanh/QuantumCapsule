@@ -286,6 +286,8 @@ const Home = () => {
         searchParams.set('lessonId', lessonId);
         navigate({ search: searchParams.toString() });
     };
+    const searchParams = new URLSearchParams(location.search);
+    const currentGrade = parseInt(searchParams.get('grade') || userRedux?.grade?.toString() || '1', 10);
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -563,11 +565,11 @@ const Home = () => {
                             <img
                                 className='tw-w-64 tw-h-40'
                                 src={
-                                    selectedSubject === 'subject1' && userRedux?.grade === 1
+                                    selectedSubject === 'subject1' && currentGrade === 1
                                         ? 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/toan1.jpg'
-                                        : selectedSubject === 'subject1' && userRedux?.grade === 2
+                                        : selectedSubject === 'subject1' && currentGrade === 2
                                             ? 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/toan2.jpg'
-                                            : selectedSubject !== 'subject1' && userRedux?.grade === 1
+                                            : selectedSubject !== 'subject1' && currentGrade === 1
                                                 ? 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/tiengviet1.jpg'
                                                 : 'https://canhbk29.s3.ap-southeast-2.amazonaws.com/tiengviet2.jpg'
                                 }
