@@ -532,7 +532,9 @@ const Chart: React.FC = () => {
                                     const score = group.scores?.[datasetIndex] || null;
                 
                                     if (score) {
-                                        const date = new Date(score.createdAt).toLocaleDateString();
+                                        // const date = new Date(score.createdAt).toLocaleDateString();
+                                        const date = new Date(score.createdAt).toLocaleDateString('vi-VN');
+
                                         const timeSpent = calculateTimeSpent(score.timeStart, score.timeEnd);
                                         
                                         // Sử dụng \n để chia thành các dòng
@@ -608,7 +610,12 @@ const Chart: React.FC = () => {
                 };
             }).filter(item => item.examDate) : [];
     
-            const labels = mergedExamData.length > 0 ? mergedExamData.map(item => item.examDate?.toLocaleDateString()) : ['Không có dữ liệu'];
+            // const labels = mergedExamData.length > 0 ? mergedExamData.map(item => item.examDate?.toLocaleDateString()) : ['Không có dữ liệu'];
+            const labels = mergedExamData.length > 0
+                ? mergedExamData.map(item =>
+                    item.examDate ? new Date(item.examDate).toLocaleDateString('vi-VN') : 'N/A'
+                )
+                : ['Không có dữ liệu'];
             const data = mergedExamData.length > 0 ? mergedExamData.map(item => calculateScore(item.totalScore, item.yourScore)) : [0];
     
             mergedExamData.sort((a, b) => (a.examDate?.getTime() || 0) - (b.examDate?.getTime() || 0));
@@ -655,10 +662,18 @@ const Chart: React.FC = () => {
                         },
                         tooltip: {
                             callbacks: {
+                                // title: function (context) {
+                                //     const index = context[0].dataIndex;
+                                //     const item = mergedExamData[index];
+                                //     return `Ngày làm bài: ${item?.examDate?.toLocaleDateString() || 'N/A'}`;
+                                // },
                                 title: function (context) {
                                     const index = context[0].dataIndex;
                                     const item = mergedExamData[index];
-                                    return `Ngày làm bài: ${item?.examDate?.toLocaleDateString() || 'N/A'}`;
+                                    const examDate = item?.examDate
+                                        ? new Date(item.examDate).toLocaleDateString('vi-VN')
+                                        : 'N/A';
+                                    return `Ngày làm bài: ${examDate}`;
                                 },
                                 label: function (context) {
                                     const index = context.dataIndex;

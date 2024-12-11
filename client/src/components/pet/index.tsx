@@ -168,14 +168,14 @@ const Pet = () => {
                                 </button>
                                 {isDropdownVisible && (
                                     <div className="tw-absolute tw-bottom-full tw-w-[700px] tw-max-h-[400px] tw-right-0 tw-mb-2 tw-bg-blue-200 tw-shadow-lg tw-rounded-lg tw-p-2 tw-overflow-auto">
-                                        <div>Điểm hiện tại: <span className='tw-font-bold'>{userRedux?.starPoint}</span></div>
+                                        <div>Số sao đang có: <span className='tw-font-bold'>{userRedux?.starPoint}</span></div>
                                         <div className="tw-grid tw-grid-cols-3 tw-gap-4 tw-mt-5">
                                             {listPet?.map(pet => (
                                                 <div key={pet.id} className="tw-flex tw-flex-col tw-items-center tw-mb-2">
                                                     <img className='tw-w-14 tw-h-14 tw-mb-2' src={pet.imageUrl} alt={pet.name} />
                                                     <div className="tw-text-center">
                                                         <h3 className="tw-font-bold">{pet.name}</h3>
-                                                        <p>Points Required: {pet.pointsRequired}</p>
+                                                        <p>Số sao yêu cầu: {pet.pointsRequired}</p>
                                                         {userRedux?.petId === pet.id ? (
                                                             <button className="tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-font-bold tw-cursor-not-allowed" disabled>
                                                                 Đang chọn

@@ -271,14 +271,22 @@ function Profile() {
   
     // Define validation schema with yup
     const schema = yup.object({
-      firstName: yup
+      // firstName: yup
+      //   .string()
+      //   .required(messageFirstName)
+      //   .matches(/^[A-Z][a-zA-Z]*$/, 'Họ không hợp lệ'),
+      // lastName: yup
+      //   .string()
+      //   .required(messageLastName)
+      //   .matches(/^[A-Z][a-zA-Z]*$/, 'Tên không hợp lệ'),
+        firstName: yup
         .string()
         .required(messageFirstName)
-        .matches(/^[A-Z][a-zA-Z]*$/, 'Họ không hợp lệ'),
-      lastName: yup
+        .matches(/^[\p{L}\s]+$/u, 'Họ không hợp lệ'),
+    lastName: yup
         .string()
         .required(messageLastName)
-        .matches(/^[A-Z][a-zA-Z]*$/, 'Tên không hợp lệ'),
+        .matches(/^[\p{L}\s]+$/u, 'Tên không hợp lệ'),
       email: yup
         .string()
         .email('Email không hợp lệ')
@@ -713,7 +721,7 @@ function Profile() {
                       </div>
                       <div className='tw-flex tw-justify-start tw-items-center tw-cursor-pointer'>
                         <div className='tw-bg-white tw-border-gray-500 tw-border tw-rounded-3xl tw-px-3 tw-py-2' onClick={handleCancelUpdatePersonalInfo}>
-                          {t('profile.cancel')}
+                          Xóa
                         </div>
                     </div>
                   </div>
