@@ -22,6 +22,7 @@ import ExamQuestionManager from './ExamQuestionManager/ExamQuestionManagerProvid
 import LessonManager from './LessonManager/LessonManagerProvider';
 import ChapterManagerProvider from './ChapterManager/ChapterManagerProvider';
 import AdminManager from './AdminManager/AdminManager';
+import AdminChart from './AdminManager/AdminChart';
 const Admin: React.FC = () => {
 
     const handleImportMulti = async (listData: { index: number, data: any[] }[]) => {
@@ -121,10 +122,10 @@ const Admin: React.FC = () => {
         }
     };
     const handleDownloadTemplate = () => {
-        const url = `${process.env.PUBLIC_URL}/excel_mau.xlsm`; 
+        const url = `${process.env.PUBLIC_URL}/excel_mau.xlsm`;
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'template.xlsm'); 
+        link.setAttribute('download', 'template.xlsm');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -132,18 +133,16 @@ const Admin: React.FC = () => {
     return (
         <div>
             <Box p={2}>
-                <AdminManager />
-                {/* <TabMenu
+                {/* <AdminManager />
+                <hr style={{ margin: "20px 0", border: "2px solid #ccc" }} />
+                <AdminChart /> */}
+                <TabMenu
                     listItems={[
-                        { index: 0, label: 'Quản lý chương', item: <ChapterManagerProvider /> },
-                        { index: 1, label: 'Quản lý bài học', item: <LessonManager /> },
-                        { index: 2, label: 'Quản lý bài giảng (lý thuyết)', item: <TheoryManager /> },
-                        { index: 3, label: 'Quản lý bài bài tập', item: <ExamManager /> },
-                        { index: 4, label: 'Quản lý câu hỏi', item: <QuestionManager /> },
-                        { index: 5, label: 'Quản lý bài tập - câu hỏi', item: <ExamQuestionManager /> }
+                        { index: 0, label: 'Quản lý học liệu', item: <AdminManager /> },
+                        { index: 1, label: 'Biểu đồ học liệu', item: <AdminChart /> }
                     ]}
                     defaultIndex={0}
-                /> */}
+                />
             </Box>
             <div className='tw-flex tw-justify-center'>
                 <div className='tw-w-11/12'>
@@ -156,7 +155,7 @@ const Admin: React.FC = () => {
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Nhập dữ liệu excel</h1>
-                        <ExcelReaderBtn listSheetIndex={[0,1,2,3,5,4]} name='Nhập dữ liệu từ file excel' onUploadMulti={handleImportMulti} />
+                        <ExcelReaderBtn listSheetIndex={[0, 1, 2, 3, 5, 4]} name='Nhập dữ liệu từ file excel' onUploadMulti={handleImportMulti} />
                     </div>
                     <div className='tw-border tw-border-gray-300 tw-mb-4 tw-p-4'>
                         <h1 className='tw-font-bold'>Chương</h1>
