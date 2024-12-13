@@ -537,7 +537,7 @@ const Chart: React.FC = () => {
                 
                                     if (score) {
                                         // const date = new Date(score.createdAt).toLocaleDateString();
-                                        const date = new Date(score.createdAt).toISOString().split('T')[0];
+                                        const date = new Date(score.createdAt).toLocaleDateString('vi-VN') 
 
                                         const timeSpent = calculateTimeSpent(score.timeStart, score.timeEnd);
                                         
