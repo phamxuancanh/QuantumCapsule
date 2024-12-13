@@ -124,25 +124,42 @@ const Chart: React.FC = () => {
             fetchExam2ByChapterId(selectedChapterId);
         }
     }, [selectedChapterId]);
+    const [filter, setFilter] = useState<IDateFilter | null>(null);
+
     useEffect(() => {
         const fetchResultProgress = async () => {
             if (userRedux?.grade && selectedSubject) {
-                // danh sách kết quả bài kiểm tra của bài kiểm tra đó
                 if (selectedChapterId && selectedExam && listExams.length > 0 && activeTab === 'exam') {
-                    const progress = await getListAllDoneResultByUserIdandExamId(selectedExam?.value)
-                    // setProgress(progress.data.data)
-                    setResultExam(progress.data.data.exams)
+                    const progress = await getListAllDoneResultByUserIdandExamId(selectedExam?.value, filter || {});
+                    setResultExam(progress.data.data.exams);
                 }
-                // danh sách kết quả bài tập của chương
-                if(selectedChapterId && activeTab === 'exercise') {
-                    const progress2 = await getListAllDoneResultByUserIdandChapterId(selectedChapterId)
-                    setResultExercises(progress2.data.data.exercises)
+                if (selectedChapterId && activeTab === 'exercise') {
+                    const progress2 = await getListAllDoneResultByUserIdandChapterId(selectedChapterId, filter || {});
+                    setResultExercises(progress2.data.data.exercises);
                 }
-                // số bài đã làm
             }
-        }
-        fetchResultProgress()
-    }, [selectedChapterId, selectedExam, activeTab])
+        };
+        fetchResultProgress();
+    }, [selectedChapterId, selectedExam, activeTab, filter]);
+    // useEffect(() => {
+    //     const fetchResultProgress = async () => {
+    //         if (userRedux?.grade && selectedSubject) {
+    //             // danh sách kết quả bài kiểm tra của bài kiểm tra đó
+    //             if (selectedChapterId && selectedExam && listExams.length > 0 && activeTab === 'exam') {
+    //                 const progress = await getListAllDoneResultByUserIdandExamId(selectedExam?.value)
+    //                 // setProgress(progress.data.data)
+    //                 setResultExam(progress.data.data.exams)
+    //             }
+    //             // danh sách kết quả bài tập của chương
+    //             if(selectedChapterId && activeTab === 'exercise') {
+    //                 const progress2 = await getListAllDoneResultByUserIdandChapterId(selectedChapterId)
+    //                 setResultExercises(progress2.data.data.exercises)
+    //             }
+    //             // số bài đã làm
+    //         }
+    //     }
+    //     fetchResultProgress()
+    // }, [selectedChapterId, selectedExam, activeTab])
     useEffect(() => {
         const fetchProgressBar = async () => {
             if(selectedChapterId) {
@@ -226,7 +243,10 @@ const Chart: React.FC = () => {
         if (selectedLesson) {
             const fetchData = async () => {
                 try {
-                    const response = await getListAllDoneResultByUserIdandLessonId(selectedLesson?.value);
+                    const response = await getListAllDoneResultByUserIdandLessonId(
+                        selectedLesson?.value,
+                        filter || {} // Sử dụng filter nếu có
+                    );
                     console.log(response.data.data);
                     setResultExercises(response.data.data.exercises);
                 } catch (error) {
@@ -235,7 +255,7 @@ const Chart: React.FC = () => {
             };
             fetchData();
         }
-    }, [selectedLesson]);
+    }, [selectedLesson, filter]);
     useEffect(() => {
         const fetchData = async () => {
             if (selectedChapter) {
@@ -303,39 +323,56 @@ const Chart: React.FC = () => {
     const handleExamChange = async (selectedExam: any) => {
         setSelectedExam(selectedExam);
     }
-    const handleFilter = async (filter: IDateFilter) => {
+    const handleFilter = async (newFilter: IDateFilter) => {
         try {
-            if (!filter.from && !filter.to) {
+            if (!newFilter.from && !newFilter.to) {
                 return;
             }
-            const fromDate = filter.from ? new Date(filter.from) : new Date();
-            const toDate = filter.to ? new Date(filter.to) : new Date();
+            const fromDate = newFilter.from ? new Date(newFilter.from) : new Date();
+            const toDate = newFilter.to ? new Date(newFilter.to) : new Date();
             if (toDate < fromDate) {
                 toast.error("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.");
                 return;
             }
-
-            if (userRedux?.grade && selectedSubject) {
-                if (selectedChapterId && selectedExam && listExams.length > 0 && activeTab === 'exam') {
-                    const progress = await getListAllDoneResultByUserIdandExamId(selectedExam?.value, {
-                        from: filter.from,
-                        to: filter.to
-                    })
-                    setResultExam(progress.data.data.exams)
-                }
-                if (selectedChapterId && activeTab === 'exercise') {
-                    const progress2 = await getListAllDoneResultByUserIdandChapterId(selectedChapterId, {
-                        from: filter.from,
-                        to: filter.to
-                    }
-                    )
-                    setResultExercises(progress2.data.data.exercises)
-                }
-            }
+    
+            setFilter(newFilter); // Cập nhật bộ lọc
         } catch (err) {
             toast.error("Đã xảy ra lỗi khi lọc dữ liệu.");
         }
     };
+    // const handleFilter = async (filter: IDateFilter) => {
+    //     try {
+    //         if (!filter.from && !filter.to) {
+    //             return;
+    //         }
+    //         const fromDate = filter.from ? new Date(filter.from) : new Date();
+    //         const toDate = filter.to ? new Date(filter.to) : new Date();
+    //         if (toDate < fromDate) {
+    //             toast.error("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.");
+    //             return;
+    //         }
+
+    //         if (userRedux?.grade && selectedSubject) {
+    //             if (selectedChapterId && selectedExam && listExams.length > 0 && activeTab === 'exam') {
+    //                 const progress = await getListAllDoneResultByUserIdandExamId(selectedExam?.value, {
+    //                     from: filter.from,
+    //                     to: filter.to
+    //                 })
+    //                 setResultExam(progress.data.data.exams)
+    //             }
+    //             if (selectedChapterId && activeTab === 'exercise') {
+    //                 const progress2 = await getListAllDoneResultByUserIdandChapterId(selectedChapterId, {
+    //                     from: filter.from,
+    //                     to: filter.to
+    //                 }
+    //                 )
+    //                 setResultExercises(progress2.data.data.exercises)
+    //             }
+    //         }
+    //     } catch (err) {
+    //         toast.error("Đã xảy ra lỗi khi lọc dữ liệu.");
+    //     }
+    // };
     useEffect(() => {
         if (activeTab !== "theory") return;
     
@@ -533,7 +570,7 @@ const Chart: React.FC = () => {
                 
                                     if (score) {
                                         // const date = new Date(score.createdAt).toLocaleDateString();
-                                        const date = new Date(score.createdAt).toLocaleDateString('vi-VN');
+                                        const date = new Date(score.createdAt).toISOString().split('T')[0];
 
                                         const timeSpent = calculateTimeSpent(score.timeStart, score.timeEnd);
                                         
@@ -752,7 +789,14 @@ const Chart: React.FC = () => {
                                 <div className="tw-flex tw-items-center">
                                     <QCDateFilter
                                         key={activeTab}
+                                        // onChange={(filter) => {
+                                        //     handleFilter(filter);
+                                        // }}
                                         onChange={(filter) => {
+                                            if (filter.from && filter.to && new Date(filter.to) < new Date(filter.from)) {
+                                                toast.error("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.");
+                                                return;
+                                            }
                                             handleFilter(filter);
                                         }}
                                     />
@@ -802,7 +846,7 @@ const Chart: React.FC = () => {
                                 )}
                                 {activeTab === "exercise" && (
                                     <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md">
-                                        <div className='tw-flex tw-w-3/5 tw-py-4'>
+                                        {/* <div className='tw-flex tw-w-3/5 tw-py-4'>
                                             <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
                                                 <div>Bài tập: </div>
                                             </div>
@@ -821,7 +865,7 @@ const Chart: React.FC = () => {
                                                     completed={numberExcersiceDone / (chaptersData?.data.find((chapter: IChapter) => chapter.id === selectedChapterId)?.examCount || 0) * 100}
                                                 />
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê điểm bài tập</h2>
                                         <div className="tw-flex">
                                             <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>
@@ -855,7 +899,7 @@ const Chart: React.FC = () => {
                                 )}
                                 {activeTab === "exam" && (
                                     <div className="tw-bg-white tw-p-4 tw-rounded-lg tw-shadow-md">
-                                        <div className='tw-flex tw-w-3/5 tw-py-4'>
+                                        {/* <div className='tw-flex tw-w-3/5 tw-py-4'>
                                             <div className='tw-flex tw-justify-start tw-items-center tw-w-1/5'>
                                                 <div>Bài kiểm tra: </div>
                                             </div>
@@ -873,7 +917,7 @@ const Chart: React.FC = () => {
                                                     completed={numberExamDone / exams2?.length * 100}
                                                 />
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <h2 className="tw-text-xl tw-font-semibold tw-mb-4">Thống kê điểm bài kiểm tra</h2>
                                         <div className="tw-flex">
                                         <div className='tw-flex tw-items-center tw-space-x-4 tw-w-3/5 tw-p-1'>

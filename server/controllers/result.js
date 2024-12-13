@@ -1,6 +1,7 @@
 const { queries } = require('../helpers/QueryHelper')
 const { models, sequelize } = require('../models')
 const { Sequelize } = require('sequelize')
+const moment = require('moment-timezone')
 const insertResult = async (req, res, next) => {
   try {
     const { result } = req.body
@@ -137,8 +138,15 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
       replacements.chapterId = chapterId
     }
     if (from && to) {
-      replacements.from = from
-      replacements.to = to
+      // Chuyển từ UTC sang UTC+7
+      const adjustedFrom = moment.tz(from, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+      const adjustedTo = moment.tz(to, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+
+      console.log('Adjusted FROMMMMMMMMMMMMM:', adjustedFrom) // Đã khớp múi giờ với DB
+      console.log('Adjusted TO:', adjustedTo) // Đã khớp múi giờ với DB
+
+      replacements.from = adjustedFrom
+      replacements.to = adjustedTo
     }
 
     const resultQuery = await sequelize.query(query, {
@@ -252,8 +260,15 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
       replacements.chapterId = chapterId
     }
     if (from && to) {
-      replacements.from = from
-      replacements.to = to
+      // Chuyển từ UTC sang UTC+7
+      const adjustedFrom = moment.tz(from, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+      const adjustedTo = moment.tz(to, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+
+      console.log('Adjusted FROMMMMMMMMMMMMM:', adjustedFrom) // Đã khớp múi giờ với DB
+      console.log('Adjusted TO:', adjustedTo) // Đã khớp múi giờ với DB
+
+      replacements.from = adjustedFrom
+      replacements.to = adjustedTo
     }
 
     const resultQuery = await sequelize.query(query, {
@@ -333,8 +348,15 @@ const getListAllDoneResultByUserIdandLessonId = async (req, res, next) => {
       replacements.lessonId = lessonId
     }
     if (from && to) {
-      replacements.from = from
-      replacements.to = to
+      // Chuyển từ UTC sang UTC+7
+      const adjustedFrom = moment.tz(from, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+      const adjustedTo = moment.tz(to, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+
+      console.log('Adjusted FROMMMMMMMMMMMMM:', adjustedFrom) // Đã khớp múi giờ với DB
+      console.log('Adjusted TO:', adjustedTo) // Đã khớp múi giờ với DB
+
+      replacements.from = adjustedFrom
+      replacements.to = adjustedTo
     }
 
     const resultQuery = await sequelize.query(query, {
@@ -420,8 +442,15 @@ const getListAllDoneResultByUserIdandExamId = async (req, res, next) => {
     }
 
     if (from && to) {
-      replacements.from = from
-      replacements.to = to
+      // Chuyển từ UTC sang UTC+7
+      const adjustedFrom = moment.tz(from, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+      const adjustedTo = moment.tz(to, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+
+      console.log('Adjusted FROMMMMMMMMMMMMM:', adjustedFrom) // Đã khớp múi giờ với DB
+      console.log('Adjusted TO:', adjustedTo) // Đã khớp múi giờ với DB
+
+      replacements.from = adjustedFrom
+      replacements.to = adjustedTo
     }
 
     const resultQuery = await sequelize.query(query, {
