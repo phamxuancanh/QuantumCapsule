@@ -1,4 +1,4 @@
-const admin = require('../config/firebase-admin-setup') // Khởi tạo Firebase Admin SDK
+const admin = require('../config/firebase-admin-setup')
 
 const verifyToken = async (req, res, next) => {
   const idToken = req.headers.authorization?.split(' ')[1]
@@ -16,4 +16,4 @@ const verifyToken = async (req, res, next) => {
   }
 }
 
-module.exports = { verifyToken } // Export đúng cách
+module.exports = { verifyToken }
