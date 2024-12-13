@@ -158,7 +158,7 @@ export default function SimpleTable(props: ISimpleTableProps) {
                 ...prep,
                 headerClassName: 'table-header',
                 flex: 1,
-                minWidth: props.minWidth ? props.minWidth : 150,
+                // minWidth: props.minWidth ? props.minWidth : 30,
                 // editable: false
             };
             return gridColumn
@@ -234,14 +234,14 @@ export default function SimpleTable(props: ISimpleTableProps) {
             }}
         >
             <DataGrid
-                // sx={{
-                //     "& .MuiDataGrid-cell": {
-                //         fontSize: "20px", // Kích thước chữ trong ô
-                //     },
-                //     "& .MuiDataGrid-columnHeaderTitle": {
-                //         fontSize: "22px", // Kích thước chữ trong header
-                //     },
-                // }}
+                sx={{
+                    "& .MuiDataGrid-cell": {
+                        fontSize: "17px", // Kích thước chữ trong ô
+                    },
+                    // "& .MuiDataGrid-columnHeaderTitle": {
+                    //     fontSize: "22px", // Kích thước chữ trong header
+                    // },
+                }}
                 apiRef={props.apiRef}
                 rows={rows}
                 columns={columns}
