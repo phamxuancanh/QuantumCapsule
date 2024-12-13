@@ -169,7 +169,7 @@ const Home = () => {
         try {
             const res = await getListChapterNoPaging({ params });
             setChaptersData(res.data);
-            console.log('Chapters:', chaptersData);
+            console.log('Chapters:', res.data);
             if (res.data.data.length > 0) {
                 if (res.data.data[0].id) {
                     setSelectedChapterId(res.data.data[0].id);
@@ -177,7 +177,6 @@ const Home = () => {
                     const firstLessonInChapter = await getFirstLessonByChapterId(res.data.data[0].id);
                     console.log('First lesson in chapter:', firstLessonInChapter);
                     setSelectedLessonId(firstLessonInChapter?.data.data.id ?? null);
-                    console.log('Selected chapter:', selectedChapter);
                     console.log('Selected chapter:', res.data.data[0]);
                 }
             }

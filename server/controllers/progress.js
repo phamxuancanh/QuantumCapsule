@@ -47,17 +47,24 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
           model: models.Theory,
           required: true,
           attributes: ['id'], // Chỉ bao gồm trường 'id' của Theory
+          where: {
+            status: 1 // Thêm điều kiện status = 1 cho Theory
+          },
           include: [
             {
               model: models.Lesson,
               required: true,
+              where: {
+                status: 1 // Thêm điều kiện status = 1 cho Lesson
+              },
               include: [
                 {
                   model: models.Chapter,
                   required: true,
                   where: {
                     grade: parsedGrade,
-                    subjectId
+                    subjectId,
+                    status: 1 // Thêm điều kiện status = 1 cho Chapter
                   }
                 }
               ]
@@ -67,7 +74,7 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
       ]
     })
 
-    const theoryIds = progressList.map(progress => progress.Theory.id)
+    const theoryIds = progressList.map((progress) => progress.Theory.id)
 
     return res.status(200).json({
       message: 'Progress retrieved successfully',
@@ -75,7 +82,10 @@ const findProgressByGradeAndSubject = async (req, res, next) => {
     })
   } catch (error) {
     console.error('Error finding Progress:', error.message)
-    return res.status(500).json({ message: 'An error occurred while retrieving progress', error: error.message })
+    return res.status(500).json({
+      message: 'An error occurred while retrieving progress',
+      error: error.message
+    })
   }
 }
 const findProgressByChapter = async (req, res, next) => {
@@ -104,16 +114,23 @@ const findProgressByChapter = async (req, res, next) => {
         {
           model: models.Theory,
           required: true,
-          attributes: ['id', 'name'], // Include 'name' attribute
+          attributes: ['id', 'name'],
+          where: {
+            status: 1 // Thêm điều kiện status = 1 cho Lesson
+          }, // Include 'name' attribute
           include: [
             {
               model: models.Lesson,
               required: true,
+              where: {
+                status: 1 // Thêm điều kiện status = 1 cho Lesson
+              },
               include: [
                 {
                   model: models.Chapter,
                   required: true,
                   where: {
+                    status: 1, // Thêm điều kiện status = 1 cho Lesson
                     id: chapterId
                   }
                 }
@@ -164,13 +181,17 @@ const findProgressByLesson = async (req, res, next) => {
         {
           model: models.Theory,
           required: true,
-          attributes: ['id', 'name'], // Include 'name' attribute
+          attributes: ['id', 'name'],
+          where: {
+            status: 1 // Thêm điều kiện status = 1 cho Lesson
+          }, // Include 'name' attribute
           include: [
             {
               model: models.Lesson,
               required: true,
               where: {
-                id: lessonId
+                id: lessonId,
+                status: 1 // Thêm điều kiện status = 1 cho Lesson
               }
             }
           ]

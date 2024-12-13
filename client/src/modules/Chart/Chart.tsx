@@ -340,39 +340,6 @@ const Chart: React.FC = () => {
             toast.error("Đã xảy ra lỗi khi lọc dữ liệu.");
         }
     };
-    // const handleFilter = async (filter: IDateFilter) => {
-    //     try {
-    //         if (!filter.from && !filter.to) {
-    //             return;
-    //         }
-    //         const fromDate = filter.from ? new Date(filter.from) : new Date();
-    //         const toDate = filter.to ? new Date(filter.to) : new Date();
-    //         if (toDate < fromDate) {
-    //             toast.error("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.");
-    //             return;
-    //         }
-
-    //         if (userRedux?.grade && selectedSubject) {
-    //             if (selectedChapterId && selectedExam && listExams.length > 0 && activeTab === 'exam') {
-    //                 const progress = await getListAllDoneResultByUserIdandExamId(selectedExam?.value, {
-    //                     from: filter.from,
-    //                     to: filter.to
-    //                 })
-    //                 setResultExam(progress.data.data.exams)
-    //             }
-    //             if (selectedChapterId && activeTab === 'exercise') {
-    //                 const progress2 = await getListAllDoneResultByUserIdandChapterId(selectedChapterId, {
-    //                     from: filter.from,
-    //                     to: filter.to
-    //                 }
-    //                 )
-    //                 setResultExercises(progress2.data.data.exercises)
-    //             }
-    //         }
-    //     } catch (err) {
-    //         toast.error("Đã xảy ra lỗi khi lọc dữ liệu.");
-    //     }
-    // };
     useEffect(() => {
         if (activeTab !== "theory") return;
     

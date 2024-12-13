@@ -55,14 +55,25 @@ const getListResultByUserId = async (req, res, next) => {
     }
 
     const query = `
-      SELECT r.*, e.name AS examName, c.name as chapterName, l.name as lessonName
-      FROM results r
-      JOIN exams e ON r.examId = e.id
-      left join chapters c on e.chapterId = c.id
-      left join lessons l on e.lessonId = l.id
-      WHERE r.userId = :userId
-      ${dateFilter}
-      order by r.timeStart desc;
+      SELECT 
+        r.*, 
+        e.name AS examName, 
+        c.name AS chapterName, 
+        l.name AS lessonName
+      FROM 
+        results r
+      JOIN 
+        exams e ON r.examId = e.id
+      LEFT JOIN 
+        chapters c ON e.chapterId = c.id
+      LEFT JOIN 
+        lessons l ON e.lessonId = l.id
+      WHERE 
+        r.userId = :userId
+        AND e.status = 1 -- Lọc chỉ các bài kiểm tra có status = 1
+        ${dateFilter}
+      ORDER BY 
+        r.timeStart DESC;
     `
 
     const resultQuery = await sequelize.query(query, {
@@ -75,6 +86,7 @@ const getListResultByUserId = async (req, res, next) => {
     res.status(500).json({ message: error.message })
   }
 }
+
 const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
@@ -127,6 +139,7 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
           lessons l ON e.lessonId = l.id
         WHERE 
           r.userId = :userId
+          AND e.status = 1 -- Lọc chỉ các bài kiểm tra có status = 1
           ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''}
           ${dateFilter}
       ) r
@@ -142,7 +155,7 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
       const adjustedFrom = moment.tz(from, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
       const adjustedTo = moment.tz(to, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
 
-      console.log('Adjusted FROMMMMMMMMMMMMM:', adjustedFrom) // Đã khớp múi giờ với DB
+      console.log('Adjusted FROM:', adjustedFrom) // Đã khớp múi giờ với DB
       console.log('Adjusted TO:', adjustedTo) // Đã khớp múi giờ với DB
 
       replacements.from = adjustedFrom
@@ -163,6 +176,7 @@ const getListUniqueDoneResultByUserIdandChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Internal server error' })
   }
 }
+
 const getResultDetail = async (req, res, next) => {
   try {
     console.log('-------getResultDetail')
@@ -250,6 +264,7 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
           lessons l ON e.lessonId = l.id
         WHERE 
           r.userId = :userId
+          AND e.status = 1 -- Lọc chỉ các bài kiểm tra có status = 1
           ${chapterId ? 'AND (l.chapterId = :chapterId OR e.chapterId = :chapterId)' : ''} 
           ${dateFilter}
       ) r
@@ -264,7 +279,7 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
       const adjustedFrom = moment.tz(from, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
       const adjustedTo = moment.tz(to, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
 
-      console.log('Adjusted FROMMMMMMMMMMMMM:', adjustedFrom) // Đã khớp múi giờ với DB
+      console.log('Adjusted FROM:', adjustedFrom) // Đã khớp múi giờ với DB
       console.log('Adjusted TO:', adjustedTo) // Đã khớp múi giờ với DB
 
       replacements.from = adjustedFrom
@@ -285,6 +300,7 @@ const getListAllDoneResultByUserIdandChapterId = async (req, res, next) => {
     res.status(500).json({ message: 'Internal server error' })
   }
 }
+
 const getListAllDoneResultByUserIdandLessonId = async (req, res, next) => {
   try {
     const loginedUserId = req.userId
@@ -338,6 +354,7 @@ const getListAllDoneResultByUserIdandLessonId = async (req, res, next) => {
           lessons l ON e.lessonId = l.id
         WHERE 
           r.userId = :userId
+          AND e.status = 1 -- Lọc chỉ những bài kiểm tra có status = 1
           ${lessonId ? 'AND e.lessonId = :lessonId' : ''} 
           ${dateFilter}
       ) r
@@ -433,6 +450,7 @@ const getListAllDoneResultByUserIdandExamId = async (req, res, next) => {
         WHERE 
           r.userId = :userId
           AND r.examId = :examId  -- Bắt buộc lọc theo examId
+          AND e.status = 1        -- Chỉ lấy exam có status là 1
           ${dateFilter}
       ) r
     `
